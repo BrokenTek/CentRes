@@ -1,0 +1,30 @@
+
+ticket: ID - Auto Incremenet, used as ticket# in ticketItem ID field
+		
+(Main Formula to Consider)
+ticketItem: ID field - ticket# + split + item#
+
+
+
+			
+		EXAMPLE #1	
+		-Ticket #25 (auto incrementedish), no split, 1 item ordered)	
+		ex1:  25 + 0 + 000 + 1 = 2500001	(Order/Ticket#=25,Split=0*,item#=1**)
+
+
+		EXAMPLE #2
+		-Ticket #115 (auto incremented), split 2 ways, 4 items ordered (2 each))
+		ex2a1:  115 + 1 + 000 + 1  = 11510001
+		ex2b1:  115 + 1 + 000 + 2  = 11510002
+		ex2a2:  115 + 2 + 000 + 3  = 11520003
+		ex3b2:  115 + 2 + 000 + 4  = 11520004
+
+
+
+	
+*	split # will be the number for each split. So if split in two ways, two receipts will come out 
+		if split into two tickets.
+		
+**	First item ordered is 1, increment for each new item ordered. (Not based on menu item id#)	
+
+		
