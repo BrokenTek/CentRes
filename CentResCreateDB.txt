@@ -1,0 +1,126 @@
+DROP TABLE IF EXISTS TicketItems, TicketAndSplit, MenuItems, MenuCategories, TableLog, Tables, TableShapes, EmployeeLog, Employees, EmployeeRoles;
+
+CREATE TABLE EmployeeRoles (
+	id TINYINT UNSIGNED PRIMARY KEY,
+	title VARCHAR(25)
+);
+
+INSERT INTO EmployeeRoles VALUES
+	(8,'Manager'),
+	(4,'Host'),
+	(2, 'Server'),
+	(1, 'Back-of-House Anon');
+	
+CREATE TABLE Employees(
+	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	userName varchar(25) NOT NULL UNIQUE,
+	permissionLevel INT UNSIGNED NOT NULL,
+	passwordBCrypt CHAR(60) NOT NULL,
+	lastName VARCHAR(50) NOT NULL,
+	firstName VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE EmployeeLog (
+	employeeID INT UNSIGNED NOT NULL,
+	employeeRole TINYINT UNSIGNED NOT NULL,
+	startTime DATETIME NOT NULL DEFAULT NOW(),
+	endTime DATETIME
+);
+
+CREATE TABLE MenuCategories (
+	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	title VARCHAR(75) NOT NULL,
+	parentID INT UNSIGNED,
+	visible BOOLEAN NOT NULL DEFAULT TRUE,
+	FOREIGN KEY (parentID) REFERENCES MenuCategories(id)
+);
+
+CREATE TABLE MenuItems (
+	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	categoryID INT UNSIGNED NOT NULL,
+	title VARCHAR(75) NOT NULL,
+	description varchar(200),
+	basePrice DECIMAL(5, 2) UNSIGNED NOT NULL,
+	baseDiscount DECIMAL(6, 2),
+	route char(1),
+	quantity SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+	requests SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+	prepTimeInSecs SMALLINT UNSIGNED NOT NULL,
+	visible BOOLEAN NOT NULL DEFAULT TRUE,
+	FOREIGN KEY (categoryID) REFERENCES MenuCategories(id)
+);
+
+CREATE TABLE TableShapes (
+	shapeName VARCHAR(50) PRIMARY KEY,
+	svgPathData VARCHAR(5000)
+);
+
+CREATE TABLE Tables (
+	id VARCHAR(3) PRIMARY KEY,
+	shape VARCHAR(50),
+	gridLocationX TINYINT UNSIGNED,
+	gridLocationY TINYINT UNSIGNED,
+	gridSpanX TINYINT UNSIGNED,
+	gridSpanY TINYINT UNSIGNED,
+	FOREIGN KEY (shape) REFERENCES TableShapes(shapeName)
+);
+
+CREATE TABLE TableLog (
+	id VARCHAR(3) NOT NULL,
+	timeStamp TIMESTAMP DEFAULT NOW()	
+);
+
+CREATE TABLE TicketAndSplit (
+	id INT UNSIGNED NOT NULL UNIQUE,
+	ticketID INT UNSIGNED GENERATED ALWAYS AS (id DIV 10),
+	splitID INT UNSIGNED GENERATED ALWAYS AS (MOD(id, 10)),
+	tableID VARCHAR(3),
+	total DECIMAL(6, 2) UNSIGNED,
+	nickname VARCHAR(25) UNIQUE,
+	partySize TINYINT UNSIGNED NOT NULL,
+	overridePrice DECIMAL(6, 2) UNSIGNED,
+	overrideNote VARCHAR(500),
+	overrideAuthorization INT UNSIGNED,
+	adjustedTotal DECIMAL(6, 2),
+	tax DECIMAL(6, 2) UNSIGNED,
+	tip DECIMAL(6, 2) UNSIGNED,
+	totalPaidAmount DECIMAL(6, 2) UNSIGNED,
+	changeDue DECIMAL(6, 2) UNSIGNED,
+	timeRequested DATETIME NOT NULL DEFAULT NOW(),
+	timeSeated DATETIME,
+	timeClosed DATETIME,
+	FOREIGN KEY (overrideAuthorization) References Employees(id)
+);
+
+CREATE TABLE TicketItems (
+	id INT UNSIGNED UNIQUE NOT NULL,
+	ticketID INT UNSIGNED GENERATED ALWAYS AS (id DIV 10000),
+	splitID INT UNSIGNED GENERATED ALWAYS AS ((id DIV 1000) - (id DIV 10000 * 10)),
+	itemID INT UNSIGNED GENERATED ALWAYS AS (id - (id DIV 1000) * 1000),
+	changePointer INT UNSIGNED,
+	highlightChanges BOOLEAN,
+	employeeID INT UNSIGNED,
+	menuItemID INT UNSIGNED,
+	customizationNotes VARCHAR(500),
+	seat TINYINT UNSIGNED,
+	status ENUM('Pending','Submitted','Out-of-Date','Updated','Removed','Ready','Delivered'),
+	overridePrice DECIMAL(6, 2),
+	overrideNote VARCHAR(500),
+	overrideAuthorization INT UNSIGNED,
+	prepPriority TINYINT UNSIGNED,
+	submitTime DATETIME,
+	readyTime DATETIME,
+	deliveredTime DATETIME,
+	FOREIGN KEY (changePointer) REFERENCES TicketItems(id),
+	FOREIGN KEY (employeeID) REFERENCES Employees(id),
+	FOREIGN KEY (overrideAuthorization) REFERENCES Employees(id),
+	FOREIGN KEY (menuItemID) REFERENCES MenuItems(id) 
+);
+
+DELIMITER $$
+CREATE TRIGGER afterDeleteTicketSplit
+AFTER DELETE ON TicketAndSplit FOR EACH ROW
+BEGIN
+DELETE FROM TicketItems WHERE BEFORE.ticketID = ticketID and BEFORE.splitID = splitID;
+END$$
+DELIMITER ;
