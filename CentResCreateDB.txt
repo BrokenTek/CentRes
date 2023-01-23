@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS TicketItems, TicketAndSplit, MenuItems, MenuCategories, TableLog, Tables, TableShapes, EmployeeLog, Employees, EmployeeRoles;
+
 CREATE TABLE EmployeeRoles (
 	id TINYINT UNSIGNED PRIMARY KEY,
 	title VARCHAR(25)
@@ -10,7 +12,7 @@ INSERT INTO EmployeeRoles VALUES
 	(1, 'Back-of-House Anon');
 	
 CREATE TABLE Employees(
-	employeeID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	userName varchar(25) NOT NULL UNIQUE,
 	permissionLevel INT UNSIGNED NOT NULL,
 	passwordBCrypt CHAR(60) NOT NULL,
@@ -23,50 +25,6 @@ CREATE TABLE EmployeeLog (
 	employeeRole TINYINT UNSIGNED NOT NULL,
 	startTime DATETIME NOT NULL DEFAULT NOW(),
 	endTime DATETIME
-);
-
-CREATE TABLE TicketAndSplit (
-	ticketAndSplitNumber INT UNSIGNED NOT NULL UNIQUE,
-	tableID VARCHAR(3),
-	total DECIMAL(6, 2) UNSIGNED,
-	nickname VARCHAR(25) UNIQUE,
-	partySize TINYINT UNSIGNED NOT NULL,
-	overridePrice DECIMAL(6, 2) UNSIGNED,
-	overrideNote VARCHAR(500),
-	overrideAuthorization INT UNSIGNED,
-	adjustedTotal DECIMAL(6, 2),
-	tax DECIMAL(6, 2) UNSIGNED,
-	tip DECIMAL(6, 2) UNSIGNED,
-	totalPaidAmount DECIMAL(6, 2) UNSIGNED,
-	changeDue DECIMAL(6, 2) UNSIGNED,
-	timeRequested DATETIME NOT NULL DEFAULT NOW(),
-	timeSeated DATETIME,
-	timeClosed DATETIME,
-	FOREIGN KEY (overrideAuthorization) References Employees(employeeID)
-);
-
-CREATE TABLE TicketItems (
-	id INT UNSIGNED UNIQUE NOT NULL,
-	ticketID INT UNSIGNED GENERATED ALWAYS AS (id DIV 10000),
-	splitID INT UNSIGNED GENERATED ALWAYS AS ((id DIV 1000) - (id DIV 10000 * 10)),
-	changePointer INT UNSIGNED,
-	highlightChanges BOOLEAN,
-	employeeID INT UNSIGNED,
-	menuItemID INT UNSIGNED,
-	customizationNotes VARCHAR(500),
-	seat TINYINT UNSIGNED,
-	status ENUM('Pending','Submitted','Out-of-Date','Updated','Removed','Ready','Delivered'),
-	overridePrice DECIMAL(6, 2),
-	overrideNote VARCHAR(500),
-	overrideAuthorization INT UNSIGNED,
-	prepPriority TINYINT UNSIGNED,
-	submitTime DATETIME,
-	readyTime DATETIME,
-	deliveredTime DATETIME,
-	FOREIGN KEY (changePointer) REFERENCES TicketItems(id),
-	FOREIGN KEY (employeeID) REFERENCES Employees(employeeID),
-	FOREIGN KEY (overrideAuthorization) REFERENCES Employees(employeeID),
-	FOREIGN KEY (menuItemID) REFERENCES MenuItems(id) 
 );
 
 CREATE TABLE MenuCategories (
@@ -108,6 +66,61 @@ CREATE TABLE Tables (
 );
 
 CREATE TABLE TableLog (
-	tableID VARCHAR(3) NOT NULL,
+	id VARCHAR(3) NOT NULL,
 	timeStamp TIMESTAMP DEFAULT NOW()	
 );
+
+CREATE TABLE TicketAndSplit (
+	id INT UNSIGNED NOT NULL UNIQUE,
+	ticketID INT UNSIGNED GENERATED ALWAYS AS (id DIV 10),
+	splitID INT UNSIGNED GENERATED ALWAYS AS (MOD(id, 10)),
+	tableID VARCHAR(3),
+	total DECIMAL(6, 2) UNSIGNED,
+	nickname VARCHAR(25) UNIQUE,
+	partySize TINYINT UNSIGNED NOT NULL,
+	overridePrice DECIMAL(6, 2) UNSIGNED,
+	overrideNote VARCHAR(500),
+	overrideAuthorization INT UNSIGNED,
+	adjustedTotal DECIMAL(6, 2),
+	tax DECIMAL(6, 2) UNSIGNED,
+	tip DECIMAL(6, 2) UNSIGNED,
+	totalPaidAmount DECIMAL(6, 2) UNSIGNED,
+	changeDue DECIMAL(6, 2) UNSIGNED,
+	timeRequested DATETIME NOT NULL DEFAULT NOW(),
+	timeSeated DATETIME,
+	timeClosed DATETIME,
+	FOREIGN KEY (overrideAuthorization) References Employees(id)
+);
+
+CREATE TABLE TicketItems (
+	id INT UNSIGNED UNIQUE NOT NULL,
+	ticketID INT UNSIGNED GENERATED ALWAYS AS (id DIV 10000),
+	splitID INT UNSIGNED GENERATED ALWAYS AS ((id DIV 1000) - (id DIV 10000 * 10)),
+	itemID INT UNSIGNED GENERATED ALWAYS AS (id - (id DIV 1000) * 1000),
+	changePointer INT UNSIGNED,
+	highlightChanges BOOLEAN,
+	employeeID INT UNSIGNED,
+	menuItemID INT UNSIGNED,
+	customizationNotes VARCHAR(500),
+	seat TINYINT UNSIGNED,
+	status ENUM('Pending','Submitted','Out-of-Date','Updated','Removed','Ready','Delivered'),
+	overridePrice DECIMAL(6, 2),
+	overrideNote VARCHAR(500),
+	overrideAuthorization INT UNSIGNED,
+	prepPriority TINYINT UNSIGNED,
+	submitTime DATETIME,
+	readyTime DATETIME,
+	deliveredTime DATETIME,
+	FOREIGN KEY (changePointer) REFERENCES TicketItems(id),
+	FOREIGN KEY (employeeID) REFERENCES Employees(id),
+	FOREIGN KEY (overrideAuthorization) REFERENCES Employees(id),
+	FOREIGN KEY (menuItemID) REFERENCES MenuItems(id) 
+);
+
+DELIMITER $$
+CREATE TRIGGER afterDeleteTicketSplit
+AFTER DELETE ON TicketAndSplit FOR EACH ROW
+BEGIN
+DELETE FROM TicketItems WHERE BEFORE.ticketID = ticketID and BEFORE.splitID = splitID;
+END$$
+DELIMITER ;
