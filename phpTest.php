@@ -81,7 +81,7 @@ function logout($userName) {
 	}	
 }
 
-function getTicketItemSplitCount(int $ticketItemNumber) (
+function getTicketItemSplitCount(int $ticketItemNumber) {
 	//return null if invalid ticket #, otherwise get the record
 	$sql = "SELECT * FROM TicketItems WHERE id = " .$ticketItemNumber. ";";
 	$result = $GLOBALS['conn']->query($sql);
@@ -93,7 +93,7 @@ function getTicketItemSplitCount(int $ticketItemNumber) (
 	$sql = "SELECT COUNT(*) FROM TicketItems WHERE ticketID = " .$ticketItemRecord['ticketID']. " AND splitID = " .$ticketItemRecord['splitID']. ";";
 	$result = $GLOBALS['conn']->query($sql);
 	return mysqli_fetch_array($result)[0];
-)
+}
 ?>
 </body>
 </html>
