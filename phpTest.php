@@ -47,15 +47,15 @@ function login(string $userName, string $password, int $requestedRole) {
 	}
 	
 	// check if you're already logged in
-	$sql = "SELECT * FROM EmployeeLog WHERE employeeID = " .$empRecord['employeeID']. " AND endTime IS NULL;";
+	$sql = "SELECT * FROM EmployeeLog WHERE employeeID = " .$empRecord['id']. " AND endTime IS NULL;";
 	$result2 = $GLOBALS['conn']->query($sql);
 	if (mysqli_num_rows ($result2)  > 0) {
 		// Log out of current session if you are already logged in.
-		$sql = "UPDATE EmployeeLog SET endTime = NOW() WHERE employeeID = " .$empRecord['employeeID']. " AND endTime IS NULL;";
+		$sql = "UPDATE EmployeeLog SET endTime = NOW() WHERE employeeID = " .$empRecord['id']. " AND endTime IS NULL;";
 		$result2 = $GLOBALS['conn']->query($sql);
 	}
 	
-	$sql = "INSERT INTO EmployeeLog (employeeID, employeeRole) VALUES (" .$empRecord['employeeID']. ", " .$requestedRole. ")";
+	$sql = "INSERT INTO EmployeeLog (employeeID, employeeRole) VALUES (" .$empRecord['id']. ", " .$requestedRole. ")";
 		$result2 = $GLOBALS['conn']->query($sql);
 		return;	
 }
@@ -68,14 +68,14 @@ function logout($userName) {
 	}
 	
 	$empRecord = mysqli_fetch_array($result);
-	$sql = "SELECT * FROM EmployeeLog WHERE employeeID = " .$empRecord['employeeID']. " AND endTime IS NULL;";
+	$sql = "SELECT * FROM EmployeeLog WHERE employeeID = " .$empRecord['id']. " AND endTime IS NULL;";
 	$result2 = $GLOBALS['conn']->query($sql);
 	if (mysqli_num_rows ($result2) == 0) {
 		return "Not Logged In";
 	}
 	else {
 		// You are logged into 1 or more devices.
-		$sql = "UPDATE EmployeeLog SET endTime = NOW() WHERE employeeID = " .$empRecord['employeeID']. " AND endTime IS NULL;";
+		$sql = "UPDATE EmployeeLog SET endTime = NOW() WHERE employeeID = " .$empRecord['id']. " AND endTime IS NULL;";
 		$result2 = $GLOBALS['conn']->query($sql);
 		return;
 	}	
