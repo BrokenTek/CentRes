@@ -1,4 +1,5 @@
-DROP TABLE IF EXISTS TicketItems, TicketAndSplit, MenuItems, MenuCategories, TableLog, Tables, TableShapes, EmployeeLog, Employees, EmployeeRoles;
+DROP TABLE IF EXISTS TicketItems, TicketAndSplit, MenuItems, MenuCategories, TableLog, TableAssignments, Tables, TableStatuses, TableShapes, EmployeeLog, ActiveEmployees, Employees, EmployeeRoles;
+
 
 CREATE TABLE EmployeeRoles (
 	id TINYINT UNSIGNED PRIMARY KEY,
@@ -13,8 +14,8 @@ INSERT INTO EmployeeRoles VALUES
 	
 CREATE TABLE Employees(
 	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-	userName varchar(25) NOT NULL UNIQUE,
-	permissionLevel INT UNSIGNED NOT NULL,
+	userName VARCHAR(25) NOT NULL UNIQUE,
+	roleLevel INT UNSIGNED NOT NULL,
 	passwordBCrypt CHAR(60) NOT NULL,
 	lastName VARCHAR(50) NOT NULL,
 	firstName VARCHAR(50) NOT NULL
@@ -24,7 +25,13 @@ CREATE TABLE EmployeeLog (
 	employeeID INT UNSIGNED NOT NULL,
 	employeeRole TINYINT UNSIGNED NOT NULL,
 	startTime DATETIME NOT NULL DEFAULT NOW(),
-	endTime DATETIME
+	endTime DATETIME,
+	FOREIGN KEY (employeeID) REFERENCES Employees(id)
+);
+
+CREATE TABLE ActiveEmployees (
+	employeeID INT UNSIGNED NOT NULL,
+	employeeRole TINYINT UNSIGNED
 );
 
 CREATE TABLE MenuCategories (
@@ -55,6 +62,18 @@ CREATE TABLE TableShapes (
 	svgPathData VARCHAR(5000)
 );
 
+CREATE TABLE TableStatuses (
+	id VARCHAR(30) PRIMARY KEY
+);
+
+INSERT INTO TableStatuses VALUES
+	('Unavailable'),
+	('Unassigned'),
+	('Open'),
+	('Seated'),
+	('Bussing');
+
+
 CREATE TABLE Tables (
 	id VARCHAR(3) PRIMARY KEY,
 	shape VARCHAR(50),
@@ -62,12 +81,28 @@ CREATE TABLE Tables (
 	gridLocationY TINYINT UNSIGNED,
 	gridSpanX TINYINT UNSIGNED,
 	gridSpanY TINYINT UNSIGNED,
-	FOREIGN KEY (shape) REFERENCES TableShapes(shapeName)
+	transformData VARCHAR(5000),
+	status VARCHAR(30),
+	FOREIGN KEY (shape) REFERENCES TableShapes(shapeName),
+	FOREIGN KEY (status) REFERENCES TableStatuses(id)
+);
+
+CREATE TABLE TableAssignments (
+	employeeID INT UNSIGNED NOT NULL,
+	tableID VARCHAR(3) NOT NULL
 );
 
 CREATE TABLE TableLog (
-	id VARCHAR(3) NOT NULL,
-	timeStamp TIMESTAMP DEFAULT NOW()	
+	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	tableID VARCHAR(3) NOT NULL,
+	action ENUM('Add', 'Remove', 'Bused', 'Disable', 'Enable') NOT NULL,
+	timeStamp TIMESTAMP DEFAULT NOW(),
+	authorizationID INT UNSIGNED,
+	employeeID INT UNSIGNED,
+	ticketID INT UNSIGNED,
+	FOREIGN KEY(tableID) REFERENCES Tables(id),
+	FOREIGN KEY(authorizationID) REFERENCES Employees(id),
+	FOREIGN KEY (employeeID) REFERENCES Employees(id)
 );
 
 CREATE TABLE TicketAndSplit (
@@ -81,6 +116,7 @@ CREATE TABLE TicketAndSplit (
 	overridePrice DECIMAL(6, 2) UNSIGNED,
 	overrideNote VARCHAR(500),
 	overrideAuthorization INT UNSIGNED,
+	overrideTimeStamp DATETIME,
 	adjustedTotal DECIMAL(6, 2),
 	tax DECIMAL(6, 2) UNSIGNED,
 	tip DECIMAL(6, 2) UNSIGNED,
@@ -95,8 +131,8 @@ CREATE TABLE TicketAndSplit (
 CREATE TABLE TicketItems (
 	id INT UNSIGNED UNIQUE NOT NULL,
 	ticketID INT UNSIGNED GENERATED ALWAYS AS (id DIV 10000),
-	splitID INT UNSIGNED GENERATED ALWAYS AS ((id DIV 1000) - (id DIV 10000 * 10)),
-	itemID INT UNSIGNED GENERATED ALWAYS AS (id - (id DIV 1000) * 1000),
+	splitID INT UNSIGNED GENERATED ALWAYS AS (MOD((id DIV 1000),10)),
+	itemID INT UNSIGNED GENERATED ALWAYS AS (MOD(id, 1000)),
 	changePointer INT UNSIGNED,
 	highlightChanges BOOLEAN,
 	employeeID INT UNSIGNED,
@@ -107,6 +143,7 @@ CREATE TABLE TicketItems (
 	overridePrice DECIMAL(6, 2),
 	overrideNote VARCHAR(500),
 	overrideAuthorization INT UNSIGNED,
+	overrideTimeStamp DATETIME,
 	prepPriority TINYINT UNSIGNED,
 	submitTime DATETIME,
 	readyTime DATETIME,
@@ -116,11 +153,3 @@ CREATE TABLE TicketItems (
 	FOREIGN KEY (overrideAuthorization) REFERENCES Employees(id),
 	FOREIGN KEY (menuItemID) REFERENCES MenuItems(id) 
 );
-
-DELIMITER $$
-CREATE TRIGGER afterDeleteTicketSplit
-AFTER DELETE ON TicketAndSplit FOR EACH ROW
-BEGIN
-DELETE FROM TicketItems WHERE BEFORE.ticketID = ticketID and BEFORE.splitID = splitID;
-END$$
-DELIMITER ;

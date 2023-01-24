@@ -1,0 +1,262 @@
+DROP TRIGGER IF EXISTS beforeInsertTableLog;
+DROP TRIGGER IF EXISTS afterInsertTableLog;
+DROP PROCEDURE IF EXISTS login;
+DROP PROCEDURE IF EXISTS logout;
+DROP PROCEDURE IF EXISTS assignEmployeeToTable;
+DROP PROCEDURE IF EXISTS removeEmployeeFromTable;
+DROP PROCEDURE IF EXISTS assignTicketToTable;
+DROP PROCEDURE IF EXISTS removeTicketFromTable;
+DROP PROCEDURE IF EXISTS enableTable;
+DROP PROCEDURE IF EXISTS disableTable;
+DROP PROCEDURE IF EXISTS bussingComplete;
+DROP FUNCTION IF EXISTS userPasswordHash;
+DROP FUNCTION IF EXISTS usernameFromID;
+DROP FUNCTION IF EXISTS idFromUsername;
+
+DELIMITER $$
+CREATE TRIGGER afterDeleteTicketSplit
+AFTER DELETE ON TicketAndSplit FOR EACH ROW
+BEGIN
+	DELETE FROM TicketItems WHERE OLD.ticketID = ticketID and OLD.splitID = splitID;
+	DELETE FROM TableAssignments WHERE tableID = OLD.tableID;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER beforeInsertTableLog
+BEFORE INSERT ON TableLog FOR EACH ROW
+BEGIN
+	
+	IF ((SELECT COUNT(*) FROM EmployeeLog WHERE employeeID = NEW.authorizationID AND startTime IS NOT NULL AND endTime IS NULL) = 0) THEN
+		-- authorizer isn't logged in
+	    -- This is going to bog down the system the longer the EmployeeLog gets. Need to set up trigger to add/remove logged in employees from another table.
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Authorized host must be logged in!';
+		
+		
+		-- authorizer has invalid roles for session to perform action
+	ELSEIF ((NEW.ticketID IS NOT NULL) AND (SELECT COUNT(*) FROM TicketAndSplit WHERE ticketID = NEW.ticketID) = 0) THEN
+		-- if a ticket number is specified, but it's invalid
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Specifed ticket number does not exist!';
+	
+		-- If you are assigning a server to table, but they aren't logged in or don't have server roles for session
+	ELSEIF (NEW.tableID IS NOT NULL AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableID AND status IN ('Occupied', 'Unavailable')) = 1) THEN
+		-- if you're assigning a ticket to a table, but it's occupied or unavailable	
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Cannot assign a Ticket to an Unassigned or Occupied Table!';
+	ELSEIF (NEW.action = 'Bused' AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableID AND status = 'Bussing') = 0) THEN	
+		-- if you're setting the bused flag but the table isn't flagged as bussing
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Specified Table is not marked for bussing. Cannot set status to bused.';
+	-- ELSEIF () THEN
+		-- if you're removing the only server, but the table is occupied and you're not removing the ticket
+	
+		-- if you're trying to set the table as disabled but the table is occupied
+	END IF;
+	
+	
+END$$
+DELIMITER ;
+
+-- add employee to table
+DELIMITER $$
+CREATE PROCEDURE assignEmployeeToTable(IN employeeID INT UNSIGNED, IN tableID VARCHAR(3), authorizationID INT UNSIGNED)
+BEGIN
+	DECLARE empID INT UNSIGNED;
+	DECLARE hashReturn CHAR(60);
+	
+END$$
+DELIMITER ;
+
+-- add remove employee from table
+DELIMITER $$
+CREATE PROCEDURE removeEmployeeFromTable(IN employeeID INT UNSIGNED, IN tableID VARCHAR(3), authorizationID INT UNSIGNED)
+BEGIN
+		
+END$$
+DELIMITER ;
+
+-- add ticket to table
+DELIMITER $$
+CREATE PROCEDURE assignTicketToTable(IN ticketID VARCHAR(3), IN tableID VARCHAR(3), authorizationID INT UNSIGNED)
+BEGIN
+		
+END$$
+DELIMITER ;
+
+-- remove ticket from table
+DELIMITER $$
+CREATE PROCEDURE removeTicketFromTable(IN ticketID VARCHAR(3), IN tableID VARCHAR(3), authorizationID INT UNSIGNED)
+BEGIN
+		
+END$$
+DELIMITER ;
+
+-- disable table
+DELIMITER $$
+CREATE PROCEDURE disableTable(IN tableID VARCHAR(3))
+BEGIN
+		
+END$$
+DELIMITER ;
+
+-- enable table
+DELIMITER $$
+CREATE PROCEDURE enableTable(IN tableID VARCHAR(3))
+BEGIN
+		
+END$$
+DELIMITER ;
+
+-- set table status to bussed
+DELIMITER $$
+CREATE PROCEDURE bussingComplete(IN tableID VARCHAR(3))
+BEGIN
+		
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE TRIGGER afterInsertTableLog
+AFTER INSERT ON TableLog FOR EACH ROW
+BEGIN
+	IF (NEW.action = 'Add' AND NEW.ticketID IS NOT NULL AND NEW.employeeID IS NOT NULL) THEN
+		UPDATE TicketAndSplit SET tableID = NEW.tableID WHERE ticketID = NEW.ticketID;
+		INSERT INTO TableAssignments VALUES(NEW.employeeID, NEW.tableID);
+		UPDATE Tables SET status = 'Seated' WHERE id = NEW.tableID;
+	ELSEIF (NEW.action = 'Add' AND NEW.ticketID IS NOT NULL) THEN
+		UPDATE TicketAndSplit SET tableID = NEW.tableID WHERE ticketID = NEW.ticketID;
+		UPDATE Tables SET status = 'Seated' WHERE id = NEW.tableID;
+	ELSEIF (NEW.action = 'Add' AND NEW.employeeID IS NOT NULL) THEN
+		INSERT INTO TableAssignments VALUES(NEW.employeeID, NEW.tableID);
+		IF (SELECT COUNT(*) FROM TicketAndSplit WHERE tableID = NEW.TableID > 0) THEN
+			UPDATE Tables SET status = 'Seated' WHERE id = NEW.tableID;
+		ELSE
+			UPDATE Tables SET status = 'Open' WHERE id = NEW.tableID;
+		END IF;
+	ELSEIF (NEW.action = 'Remove' AND NEW.ticketID IS NOT NULL AND NEW.employeeID IS NOT NULL) THEN
+		DELETE FROM TableAssignments WHERE employeeID = NEW.employeeID AND tableID = NEW.tableID;
+		UPDATE TicketAndSplit SET tableID = NULL WHERE ticketID = NEW.ticketID;
+		UPDATE Tables SET status = 'Bussing' WHERE id = NEW.tableID;
+	ELSEIF (NEW.action = 'Remove' AND NEW.ticketID IS NOT NULL) THEN
+		UPDATE TicketAndSplit SET tableID = NULL WHERE ticketID = NEW.ticketID;
+		UPDATE Tables SET status = 'Bussing' WHERE id = NEW.tableID;
+	ELSEIF (NEW.action = 'Remove' AND NEW.employeeID IS NOT NULL) THEN
+		DELETE FROM TableAssignments WHERE employeeID = NEW.employeeID and tableID = NEW.tableID;
+		IF (((SELECT COUNT(*) FROM TicketAndSplit WHERE tableID = NEW.TableID) = 0) AND 
+		((SELECT COUNT(*) FROM Tables WHERE id = NEW.tableID and status = 'Bussing')) = 0) THEN
+			UPDATE Tables SET status = 'Unassigned' WHERE id = NEW.tableID;
+		END IF;
+	ELSEIF (NEW.action = 'Bused') THEN
+		IF ((SELECT COUNT(*) FROM TableAssignments WHERE tableID = NEW.TableID) = 0) THEN
+			UPDATE Tables SET status = 'Unassigned' WHERE id = NEW.tableID;
+		ELSE
+			UPDATE Tables SET status = 'Open' WHERE id = NEW.tableID;
+		END IF;
+	ELSEIF (NEW.action = 'Disable') THEN
+		UPDATE Tables SET status = 'Unavailable' WHERE id = NEW.tableID;
+	ELSEIF (NEW.action = 'Enable') THEN
+		IF ((SELECT COUNT(*) FROM TableAssignments WHERE tableID = NEW.TableID) = 0) THEN
+			UPDATE Tables SET status = 'Unassigned' WHERE id = NEW.tableID;
+		ELSE
+			UPDATE Tables SET status = 'Open' WHERE id = NEW.tableID;
+		END IF;
+	END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE FUNCTION userPasswordHash(uname VARCHAR(25)) RETURNS CHAR(60)
+BEGIN
+	DECLARE empID INT UNSIGNED;
+	DECLARE hashReturn CHAR(60);
+	IF ((SELECT COUNT(*) FROM Employees WHERE userName = uname) = 0) THEN
+		-- Invalid Employee ID
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Username not found!';
+	ELSE
+		SELECT passwordBCrypt INTO hashReturn FROM Employees WHERE userName = uname;
+		RETURN hashReturn;
+	END IF;
+	
+END$$
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE FUNCTION usernameFromID(empID INT UNSIGNED) RETURNS VARCHAR(25)
+BEGIN
+	DECLARE uname VARCHAR(25);
+	IF ((SELECT COUNT(*) FROM Employees WHERE id = empID) = 0) THEN
+		-- Invalid Employee ID
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Invalid Employee ID!';
+	ELSE
+		SELECT userName INTO uname FROM Employees WHERE id = empID;
+		RETURN uname;
+	END IF;
+	
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE FUNCTION idFromUsername(uname VARCHAR(25)) RETURNS INT UNSIGNED
+BEGIN
+	DECLARE empID INT UNSIGNED;
+	IF ((SELECT COUNT(*) FROM Employees WHERE userName = uname) = 0) THEN
+		-- Invalid Username
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Username not found!';
+	ELSE
+		SELECT id INTO empID FROM Employees WHERE userName = uname;
+		RETURN empID;
+	END IF;
+	
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE login(IN requestedUsername VARCHAR(25), IN requestedRoles TINYINT UNSIGNED)
+BEGIN
+	DECLARE allowedRoles TINYINT UNSIGNED;
+	DECLARE empID INT UNSIGNED;
+	IF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername) = 0) THEN
+		-- Invalid Employee ID
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Username not found!';
+	ELSE
+		SELECT roleLevel INTO allowedRoles FROM Employees WHERE userName = requestedUsername;
+		IF (allowedRoles & requestedRoles <> requestedRoles) THEN
+			-- Invalid Requested Roles
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'You do not have the authorization to login with the role you sepcified!';
+		ELSE
+			SELECT id INTO empID FROM Employees WHERE userName = requestedUsername;
+			UPDATE EmployeeLog SET endTime = NOW() WHERE employeeID = empID and endTime IS NULL;
+			INSERT INTO EmployeeLog (employeeID, employeeRole) VALUES(empID, requestedRoles);
+			DELETE FROM ActiveEmployees WHERE employeeID = empID;
+			INSERT INTO ActiveEmployees (employeeID, employeeRole) VALUES (empID, requestedRoles);
+		END IF;
+	END IF;
+	
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE logout(IN uname VARCHAR(25))
+BEGIN
+	DECLARE empID INT UNSIGNED;
+	IF ((SELECT COUNT(*) FROM Employees WHERE userName = uname) = 0) THEN
+		-- Invalid Employee ID
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Username not found!';
+	ELSE
+		SELECT id INTO empID FROM Employees WHERE userName = uname;
+		UPDATE EmployeeLog SET endTime = NOW() WHERE employeeID = empID and endTime IS NULL;
+		DELETE FROM ActiveEmployees WHERE employeeID = empID;
+	END IF;
+	
+END$$
+DELIMITER ;
