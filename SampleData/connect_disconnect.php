@@ -9,25 +9,30 @@
 <html>
 <body>
 <?php
-// Connect To Database, Connection Is Persistent - 'p:'localhost
-function connect() {
-$servername = "p:localhost";
-$username = "scott";
-$password = "tiger";
-$dbname = "centres";
+
 global $conn;
 
-$conn = mysqli_connect($servername, $username, $password, $dbname);
-if (!$conn) {
-	die("Connection failed: " . mysqli_connect_error());
-	} 	
+function connection() {
+	if ($GLOBALS['conn'] && !$GLOBALS['conn']->connect_error) {
+		return $GLOBALS['conn'];
+	}
+
+	$servername = "p:localhost";
+	$username = "scott";
+	$password = "tiger";
+	$dbname = "centres";
+
+	$conn = mysqli_connect($servername, $username, $password, $dbname);
+	if (!$conn) {
+		die("Connection failed: " . mysqli_connect_error());
+		} 	
 	return $conn;
 }
 
-
 // Disconnect From The Persistent Database Connection. This Is Necessary
 function disconnect() {
-	mysqli_close($GLOBALS['conn']);	
+	// mysqli_close($GLOBALS['conn']);	
+	mysqli_close(connection());
 }
 ?>
 
