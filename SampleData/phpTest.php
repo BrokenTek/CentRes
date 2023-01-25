@@ -1,29 +1,16 @@
+<!--  The below 'include' statement is not necessary as if someone is
+		is logging in or out, the database connection has already been
+		made. Therefore, calling $GLOBALS['conn']->query(*query*) will
+		provide access to that connection (creatUser, login, logout). -->
+
+<!-- THIS FILE CONTAINS THE MAIN METHODS BEING USED -->
+
 <html>
 <body>
 <?php
-
-
-// Change these variables to match your XAMPP and MySql config
-$servername = "localhost";
-$username = "root";
-$password = "blInk309";
-$dbname = "CentRes";
-
-$conn = mysqli_connect($servername, $username, $password, $dbname);
-if (!$conn) {
-  die("Connection failed: " . mysqli_connect_error());
-}
-
-createUser("sshort0", "Short", "Susan", "blInk309", 15);
-login("sshort0", "mah", 15);
-login("sshort0", "blInk309", 15);
-login("sshort0", "blInk309", 15);
-logout("sshort0");
-mysqli_close($conn);
-
 function createUser(string $userName, string $lastName, string $firstName, string $password, int $allowedRoles) {
 	$hash = password_hash($password, PASSWORD_BCRYPT);
-	$sql = "INSERT INTO Employees (userName, lastName, firstName, passwordBCrypt, permissionLevel) VALUES (".
+	$sql = "INSERT INTO Employees (userName, lastName, firstName, passwordBCrypt, roleLevel) VALUES (".
 		"'".$userName. "', ".
 		"'".$lastName. "', ".
 		"'".$firstName. "', ".
@@ -31,53 +18,34 @@ function createUser(string $userName, string $lastName, string $firstName, strin
 		$allowedRoles.");";
 	$result = $GLOBALS['conn']->query($sql);
 }
+
 function login(string $userName, string $password, int $requestedRole) {
-	$sql = "SELECT * FROM Employees WHERE userName = '" .$userName. "';";
-	$result = $GLOBALS['conn']->query($sql);
-	if (mysqli_num_rows($result) == 0) {
-		return "Username Not Found";
+	try {
+		$sql = "SELECT userPasswordHash('$userName');";
+		$passResult = $GLOBALS['conn']->query($sql);
+		$passFromUser = $passResult->fetch_row()[0];
+
+		if (!password_verify($password, $passFromUser)) {
+			throw new mysqli_sql_exception("Password Is Not Valid");
+			}
+
+		$sql2 = "CALL login('$userName', $requestedRole);";
+
+		$GLOBALS['conn']->query($sql2);
+			
 	}
-	
-	$empRecord = mysqli_fetch_array($result);
-	if (!password_verify($password, $empRecord['passwordBCrypt'])) {
-		return "Invalid Password";
+	catch(Exception $e) {
+		echo "EXCEPTION: ", $e->getMessage();
 	}
-	if ($empRecord['permissionLevel'] & $requestedRole == 0) {
-		return "Not Authorized";
-	}
-	
-	// check if you're already logged in
-	$sql = "SELECT * FROM EmployeeLog WHERE employeeID = " .$empRecord['id']. " AND endTime IS NULL;";
-	$result2 = $GLOBALS['conn']->query($sql);
-	if (mysqli_num_rows ($result2)  > 0) {
-		// Log out of current session if you are already logged in.
-		$sql = "UPDATE EmployeeLog SET endTime = NOW() WHERE employeeID = " .$empRecord['id']. " AND endTime IS NULL;";
-		$result2 = $GLOBALS['conn']->query($sql);
-	}
-	
-	$sql = "INSERT INTO EmployeeLog (employeeID, employeeRole) VALUES (" .$empRecord['id']. ", " .$requestedRole. ")";
-		$result2 = $GLOBALS['conn']->query($sql);
-		return;	
 }
 
 function logout($userName) {
-	$sql = "SELECT * FROM Employees WHERE userName = '" .$userName. "';";
-	$result = $GLOBALS['conn']->query($sql);
-	if (mysqli_num_rows ($result) == 0) {
-		return "Username Not Found";
+	try {
+		$sql = "CALL logout('$userName');";
+		$GLOBALS['conn']->query($sql);
 	}
-	
-	$empRecord = mysqli_fetch_array($result);
-	$sql = "SELECT * FROM EmployeeLog WHERE employeeID = " .$empRecord['id']. " AND endTime IS NULL;";
-	$result2 = $GLOBALS['conn']->query($sql);
-	if (mysqli_num_rows ($result2) == 0) {
-		return "Not Logged In";
-	}
-	else {
-		// You are logged into 1 or more devices.
-		$sql = "UPDATE EmployeeLog SET endTime = NOW() WHERE employeeID = " .$empRecord['id']. " AND endTime IS NULL;";
-		$result2 = $GLOBALS['conn']->query($sql);
-		return;
+	catch(Exception $e) {
+		echo "EXCEPTION: ", $e->getMessage();
 	}	
 }
 
