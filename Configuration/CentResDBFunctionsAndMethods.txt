@@ -1,5 +1,6 @@
 DROP TRIGGER IF EXISTS beforeInsertTableLog;
 DROP TRIGGER IF EXISTS afterInsertTableLog;
+DROP TRIGGER IF EXISTS afterDeleteTicketModificationSplit;
 DROP PROCEDURE IF EXISTS login;
 DROP PROCEDURE IF EXISTS logout;
 DROP PROCEDURE IF EXISTS assignEmployeeToTable;
@@ -12,9 +13,87 @@ DROP PROCEDURE IF EXISTS bussingComplete;
 DROP FUNCTION IF EXISTS userPasswordHash;
 DROP FUNCTION IF EXISTS usernameFromID;
 DROP FUNCTION IF EXISTS idFromUsername;
+DROP FUNCTION IF EXISTS menuItemPrice;
+DROP FUNCTION IF EXISTS ticketItemPrice;
+DROP TRIGGER IF EXISTS beforeAddMenuCategory;
+DROP TRIGGER IF EXISTS beforeAddMenuItem;
+DROP TRIGGER IF EXISTS beforeAddMenuModificationCategory;
+DROP TRIGGER IF EXISTS beforeAddMenuModificationItem;
+DROP TRIGGER IF EXISTS afterDeleteMenuCategory;
+DROP TRIGGER IF EXISTS afterDeleteMenuItem;
+DROP TRIGGER IF EXISTS afterDeleteMenuModificationCategory;
+DROP TRIGGER IF EXISTS AfterDeleteMenuModificationItem;
 
 DELIMITER $$
-CREATE TRIGGER afterDeleteTicketSplit
+CREATE TRIGGER beforeAddMenuCategory
+BEFORE INSERT ON MenuCategories FOR EACH ROW
+BEGIN
+	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER beforeAddMenuItem
+BEFORE INSERT ON MenuItems FOR EACH ROW
+BEGIN
+	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER beforeAddMenuModificationCategory
+BEFORE INSERT ON MenuModificationCategories FOR EACH ROW
+BEGIN
+	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER beforeAddMenuModificationItem
+BEFORE INSERT ON MenuModificationItems FOR EACH ROW
+BEGIN
+	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE TRIGGER afterDeleteMenuCategory
+AFTER DELETE ON MenuCategories FOR EACH ROW
+BEGIN
+	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER afterDeleteMenuItem
+AFTER DELETE ON MenuItems FOR EACH ROW
+BEGIN
+	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER afterDeleteMenuModificationCategory
+AFTER DELETE ON MenuModificationCategories FOR EACH ROW
+BEGIN
+	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER afterDeleteMenuModificationItem
+AFTER DELETE ON MenuModificationItems FOR EACH ROW
+BEGIN
+	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
+END$$
+DELIMITER ;
+
+
+
+
+DELIMITER $$
+CREATE TRIGGER afterDeleteTicketModificationSplit
 AFTER DELETE ON TicketAndSplit FOR EACH ROW
 BEGIN
 	DELETE FROM TicketItems WHERE OLD.ticketID = ticketID and OLD.splitID = splitID;
@@ -213,9 +292,31 @@ BEGIN
 		SELECT id INTO empID FROM Employees WHERE userName = uname;
 		RETURN empID;
 	END IF;
-	
 END$$
 DELIMITER ;
+
+-- function needs to be recoded to include appropriate price calculation
+DELIMITER $$
+CREATE FUNCTION menuItemPrice(menuItemQuickCode VARCHAR(10)) RETURNS DECIMAL(6, 2)
+BEGIN
+	DECLARE price INT UNSIGNED;
+	SELECT basePrice INTO price FROM MenuItems WHERE quickCode = menuItemQuickCode;
+	RETURN price;
+END$$
+DELIMITER ;
+
+-- function needs to be recoded to include appropriate price calculation
+DELIMITER $$
+CREATE FUNCTION ticketItemPrice(ticketItemID INT UNSIGNED) RETURNS DECIMAL(6, 2)
+BEGIN
+	DECLARE miQuickCode VARCHAR(10);
+	DECLARE price DECIMAL(6, 2);
+	SELECT menuItemQuickCode INTO miQuickCode FROM TicketItems WHERE id = ticketItemID;
+	SELECT basePrice INTO price FROM MenuItems WHERE quickCode = miQuickCode;
+	RETURN price;	
+END$$
+DELIMITER ;
+
 
 DELIMITER $$
 CREATE PROCEDURE login(IN requestedUsername VARCHAR(25), IN requestedRoles TINYINT UNSIGNED)
