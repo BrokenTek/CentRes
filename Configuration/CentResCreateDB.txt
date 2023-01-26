@@ -45,9 +45,8 @@ CREATE TABLE QuickCodes (
 );
 
 CREATE TABLE MenuCategories (
-	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	quickCode VARCHAR(10) PRIMARY KEY,
 	title VARCHAR(75) NOT NULL,
-	quickCode VARCHAR(10) UNIQUE,
 	description VARCHAR(1000),
 	route char(1),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
@@ -57,35 +56,31 @@ CREATE TABLE MenuCategories (
 );
 
 CREATE TABLE MenuItems (
-	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-	categoryID INT UNSIGNED NOT NULL,
+	quickCode VARCHAR(10) PRIMARY KEY,
 	title VARCHAR(75) NOT NULL,
-	quickCode VARCHAR(10) UNIQUE,
 	description varchar(1000),
 	basePrice DECIMAL(5, 2) UNSIGNED,
 	baseDiscount DECIMAL(6, 2),
 	route char(1),
 	quantity SMALLINT UNSIGNED NOT NULL DEFAULT 0,
 	requests SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-	prepTimeInSecs SMALLINT UNSIGNED NOT NULL,
+	prepTimeInSecs SMALLINT UNSIGNED,
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
 );
 
-CREATE TABLE MenuCustomizationCategories (
-	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE MenuModificationCategories (
+	quickCode VARCHAR(10) PRIMARY KEY,
 	title VARCHAR(75) NOT NULL,
-	quickCode VARCHAR(10) UNIQUE,
 	description VARCHAR(1000),
 	selfDescriptive BOOLEAN NOT NULL DEFAULT FALSE,
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
 );
 
-CREATE TABLE MenuCustomizationItems (
-	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE MenuModificationItems (
+	quickCode VARCHAR(10) PRIMARY KEY,
 	title VARCHAR(75) NOT NULL,
-	quickCode VARCHAR(10) UNIQUE,
 	description varchar(1000),
 	basePrice DECIMAL(5, 2) UNSIGNED NOT NULL,
 	baseDiscount DECIMAL(6, 2),
@@ -172,53 +167,47 @@ CREATE TABLE TicketAndSplit (
 );
 
 CREATE TABLE TicketItems (
-	id INT UNSIGNED UNIQUE NOT NULL,
+	id INT UNSIGNED PRIMARY KEY,
 	ticketID INT UNSIGNED GENERATED ALWAYS AS (id DIV 10000),
 	splitID INT UNSIGNED GENERATED ALWAYS AS (MOD((id DIV 1000),10)),
 	itemID INT UNSIGNED GENERATED ALWAYS AS (MOD(id, 1000)),
+	menuItemQuickCode VARCHAR(10),
 	changePointer INT UNSIGNED,
 	highlightChanges BOOLEAN,
 	employeeID INT UNSIGNED,
 	menuItemID INT UNSIGNED,
-	customizationNotes VARCHAR(500),
+	modificationNotes VARCHAR(500),
 	seat TINYINT UNSIGNED,
 	status ENUM('Pending','Submitted','Added','Out-of-Date','Updated','Removed','Ready','Delivered'),
 	overridePrice DECIMAL(6, 2),
 	overrideNote VARCHAR(500),
 	overrideAuthorization INT UNSIGNED,
 	overrideTimeStamp DATETIME,
-	prepPriority TINYINT UNSIGNED,
+	prepPriority TINYINT UNSIGNED NOT NULL DEFAULT 1,
 	submitTime DATETIME,
 	readyTime DATETIME,
 	deliveredTime DATETIME,
 	FOREIGN KEY (changePointer) REFERENCES TicketItems(id),
 	FOREIGN KEY (employeeID) REFERENCES Employees(id),
 	FOREIGN KEY (overrideAuthorization) REFERENCES Employees(id),
-	FOREIGN KEY (menuItemID) REFERENCES MenuItems(id) 
+	FOREIGN KEY (menuItemQuickCode) REFERENCES QuickCodes(id) 
 );
 
 CREATE TABLE BufferedTicketItems (
-	id INT UNSIGNED UNIQUE NOT NULL,
+	-- id cannot be a primary key, as multiple new items will have item number 000
+	id INT UNSIGNED,
 	ticketID INT UNSIGNED GENERATED ALWAYS AS (id DIV 10000),
 	splitID INT UNSIGNED GENERATED ALWAYS AS (MOD((id DIV 1000),10)),
 	itemID INT UNSIGNED GENERATED ALWAYS AS (MOD(id, 1000)),
-	changePointer INT UNSIGNED,
-	highlightChanges BOOLEAN,
 	employeeID INT UNSIGNED,
-	menuItemID INT UNSIGNED,
-	customizationNotes VARCHAR(500),
+	menuItemQuickCode VARCHAR(10),
+	modificationNotes VARCHAR(500),
 	seat TINYINT UNSIGNED,
-	status ENUM('Pending','Submitted','Added','Out-of-Date','Updated','Removed','Ready','Delivered'),
 	overridePrice DECIMAL(6, 2),
 	overrideNote VARCHAR(500),
 	overrideAuthorization INT UNSIGNED,
-	overrideTimeStamp DATETIME,
-	prepPriority TINYINT UNSIGNED,
-	submitTime DATETIME,
-	readyTime DATETIME,
-	deliveredTime DATETIME,
-	FOREIGN KEY (changePointer) REFERENCES TicketItems(id),
+	prepPriority TINYINT UNSIGNED NOT NULL DEFAULT 1,
 	FOREIGN KEY (employeeID) REFERENCES Employees(id),
 	FOREIGN KEY (overrideAuthorization) REFERENCES Employees(id),
-	FOREIGN KEY (menuItemID) REFERENCES MenuItems(id) 
+	FOREIGN KEY (menuItemQuickCode) REFERENCES QuickCodes(id) 
 );
