@@ -56,7 +56,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-
 DELIMITER $$
 CREATE TRIGGER afterDeleteMenuCategory
 AFTER DELETE ON MenuCategories FOR EACH ROW
