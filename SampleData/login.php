@@ -22,9 +22,10 @@
 			
 			include 'connect_disconnect.php';
 
+			connect();
 
 			$sql = "SELECT * FROM employeeroles";
-			$result = connection()->query($sql);
+			$result = $conn->query($sql);
 
 			echo "<label> Select Your Role </label>";
 			echo "<select name='role' id='role'>";

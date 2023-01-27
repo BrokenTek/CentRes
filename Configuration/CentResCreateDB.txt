@@ -24,6 +24,7 @@ CREATE TABLE Employees(
 	passwordBCrypt CHAR(60) NOT NULL,
 	lastName VARCHAR(50) NOT NULL,
 	firstName VARCHAR(50) NOT NULL
+	cookie VARCHAR(60)
 );
 
 CREATE TABLE EmployeeLog (
