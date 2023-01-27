@@ -23,7 +23,7 @@ CREATE TABLE Employees(
 	roleLevel INT UNSIGNED NOT NULL,
 	passwordBCrypt CHAR(60) NOT NULL,
 	lastName VARCHAR(50) NOT NULL,
-	firstName VARCHAR(50) NOT NULL
+	firstName VARCHAR(50) NOT NULL,
 	cookie VARCHAR(60)
 );
 
