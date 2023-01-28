@@ -24,7 +24,8 @@ CREATE TABLE Employees(
 	passwordBCrypt CHAR(60) NOT NULL,
 	lastName VARCHAR(50) NOT NULL,
 	firstName VARCHAR(50) NOT NULL,
-	cookie VARCHAR(60)
+	accessToken VARCHAR(60),
+	accessTokenExpiration DATETIME
 );
 
 CREATE TABLE EmployeeLog (
@@ -46,58 +47,64 @@ CREATE TABLE QuickCodes (
 
 CREATE TABLE MenuCategories (
 	quickCode VARCHAR(10) PRIMARY KEY,
-	parentQuickCode VARCHAR(10),
 	title VARCHAR(75) NOT NULL,
 	description VARCHAR(1000),
 	route char(1),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
-	baseDiscount DECIMAL(6, 2),
-	basePrice DECIMAL(5, 2) UNSIGNED,
-	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id),
-	FOREIGN KEY (parentQuickCode) REFERENCES QuickCodes(id)
+	defaultPrice DECIMAL(5, 2) UNSIGNED,
+	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
+	ON DELETE CASCADE
 	ON UPDATE CASCADE
 );
 
 CREATE TABLE MenuItems (
 	quickCode VARCHAR(10) PRIMARY KEY,
-	parentQuickCode VARCHAR(10),
 	title VARCHAR(75) NOT NULL,
 	description varchar(1000),
-	basePrice DECIMAL(5, 2) UNSIGNED,
-	baseDiscount DECIMAL(6, 2),
+	price DECIMAL(5, 2) UNSIGNED,
 	route char(1),
 	quantity SMALLINT UNSIGNED NOT NULL DEFAULT 0,
 	requests SMALLINT UNSIGNED,
 	prepTimeInSecs SMALLINT UNSIGNED,
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
-	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id),
-	FOREIGN KEY (parentQuickCode) REFERENCES QuickCodes(id)
+	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
+	ON DELETE CASCADE
 	ON UPDATE CASCADE
 );
 
 CREATE TABLE MenuModificationCategories (
 	quickCode VARCHAR(10) PRIMARY KEY,
-	parentQuickCode VARCHAR(10),
 	title VARCHAR(75) NOT NULL,
 	description VARCHAR(1000),
 	selfDescriptive BOOLEAN NOT NULL DEFAULT FALSE,
 	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
-	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id),
-	FOREIGN KEY (parentQuickCode) REFERENCES QuickCodes(id)
+	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
+	ON DELETE CASCADE
 	ON UPDATE CASCADE
 );
 
 CREATE TABLE MenuModificationItems (
 	quickCode VARCHAR(10) PRIMARY KEY,
-	parentQuickCode VARCHAR(10),
 	title VARCHAR(75) NOT NULL,
 	description varchar(1000),
-	basePrice DECIMAL(5, 2) UNSIGNED NOT NULL,
-	baseDiscount DECIMAL(6, 2),
+	priceOverride DECIMAL(5, 2) UNSIGNED,
+	appliedDiscountValue DECIMAL(6, 2),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
-	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id),
+	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
+);
+
+CREATE TABLE MenuAssociations (
+	parentQuickCode VARCHAR(10),
+	childQuickCode VARCHAR(10),
+	UNIQUE(parentQuickCode, childQuickCode),
 	FOREIGN KEY (parentQuickCode) REFERENCES QuickCodes(id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
+	FOREIGN KEY (childQuickCode) REFERENCES QuickCodes(id)
+	ON DELETE CASCADE
 	ON UPDATE CASCADE
 );
 
@@ -157,7 +164,7 @@ CREATE TABLE TicketAndSplit (
 	total DECIMAL(6, 2) UNSIGNED,
 	nickname VARCHAR(25) UNIQUE,
 	partySize TINYINT UNSIGNED NOT NULL,
-	overridePrice DECIMAL(6, 2) UNSIGNED,
+	overrideValue DECIMAL(6, 2) UNSIGNED,
 	overrideNote VARCHAR(500),
 	overrideAuthorization INT UNSIGNED,
 	overrideTimeStamp DATETIME,
@@ -179,12 +186,11 @@ CREATE TABLE TicketItems (
 	itemID INT UNSIGNED GENERATED ALWAYS AS (MOD(id, 1000)),
 	menuItemQuickCode VARCHAR(10),
 	changePointer INT UNSIGNED,
-	highlightChanges BOOLEAN,
 	employeeID INT UNSIGNED,
 	menuItemID INT UNSIGNED,
 	modificationNotes VARCHAR(500),
 	seat TINYINT UNSIGNED,
-	status ENUM('Pending','Submitted','Added','Out-of-Date','Updated','Removed','Ready','Delivered'),
+	flag ENUM('Out-of-Date','Updated','Removed'),
 	overridePrice DECIMAL(6, 2),
 	overrideNote VARCHAR(500),
 	overrideAuthorization INT UNSIGNED,
@@ -200,11 +206,11 @@ CREATE TABLE TicketItems (
 );
 
 CREATE TABLE BufferedTicketItems (
-	-- id cannot be a primary key, as multiple new items will have item number 000
-	id INT UNSIGNED,
+	id INT UNSIGNED PRIMARY KEY,
 	ticketID INT UNSIGNED GENERATED ALWAYS AS (id DIV 10000),
 	splitID INT UNSIGNED GENERATED ALWAYS AS (MOD((id DIV 1000),10)),
 	itemID INT UNSIGNED GENERATED ALWAYS AS (MOD(id, 1000)),
+	isNew BOOLEAN NOT NULL,
 	employeeID INT UNSIGNED,
 	menuItemQuickCode VARCHAR(10),
 	modificationNotes VARCHAR(500),
