@@ -1,17 +1,17 @@
 <?php echo '
-			<span class="order-item" id="orderItem22101107">
+			<span class="ticketItem" id="ticketItem22101107" data-pushToDB="">
 				
-				<span class="remove-order-item-btn">X</span>
+				<span class="ticketItemStatus">ýþ6</span>
 				
-				<span class="order-item-number">107</span>
-				<span class="order-item-text">Royal Burger</span>
-				<span class="order-item-price old-info">$8,888.88</span>
-				<span class="order-item-override-note">Long Wait</span>
-				<span class="order-item-override-price">$3.57</span>
-				<span class="mod-text">Egg</span>
-				<span class="mod-text">Cheese</span>
-				<span class="mod-text">Extra Mayo</span>
-				<span class="mod-custom">Karen wants exactly 1/2 pickle</span>
+				<span class="ticketItemNumber">107</span>
+				<span class="ticketItemText">Royal Burger</span>
+				<span class="ticketItemPrice old-info">$8,888.88</span>
+				<span class="ticketItemOverrideNote">Long Wait</span>
+				<span class="ticketItemOverridePrice">$3.57</span>
+				<span class="modText">Egg</span>
+				<span class="modText">Cheese</span>
+				<span class="modText">Extra Mayo</span>
+				<span class="modCustom">Karen wants exactly 1/2 pickle</span>
 				
 				<input type="hidden" name="ticketItemNumber[]" value="2210000"/>
 				<input type="hidden" name="menuItem[]" value="BRG"/>
@@ -21,18 +21,17 @@
 				<input type="hidden" name="overideNote[]" value="Long Wait"/>
             </span>
 			
-			<span class="order-item" id="orderItem2004">
+			<span class="ticketItem" id="ticketItem2004">
 				
-				<span class="remove-order-item-btn">X</span>
+				<span class="removeTicketItemBtn">X</span>
 				
-				<span class="order-item-number"></span>
-				<span class="order-item-text">Hot Dog</span>
-				<span class="order-item-price">$9.87</span>
-				<span class="order-item-override-note"></span>
-				<span class="order-item-override-price"></span>
-				<span class="order-item-override-price"></span>
-				<span class="mod-text"></span>
-				<span class="mod-custom"></span>
+				<span class="ticketItemNumber"></span>
+				<span class="ticketItemText">Hot Dog</span>
+				<span class="ticketItemPrice">$9.87</span>
+				<span class="ticketItemOverrideNote"></span>
+				<span class="ticketItemOverridePrice"></span>
+				<span class="modText"></span>
+				<span class="modCustom"></span>
 				
 				<input type="hidden" name="ticketItemNumber[]" value="4"/>
 				<input type="hidden" name="menuItem[]" value="HDG"/>

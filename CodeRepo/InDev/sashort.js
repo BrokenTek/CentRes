@@ -1,7 +1,49 @@
-var helloWorld = window.helloWorld;
-window.helloWorld = function(var arg) {
-	// your function code goes here
-	alert (arg);
+// This function checks for any menu items, identified by
+// a class name of "menuItem", and adds an event listener
+function createMenuSelectEventhandlers() {
+	var elements = document.getElementsByClassName("menuItem");
+
+	var myFunction = function() {
+		var attribute = this.id;
+		alert("You clicked menu item " + attribute);
+		selectMenuItem( id );
+	};
+
+
+	for (var i = 0; i < elements.length; i++) {
+	
+		elements[i].addEventListener('click', myFunction);
+	};
+	window.removeEventListener('load', createMenuSelectEventhandlers);
 }
 
-alert("Hello Friend");
+window.addEventListener('load', createMenuSelectEventhandlers);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
