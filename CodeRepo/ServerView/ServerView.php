@@ -3,7 +3,9 @@
 	<link rel="stylesheet" href="serverStructure.css">
 		
   	  <script type="text/javascript">
-		function templateFunction( a ) { alert("You override the template function in your file"); }
+		function templateFunction( a ) { 
+			alert("You override the template function in your file"); 
+		}
 		
 		function reloadPage() {
 			document.getElementById("form-container").submit();
@@ -13,13 +15,13 @@
 		function maxSplitNumber() { return 9; }
 		function createMenuSelectEventHandlers() {}
 		function selectMenuItem( id ) {}
-		function selectTicketItem( id )
+		function selectTicketItem( id ) {}
 		function moveTicketItem() {}
 		function removeTicketItem() {}
 		function stateChanged() {}
-		function editTicketItem()
-		function configureModificationWindow()
-		function updateMenuItem()
+		function editTicketItem() {}
+		function configureModificationWindow() {}
+		function updateMenuItem() {}
 
 		
 
