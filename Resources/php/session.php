@@ -10,15 +10,15 @@
 			
 			// check corresponding accessToken in database exists and is valid
 			$sql = "SELECT sessionRole('" .$_COOKIE[$cookie_name].  "') AS sessionRole;";
-			$role = $GLOBALS['conn']->query($sql)->fetch_assoc()['sessionRole'];
+			$role = connection()->query($sql)->fetch_assoc()['sessionRole'];
 			
 			// session validated and session role determined.... get the session username
 			$sql = "SELECT sessionUsername('" .$_COOKIE[$cookie_name].  "') AS sessionUsername;";
-			$uname = $GLOBALS['conn']->query($sql)->fetch_assoc()['sessionUsername'];
+			$uname = connection()->query($sql)->fetch_assoc()['sessionUsername'];
 			
 			//$get First and Last Name
 			$sql = "SELECT firstName, lastName FROM Employees where userName = '" .$uname. "';";
-			$row = $GLOBALS['conn']->query($sql)->fetch_assoc();
+			$row = connection()->query($sql)->fetch_assoc();
 			$fname = $row['firstName'];
 			$lname = $row['lastName'];
 					

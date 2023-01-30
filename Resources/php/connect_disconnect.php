@@ -24,12 +24,10 @@ function connection() {
 		return $GLOBALS['conn'];
 	}
 
-	echo "<h2>DEBUG: Not connected, connecting now</h2>";
-
 	$servername = "p:localhost";
 	$username = "scott";
 	$password = "tiger";
-	$dbname = "centres0";
+	$dbname = "centres";
 
 	$conn = mysqli_connect($servername, $username, $password, $dbname);
 	$conn2 = mysqli_connect($servername, $username, $password, $dbname);			// test multiple login on same user

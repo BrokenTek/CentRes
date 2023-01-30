@@ -1,6 +1,6 @@
 <?php
 	include '../Resources/php/connect_disconnect.php';
-	connection();
+	// connection();
 	$sql = NULL;
 	$allowedRoles = NULL;
 	$errorMessage = NULL;
@@ -11,9 +11,9 @@
 	if (isset($_POST['uname'])) {
 		//if username exists, get the allowed roles value
 		$sql = "SELECT roleLevel FROM Employees WHERE userName = '" .$_POST['uname']. "';";
-		$result = $GLOBALS['conn']->query($sql);
+		$result = connection()->query($sql);
 		if (mysqli_num_rows ($result) == 1) {
-			$allowedRoles = $GLOBALS['conn']->query($sql)->fetch_assoc()['roleLevel'];
+			$allowedRoles = connection()->query($sql)->fetch_assoc()['roleLevel'];
 		}	
 	}
 	
@@ -22,9 +22,9 @@
 			// unvalidated username and password entered
 		
 			// confirm valid username & get password hash, otherwise invalid username.
-			connection();
+			// connection();
 			$sql = "SELECT userPasswordHash('" .$_POST['uname']. "') AS userPasswordHash;";
-			$passResult = $GLOBALS['conn']->query($sql)->fetch_assoc()['userPasswordHash'];
+			$passResult = connection()->query($sql)->fetch_assoc()['userPasswordHash'];
 
 			// confirm entered password matches stored password, otherwise invalid password entered.
 			if (!password_verify($_POST['pword'], $passResult)) {
@@ -39,7 +39,7 @@
 					
 			// login to database and set session token, otherwise sessionToken is already in use or incorrect role selected.
 			$sql = "CALL login('" .$_POST['uname']. "', " .$_POST['role']. ", '" .$sessionToken. "');";
-			$GLOBALS['conn']->query($sql);	
+			connection()->query($sql);	
 			
 			// LOGIN SUCCESSFUL..... redirect to the appropriate page.
 			header("Location: ../ServerView/ServerView.php");
@@ -78,7 +78,7 @@
 			// user has entered a valid username and password.... Existing session not verified yet.
 			if (isset($_POST['uname']) and !isset($errorMessage)) {				
 				$sql = "SELECT * FROM employeeroles";
-				$definedRoles = $GLOBALS['conn']->query($sql);
+				$definedRoles = connection()->query($sql);
 			
 				echo "<label> Select Your Role </label>";
 				echo "<select name='role' id='cboLoginRole' onchange='autoLogin()'>";
