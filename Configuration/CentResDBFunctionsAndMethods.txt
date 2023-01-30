@@ -30,6 +30,8 @@ DROP TRIGGER IF EXISTS afterDeleteMenuModificationItem;
 DROP PROCEDURE IF EXISTS createUser;
 DROP FUNCTION IF EXISTS sessionUsername;
 DROP FUNCTION IF EXISTS sessionRole;
+DROP FUNCTION IF EXISTS getMods;
+DROP FUNCTION IF EXISTS loggedIn;
 
 DELIMITER $$
 CREATE TRIGGER beforeAddMenuCategory
@@ -441,6 +443,36 @@ BEGIN
 	END IF;
 END$$
 DELIMITER ;
+
+ - ////////////////////////////////////////////////////////////////////////////////////////
+ - NEEDS TO BE CORRECTLY IMPLEMENTED
+DELIMITER $$
+CREATE FUNCTION getMods(quickCode VARCHAR(10)) RETURNS VARCHAR(500)
+BEGIN
+	 RETURN 'MOD1,MOD2';
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE FUNCTION loggedIn(uname VARCHAR(25)) RETURNS BOOLEAN
+BEGIN
+	DECLARE endTime DATETIME;
+	DECLARE empID INT UNSIGNED;
+	SELECT id INTO empID FROM Employees WHERE userName = uname;
+	SELECT accessTokenExpiration INTO endTime FROM Employees WHERE userName = uname;
+	IF (empID IS NULL) THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Username Not Found!';
+	ELSEIF (endTime IS NULL OR endTime < NOW()) THEN
+		RETURN FALSE;
+	ELSE
+		RETURN TRUE;
+	END IF;
+END$$
+DELIMITER ;
+
+
+
 
 DELIMITER $$
 CREATE PROCEDURE createUser(IN lName VARCHAR(50), fName VARCHAR(60), IN uName VARCHAR(25), IN pHash VARCHAR(60), IN roles TINYINT UNSIGNED)
