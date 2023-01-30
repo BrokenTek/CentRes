@@ -9,25 +9,45 @@
 <html>
 <body>
 <?php
+
 global $conn;
-// Connect To Database, Connection Is Persistent - 'p:'localhost
-function connect() {
+global $connection_level;
+$connection_level = 0;
+
+// testing
+global $conn2;
+
+function connection() {
+	if ($GLOBALS['conn'] && !$GLOBALS['conn']->connect_error) {
+		$GLOBALS['connection_level']++;
+		echo "<h2>Connection Is Still Connected</h2>";
+		return $GLOBALS['conn'];
+	}
+
+	echo "<h2>DEBUG: Not connected, connecting now</h2>";
+
 	$servername = "p:localhost";
 	$username = "scott";
 	$password = "tiger";
-	$dbname = "centres";
+	$dbname = "centres0";
 
-	$GLOBALS['conn'] = mysqli_connect($servername, $username, $password, $dbname);
-	if (!$GLOBALS['conn']) {
+	$conn = mysqli_connect($servername, $username, $password, $dbname);
+	$conn2 = mysqli_connect($servername, $username, $password, $dbname);			// test multiple login on same user
+	if (!$conn) {
 		die("Connection failed: " . mysqli_connect_error());
-	} 	
-	return $GLOBALS['conn'];
-}
+		} 	
+	$GLOBALS['connection_level']++;	
 
+	return $conn;
+}
 
 // Disconnect From The Persistent Database Connection. This Is Necessary
 function disconnect() {
-	mysqli_close($GLOBALS['conn']);	
+	// mysqli_close($GLOBALS['conn']);
+	$GLOBALS['connection_level']--;	
+	if ($GLOBALS['connection_level'] == 0) {
+		mysqli_close(connection());
+	}
 }
 ?>
 
