@@ -26,7 +26,10 @@ DROP TRIGGER IF EXISTS beforeUpdateMenuModificationItem;
 DROP TRIGGER IF EXISTS afterDeleteMenuCategory;
 DROP TRIGGER IF EXISTS afterDeleteMenuItem;
 DROP TRIGGER IF EXISTS afterDeleteMenuModificationCategory;
-DROP TRIGGER IF EXISTS AfterDeleteMenuModificationItem;
+DROP TRIGGER IF EXISTS afterDeleteMenuModificationItem;
+DROP PROCEDURE IF EXISTS createUser;
+DROP FUNCTION IF EXISTS sessionUsername;
+DROP FUNCTION IF EXISTS sessionRole;
 
 DELIMITER $$
 CREATE TRIGGER beforeAddMenuCategory
@@ -408,28 +411,76 @@ BEGIN
 END$$
 DELIMITER ;
 
+DELIMITER $$
+CREATE FUNCTION sessionRole(token VARCHAR(60)) RETURNS INT UNSIGNED
+BEGIN
+	DECLARE empID INT UNSIGNED;
+	DECLARE role INT UNSIGNED;
+	SELECT id INTO empID FROM Employees WHERE accessToken = token AND accessTokenExpiration > NOW();
+	IF (empId IS NULL) THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Access Token Expired Or Doesn''t Exist!';
+	ELSE
+		SELECT employeeRole INTO role FROM ActiveEmployees WHERE employeeID = empID;
+		RETURN role;
+	END IF;
+END$$
+DELIMITER ;
+
 
 DELIMITER $$
-CREATE PROCEDURE login(IN requestedUsername VARCHAR(25), IN requestedRoles TINYINT UNSIGNED)
+CREATE FUNCTION sessionUsername(token VARCHAR(60)) RETURNS VARCHAR(25)
+BEGIN
+	 DECLARE uname VARCHAR(25);
+	 SELECT userName INTO uname FROM Employees WHERE accessToken = token AND accessTokenExpiration > NOW();
+	IF (uname IS NULL) THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Access Token Expired Or Doesn''t Exist!';
+	ELSE
+		RETURN uname;
+	END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE createUser(IN lName VARCHAR(50), fName VARCHAR(60), IN uName VARCHAR(25), IN pHash VARCHAR(60), IN roles TINYINT UNSIGNED)
+BEGIN
+	INSERT INTO Employees (lastName, firstName, userName, passwordBCrypt, roleLevel) VALUES (lName, fName, uname, pHash, roles);
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE PROCEDURE login(IN requestedUsername VARCHAR(25), IN requestedRoles TINYINT UNSIGNED, IN newAccessToken varchar(60))
 BEGIN
 	DECLARE allowedRoles TINYINT UNSIGNED;
 	DECLARE empID INT UNSIGNED;
+	
 	IF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername) = 0) THEN
 		-- Invalid Employee ID
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Username not found!';
 	ELSE
 		SELECT roleLevel INTO allowedRoles FROM Employees WHERE userName = requestedUsername;
+		
 		IF (allowedRoles & requestedRoles <> requestedRoles) THEN
 			-- Invalid Requested Roles
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'You do not have the authorization to login with the role you sepcified!';
-		ELSE
+		ELSEIF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername AND accessToken IS NOT NULL AND accessTokenExpiration > now()) = 1) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'You are already logged in elsewhere!';
+		ELSEIF ((SELECT COUNT(*) FROM Employees WHERE accessToken = newAccessToken AND userName <> requestedUsername) = 1 ) THEN
+			-- Another user is already logged in using your access key.
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Access Token Not Unique! Retry Login.';
+		ELSE			
 			SELECT id INTO empID FROM Employees WHERE userName = requestedUsername;
 			UPDATE EmployeeLog SET endTime = NOW() WHERE employeeID = empID and endTime IS NULL;
 			INSERT INTO EmployeeLog (employeeID, employeeRole) VALUES(empID, requestedRoles);
 			DELETE FROM ActiveEmployees WHERE employeeID = empID;
 			INSERT INTO ActiveEmployees (employeeID, employeeRole) VALUES (empID, requestedRoles);
+			UPDATE employees SET accessToken = newAccessToken, accessTokenExpiration = ADDTIME(NOW(), 500) WHERE userName = requestedUsername;
 		END IF;
 	END IF;
 	
@@ -446,7 +497,8 @@ BEGIN
 		SET MESSAGE_TEXT = 'Username not found!';
 	ELSE
 		SELECT id INTO empID FROM Employees WHERE userName = uname;
-		UPDATE EmployeeLog SET endTime = NOW() WHERE employeeID = empID and endTime IS NULL;
+		UPDATE EmployeeLog SET endTime = DATE_ADD(NOW(), INTERVAL 5 MINUTE) WHERE employeeID = empID and endTime IS NULL;
+		UPDATE Employees SET accessToken = NULL, accessTokenExpiration = NULL WHERE userName = uname;
 		DELETE FROM ActiveEmployees WHERE employeeID = empID;
 	END IF;
 	
