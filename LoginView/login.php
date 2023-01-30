@@ -1,6 +1,6 @@
 <?php
 	include '../Resources/php/connect_disconnect.php';
-	connect();
+	connection();
 	$sql = NULL;
 	$allowedRoles = NULL;
 	$errorMessage = NULL;
@@ -22,7 +22,7 @@
 			// unvalidated username and password entered
 		
 			// confirm valid username & get password hash, otherwise invalid username.
-			connect();
+			connection();
 			$sql = "SELECT userPasswordHash('" .$_POST['uname']. "') AS userPasswordHash;";
 			$passResult = $GLOBALS['conn']->query($sql)->fetch_assoc()['userPasswordHash'];
 
