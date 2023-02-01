@@ -46,9 +46,8 @@ function disconnect() {
 	}
 	catch (Exception $e) {
 	}
-	unset($GLOBALS['conn']);
-	
-}
+		unset($GLOBALS['conn']);	
+	}
 ?>
 
 </body>

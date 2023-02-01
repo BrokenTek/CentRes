@@ -1,3 +1,4 @@
+<?php require "../Resources/php/session.php"; ?>
 <html>
    <head>
 	<link rel="stylesheet" href="serverStructure.css">

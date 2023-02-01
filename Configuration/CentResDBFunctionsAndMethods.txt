@@ -14,6 +14,7 @@ DROP FUNCTION IF EXISTS userPasswordHash;
 DROP FUNCTION IF EXISTS usernameFromID;
 DROP FUNCTION IF EXISTS idFromUsername;
 DROP FUNCTION IF EXISTS menuItemPrice;
+DROP FUNCTION IF EXISTS mipHelperFunction;
 DROP FUNCTION IF EXISTS ticketItemPrice;
 DROP TRIGGER IF EXISTS beforeAddMenuCategory;
 DROP TRIGGER IF EXISTS beforeAddMenuItem;
@@ -32,6 +33,7 @@ DROP FUNCTION IF EXISTS sessionUsername;
 DROP FUNCTION IF EXISTS sessionRole;
 DROP FUNCTION IF EXISTS getMods;
 DROP FUNCTION IF EXISTS loggedIn;
+DROP FUNCTION IF EXISTS menuItemModifications;
 
 DELIMITER $$
 CREATE TRIGGER beforeAddMenuCategory
@@ -391,15 +393,127 @@ BEGIN
 END$$
 DELIMITER ;
 
--- function needs to be recoded to include appropriate price calculation
+-- parent Quick code is required because Menu Items can belong to more than 1 Menu Item Category.
+-- specifying the parent uniquely identifies a specific instance of the menu item.
 DELIMITER $$
-CREATE FUNCTION menuItemPrice(menuItemQuickCode VARCHAR(10)) RETURNS DECIMAL(6, 2)
+CREATE FUNCTION menuItemPrice(qc VARCHAR(10), parentQuickCode VARCHAR(10)) RETURNS DECIMAL(6, 2)
 BEGIN
-	DECLARE price INT UNSIGNED;
-	SELECT basePrice INTO price FROM MenuItems WHERE quickCode = menuItemQuickCode;
-	RETURN price;
+	DECLARE prc DECIMAL(6, 2);
+	SELECT price INTO prc FROM MenuItems WHERE id = qc; 
+	RETURN mipHelperFunction(parentQuickCode, prc, NULL, NULL, NULL);
 END$$
 DELIMITER ;
+
+DELIMITER $$
+CREATE FUNCTION mipHelperFunction(qc VARCHAR(10), basePrice DECIMAL(6, 2), minPercentage DECIMAL(6, 2), minDiscount DECIMAL(6, 2), minPriceOverride DECIMAL(6,2)) RETURNS DECIMAL(6, 2)
+BEGIN
+	DECLARE selectedValue DECIMAL(6, 2);
+	DECLARE defPrice DECIMAL(6, 2);
+	DECLARE done INT DEFAULT FALSE;
+	DECLARE parentQC VARCHAR(10);
+	DECLARE myCursor CURSOR
+		FOR 
+			SELECT priceModificationValue FROM MenuModificationItems INNER JOIN MenuAssociations ON MenuModificationItems.quickCode = MenuAssociations.childQuickCode WHERE parentQuickCode = qc;
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+	
+	OPEN myCursor;
+	modItemsLoop:
+	LOOP
+		FETCH myCursor INTO selectedValue;
+		IF (done = 1) THEN
+			LEAVE modItemsLoop;
+		END IF;
+		IF (selectedValue = 0) THEN
+			CLOSE myCursor;
+			RETURN 0;
+		ELSEIF (selectedValue < 0 AND (selectedValue < minDiscount OR minDiscount IS NULL)) THEN
+			SET minDiscount = selectedValue;
+		ELSEIF (selectedValue > 0 AND selectedValue < 1 and (selectedValue < minDiscount OR minDiscount IS NULL)) THEN
+			SET minPercentage = selectedValue;
+		ELSEIF (selectedValue >= 1 AND (selectedValue < minPriceOverride OR minPriceOverride IS NULL)) THEN
+			SET minPriceOverride = selectedValue;
+		END IF;
+	END LOOP modItemsLoop;
+	CLOSE myCursor;
+
+	IF (basePrice IS NULL) Then
+		SELECT defaultPrice INTO basePrice FROM MenuCategories WHERE quickCode = qc;
+	End If;
+
+	SELECT parentQuickCode INTO parentQC FROM TableAssociations WHERE childQuickCode = qc;
+	IF (basePrice - minDiscount < 0) THEN
+		SET minDiscount = 0;
+	END IF;
+	IF parentQC IS NULL THEN
+		IF (basePrice IS NULL and minPriceOverride IS NULL) Then
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Menu Item doesn''t have a price set, and cannot be inferred from ancestors!';
+		ELSE
+			SET selectedValue = basePrice;
+			IF (minPercentage IS NOT NULL AND basePrice * minPercentage < selectedValue) THEN
+				SET selectedValue = basePrice * minPercentage;
+			End IF;
+			IF (minDiscount IS NOT NULL AND basePrice + minDiscount < selectedValue) THEN
+				SET selectedValue = basePrice + minDiscount;
+			End IF;
+			IF (minPriceOverride IS NOT NULL AND minPriceOverride < selectedValue) THEN
+				SET selectedValue = basePrice + minDiscount;
+			End IF;
+			RETURN selectedValue;
+		END IF;
+	ELSE
+		RETURN mipHelperFunction(parentQC, basePrice, minPercentage, minDiscount, minPriceOverride);
+	END IF;
+	
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE FUNCTION menuItemModifications(qc VARCHAR(10), parentQC VARCHAR(10)) RETURNS VARCHAR(500)
+BEGIN
+	DECLARE inString VARCHAR(10);
+	DECLARE myString VARCHAR(500);
+
+	DECLARE done INT DEFAULT FALSE;
+	DECLARE myCursor CURSOR
+		FOR 
+			SELECT childQuickCode FROM MenuAssociations INNER JOIN MenuModificationCategories ON MenuAssociations.childQuickCode = MenuModificationsCategories.quickCode WHERE parentQuickCode = parentQC;
+	DECLARE myCursor2 CURSOR
+		FOR 
+			SELECT childQuickCode FROM MenuAssociations INNER JOIN MenuModificationCategories ON MenuAssociations.childQuickCode = MenuModificationsCategories.quickCode WHERE parentQuickCode = qc;
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+	
+	OPEN myCursor;
+	modItemsLoop:
+	LOOP
+		FETCH myCursor INTO inString;
+		IF (done = 1) THEN
+			LEAVE modItemsLoop;
+		END IF;
+		UPDATE myString SET myString = myString + ',' + inString;
+		
+	END LOOP modItemsLoop;
+	CLOSE myCursor;
+	SET done = FALSE;
+	
+	OPEN myCursor2;
+	modItemsLoop2:
+	LOOP
+		FETCH myCursor INTO inString;
+		IF (done = 1) THEN
+			LEAVE modItemsLoop2;
+		END IF;
+		UPDATE myString SET myString = myString + ',' + inString;
+		
+	END LOOP modItemsLoop2;
+	CLOSE myCursor2;
+
+	RETURN myString + ',';
+
+END$$
+DELIMITER ;
+
+
 
 -- function needs to be recoded to include appropriate price calculation
 DELIMITER $$
@@ -444,14 +558,6 @@ BEGIN
 END$$
 DELIMITER ;
 
- - ////////////////////////////////////////////////////////////////////////////////////////
- - NEEDS TO BE CORRECTLY IMPLEMENTED
-DELIMITER $$
-CREATE FUNCTION getMods(quickCode VARCHAR(10)) RETURNS VARCHAR(500)
-BEGIN
-	 RETURN 'MOD1,MOD2';
-END$$
-DELIMITER ;
 
 DELIMITER $$
 CREATE FUNCTION loggedIn(uname VARCHAR(25)) RETURNS BOOLEAN
@@ -470,8 +576,6 @@ BEGIN
 	END IF;
 END$$
 DELIMITER ;
-
-
 
 
 DELIMITER $$

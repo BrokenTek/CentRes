@@ -51,7 +51,7 @@ CREATE TABLE MenuCategories (
 	description VARCHAR(1000),
 	route char(1),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
-	defaultPrice DECIMAL(5, 2) UNSIGNED,
+	defaultPrice DECIMAL(6, 2) UNSIGNED,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE
@@ -61,7 +61,7 @@ CREATE TABLE MenuItems (
 	quickCode VARCHAR(10) PRIMARY KEY,
 	title VARCHAR(75) NOT NULL,
 	description varchar(1000),
-	price DECIMAL(5, 2) UNSIGNED,
+	price DECIMAL(6, 2) UNSIGNED,
 	route char(1),
 	quantity SMALLINT UNSIGNED NOT NULL DEFAULT 0,
 	requests SMALLINT UNSIGNED,
@@ -76,6 +76,7 @@ CREATE TABLE MenuModificationCategories (
 	quickCode VARCHAR(10) PRIMARY KEY,
 	title VARCHAR(75) NOT NULL,
 	description VARCHAR(1000),
+	defaultPrice DECIMAL(6, 2) UNSIGNED,
 	selfDescriptive BOOLEAN NOT NULL DEFAULT FALSE,
 	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
@@ -88,8 +89,7 @@ CREATE TABLE MenuModificationItems (
 	quickCode VARCHAR(10) PRIMARY KEY,
 	title VARCHAR(75) NOT NULL,
 	description varchar(1000),
-	priceOverride DECIMAL(5, 2) UNSIGNED,
-	appliedDiscountValue DECIMAL(6, 2),
+	priceOrModificationValue DECIMAL(6, 2),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
 	ON DELETE CASCADE

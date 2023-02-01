@@ -1,0 +1,23 @@
+1.	QuickCodes can't contain commas
+
+2.	MenuItemCategories can have at most 1 parent
+	If you want to include a MenuItemCategory in the menu and in more than 1 location
+	use a MenuModificationCategory instead.
+	
+3. Menu items can be shared among different Menu Item CATEGORIES
+
+3.	MenuModificationItems can have:
+		- parent MenuItemCategory (1+)
+		- parent MenuModificationCategory (1+)
+	(Not allowed to have a parent MenuItem)
+		
+4a.	Any MenuModificationItem attached to a MenuItemCategory or its ancestor MenuItemCategories
+	are used to calculate any descendant MenuItem prices.
+	
+4b.	the menuItemPrice function will reflect any applications of MenuModificationItems applied to any ancestor
+	MenuItemCategories. It gives the customer the cheapest possible price.
+
+5.	Any MenuModificationCategories attached to a MenuItem or its parent MenuItemCategory will appear in the
+	modification window.
+	
+6.	prices 0-.99 have to calculated as the base price - set value
