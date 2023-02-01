@@ -18,7 +18,7 @@ global $conn;
 global $connection_level;
 
 function connection() {
-	if ($GLOBALS['conn'] && !$GLOBALS['conn']->connect_error) {
+	if (!empty($GLOBALS['conn']) && !$GLOBALS['conn']->connect_error) {
 		$GLOBALS['connection_level']++;
 		return $GLOBALS['conn'];
 	}

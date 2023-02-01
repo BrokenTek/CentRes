@@ -1,7 +1,7 @@
 <?php require "../Resources/php/session.php"; ?>
 <html>
    <head>
-	<link rel="stylesheet" href="serverStructure.css">
+	<link rel="stylesheet" href="../Resources/CSS/serverStructure.css">
 		
   	  <script type="text/javascript">
 		function templateFunction( a ) { 

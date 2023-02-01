@@ -1,40 +1,63 @@
 <?php 
-	echo '
-	<details>
-		<summary class="menuCategory" id="ENT">Entrees</summary>
-		<ol>
-			<li class="menuItem" id="BRG" data-text="Royal Burger" data-price="8888.88"><span>Royal Burger</span><span>$8,888.88</span></li>
-			<li class="menuItem" id = "HDG" data-text="Hot Dog" data-price="9.87"><span>Hot Dog</span><span>$9.87</span></li>
-		</ol>
-	</details>
-	<details>
-		<summary class="menuCategory" id="DRK">Drinks</summary>
-		<details>
-			<summary class="menuCategory" id="DRK-N">Non-Alcoholic</summary>
-				<ol>
-					<button class="menuItem" id="PEPSI" data-text="Pepsi" data-price="2.99"><span>Pepsi</span><span>$2.99</span></button>
-					<h1 class="menuItem" id = "COKE" data-text="Pepsi" data-price="3.25"><span>Coke</span><span>$3.25</span></h1>
-					<li class="menuItem" id = "SWTT" data-text="Sweet Tea" data-price="4.00"><span>Sweet Tea</span><span>$4.00</span></li>
-				</ol>
-				<details>
-					<summary class="menuCategory" id="CLD">Cold Drinks</summary>
-					<ol>
-						<li class="menuItem" id="FRL" data-text="Frozen Lemonade" data-price="2.99"><span>Frozen Lemonade</span><span>$2.99</span></li>
-						<li class="menuItem" id ="RBF" data-text="Rootbeer Float" data-price="4.85"><span>Rootbeer Float</span><span>$4.85</span></li>
-					</ol>
-				</details>
-		</details>
-		<details>
-			<summary class="menuCategory" id="DRK-A">Alcoholic</summary>
-				<ol>
-					<li class="menuItem" data-text="Rum" data-price="4,00"><span>Rum</span><span>$4.00</span></li>
-					<li class="menuItem" data-text="Gin" data-price="6.00"><span>Gin</span><span>$6.00</span></li>
-					<li class="menuItem" data-text="Whiskey" data-price="6.50"><span>Whiskey</span><span>$6.50</span></li>
-				</ol>
-		</details>
-		
-	</details>
-	';
-	
 
+$sql = "SELECT childQuickCode, title
+		FROM MenuAssociations 
+		INNER JOIN MenuCategories ON MenuCategories.quickCode = MenuAssociations.childQuickCode 
+		WHERE MenuAssociations.parentQuickCode = 'ROOT';";
+$result = connection()->query($sql);
+
+if ($result->num_rows > 0) {
+	while($row = $result->fetch_assoc()) {
+		printMenuCategory($row['childQuickCode'], $row['title']);
+	}
+}
+
+
+	function printMenuCategory(string $qc, string $title) {
+
+		echo "<details id='". $qc ."' class='menuCategory'>
+			<summary>". $title ."</summary>
+			<div>";
+
+		$sql = "SELECT childQuickCode, title 
+		FROM MenuAssociations 
+		INNER JOIN MenuCategories ON MenuCategories.quickCode = MenuAssociations.childQuickCode 
+		WHERE MenuAssociations.parentQuickCode = '$qc';";
+		$result = connection()->query($sql);
+
+		if ($result->num_rows > 0) {
+			while($row = $result->fetch_assoc()) {
+				printMenuCategory($row['childQuickCode'], $row['title']);
+			}
+		}
+
+		echo "<span class='menuItemContainer'>";
+
+		$sql = "SELECT childQuickCode, title, price 
+		FROM MenuAssociations 
+		INNER JOIN MenuItems ON MenuItems.quickCode = MenuAssociations.childQuickCode 
+		WHERE MenuAssociations.parentQuickCode = '$qc';";
+		$result = connection()->query($sql);
+
+		if ($result->num_rows > 0) {
+			while($row = $result->fetch_assoc()) {
+				// ** NEEDS TO PASS IN CALCULATED PRICE AND THE CALCULATED MODS STR (COMMA DELIMINATED) **
+				printMenuItem($row['childQuickCode'], $row['title'], $row['price']);
+			}
+		}		
+		
+		echo "</span>";
+		echo "</div>";
+		echo "</details>";
+
+		return;		
+	}
+	function printMenuItem(string $qc, string $title, float $price) {
+
+		// ** NEEDS TO HAVE THE DATA ATTRIBUTE PASSED INTO 'PRICE' BE THE CALCULATED PRICE^ AND CALCULATED MODS STR (COMMA DELIMINATED) **
+		// GOING TO NEED TO REVISIT FOR THE DATA-MODS ATTR (X)
+		echo "<span id='".$qc."' class='menuItem menuItemTitle' data-text='".$title."' data-price='".$price."' data-mods='X'>".$title."</span>";
+		echo "<span class='menuItemPrice'> $". $price ."</span>";
+
+	}
 ?>
