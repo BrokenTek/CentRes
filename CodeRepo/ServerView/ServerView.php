@@ -68,16 +68,16 @@
 			</span>
 			
 			<span id="ticketHeader">
-				<span id="ticketHeaderText">Ticket Number Goes Here</span>
+				<span id="ticketHeaderText">Ticket&nbsp;Number&nbsp;Goes&nbsp;Here</span>
 				<select id="cboSplit">
 					
 				</select>
 			</span>
 			<span id="ticketContainer">
 				
-				<?php //require "loadTicket.php"; 	 
+				<?php require "loadTicket.php"; 	 
 						if (!empty($_POST['tableNumber'])) {
-							//loadTicketItems($_POST['tableNumber']);
+							loadTicketItems($_POST['tableNumber']);
 						}
 				?>
 				
@@ -96,9 +96,6 @@
 					<option value="2">Split 2</option>
 					<option value="3" style="background-color: red;">Split 3</option>
 				</select>
-			</span>
-			<span id="optionsContainer">
-
 			</span>
 		</span>
 	  </form>
