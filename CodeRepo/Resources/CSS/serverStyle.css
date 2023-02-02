@@ -1,0 +1,26 @@
+		 .old-info {
+         color: grey;
+         text-decoration: line-through;
+         }
+		 		 
+		 .ticketItem {
+			 border: 1px solid grey;
+		 }
+		 
+		 .removeTicketItemBtn {
+			background-color: red;
+			color: white;
+		 }
+		 
+		 .ticketItemText {
+			 font-weight: bold;
+		 }
+		 
+		 .ticketItemOverrideNote, .ticketItemOverridePrice {
+			color: red;
+         }
+		 
+		 .menuItem:hover {
+			font-size: 17px;
+			background-color: #cfcfcf;
+		 }

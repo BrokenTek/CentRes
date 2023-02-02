@@ -1,36 +1,10 @@
-* {
-			 font-family: Helvetica;
-		 }
-		 
-		 .old-info {
-         color: grey;
-         text-decoration: line-through;
-         }
-		 
-         .hidden {
-         display: none;
-         }
-		 
-		 .ticketItem {
-			 border: 1px solid grey;
-		 }
-		 
-		 .removeTicketItemBtn {
-			background-color: red;
-			color: white;
-		 }
-		 
-		 .ticketItemText {
-			 font-weight: bold;
-		 }
-		 
-		 .ticketItemOverrideNote, .ticketItemOverridePrice {
-			color: red;
-         }
+
 		
 		/* =============================================
 		    REQUIRED CSS TO PROPERLY LAYOUT SERVER VIEW
 			============================================= */
+		
+		
 		#serverViewContainer {
 			display: grid;
 			grid-template-areas: "serverViewHeader serverViewHeader"
@@ -113,11 +87,6 @@
 			/* grid-auto-rows: min-content; */
          }
 
-		 .menuItem:hover {
-			font-size: 17px;
-			background-color: #cfcfcf;
-		 }
-		 
 		
 		 /* =============================================
 		    REQUIRED CSS TO PROPERLY LAYOUT AN ORDER ITEM
