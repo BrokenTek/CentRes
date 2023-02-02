@@ -72,7 +72,7 @@
 			 grid-auto-rows: min-content;
 			 
 		 }
-		 #optionsContainer {
+		 #modsContainer {
 			 grid-area: ticketAndOptions;
 			 overflow: auto;
 			 display: grid;

@@ -66,23 +66,24 @@
 			<span id="menuContainer">
 				<?php require "loadServerMenu.php"; ?>
 			</span>
+			
 			<span id="ticketHeader">
-				<span id="ticketHeaderText">asdfasdfadf</span>
+				<span id="ticketHeaderText">Ticket Number Goes Here</span>
 				<select id="cboSplit">
-					<option value="">Select Split</option>
-					<option value="Split 1">Split 1</option>
-					<option value="2">Split 2</option>
-					<option value="3" style="background-color: red;">Split 3</option>
+					
 				</select>
 			</span>
 			<span id="ticketContainer">
 				
-				<?php require "loadTicket.php"; 	 
+				<?php //require "loadTicket.php"; 	 
 						if (!empty($_POST['tableNumber'])) {
-							loadTicketItems($_POST['tableNumber']);
+							//loadTicketItems($_POST['tableNumber']);
 						}
 				?>
 				
+			</span>
+			<span id="modsContainer">
+				<?php require "loadModsWindow.php"; ?>
 			</span>
 			<span id="ticketFooter">
 				<button>Edit</button>

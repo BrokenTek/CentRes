@@ -99,6 +99,7 @@ CREATE TABLE MenuModificationItems (
 CREATE TABLE MenuAssociations (
 	parentQuickCode VARCHAR(10),
 	childQuickCode VARCHAR(10),
+	displayIndex TINYINT UNSIGNED,
 	UNIQUE(parentQuickCode, childQuickCode),
 	FOREIGN KEY (parentQuickCode) REFERENCES QuickCodes(id)
 	ON DELETE CASCADE
