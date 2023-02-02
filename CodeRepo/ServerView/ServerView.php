@@ -68,21 +68,21 @@
 			</span>
 			
 			<span id="ticketHeader">
-				<span id="ticketHeaderText">Ticket Number Goes Here</span>
+				<span id="ticketHeaderText">Ticket&nbsp;Number&nbsp;Goes&nbsp;Here</span>
 				<select id="cboSplit">
 					
 				</select>
 			</span>
-			<span id="ticketContainer">
+			<span id="ticketContainer" style="display: initial;">
 				
-				<?php //require "loadTicket.php"; 	 
+				<?php require "loadTicket.php"; 	 
 						if (!empty($_POST['tableNumber'])) {
-							//loadTicketItems($_POST['tableNumber']);
+							loadTicketItems($_POST['tableNumber']);
 						}
 				?>
 				
 			</span>
-			<span id="modsContainer">
+			<span id="modsContainer" style='display: none;'>
 				<?php require "loadModsWindow.php"; ?>
 			</span>
 			<span id="ticketFooter">
@@ -97,11 +97,14 @@
 					<option value="3" style="background-color: red;">Split 3</option>
 				</select>
 			</span>
-			<span id="optionsContainer">
-
-			</span>
 		</span>
 	  </form>
+	
+	<br>
+	<button type='button' id='getTicketContainer'>View Ticket Container</button>
+	<button type='button' id='getModsContainer'>View Mods Container</button>
 
+	<!-- Event Listeners: Currently Only Functions as a toggle between TICKETCONTAINER and MODSCONTAINER -->
+	<script src="../Resources/JavaScript/eventListeners.js"> </script>					
    </body>
 </html>

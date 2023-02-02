@@ -109,11 +109,16 @@
 
          .menuItemContainer {
 			display: grid;
-			grid-template-columns: minmax(1fr, 200px) min-content;
+			grid-template-columns: 1fr min-content;
 			/* grid-auto-rows: min-content; */
-         }		
+         }
 
-
+		 .menuItem:hover {
+			font-size: 17px;
+			background-color: #cfcfcf;
+		 }
+		 
+		
 		 /* =============================================
 		    REQUIRED CSS TO PROPERLY LAYOUT AN ORDER ITEM
 			============================================= */

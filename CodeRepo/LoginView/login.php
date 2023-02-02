@@ -55,6 +55,7 @@
 		$errorMessage = $e->getMessage();
 	}
 ?>
+
 <html>
 <head>
 	<title> CentRes Employee Portal </title>
