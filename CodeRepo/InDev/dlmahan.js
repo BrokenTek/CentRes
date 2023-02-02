@@ -12,11 +12,15 @@ window.selectTicketItem = function(id){
 };
 
 //this function should remove a ticket item from the list. It does not know if the item exists in the database, that will have to be covered elsewhere.
-/*
+
 window.removeTicketItem = function(){
     //remove the event listener that called this function
+    this.removeEventListener("onclick", removeTicketItem);
+    //determine the ticket item related to the remove button that was clicked.
+    var theItem = this.parentElement;
     //remove the event listener for selecting the parent element
+    theItem.removeEventListener("onclick", selectTicketItem);
     //remove the parent element
+    theItem.remove();
     window.stateChanged();
 };
-*/
