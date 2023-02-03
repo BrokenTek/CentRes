@@ -6,8 +6,8 @@ function createMenuSelectEventhandlers() {
 
 	var myFunction = function() {
 		var attribute = this.id;
-		alert("You clicked menu item " + attribute);
-		selectMenuItem( id );
+		// alert("You clicked menu item " + attribute);
+		selectMenuItem( attribute );
 	};
 
 
@@ -19,25 +19,6 @@ function createMenuSelectEventhandlers() {
 }
 
 window.addEventListener('load', createMenuSelectEventhandlers);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
