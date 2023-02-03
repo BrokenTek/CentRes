@@ -12,21 +12,23 @@ if ($result->num_rows > 0) {
         WHERE MenuAssociations.parentQuickCode = '" .$row['quickCode']. "';";
     $result2 = connection()->query($sql2);
 
-    echo("<fieldset id='" .$row['quickCode']. "' class='modCategory ");
-    if ($row['categoryType'] == 'MandatoryAny' or $row['categoryType'] == 'MandatoryOne') {
-      echo(" mandatoryMod'>");
+    if ($row['categoryType'] == 'MandatoryOne' or $row['categoryType'] == 'OptionalOne') {
+      echo("<fieldset class='modCategory mandatoryMod'>");
     }
     else {
-      echo(" optionalMod'>");
+      echo("<fieldset id='" .$row['quickCode']. "' class='modCategory optionalMod'>");
     }
 
     //TODO
     // If mod has a default price tagged with it, display it in the legend
-    echo("<legend class='modCategoryTitle'>" .$row['title']. "</legend>");
+    
 
     if ($row['categoryType'] == 'MandatoryOne' or $row['categoryType'] == 'OptionalOne') {
-      echo("<label for='modCategory-" .$row['quickCode']. "'>Select One</label>
-      <select id='modCategory-" .$row['quickCode']. "name='" .$row['quickCode']. "'>");
+      //TODO
+      // If mod has a default price tagged with it, display it in the legend
+      echo("<legend class='modCategoryTitle'>" .$row['title']. "</legend>");
+      echo("<label for='" .$row['quickCode']. "'>Select One</label>
+      <select id='" .$row['quickCode']. "' name='" .$row['quickCode']. "'>");
     
       while($row2 = $result2->fetch_assoc()) {
         //TODO
@@ -37,9 +39,12 @@ if ($result->num_rows > 0) {
       echo("</select>");  
     }
     else {
+      //TODO
+      // If mod has a default price tagged with it, display it in the legend
+      echo("<legend class='modCategoryTitle' id = '" .$row['quickCode']. "'>" .$row['title']. "</legend>");
       while($row2 = $result2->fetch_assoc()) {
-        echo("<input type='checkbox' id='" .$row['quickCode']."-" .$row2['quickCode']. "' name='" .$row['quickCode']. "' value='" .$row2['quickCode']. "'/>");
-        echo("<label for='" .$row['quickCode']."-" .$row2['quickCode']. "'>" .$row2['title']. "</label>");
+        echo("<input type='checkbox' id='" .$row2['quickCode']. "' name='" .$row['quickCode']. "' value='" .$row2['quickCode']. "'/>");
+        echo("<label for='" .$row2['quickCode']. "'>" .$row2['title']. "</label>");
       }
     }
     echo('</fieldset>');

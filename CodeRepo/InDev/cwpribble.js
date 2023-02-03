@@ -109,12 +109,12 @@ function selectMenuItem(id) {
         menuItemArray.setAttribute('value',id);
         rootSpan.appendChild(menuItemArray);
         
-        // Add hidden customizationNotes[] span
-        var customizationNotesArray = document.createElement('input');
-        customizationNotesArray.setAttribute('type','hidden');
-        customizationNotesArray.setAttribute('name','customizationNotes[]');
-        customizationNotesArray.setAttribute('value','');
-        rootSpan.appendChild(customizationNotesArray);  
+        // Add hidden modificationNotes[] span
+        var modificationNotesArray = document.createElement('input');
+        modificationNotesArray.setAttribute('type','hidden');
+        modificationNotesArray.setAttribute('name','modificationNotes[]');
+        modificationNotesArray.setAttribute('value','');
+        rootSpan.appendChild(modificationNotesArray);  
 
         // Add hidden seat[] span
         var seatNumArray = document.createElement('input');
