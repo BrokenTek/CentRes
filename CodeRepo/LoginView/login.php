@@ -44,11 +44,13 @@
 			// LOGIN SUCCESSFUL..... redirect to the appropriate page.
 			header("Location: ../ServerView/ServerView.php");
 			
+			connection();
+			$sql = "SELECT sessionTimeoutInMins FROM Config;";
+			$timeoutLength = connection()->query($sql)->fetch_assoc()['sessionTimeoutInMins'];
 			
 			
 			
-			
-			setcookie($cookie_name, $sessionToken, time() + (86400 * 30), "/"); // 86400 is 1 day
+			setcookie($cookie_name, $sessionToken, time() + ($timeoutLength * 60), "/"); // 86400 is 1 day
 		}
 	}
 	catch (Exception $e) {

@@ -642,3 +642,5 @@ BEGIN
 	
 END$$
 DELIMITER ;
+
+INSERT INTO Config (sessionTimeoutInMins) VALUES (30);
