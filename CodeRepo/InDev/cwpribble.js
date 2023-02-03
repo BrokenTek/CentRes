@@ -5,32 +5,27 @@
 //  to grab the necessary data using PHP to be sent to the DB.
 
 // Counter to create part of the id for each ticketItem
-var ticketItemNumber = 0;
+var ticketItemNumber = 1;
 
 // Move menuItem(s) from the menuContainer to the 
 //  ticketContainer with data.
-function createMenuSelectEventhandlers() {
-	var elements = document.getElementsByClassName("menuItem");
 
-	var menuToTicket = function() {
+
+function selectMenuItem(id) {
+		
+	var menuToTicket = function(id) {
+		var menuItem = document.getElementById(id);
         // Get Attributes From Menu Item
-        var itemId = this.id;
-        var dataText = this.getAttribute('data-text');
-        var dataPrice = this.getAttribute('data-price');
-        var dataMods = this.getAttribute('data-mods');
+        var itemId = menuItem.id;
+        var dataText = menuItem.getAttribute('data-text');
+        var dataPrice = menuItem.getAttribute('data-price');
+        var dataMods = menuItem.getAttribute('data-mods');
+		
         // Create ticketItemNumber as a string. This will be the id attr for the ticketItem
-        if (ticketItemNumber.toString().length < 2) {
-            var ticketSplitElement = document.getElementById('cboSplit');
-            var ticketSplitOption = ticketSplitElement.value;
-            var ticketSplitValue = ticketSplitElement.options[ticketSplitElement.selectedIndex].text;
-            var ticketItemId = "ticketItem" + ticketSplitValue.toString() + (ticketItemNumber.toString().length < 2 ? '00' : '0') + ticketItemNumber.toString();
-        }
-        else {
-            var ticketSplitElement = document.getElementById('cboSplit');
-            var ticketSplitOption = ticketSplitElement.value;
-            var ticketSplitValue = ticketSplitElement.options[ticketSplitElement.selectedIndex].text;
-            var ticketItemId = "ticketItem" + ticketSplitValue.toString() + (ticketItemNumber.toString().length < 3 ? '0' : '') + ticketItemNumber.toString();
-        }
+		var ticketItemId = "ticketItem" + 
+						   document.getElementById('cboSplit').value.toString() + 
+						   ticketItemNumber.toString().padStart(3,"0");		
+		
 
     // Create ticketItem span in ticketContainer. This is the root span that incompasses all of
     //   the spans that are displayed for each ticketItem as well as the hidden data spans. All
@@ -49,6 +44,8 @@ function createMenuSelectEventhandlers() {
         var xBtn = document.createElement('span');
         xBtn.setAttribute('class','removeTicketItemBtn');  
         xBtn.appendChild(document.createTextNode('X'));
+		xBtn.addEventListener('click', window.removeTicketItem);
+		
         rootSpan.appendChild(xBtn);
 
         // Add the ticketItemNumber span
@@ -61,14 +58,17 @@ function createMenuSelectEventhandlers() {
         tickItemText.setAttribute('class','ticketItemText');
         tickItemText.appendChild(document.createTextNode(dataText));
         rootSpan.appendChild(tickItemText);
-
-        // Add ticketItemPrice span
+		
         var tickItemPrice = document.createElement('span');
         tickItemPrice.setAttribute('class','ticketItemPrice');
         tickItemPrice.appendChild(document.createTextNode('$'+dataPrice));
         rootSpan.appendChild(tickItemPrice);
 
-        // Add ticketItemOverrideNote span
+
+		// this code isn't neccessary here, but we can use what you've written when we make modifications
+		// to the order, after you hit 'Update' on the mod window and it closes.
+		
+        /* // Add ticketItemOverrideNote span
         var tickItemOverride = document.createElement('span');
         tickItemOverride.setAttribute('class','ticketItemOverrideNote');
         tickItemOverride.appendChild(document.createTextNode(''));
@@ -90,23 +90,23 @@ function createMenuSelectEventhandlers() {
         var modItemCustom = document.createElement('span');
         modItemCustom.setAttribute('class','modCustom');
         modItemCustom.appendChild(document.createTextNode(''));
-        rootSpan.appendChild(modItemCustom);
+        rootSpan.appendChild(modItemCustom); */
 
-    // MOVES TO ADDING THE INPUT ELEMENTS. THESE ARE ALL HIDDEN. THESE ARE
+    // MOVES TO ADDING THE INPUT ELEMENTS. THESE ARE ALL HIdDEN. THESE ARE
     //  USED FOR SENDING THE DATA TO THE DATABASE
 
         // Add hidden ticketItemNumner[] span
         var tickItemNumArray = document.createElement('input');
         tickItemNumArray.setAttribute('type','hidden');
         tickItemNumArray.setAttribute('name','ticketItemNumber[]');
-        tickItemNumArray.setAttribute('value',ticketItemNumber);
+        tickItemNumArray.setAttribute('value',ticketItemId.substring(10));
         rootSpan.appendChild(tickItemNumArray);
 
         // Add hidden menuItem[] span
         var menuItemArray = document.createElement('input');
         menuItemArray.setAttribute('type','hidden');
         menuItemArray.setAttribute('name','menuItem[]');
-        menuItemArray.setAttribute('value',dataText);
+        menuItemArray.setAttribute('value',id);
         rootSpan.appendChild(menuItemArray);
         
         // Add hidden customizationNotes[] span
@@ -120,7 +120,7 @@ function createMenuSelectEventhandlers() {
         var seatNumArray = document.createElement('input');
         seatNumArray.setAttribute('type','hidden');
         seatNumArray.setAttribute('name','seat[]');
-        seatNumArray.setAttribute('value','');
+        seatNumArray.setAttribute('value',document.getElementById('cboSeat').value.toString());
         rootSpan.appendChild(seatNumArray);
         
         // Add hidden overidePrice[] span
@@ -144,19 +144,15 @@ function createMenuSelectEventhandlers() {
         //  (1 is the default).
         ticketItemNumber+=1;
 
-        // Select the menuItem for further functionality.
-        selectMenuItem(itemId);       
+        // Select the ticketItem for further functionality.
+        return rootSpan;     
 	};
-
-	for (var i = 0; i < elements.length; i++) {
 	
-		elements[i].addEventListener('click', menuToTicket);
-	};
-
-	window.removeEventListener('load', createMenuSelectEventhandlers);
+	var ticketItem = menuToTicket(id);
+	ticketItem.addEventListener('click', window.selectTicketItem);
+	document.getElementById('ticketContainer').append(ticketItem);
+	window.stateChanged();
 }
-
-window.addEventListener('load', createMenuSelectEventhandlers);
 
 
 

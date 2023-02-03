@@ -15,13 +15,13 @@
             function maxSplitNumber() { return 9; }
             function createMenuSelectEventHandlers() {}
             function selectMenuItem( id ) {}
-            function selectTicketItem( id ) {}
+            function selectTicketItem() {alert("select");}
             function moveTicketItem() {}
             function removeTicketItem() {}
             function stateChanged() {}
             function editTicketItem() {}
             function configureModificationWindow() {}
-            function updateMenuItem() {}
+            function updateTicketItem() {}
             
         </script>
         <script src="../InDev/cwpribble.js"></script>
