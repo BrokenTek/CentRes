@@ -188,7 +188,6 @@ CREATE TABLE TicketItems (
 	menuItemQuickCode VARCHAR(10),
 	changePointer INT UNSIGNED,
 	employeeID INT UNSIGNED,
-	menuItemID INT UNSIGNED,
 	modificationNotes VARCHAR(500),
 	seat TINYINT UNSIGNED,
 	flag ENUM('Out-of-Date','Updated','Removed'),
@@ -224,3 +223,7 @@ CREATE TABLE BufferedTicketItems (
 	FOREIGN KEY (overrideAuthorization) REFERENCES Employees(id),
 	FOREIGN KEY (menuItemQuickCode) REFERENCES QuickCodes(id) 
 );
+
+CREATE TABLE Config (
+	sessionTimeoutInMins INT UNSIGNED NOT NULL DEFAULT 5
+)

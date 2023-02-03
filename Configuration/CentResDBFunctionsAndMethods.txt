@@ -591,7 +591,7 @@ CREATE PROCEDURE login(IN requestedUsername VARCHAR(25), IN requestedRoles TINYI
 BEGIN
 	DECLARE allowedRoles TINYINT UNSIGNED;
 	DECLARE empID INT UNSIGNED;
-	
+	DECLARE timeoutMins INT UNSIGNED;
 	IF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername) = 0) THEN
 		-- Invalid Employee ID
 		SIGNAL SQLSTATE '45000'
@@ -610,13 +610,15 @@ BEGIN
 			-- Another user is already logged in using your access key.
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Access Token Not Unique! Retry Login.';
-		ELSE			
+		ELSE
+					
 			SELECT id INTO empID FROM Employees WHERE userName = requestedUsername;
 			UPDATE EmployeeLog SET endTime = NOW() WHERE employeeID = empID and endTime IS NULL;
 			INSERT INTO EmployeeLog (employeeID, employeeRole) VALUES(empID, requestedRoles);
 			DELETE FROM ActiveEmployees WHERE employeeID = empID;
 			INSERT INTO ActiveEmployees (employeeID, employeeRole) VALUES (empID, requestedRoles);
-			UPDATE employees SET accessToken = newAccessToken, accessTokenExpiration = ADDTIME(NOW(), 500) WHERE userName = requestedUsername;
+			SELECT (sessionTimeoutInMins * 100) INTO timeoutMins FROM Config;	
+			UPDATE employees SET accessToken = newAccessToken, accessTokenExpiration = ADDTIME(NOW(), timeoutMins) WHERE userName = requestedUsername;
 		END IF;
 	END IF;
 	
@@ -633,7 +635,7 @@ BEGIN
 		SET MESSAGE_TEXT = 'Username not found!';
 	ELSE
 		SELECT id INTO empID FROM Employees WHERE userName = uname;
-		UPDATE EmployeeLog SET endTime = DATE_ADD(NOW(), INTERVAL 5 MINUTE) WHERE employeeID = empID and endTime IS NULL;
+		UPDATE EmployeeLog SET endTime = NOW() WHERE employeeID = empID and endTime IS NULL;
 		UPDATE Employees SET accessToken = NULL, accessTokenExpiration = NULL WHERE userName = uname;
 		DELETE FROM ActiveEmployees WHERE employeeID = empID;
 	END IF;
