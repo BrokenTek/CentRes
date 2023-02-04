@@ -24,3 +24,7 @@
 			font-size: 17px;
 			background-color: #cfcfcf;
 		 }
+
+		 .selected {
+			background-color: yellow;
+		 }

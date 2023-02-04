@@ -59,6 +59,7 @@ function selectMenuItem(id) {
         tickItemText.appendChild(document.createTextNode(dataText));
         rootSpan.appendChild(tickItemText);
 		
+        // Add the ticketItemPrice span
         var tickItemPrice = document.createElement('span');
         tickItemPrice.setAttribute('class','ticketItemPrice');
         tickItemPrice.appendChild(document.createTextNode('$'+dataPrice));
@@ -92,14 +93,14 @@ function selectMenuItem(id) {
         modItemCustom.appendChild(document.createTextNode(''));
         rootSpan.appendChild(modItemCustom); */
 
-    // MOVES TO ADDING THE INPUT ELEMENTS. THESE ARE ALL HIdDEN. THESE ARE
+    // MOVES TO ADDING THE INPUT ELEMENTS. THESE ARE ALL HIDDEN. THESE ARE
     //  USED FOR SENDING THE DATA TO THE DATABASE
 
         // Add hidden ticketItemNumner[] span
         var tickItemNumArray = document.createElement('input');
         tickItemNumArray.setAttribute('type','hidden');
         tickItemNumArray.setAttribute('name','ticketItemNumber[]');
-        tickItemNumArray.setAttribute('value',ticketItemId.substring(10));
+        tickItemNumArray.setAttribute('value',ticketItemId.substring(10) + '[]');
         rootSpan.appendChild(tickItemNumArray);
 
         // Add hidden menuItem[] span
@@ -151,6 +152,15 @@ function selectMenuItem(id) {
 	var ticketItem = menuToTicket(id);
 	ticketItem.addEventListener('click', window.selectTicketItem);
 	document.getElementById('ticketContainer').append(ticketItem);
+
+    var oldSelectedItems = document.getElementsByClassName("selected");
+    /*this iterates through the list returned, if there is no case where multiple items are selected concurrently,
+    you can just use oldSelectedItems[0].classList.remove("selected"); instead*/
+    for(let i = 0; i < oldSelectedItems.length; i++){
+        oldSelectedItems[i].classList.remove("selected");
+    }
+
+    ticketItem.classList.add("selected");
 	window.stateChanged();
 }
 
