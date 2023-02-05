@@ -104,11 +104,11 @@ function selectMenuItem(id) {
         rootSpan.appendChild(tickItemNumArray);
 		
 		// Add hidden ticketItemSplits[] span
-        var tickItemNumArray = document.createElement('input');
-        tickItemNumArray.setAttribute('type','hidden');
-        tickItemNumArray.setAttribute('name','ticketItemSplits[]');
-        tickItemNumArray.setAttribute('value',ticketItemId.substring(10) + '[]');
-        rootSpan.appendChild(tickItemNumArray);
+        var tickItemSplits = document.createElement('input');
+        tickItemSplits.setAttribute('type','hidden');
+        tickItemSplits.setAttribute('name','ticketItemSplits[]');
+        tickItemSplits.setAttribute('value',ticketItemId.substring(10) + '[]');
+        rootSpan.appendChild(tickItemSplits);
 
         // Add hidden menuItem[] span
         var menuItemArray = document.createElement('input');
