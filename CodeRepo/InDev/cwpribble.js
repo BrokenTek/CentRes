@@ -96,10 +96,17 @@ function selectMenuItem(id) {
     // MOVES TO ADDING THE INPUT ELEMENTS. THESE ARE ALL HIDDEN. THESE ARE
     //  USED FOR SENDING THE DATA TO THE DATABASE
 
-        // Add hidden ticketItemNumner[] span
+        // Add hidden ticketItemNumber[] span
         var tickItemNumArray = document.createElement('input');
         tickItemNumArray.setAttribute('type','hidden');
         tickItemNumArray.setAttribute('name','ticketItemNumber[]');
+        tickItemNumArray.setAttribute('value',ticketItemId.substring(10) + '[]');
+        rootSpan.appendChild(tickItemNumArray);
+		
+		// Add hidden ticketItemSplits[] span
+        var tickItemNumArray = document.createElement('input');
+        tickItemNumArray.setAttribute('type','hidden');
+        tickItemNumArray.setAttribute('name','ticketItemSplits[]');
         tickItemNumArray.setAttribute('value',ticketItemId.substring(10) + '[]');
         rootSpan.appendChild(tickItemNumArray);
 
