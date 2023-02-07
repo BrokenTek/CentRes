@@ -3,7 +3,7 @@ CREATE DATABASE Centres;
 USE Centres;
 
 DROP USER IF EXISTS 'scott'@'localhost';
-CREATE USER 'scott'@'localhost' IDENTIFIED BY 'tiger';
+CREATE USER 'scott'@'localhost' IdENTIFIED BY 'tiger';
 GRANT ALL PRIVILEGES ON * . * TO 'scott'@'localhost';
 
 CREATE TABLE EmployeeRoles (
@@ -29,51 +29,49 @@ CREATE TABLE Employees(
 );
 
 CREATE TABLE EmployeeLog (
-	employeeID INT UNSIGNED NOT NULL,
+	employeeId INT UNSIGNED NOT NULL,
 	employeeRole TINYINT UNSIGNED NOT NULL,
 	startTime DATETIME NOT NULL DEFAULT NOW(),
 	endTime DATETIME,
-	FOREIGN KEY (employeeID) REFERENCES Employees(id)
+	FOREIGN KEY (employeeId) REFERENCES Employees(id)
 );
 
 CREATE TABLE ActiveEmployees (
-	employeeID INT UNSIGNED NOT NULL,
+	employeeId INT UNSIGNED NOT NULL,
 	employeeRole TINYINT UNSIGNED
 );
 
 CREATE TABLE QuickCodes (
-	id VARCHAR(10) PRIMARY KEY
+	id VARCHAR(40) PRIMARY KEY
 );
 
 CREATE TABLE MenuCategories (
-	quickCode VARCHAR(10) PRIMARY KEY,
+	quickCode VARCHAR(40) PRIMARY KEY,
 	title VARCHAR(75) NOT NULL,
 	description VARCHAR(1000),
 	route char(1),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
 	defaultPrice DECIMAL(6, 2) UNSIGNED,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE MenuItems (
-	quickCode VARCHAR(10) PRIMARY KEY,
+	quickCode VARCHAR(40) PRIMARY KEY,
 	title VARCHAR(75) NOT NULL,
 	description varchar(1000),
 	price DECIMAL(6, 2) UNSIGNED,
 	route char(1),
-	quantity SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-	requests SMALLINT UNSIGNED,
+	quantity SMALLINT UNSIGNED,
+	requests SMALLINT UNSIGNED NOT NULL DEFAULT 0,
 	prepTimeInSecs SMALLINT UNSIGNED,
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE MenuModificationCategories (
-	quickCode VARCHAR(10) PRIMARY KEY,
+	quickCode VARCHAR(40) PRIMARY KEY,
 	title VARCHAR(75) NOT NULL,
 	description VARCHAR(1000),
 	defaultPrice DECIMAL(6, 2) UNSIGNED,
@@ -81,32 +79,29 @@ CREATE TABLE MenuModificationCategories (
 	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE MenuModificationItems (
-	quickCode VARCHAR(10) PRIMARY KEY,
+	quickCode VARCHAR(40) PRIMARY KEY,
 	title VARCHAR(75) NOT NULL,
 	description varchar(1000),
 	priceOrModificationValue DECIMAL(6, 2),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE MenuAssociations (
-	parentQuickCode VARCHAR(10),
-	childQuickCode VARCHAR(10),
+	parentQuickCode VARCHAR(40),
+	childQuickCode VARCHAR(40),
 	displayIndex TINYINT UNSIGNED,
 	UNIQUE(parentQuickCode, childQuickCode),
 	FOREIGN KEY (parentQuickCode) REFERENCES QuickCodes(id)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE,
 	FOREIGN KEY (childQuickCode) REFERENCES QuickCodes(id)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE TableShapes (
@@ -135,62 +130,71 @@ CREATE TABLE Tables (
 	gridSpanY TINYINT UNSIGNED,
 	transformData VARCHAR(5000),
 	status VARCHAR(30),
-	FOREIGN KEY (shape) REFERENCES TableShapes(shapeName),
+	FOREIGN KEY (shape) REFERENCES TableShapes(shapeName)
+	ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (status) REFERENCES TableStatuses(id)
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE TableAssignments (
-	employeeID INT UNSIGNED NOT NULL,
-	tableID VARCHAR(3) NOT NULL
+	employeeId INT UNSIGNED NOT NULL,
+	tableId VARCHAR(3) NOT NULL
 );
 
 CREATE TABLE TableLog (
 	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-	tableID VARCHAR(3) NOT NULL,
+	tableId VARCHAR(3) NOT NULL,
 	action ENUM('Add', 'Remove', 'Bused', 'Disable', 'Enable') NOT NULL,
 	timeStamp TIMESTAMP DEFAULT NOW(),
-	authorizationID INT UNSIGNED,
-	employeeID INT UNSIGNED,
-	ticketID INT UNSIGNED,
-	FOREIGN KEY(tableID) REFERENCES Tables(id),
-	FOREIGN KEY(authorizationID) REFERENCES Employees(id),
-	FOREIGN KEY (employeeID) REFERENCES Employees(id)
+	authorizationId INT UNSIGNED,
+	employeeId INT UNSIGNED,
+	ticketId INT UNSIGNED,
+	FOREIGN KEY(tableId) REFERENCES Tables(id)
+	ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY(authorizationId) REFERENCES Employees(id)
+	ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (employeeId) REFERENCES Employees(id)
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE TicketAndSplit (
-	id INT UNSIGNED NOT NULL UNIQUE,
-	ticketID INT UNSIGNED GENERATED ALWAYS AS (id DIV 10),
-	splitID INT UNSIGNED GENERATED ALWAYS AS (MOD(id, 10)),
-	tableID VARCHAR(3),
-	total DECIMAL(6, 2) UNSIGNED,
-	nickname VARCHAR(25) UNIQUE,
-	partySize TINYINT UNSIGNED NOT NULL,
+CREATE TABLE Tickets (
+	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	nickname VARCHAR(25) UNIQUE NOT NULL,
+	partySize INTEGER UNSIGNED NOT NULL,
+	tableId VARCHAR(3),
+	timeRequested DATETIME NOT NULL DEFAULT NOW(),
+	timeSeated DATETIME,
+	timeClosed DATETIME
+);
+
+CREATE TABLE Splits (
+	ticketId INT UNSIGNED NOT NULL,
+	splitId TINYINT UNSIGNED NOT NULL,
+	id INT UNSIGNED GENERATED ALWAYS AS (ticketId * 10000 + splitId * 1000),
 	overrideValue DECIMAL(6, 2) UNSIGNED,
 	overrideNote VARCHAR(500),
 	overrideAuthorization INT UNSIGNED,
 	overrideTimeStamp DATETIME,
-	adjustedTotal DECIMAL(6, 2),
-	tax DECIMAL(6, 2) UNSIGNED,
 	tip DECIMAL(6, 2) UNSIGNED,
 	totalPaidAmount DECIMAL(6, 2) UNSIGNED,
-	changeDue DECIMAL(6, 2) UNSIGNED,
-	timeRequested DATETIME NOT NULL DEFAULT NOW(),
-	timeSeated DATETIME,
-	timeClosed DATETIME,
+	calculatedSubtotal DECIMAL(6, 2) UNSIGNED,
+	calculatedTax DECIMAL(6, 2) UNSIGNED,
+	PRIMARY KEY (ticketId, splitId),
 	FOREIGN KEY (overrideAuthorization) References Employees(id)
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE TicketItems (
 	id INT UNSIGNED PRIMARY KEY,
-	ticketID INT UNSIGNED GENERATED ALWAYS AS (id DIV 10000),
-	itemID INT UNSIGNED GENERATED ALWAYS AS (MOD(id, 1000)),
-	splitsString VARCHAR(10) NOT NULL DEFAULT '1',
+	ticketId INT UNSIGNED GENERATED ALWAYS AS (id DIV 10000),
+	itemId INT UNSIGNED GENERATED ALWAYS AS (MOD(id, 1000)),
+	splitFlag SMALLINT UNSIGNED,
 	menuItemQuickCode VARCHAR(10),
 	changePointer INT UNSIGNED,
-	employeeID INT UNSIGNED,
 	modificationNotes VARCHAR(500),
 	seat TINYINT UNSIGNED,
-	flag ENUM('Out-of-Date','Updated','Removed'),
+	flag ENUM('Updated','Removed', 'Hidden'),
+	calculatedPriceWithMods DECIMAL(6, 2),
 	overridePrice DECIMAL(6, 2),
 	overrideNote VARCHAR(500),
 	overrideAuthorization INT UNSIGNED,
@@ -199,29 +203,12 @@ CREATE TABLE TicketItems (
 	submitTime DATETIME,
 	readyTime DATETIME,
 	deliveredTime DATETIME,
-	FOREIGN KEY (changePointer) REFERENCES TicketItems(id),
-	FOREIGN KEY (employeeID) REFERENCES Employees(id),
-	FOREIGN KEY (overrideAuthorization) REFERENCES Employees(id),
+	FOREIGN KEY (changePointer) REFERENCES TicketItems(id)
+	ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (overrideAuthorization) REFERENCES Employees(id)
+	ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (menuItemQuickCode) REFERENCES QuickCodes(id) 
-);
-
-CREATE TABLE BufferedTicketItems (
-	id INT UNSIGNED PRIMARY KEY,
-	ticketID INT UNSIGNED GENERATED ALWAYS AS (id DIV 10000),
-	itemID INT UNSIGNED GENERATED ALWAYS AS (MOD(id, 1000)),
-	splitsString VARCHAR(10) NOT NULL DEFAULT '1',
-	isNew BOOLEAN NOT NULL,
-	employeeID INT UNSIGNED,
-	menuItemQuickCode VARCHAR(10),
-	modificationNotes VARCHAR(500),
-	seat TINYINT UNSIGNED,
-	overridePrice DECIMAL(6, 2),
-	overrideNote VARCHAR(500),
-	overrideAuthorization INT UNSIGNED,
-	prepPriority TINYINT UNSIGNED NOT NULL DEFAULT 1,
-	FOREIGN KEY (employeeID) REFERENCES Employees(id),
-	FOREIGN KEY (overrideAuthorization) REFERENCES Employees(id),
-	FOREIGN KEY (menuItemQuickCode) REFERENCES QuickCodes(id) 
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE Config (

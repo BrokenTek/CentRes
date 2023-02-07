@@ -10,6 +10,69 @@
             function reloadPage() {
             	document.getElementById("form-container").submit();
             }
+
+            function configureTicketIframe() {
+                alert('a');
+                setTicketDisplayVariable('wow', 32);
+                setTicketDisplayVariable('a', 1);
+                setTicketDisplayVariable('b', 2);
+                setTicketDisplayVariable('c', 3);
+                setTicketDisplayVariable('d', 4);
+                alert();
+                removeTicketDisplayVariable('wow');
+                clearTicketDisplayVariables();
+                
+            }
+
+            function setTicketDisplayVariable(variableName, value) {
+                var ticketContainer = document.getElementById('ticketContainer');
+                var ticketForm = ticketContainer.contentWindow.document.getElementById('ticketForm');
+                var variableElement = ticketContainer.contentWindow.document.getElementById(variableName);
+                
+                if (variableElement != null) {
+                    variableElement.remove();
+                }
+                
+                variableElement = document.createElement('input');
+                variableElement.setAttribute('type', 'hidden');
+                variableElement.setAttribute('class', 'variable');
+                variableElement.setAttribute('id', variableName);
+                variableElement.setAttribute('name', variableName);
+                variableElement.setAttribute('value', value);
+
+                ticketForm.appendChild(variableElement);
+
+                updateTicketDisplay();
+            }
+
+            function removeTicketDisplayVariable(variableName, value) {
+                var ticketContainer = document.getElementById('ticketContainer');
+                var ticketForm = ticketContainer.contentWindow.document.getElementById('ticketForm');
+                var variableElement = ticketContainer.contentWindow.document.getElementById(variableName);
+                
+                if (variableElement != null) {
+                    variableElement.remove();
+                }
+            }
+
+            function clearTicketDisplayVariables() {
+                var ticketContainer = document.getElementById('ticketContainer');
+                var ticketForm = ticketContainer.contentWindow.document.getElementById('ticketForm');
+                var vars = ticketForm.getElementsByClassName('variable');
+                for(var i = vars.length - 1; i >= 0; i--)
+                {
+                    vars[i].remove();
+                }
+            }
+
+            function updateTicketDisplay() {
+                var ticketContainer = document.getElementById('ticketContainer');
+                var ticketForm = ticketContainer.contentWindow.document.getElementById('ticketForm');
+                ticketForm.submit();
+            }
+
+            
+
             
             function maxSeatNumber() { return 100; }
             function maxSplitNumber() { return 9; }
@@ -22,6 +85,9 @@
             function editTicketItem() {}
             function configureModificationWindow() {}
             function updateTicketItem() {}
+
+            
+           
             
         </script>
         <script src="../InDev/cwpribble.js"></script>
@@ -58,7 +124,8 @@
                 
                     <div id="menuTitle">Menu</div>
                     <div id="menuContainer">
-                    <?php require "loadServerMenu.php"; ?>
+                    <iframe id="menuContainer" frameborder='0' width=100% height=100% src="menu.php">
+                    </iframe>
                     </div>
                     <div id="ticketHeader">
                     <div id="ticketHeaderText">Ticket&nbsp;Number&nbsp;Goes&nbsp;Here</div>
@@ -72,13 +139,8 @@
                         <option value=7>7</option>
                     </select>
                     </div>
-                    <div id="ticketContainer" style="display: initial;">
-                    <?php require "loadTicket.php"; 	 
-                        if (!empty($_POST['tableNumber'])) {
-                        	loadTicketItems($_POST['tableNumber']);
-                        }
-                        ?>
-                    </div>
+                    <iframe id="ticketContainer" frameborder='0' width=100% height=100% src="ticket.php">
+                    </iframe>
                     <div id="modsContainer" style='display: none;'>
                     <?php require "loadModsWindow.php"; ?>
                     </div>
@@ -101,7 +163,11 @@
         <br>
         <button type='button' id='getTicketContainer'>View Ticket Container</button>
         <button type='button' id='getModsContainer'>View Mods Container</button>
+        <button type='button' onclick="configureTicketIframe()">Test</button>
         <!-- Event Listeners: Currently Only Functions as a toggle between TICKETCONTAINER and MODSCONTAINER -->
         <script src="../Resources/JavaScript/eventListeners.js"> </script>
+        
+        
+
     </body>
 </html>

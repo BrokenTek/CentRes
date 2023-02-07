@@ -19,12 +19,8 @@
 		 .ticketItemOverrideNote, .ticketItemOverridePrice {
 			color: red;
          }
-		 
-		 .menuItem:hover {
-			font-size: 17px;
-			background-color: #cfcfcf;
-		 }
 
-		 .selected {
-			background-color: yellow;
+		 #menuTitle {
+			padding-inline: 100px 100px;
+			background-color: red;
 		 }

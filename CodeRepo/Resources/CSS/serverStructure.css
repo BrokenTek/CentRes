@@ -32,12 +32,7 @@
 			 display: grid;
 			 grid-template-columns: 1fr 1fr 1fr;
 		 }
-		 #menuContainer {
-			 grid-area: menu;
-			 grid-auto-rows: min-content;
-			 display: grid;
-			 overflow: auto;
-		 }
+
 		 #ticketContainer {
 			 grid-area: ticketAndOptions;
 			 overflow-y: auto;
@@ -77,22 +72,14 @@
 			 grid-template-columns: min-content 1fr min-content min-content min-content;
 		 }
 		 
-		 /* =============================================
-		    REQUIRED CSS TO PROPERLY LAYOUT A MENU CATEGORY
-			============================================= */		 
-
-         .menuItemContainer {
-			display: grid;
-			grid-template-columns: 1fr min-content;
-			/* grid-auto-rows: min-content; */
-         }
+		
 
 		
 		 /* =============================================
-		    REQUIRED CSS TO PROPERLY LAYOUT AN ORDER ITEM
+		    REQUIRED CSS TO PROPERLY LAYOUT A TICKET ITEM
 			============================================= */
 		
-         .ticketItem {
+         .ticketItem > form {
 			display: grid;
 			grid-template-columns: 2rem  2rem 1fr 5rem;
          }

@@ -1,0 +1,33 @@
+ .menuItem:hover {
+	font-size: 17px;
+	background-color: #8EA9DB;
+}
+
+
+.selected {
+	background-color: #8EA9DB;
+}
+
+
+details > * {
+	padding-left: 2rem;
+	font-size: 1.25rem;
+}
+details > summary {
+	padding-left: .125rem;
+}
+details > details > summary {
+	font-size: 1.25rem;
+}
+
+summary {
+	font-size: 1.5rem;
+	font-weight: bold;
+}
+
+.menuItem {
+	display: grid;
+	grid-template-columns: 1fr min-content;
+	padding-left: 1rem;
+}
+
