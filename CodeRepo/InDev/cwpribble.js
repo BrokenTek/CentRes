@@ -10,9 +10,16 @@ var ticketItemNumber = 1;
 // Move menuItem(s) from the menuContainer to the 
 //  ticketContainer with data.
 
+function selectMenuItem (id) {
+    setTicketDisplayVariable('ticket', 1);
+    setTicketDisplayVariable('seat', 1);
+    setTicketDisplayVariable('split', 1);
+    setTicketDisplayVariable('command', 'add');
+    setTicketDisplayVariable('menuItem', id);
+    updateTicketDisplay();
+}
 
-function selectMenuItem(id) {
-		
+function selectMenuItem2( id ) {
 	var menuToTicket = function(id) {
 		var menuItem = document.getElementById(id);
         // Get Attributes From Menu Item
@@ -169,7 +176,7 @@ function selectMenuItem(id) {
 
     ticketItem.classList.add("selected");
 	window.stateChanged();
-}
+};
 
 
 

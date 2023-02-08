@@ -1,24 +1,23 @@
 // This function checks for any menu items, identified by
 // a class name of "menuItem", and adds an event listener
 // to check when it is clicked
+function createMenuSelectEventHandlers() {
+	var menuContainer = document.getElementById('menuContainer');
+	    var elements = menuContainer.contentWindow.document.getElementsByClassName("menuItem");
 
-function createMenuSelectEventhandlers() {
-	var elements = document.getElementsByClassName("menuItem");
-
-	var myFunction = function() {
-		var attribute = this.id;
-		selectMenuItem( attribute );
-	};
-
+	    var myFunction = function() {
+			selectMenuItem( this.id );
+		};
 
 	for (var i = 0; i < elements.length; i++) {
-	
-		elements[i].addEventListener('click', myFunction);
-	};
-	window.removeEventListener('load', createMenuSelectEventhandlers);
-}
+	    elements[i].addEventListener('pointerdown', myFunction);
+	}
+};
 
-window.addEventListener('load', createMenuSelectEventhandlers);
+
+
+
+addEventListener('load', window.createMenuSelectEventHandlers);
 
 
 

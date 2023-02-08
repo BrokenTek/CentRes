@@ -2,7 +2,7 @@
 	REQUIRED CSS TO PROPERLY LAYOUT A TICKET ITEM
 	============================================= */
 		
-         .ticketItem > form {
+         .ticketItem {
 			display: grid;
 			grid-template-columns: 2rem  2rem 1fr 5rem;
          }

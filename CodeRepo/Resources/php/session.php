@@ -50,7 +50,6 @@
 
 					let div = document.createElement("input");
 					div.setAttribute("type","hidden");
-					div.setAttribute("id", "aaaa");
 					div.setAttribute("name","logout");
 					div.setAttribute("value","true");
 					document.getElementsByClassName("sessionContainer")[0].append(div);

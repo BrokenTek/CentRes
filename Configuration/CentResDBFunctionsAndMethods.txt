@@ -1,3 +1,5 @@
+-- todo switch to using menuItemPrice
+-- todo switch to using ticketItemPrice
 DROP TRIGGER IF EXISTS beforeInsertTableLog;
 DROP TRIGGER IF EXISTS afterInsertTableLog;
 DROP TRIGGER IF EXISTS afterDeleteTicketItem;
@@ -742,7 +744,7 @@ BEGIN
 				SELECT (IFNULL(MAX(itemId),0) +1) INTO newItemIndex FROM TicketItems WHERE ticketId = ticketNumber;
 
 				-- create the ticket item
-				INSERT INTO TicketItems (id, splitFlag, seat, menuItemQuickCode, calculatedPriceWithMods) VALUES (ticketNumber * 10000 + newItemIndex, POWER(2, split),  seatNumber, menuItemQC, calcPrice);
+				INSERT INTO TicketItems (id, splitFlag, seat, menuItemQuickCode, calculatedPrice, calculatedPriceWithMods) VALUES (ticketNumber * 10000 + newItemIndex, POWER(2, split),  seatNumber, menuItemQC, calcPrice, calcPrice);
 				-- SET newTicketItemID = ticketNumber * 10000 + newItemIndex;
 
 
@@ -757,6 +759,7 @@ BEGIN
 END$$
 DELIMITER ;
 
+-- need to use real price calcualtion
 DELIMITER $$
 CREATE PROCEDURE modifyTicketItem(IN ticketItemNumber INT UNSIGNED, IN modNotes VARCHAR(500))
 BEGIN
@@ -771,6 +774,7 @@ BEGIN
 			SET MESSAGE_TEXT = 'Removed/Ready/Delivered Ticket Items Cannot Be Modified!';
 		ELSE
 			UPDATE TicketItems SET modificationNotes = modNotes WHERE id = ticketItemNumber;
+			UPDATE TicketItems SET calculatedPriceWithMods = ticketItemPrice(ticketItemNumber) WHERE id = ticketItemNumber;
 			IF (stat = 'Preparing') THEN
 				UPDATE TicketItems SET flag = 'Updated' WHERE id = ticketItemNumber;
 			END IF; 
@@ -783,12 +787,17 @@ DELIMITER $$
 CREATE PROCEDURE overrideTicketItemPrice(IN ticketItemNumber INT UNSIGNED, IN adjustemnt DECIMAL(6, 2), note VARCHAR(500), authorizationUsername VARCHAR(25))
 BEGIN
 	DECLARE empId INT UNSIGNED;
+	DECLARE stat VARCHAR(30);
+	SELECT ticketItemStatus(ticketItemNumber) INTO stat;
 	IF ((SELECT COUNT(*) FROM TicketItems WHERE id = ticketItemNumber) = 0) THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Ticket Item Number Doesn''t Exist!';
 	ELSEIF (authorizationUsername IS NULL) THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Price Overrides Require Employee# to Log Event!';
+	ELSEIF (stat NOT IN ('Delivered', 'Hidden')) THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Price Overrides Can Only Be Applied to Delivered Ticket Items!';
 	ELSE
 		SELECT idFromUsername(authorizationUsername) INTO empId; 
 		UPDATE TicketItems SET overridePrice = adjustment, 
