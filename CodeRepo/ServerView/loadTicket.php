@@ -51,13 +51,49 @@
 function loadticketItems( int $tableNumber = 0 ) {	
 	# select all the existing ticket items in the ticket
 	# SQL: SELECT * FROM TicketItems WHERE ticketID = $ticketNumber AND status <> 'Out-of-Date' AND status <> 'Removed');
-	
-	# loop through each TicketItem and echo each menuItem
+	try {
+        $db = new PDO('mysql:host=localhost;dbname=CenTres', 'root', '');
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+        $sql = $db->prepare("SELECT * FROM ticketitems WHERE ticketID = :tableNumber AND flag NOT IN ('Out-of-Date', 'Removed')");
+        $sql->execute(array(':tableNumber' => $tableNumber));
 
+        $ticketItems = $sql->fetchAll();
 
+        return $ticketItems;
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    }
 
+}
 
+# loop through each TicketItem and echo each menuItem
+$ticketItems = loadticketItems(1);
+
+if ($ticketItems !== null) {
+    foreach ($ticketItems as $ticketItem) {
+        echo '
+          <span class="ticketItem" id="ticketItem_' . $ticketItem[''] . '"></span>
+          <span class="ticketItemStatus">' . $ticketItem[''] . '</span>
+
+          <span class="ticketItemNumber">' . $ticketItem['ticketID'] . '</span>
+          <span class="ticketItemText">' . $ticketItem['menuItemQuickCode'] . '</span>
+          <span class="ticketItemPrice">$' . $ticketItem['basePrice'] . '</span>
+          <span class="ticketItemOverrideNote">' . $ticketItem['overideNote'] . '</span>
+          <span class="ticketItemOverridePrice">$' . $ticketItem['overidePrice'] . '</span>
+          <span class="modText">' . $ticketItem['modificationNotes'] . '</span>
+          <span class="modCustom">' . $ticketItem['seat'] . '</span>
+
+          <input type="hidden" name="ticketItemNumber[]" value="' . $ticketItem['ticketID'] . '"/>
+          <input type="hidden" name="menuItem[]" value="' . $ticketItem['menuItemQuickCode'] . '"/>
+          <input type="hidden" name="customizationNotes[]" value="' . $ticketItem['modificationNotes'] . '"/>
+          <input type="hidden" name="seat[]" value="' . $ticketItem['seat'] . '"/>
+          <input type="hidden" name="overidePrice[]" value="' . $ticketItem['overidePrice'] . '"/>
+          <input type="hidden" name="overideNote[]" value="' . $ticketItem['overideNote'] . '"/>
+        </span>';
+    }
+} else {
+    echo 'Error: No ticket items found';
 }
 
 ?>
