@@ -11,12 +11,12 @@ var ticketItemNumber = 1;
 //  ticketContainer with data.
 
 function selectMenuItem (id) {
-    setTicketDisplayVariable('ticket', 1);
-    setTicketDisplayVariable('seat', 1);
-    setTicketDisplayVariable('split', 1);
-    setTicketDisplayVariable('command', 'add');
-    setTicketDisplayVariable('menuItem', id);
-    updateTicketDisplay();
+    setDisplayVariable('ticket', 1, 'ticketContainer');
+    setDisplayVariable('seat', 1, 'ticketContainer');
+    setDisplayVariable('split', 1, 'ticketContainer');
+    setDisplayVariable('command', 'add', 'ticketContainer');
+    setDisplayVariable('menuItem', id, 'ticketContainer');
+    updateDisplay('ticketContainer');
 }
 
 function selectMenuItem2( id ) {

@@ -12,12 +12,9 @@ function createMenuSelectEventHandlers() {
 	for (var i = 0; i < elements.length; i++) {
 	    elements[i].addEventListener('pointerdown', myFunction);
 	}
-};
-
-
-
-
+}
 addEventListener('load', window.createMenuSelectEventHandlers);
+
 
 
 

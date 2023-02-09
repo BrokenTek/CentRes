@@ -1,9 +1,33 @@
 
 <html>
-<form id = "ticketForm" action="ticket.php" method="post" class = "ticketForm">
+<head>
 <link rel="stylesheet" href="../CSS/baseStyle.css">
 <link rel="stylesheet" href="../CSS/ticketStructure.css">
 <link rel="stylesheet" href="../CSS/ticketStyle.css">
+<script>
+    function createTicketSelectEventHandlers() {
+	var elements = document.getElementsByClassName("ticketItem");
+
+	var myFunction = function() {
+		var oldSelectedItems = document.getElementsByClassName("selected");
+    	/*this iterates through the list returned, if there is no case where multiple items are selected concurrently,
+    	you can just use oldSelectedItems[0].classList.remove("selected"); instead*/
+    	for(let i = 0; i < oldSelectedItems.length; i++){
+        	oldSelectedItems[i].classList.remove("selected");
+    	}
+    	this.classList.add("selected");
+    	stateChanged();
+	};
+	for (var i = 0; i < elements.length; i++) {
+	    elements[i].addEventListener('pointerdown', myFunction);
+	}
+}
+addEventListener('load', createTicketSelectEventHandlers);
+</script>
+</head>
+<body>
+<form id = "ticketForm" action="ticket.php" method="post" class = "ticketForm">
+
     <?php
         include 'connect_disconnect.php';
 		if (isset($_POST['command'])) {
@@ -49,7 +73,7 @@
                                                            .$_POST['toSplit']. ");";
 				}
                 elseif ($_POST['command'] == 'markAsReady') {
-					$sql = "CALL markTicketItemAsReady(" .$_POST['ticketItemNumber']. ");";
+					$sql = "CALL markTicketItemAsReady(" .$_POST['ticketItem']. ");";
 				}
                 connection()->query($sql);
 					
@@ -63,11 +87,12 @@
         if (isset($_POST['ticket'])) {
             $sql = "SELECT * FROM ticketItems WHERE ticketId =" .$_POST['ticket'];
             
-            $bitMask = POW(2,$_POST['split']);
+            
             if (isset($_POST['seat'])) {
                 $sql .= " AND seat=" .$_POST['seat'];
             }
             if (isset($_POST['split'])) {
+                $bitMask = POW(2,$_POST['split']);
                 $sql .= " AND splitFlag & " .$bitMask. " = "  .$bitMask;
             }
             $sql .= " ORDER BY id DESC;";
@@ -154,28 +179,3 @@
             echo("<H1 id='test'>No Ticket Selected</H1>");
         }
     ?>
-
-            
-            
-    
- <!--               <span class="ticketItem" id="ticketItem22101107" data-pushToDB="">
-				
-// 				<span class="ticketItemStatus">ýþ6</span>
-				
-// 				<span class="ticketItemNumber">107</span>
-// 				<span class="ticketItemText">Royal Burger</span>
-// 				<span class="ticketItemPrice old-info">$8,888.88</span>
-// 				<span class="ticketItemOverrideNote">Long Wait</span>
-// 				<span class="ticketItemOverridePrice">$3.57</span>
-// 				<span class="modText">Egg</span>
-// 				<span class="modText">Cheese</span>
-// 				<span class="modText">Extra Mayo</span>
-// 				<span class="modCustom">Karen wants exactly 1/2 pickle</span>
-
-    -->        
-
-        
-
-   
-</form>
-</html>

@@ -19,10 +19,11 @@
 			 grid-area: serverViewHeader;
 			 display: grid;
 			 grid-template-columns: min-content 1fr min-content 1fr min-content;
+			 grid-template-rows: min-content;
 			grid-template-areas: "cboTable . cboSeat . headerButtonGroup";
 		 }
 		 #cboTable { 
-			grid-area: cboTable;	
+			grid-area: cboTable;
 		 }
 		 #cboSeat { 
 			grid-area: cboSeat;	

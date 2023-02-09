@@ -1,6 +1,5 @@
 //This function should select a ticket item, while deselecting any other items that are already selected.
-window.selectTicketItem = function(){
-
+function selectTicketItem() {
     var oldSelectedItems = document.getElementsByClassName("selected");
     /*this iterates through the list returned, if there is no case where multiple items are selected concurrently,
     you can just use oldSelectedItems[0].classList.remove("selected"); instead*/

@@ -2,21 +2,11 @@
     <head>
         <link rel="stylesheet" href="../Resources/CSS/serverStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/serverStructure.css">
-        <script src="../Resources/JavaScript/ticketDisplayInterface.js"></script>
+        <script src="../Resources/JavaScript/displayInterface.js"></script>
         <script type="text/javascript">
-
-            function templateFunction( a ) { 
-            	alert("You override the template function in your file"); 
-            }
-            
-            function reloadPage() {
-            	document.getElementById("form-container").submit();
-            }
-
             function maxSeatNumber() { return 100; }
-            function maxSplitNumber() { return 9; }
-            function createMenuSelectEventHandlers() { }
-            function selectMenuItem( id )
+            function createMenuSelectEventHandlers() {}
+            function selectMenuItem(id) {}
             function selectTicketItem() {}
             function moveTicketItem() {}
             function removeTicketItem() {}
@@ -24,7 +14,48 @@
             function editTicketItem() {}
             function configureModificationWindow() {}
             function updateTicketItem() {}
+            function templateFunction(a) { alert("You override the template function in your file"); }
 
+            function reloadPage() {
+                document.getElementById("form-container").submit();
+            }
+
+            function maxSplitNumber() {
+                return 9;
+            }
+
+            function stateChanged() {
+                alert("State Changed");
+            }
+
+            addEventListener("load", loadListeners);
+            function loadListeners() {
+                alert("SSS");
+                document.getElementById("ticketContainer").addEventListener("selectedTicketItemChanged", stateChanged);
+                setDisplayVariable('username', USERNAME, 'tableListener');
+                updateDisplay('tableListener');
+                alert(USERNAME);
+            }
+
+
+            var selectedTicketItem = null;
+            function getSelectedTicketItem() {
+                var ticketContainer = document.getElementById('ticketContainer');
+                var selectedItems = ticketContainer.contentWindow.document.getElementsByClassName('selected');
+                var newSel = null;
+                if (selectedItems.length == 1) {
+                    newSel = selectedItems[0];
+                }
+                if (selectedTicketItem != newSel) {
+                    selectedTicketItem = newSel;
+                    if (newSel == null) {
+                        removeDisplayVariable('ticketItem', id)
+                    } else {
+                        settDisplayVariable('ticketItem', Number(selectedTicketItem.id.substring(10)), id)
+                    }
+                }
+            }
+            setInterval(getSelectedTicketItem, 250);
 
         </script>
         <script src="../InDev/cwpribble.js"></script>
@@ -32,20 +63,19 @@
         <script src="../InDev/dlmahan.js"></script>
         <script src="../InDev/kcdine.js"></script>
         <script src="../InDev/sashort.js"></script>
-        <script src="../InDev/OVERRIDEEXAMPLE.js"></script>
-        <script>templateFunction("Hello World");</script>
+    </head>
     <body>
         <form id="serverViewSession" class="sessionContainer" action="ServerView.php" method="POST">
             <!-- session.php must be included after the opening for tag. It adds  -->
             <?php require "../Resources/php/session.php"; ?>
             <div id="serverViewContainer" class="sessionBody">
                 <div id="serverViewHeader">
-                    <select id="cboTable" name="tableNumber" onchange="reloadPage()">
-                        <option value="">Select Table</option>
-                        <option value="1">Table 1</option>
-                        <option value="2">Table 2</option>
-                        <option value="3">Table 3</option>
-                    </select>
+                <select name="table" id="cboTable">
+                <option value="volvo">Volvo</option>
+                <option value="saab">Saab</option>
+                <option value="mercedes">Mercedes</option>
+                <option value="audi">Audi</option>
+            </select>
                     <select id="cboSeat" name="seatNumber" onchange="stateChanged()">
                         <option value="">Select Seat</option>
                         <option value="1">Table 1</option>
@@ -104,6 +134,6 @@
         <script src="../Resources/JavaScript/eventListeners.js"> </script>
         
         
-
+        <iframe id="tableListener" src="tableListener.php" ">
     </body>
 </html>
