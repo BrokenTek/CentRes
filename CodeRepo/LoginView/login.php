@@ -62,14 +62,19 @@
 <head>
 	<title> CentRes Employee Portal </title>
 	<meta charset="utf-8">
-	<link rel="stylesheet" href="style.css">
+	<!-- <link rel="stylesheet" href="style.css"> -->
+	<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
 </head>
-<body>
-	<div id="login-container">
-	<h2> CentRES Employee Portal </h2><br>
+<body id="loginBody">
 
+	<div id="loginContainer">
+	<div id="loginHeader">
+					<img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
+					<div id="loginTitle">CentRes Employee Portal</div>
+					<button type="button" id="btnLogout" onclick="logout()">Create Account</button>
+				</div>
 	<div>
-		<form action="login.php" method="POST" id="frmLogin">
+		<form action="login.php" method="POST" id="loginForm">
 
 			<label for="uname" id="lblLoginUsername">Enter Your Username</label>
 			<input type=text id='txtLoginUsername' name='uname' <?php if (isset($_POST['uname'])) { echo('value="' . $_POST['uname'] . '"');} echo( '>'); ?>
@@ -122,7 +127,7 @@
 			echo("<button id='btnClearLogin' onclick='clearLogin()' >Clear</button>
 			<script>
 				function autoLogin() {
-					document.getElementById('frmLogin').submit();
+					document.getElementById('loginForm').submit();
 				}
 				function clearLogin() {
 					document.getElementById('txtLoginUsername').remove();

@@ -830,7 +830,8 @@ BEGIN
 		
 		-- deletes split from ticket if this is the only item on it.
 		-- DELETE FROM Splits WHERE spltFlg & POWER(2, splitId) = POWER(2, splitId) AND 
-		 -- POWER(2, splitId) IN (SELECT splitFlag FROM TicketItems WHERE ticketId = (ticketItemNumber DIV 10000) GROUP BY splitFlag HAVING count(*) = 1);
+		 -- POWER(2, splitId) IN (SELECT splitFlag FROM TicketItems WHERE ticketId = (ticketItemNumber DIV 10000) 
+		 GROUP BY splitFlag HAVING count(*) = 1);
 		
 		-- delete the actual ticket item
 		DELETE FROM TicketItems WHERE id = ticketItemNumber;

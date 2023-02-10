@@ -4,7 +4,13 @@
 <link rel="stylesheet" href="../CSS/baseStyle.css">
 <link rel="stylesheet" href="../CSS/ticketStructure.css">
 <link rel="stylesheet" href="../CSS/ticketStyle.css">
+<script src="../JavaScript/displayInterface.js"></script>
 <script>
+    window.onscroll = function (e) { 
+        setDisplayVariable("scrollX", window.scrollX);
+        setDisplayVariable("scrollY", window.scrollY);
+        
+    } 
     function createTicketSelectEventHandlers() {
 	var elements = document.getElementsByClassName("ticketItem");
 
@@ -16,12 +22,34 @@
         	oldSelectedItems[i].classList.remove("selected");
     	}
     	this.classList.add("selected");
+        setDisplayVariable("selectedTicketItem", this.id);
+       
     	stateChanged();
 	};
 	for (var i = 0; i < elements.length; i++) {
 	    elements[i].addEventListener('pointerdown', myFunction);
 	}
 }
+<?php
+    if (isset($_POST['scrollX']) OR isset($_POST['scrollY'])) {
+        echo("function moveToPreviousScrollPos() { window.scrollBy(");
+            if (isset($_POST['scrollX'])) {
+                echo($_POST['scrollX']);
+            }
+            else{
+                echo("0");
+            }
+            echo(", ");
+            if (isset($_POST['scrollY'])) {
+                echo($_POST['scrollY']);
+            }
+            else{
+                echo("0");
+            }
+            echo(");}");
+        echo(" addEventListener('load', moveToPreviousScrollPos);");
+    } 
+    ?>
 addEventListener('load', createTicketSelectEventHandlers);
 </script>
 </head>
@@ -95,7 +123,7 @@ addEventListener('load', createTicketSelectEventHandlers);
                 $bitMask = POW(2,$_POST['split']);
                 $sql .= " AND splitFlag & " .$bitMask. " = "  .$bitMask;
             }
-            $sql .= " ORDER BY id DESC;";
+            $sql .= ";";
 
             $ticketItems = connection()->query($sql);
 
@@ -179,3 +207,6 @@ addEventListener('load', createTicketSelectEventHandlers);
             echo("<H1 id='test'>No Ticket Selected</H1>");
         }
     ?>
+    </form>
+    </body>
+    </html>

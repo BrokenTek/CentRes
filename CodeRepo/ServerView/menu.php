@@ -12,6 +12,7 @@
         <script>templateFunction("Hello World");</script>
 	</head>
 	<body>
+		<form>
 <?php 
 include '../Resources/php/connect_disconnect.php';
 connection();
@@ -73,6 +74,8 @@ if ($result->num_rows > 0) {
 		echo "<span class='menuItemPrice'> $". $price ."</span></span>";
 
 	}
+	include "../Resources/php/display.php";
 ?>
+</form>
 </body>
 </html>

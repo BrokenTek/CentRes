@@ -33,7 +33,7 @@ html {
   select {
     margin: .25rem .25rem .25rem .25rem;
   }
-  button {
+  button, .button {
     background-color: #F6941D;
     color: white;
     font-weight: bold;
@@ -41,13 +41,48 @@ html {
     min-width: 5rem;
   }
 
-  button:hover {
+  button:hover, .button:hover {
     background-color: #bf1e2e;
   }
 
   .sessionBody {
     background-color: #FFE699;
   }
+
+  #loginBody{
+    display: grid;
+    grid-template-areas: "loginHeader loginHeader loginHeader"
+                         "d login e"
+                         "f g     h";
+    grid-template-columns: 1fr minmax(70vw, min-content) 1fr;
+    grid-template-rows: 1fr min-content 1fr;
+    background-color: #777;
+  }
+
+  #loginContainer {
+    grid-area: login;
+    margin: auto auto auto auto;
+    background-color: #FFE699;
+    
+  }
+#loginForm {
+  padding: 1rem 1rem 1rem 1rem;
+}
+  
+  #loginHeader {
+    display: grid;
+    background-color: #333;
+    color: white;
+    grid-template-areas: "logo title . btnLogout";
+    grid-template-columns: min-content min-content 1fr min-content;
+    grid-template-rows: min-content;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    padding: .25rem .25rem .25rem .25rem;
+    
+  }
+
+
 
 
   

@@ -1,5 +1,6 @@
 <html>
     <head>
+        <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/serverStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/serverStructure.css">
         <script src="../Resources/JavaScript/displayInterface.js"></script>
@@ -30,16 +31,15 @@
 
             addEventListener("load", loadListeners);
             function loadListeners() {
-                alert("SSS");
                 document.getElementById("ticketContainer").addEventListener("selectedTicketItemChanged", stateChanged);
                 setDisplayVariable('username', USERNAME, 'tableListener');
                 updateDisplay('tableListener');
-                alert(USERNAME);
             }
 
 
             var selectedTicketItem = null;
             function getSelectedTicketItem() {
+                alert("S");
                 var ticketContainer = document.getElementById('ticketContainer');
                 var selectedItems = ticketContainer.contentWindow.document.getElementsByClassName('selected');
                 var newSel = null;
@@ -49,13 +49,14 @@
                 if (selectedTicketItem != newSel) {
                     selectedTicketItem = newSel;
                     if (newSel == null) {
-                        removeDisplayVariable('ticketItem', id)
+                        removeDisplayVariable('selectedTicketItem', id)
                     } else {
-                        settDisplayVariable('ticketItem', Number(selectedTicketItem.id.substring(10)), id)
+                        setDisplayVariable('selectedTicketItem', id), "ticketContainer")
+                        alert("Selected");
                     }
                 }
             }
-            setInterval(getSelectedTicketItem, 250);
+            var updateSelTick = setInterval(getSelectedTicketItem, 5000);
 
         </script>
         <script src="../InDev/cwpribble.js"></script>

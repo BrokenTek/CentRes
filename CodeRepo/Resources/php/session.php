@@ -24,11 +24,18 @@
 			$row = connection()->query($sql)->fetch_assoc();
 			$fname = $row['firstName'];
 			$lname = $row['lastName'];
+
+			if (isset($_POST['logout'])) {
+				$sql = "CALL logout('" .$uname. "');";
+				$result = connection()->query($sql);
+				$_COOKIE[$cookie_name] = NULL;
+				header("Location: ../LoginView/Login.php");
+			}
+			else {
+				//check validated. 
+				$session_valid = true;
+			}
 					
-			//check validated. 
-			$session_valid = true;
-			
-			
 			$username = $uname;
 			$firstName = $fname;
 			$lastName = $lname;
@@ -71,20 +78,13 @@
 			// cookie exists, but sessionID doesn't exist in the DB or it's expired.
 			// remove the cookie
 			$_COOKIE[$cookie_name] = NULL;
-		}				
-			
+			header("Location: ../LoginView/Login.php");
+		}					
 	}
-
-	if (!$session_valid or isset($_POST['logout'])) {
-		// redirect to the login page
+	else {
+		$_COOKIE[$cookie_name] = NULL;
 		header("Location: ../LoginView/Login.php");
-
-		if (isset($_POST['logout'])) {
-			$sql = "CALL logout('" .$username. "');";
-			$result = connection()->query($sql);
-		}
-
-	}
+	}	
 
 	unset($uname, $fname, $lname, $sql, $row);
 

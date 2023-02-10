@@ -40,14 +40,16 @@ function connection() {
 // Disconnect From The Persistent Database Connection. This Is Necessary
 function disconnect() {
 	try {
-		mysqli_close($GLOBALS['conn']);
+		if (!is_null($GLOBALS['conn'])) {
+			mysqli_close($GLOBALS['conn']);
+		}
 		
 		// coneection gracefully closed
 	}
 	catch (Exception $e) {
 	}
-		unset($GLOBALS['conn']);	
-	}
+	unset($GLOBALS['conn']);	
+}
 ?>
 
 </body>
