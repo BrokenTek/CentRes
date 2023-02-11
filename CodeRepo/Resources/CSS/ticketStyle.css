@@ -1,3 +1,9 @@
 .selected {
-    background-color: red;
+    background-color: #8EA9DB;
+   
+}
+
+.multiselect {
+    background-color: #063279;
+    color: white;
 }

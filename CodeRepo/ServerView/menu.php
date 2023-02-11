@@ -1,8 +1,27 @@
 <html>
     <head>
-
+		<script src="../Resources/JavaScript/displayInterface.js"></script>
         <link rel="stylesheet" href="../Resources/CSS/menuStyle.css">
 		<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
+		<script>
+			function createMenuSelectEventHandlers() {
+	    		var menuItemSelected = function() {
+					setDisplayVariable("selectedMenuItem", this.id);
+				};
+
+				var elements = document.getElementsByClassName("menuItem");
+				if (elements != null) {
+					for (var i = 0; i < elements.length; i++) {
+	    				elements[i].addEventListener('pointerdown', menuItemSelected);
+					}
+				}
+
+			}
+			addEventListener('load', createMenuSelectEventHandlers);
+
+			
+
+		</script>
         <script src="../InDev/cwpribble.js"></script>
         <script src="../InDev/dbutshudiema.js"></script>
         <script src="../InDev/dlmahan.js"></script>

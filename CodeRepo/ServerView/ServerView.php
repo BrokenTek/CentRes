@@ -5,58 +5,105 @@
         <link rel="stylesheet" href="../Resources/CSS/serverStructure.css">
         <script src="../Resources/JavaScript/displayInterface.js"></script>
         <script type="text/javascript">
-            function maxSeatNumber() { return 100; }
-            function createMenuSelectEventHandlers() {}
-            function selectMenuItem(id) {}
-            function selectTicketItem() {}
-            function moveTicketItem() {}
-            function removeTicketItem() {}
-            function stateChanged() {}
-            function editTicketItem() {}
-            function configureModificationWindow() {}
-            function updateTicketItem() {}
-            function templateFunction(a) { alert("You override the template function in your file"); }
-
-            function reloadPage() {
-                document.getElementById("form-container").submit();
-            }
-
-            function maxSplitNumber() {
-                return 9;
-            }
-
+            var updateLoopTimer;
             function stateChanged() {
-                alert("State Changed");
+                //alert("State Changed");
             }
 
-            addEventListener("load", loadListeners);
-            function loadListeners() {
-                document.getElementById("ticketContainer").addEventListener("selectedTicketItemChanged", stateChanged);
+            function startUpdateLoopTimer() {
+                updateLoopTimer = setInterval(updateLoop, 250);
+            }
+            function stopUpdateLoopTimer() {
+                clearInterval(updateLoopTimer);
+            }
+
+            function updateLoop() {
+                stopUpdateLoopTimer();
+
+                // check if the servers tables have changed.
+                    // remember the currently selectd table
+                    //
+
+                // if a seat and split are selected, check if a menu item was selected.
+                // otherwise ignore if you clicked a menu item.
+                if (true) {
+                    checkMenuItemSelected();
+                }
+                else {
+                    removeDisplayVariable("menuContainer", selectedMenuItem);
+                }
+
+                // check if the selected menu item has changed.
+                // if so, this function will trigger stateChanged()
+                getSelectedTicketItem();
+
+                startUpdateLoopTimer();
+            }
+
+            function loaded() {
+                
+                
+                // initialize the table listener
                 setDisplayVariable('username', USERNAME, 'tableListener');
                 updateDisplay('tableListener');
+
+                startUpdateLoopTimer();
             }
+            addEventListener("load", loaded);
+            
+            // listen for menu item selection
+            function checkMenuItemSelected() {
+                var selectedMenuItem = getDisplayVariable("selectedMenuItem", "menuContainer");
+               
+                // if a menu item was selected
+                if (selectedMenuItem != null) {
+                   
+                    // menu item selection acknowledged.
+                    removeDisplayVariable("selectedMenuItem", "menuContainer");
+                    
+                    // signal the ticketContainer that a menu item was selected and needs to be added to the ticket
+    			    setDisplayVariable('command', 'add', 'ticketContainer');
+    			    setDisplayVariable('menuItem', selectedMenuItem, 'ticketContainer');
 
+                    // testing variables REMOVE WEHN CONTROLS HAVE BEEN FULLY IMPLEMENTED
+                    setDisplayVariable('ticket', 1, 'ticketContainer');
+    			    setDisplayVariable('seat', 1, 'ticketContainer');
+    			    setDisplayVariable('split', 1, 'ticketContainer');
 
-            var selectedTicketItem = null;
+                    // scroll down to bottom
+                    setDisplayVariable('scrollY', Number.MAX_SAFE_INTEGER , 'ticketContainer');
+
+                    // make the ticketContaner commit the added item to the database
+                    updateDisplay('ticketContainer');
+                }
+                
+    			
+            }
+            
+            // listen for ticket item selection change
+            var lastTicketUpdate = 0;
+            var selectedTicketItem = [];
             function getSelectedTicketItem() {
-                alert("S");
-                var ticketContainer = document.getElementById('ticketContainer');
-                var selectedItems = ticketContainer.contentWindow.document.getElementsByClassName('selected');
-                var newSel = null;
-                if (selectedItems.length == 1) {
-                    newSel = selectedItems[0];
-                }
-                if (selectedTicketItem != newSel) {
-                    selectedTicketItem = newSel;
-                    if (newSel == null) {
-                        removeDisplayVariable('selectedTicketItem', id)
-                    } else {
-                        setDisplayVariable('selectedTicketItem', id), "ticketContainer")
-                        alert("Selected");
+                var lookAtTimestamp = parseInt(getDisplayVariable("lastUpdate", "ticketContainer"));
+                // if the selected ticket item(s) have changed
+                if (lookAtTimestamp > lastTicketUpdate) {
+                    lastTicketUpdate = lookAtTimestamp;
+                    // record the changes
+                    var ticketContainer = document.getElementById('ticketContainer');
+                    var selectedItems = getDisplayVariable("selectedTicketItem", "ticketContainer");
+                    
+                    // no items are selected
+                    if (selectedItems == null) {
+                        selectedTicketItem = [];
                     }
+                    else { // one or more items are selected
+                        selectedTicketItem = selectedItems.split(",");
+                    }
+                    stateChanged();
                 }
             }
-            var updateSelTick = setInterval(getSelectedTicketItem, 5000);
+
+            
 
         </script>
         <script src="../InDev/cwpribble.js"></script>

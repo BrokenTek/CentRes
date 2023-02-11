@@ -21,6 +21,6 @@
          }
 
 		 #menuTitle {
+			font-weight: bold;
 			padding-inline: 100px 100px;
-			background-color: red;
 		 }

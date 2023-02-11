@@ -6,51 +6,77 @@
 <link rel="stylesheet" href="../CSS/ticketStyle.css">
 <script src="../JavaScript/displayInterface.js"></script>
 <script>
-    window.onscroll = function (e) { 
-        setDisplayVariable("scrollX", window.scrollX);
-        setDisplayVariable("scrollY", window.scrollY);
-        
-    } 
-    function createTicketSelectEventHandlers() {
-	var elements = document.getElementsByClassName("ticketItem");
+    
+    function loaded() {
+        //initialize update id
+        setDisplayVariable("lastUpdate", Date.now());
 
-	var myFunction = function() {
-		var oldSelectedItems = document.getElementsByClassName("selected");
-    	/*this iterates through the list returned, if there is no case where multiple items are selected concurrently,
-    	you can just use oldSelectedItems[0].classList.remove("selected"); instead*/
-    	for(let i = 0; i < oldSelectedItems.length; i++){
-        	oldSelectedItems[i].classList.remove("selected");
-    	}
-    	this.classList.add("selected");
-        setDisplayVariable("selectedTicketItem", this.id);
-       
-    	stateChanged();
-	};
-	for (var i = 0; i < elements.length; i++) {
-	    elements[i].addEventListener('pointerdown', myFunction);
+        //create ticket item select listeners
+        var elements = document.getElementsByClassName('ticketItem');
+        if (elements != null) {
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].addEventListener('pointerdown',pointerDown);
+                elements[i].addEventListener('pointerup', pointerUp);
+            }
+        }
+
+        rememberScrollPosition();
+    }
+    addEventListener('load', loaded);
+    
+   
+
+    const LONG_TIME_TOUCH_LENGTH = 250;
+    var targetTicketItem = null;
+    var longTouchEnabled = false;
+    var longTouchTimer = null;
+	function pointerDown() {
+        if (this === undefined) { return; }
+        targetTicketItem = this;
+        targetTicketItem.classList.add("selected");
+        if (getDisplayVariable("selectedTicketItem") != null) {
+            longTouchTimer = setTimeout(longTouch, LONG_TIME_TOUCH_LENGTH);
+        }
 	}
-}
-<?php
-    if (isset($_POST['scrollX']) OR isset($_POST['scrollY'])) {
-        echo("function moveToPreviousScrollPos() { window.scrollBy(");
-            if (isset($_POST['scrollX'])) {
-                echo($_POST['scrollX']);
-            }
-            else{
-                echo("0");
-            }
-            echo(", ");
-            if (isset($_POST['scrollY'])) {
-                echo($_POST['scrollY']);
-            }
-            else{
-                echo("0");
-            }
-            echo(");}");
-        echo(" addEventListener('load', moveToPreviousScrollPos);");
-    } 
-    ?>
-addEventListener('load', createTicketSelectEventHandlers);
+
+    function longTouch() {
+         longTouchEnabled = true;
+         targetTicketItem.classList.add("multiselect");
+
+        // if there is exactly 1 other item selected, make it multi-select as well.
+         var alreadySelected = getDisplayVariable("selectedTicketItem");
+         if (alreadySelected.indexOf(",") == -1) {
+            document.getElementById(alreadySelected).classList.add("multiselect");
+         }
+    }
+
+    function pointerUp() {
+        if (targetTicketItem == null) { return; }
+        
+        if (longTouchTimer != null) {
+            clearTimeout(longTouchTimer);
+        }
+
+        var oldSelectedItems = document.getElementsByClassName("ticketItem");
+        if (!longTouchEnabled) {
+    	    /*this iterates through the list returned, if there is no case where multiple items are selected concurrently,
+    	    you can just use oldSelectedItems[0].classList.remove("selected"); instead*/
+    	    for(let i = 0; i < oldSelectedItems.length; i++){
+        	    oldSelectedItems[i].classList.remove("selected");
+                oldSelectedItems[i].classList.remove("multiselect");
+    	    }
+    	    targetTicketItem.classList.add("selected");
+            targetTicketItem.classList.remove("multiselect");
+            setDisplayVariable("selectedTicketItem", targetTicketItem.id);
+        }
+        else {
+            setDisplayVariable("selectedTicketItem", getDisplayVariable("selectedTicketItem") + "," + targetTicketItem.id); 
+        }
+        setDisplayVariable("lastUpdate", Date.now()); 
+        targetTicketItem = null;
+        longTouchEnabled = false;
+    }
+
 </script>
 </head>
 <body>
@@ -131,17 +157,17 @@ addEventListener('load', createTicketSelectEventHandlers);
                 $sql = "SELECT * FROM menuItems WHERE quickCode = '" .$ticketItem['menuItemQuickCode']. "'";
                 $menuItem = connection()->query($sql)->fetch_assoc();
 
-                echo('<span class="ticketItem" id="ticketItem' .$ticketItem['id']. '">
-                        <span class="ticketItemStatus"></span>
-                        <span class="ticketItemNumber">' .$ticketItem['itemId']. '</span>
-                        <span class="ticketItemText">' .$menuItem['title']. "</span>");
+                echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '">
+                        <div class="ticketItemStatus"></div>
+                        <div class="ticketItemNumber">' .$ticketItem['itemId']. '</div>
+                        <div class="ticketItemText">' .$menuItem['title']. "</div>");
                 if (is_null($ticketItem['overridePrice'])) {
-                    echo('<span class="ticketItemPrice">' .$ticketItem['calculatedPrice']. '</span>');
+                    echo('<div class="ticketItemPrice">' .$ticketItem['calculatedPrice']. '</div>');
                 }
                 else {
-                    echo('<span class="ticketItemPrice old-info">' .$ticketItem['calculatedPrice']. '</span>');
-                    echo('<span class="ticketItemOverrideNote">' .$ticketItem['overrideNote']. '</span>');
-                    echo('<span class="ticketItemOverridePrice">');
+                    echo('<div class="ticketItemPrice old-info">' .$ticketItem['calculatedPrice']. '</div>');
+                    echo('<div class="ticketItemOverrideNote">' .$ticketItem['overrideNote']. '</div>');
+                    echo('<div class="ticketItemOverridePrice">');
                     if ($ticketItem['overridePrice'] < 0) {
                         // discount applied
                         echo($ticketItem['overridePrice']);
@@ -158,7 +184,7 @@ addEventListener('load', createTicketSelectEventHandlers);
                         // percent discount applied
                        echo(((1 - $ticketItem['overridePrice']) * 100) ."% off");
                     }
-                    echo('</span>');
+                    echo('</div>');
                 }
                 if (!is_null($ticketItem['modificationNotes'])) {
                     $mods = explode(",", $ticketItem['modificationNotes']);
@@ -168,13 +194,13 @@ addEventListener('load', createTicketSelectEventHandlers);
                         $modItemRows = connection()->query($sql);
                         if (mysqli_num_rows($modItemRows) == 0) {
                             // custom mod, deleted mod. Treat as custom mod.
-                            echo('<span class="modCustom">' .$modQuickCode. '</span>');
+                            echo('<div class="modCustom">' .$modQuickCode. '</div>');
                         }
                         else {
                             $modItem = $modItemRows->fetch_assoc();
-                            echo('<span class="modText">' .$modItem['title']. '</span>');
+                            echo('<div class="modText">' .$modItem['title']. '</div>');
                             if (!is_null($modItem['priceOrModificationValue'])) {
-                                echo('<span class="modPrice">');
+                                echo('<div class="modPrice">');
                               
                                 if ($modItem['priceOrModificationValue'] < 0) {
                                     // discount applied
@@ -192,14 +218,14 @@ addEventListener('load', createTicketSelectEventHandlers);
                                     // percent discount applied
                                    echo(((1 - $modItem['priceOrModificationValue']) * 100) ."% off");
                                 }
-                                echo('</span>');
+                                echo('</div>');
                             }
 
                         }
                     }
                 }
 
-                echo("</span>");
+                echo("</div>");
 
             }
         }

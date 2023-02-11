@@ -10,14 +10,7 @@ var ticketItemNumber = 1;
 // Move menuItem(s) from the menuContainer to the 
 //  ticketContainer with data.
 
-function selectMenuItem (id) {
-    setDisplayVariable('ticket', 1, 'ticketContainer');
-    setDisplayVariable('seat', 1, 'ticketContainer');
-    setDisplayVariable('split', 1, 'ticketContainer');
-    setDisplayVariable('command', 'add', 'ticketContainer');
-    setDisplayVariable('menuItem', id, 'ticketContainer');
-    updateDisplay('ticketContainer');
-}
+
 
 function selectMenuItem2( id ) {
 	var menuToTicket = function(id) {
