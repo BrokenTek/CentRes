@@ -1,4 +1,4 @@
-function setDisplayVariable(variableName, value, id = null) {
+function setVar(variableName, value, id = null) {
     var container = document.getElementById(id);
     var form;
     var variableElement;
@@ -15,6 +15,7 @@ function setDisplayVariable(variableName, value, id = null) {
         variableElement.remove();
     }
 
+   
     variableElement = document.createElement('input');
     variableElement.setAttribute('type', 'hidden');
     variableElement.setAttribute('class', 'variable');
@@ -25,20 +26,22 @@ function setDisplayVariable(variableName, value, id = null) {
     form.appendChild(variableElement);
 }
 
-function getDisplayVariable(variableName, id = null) {
+function getVar(variableName, id = null) {
     var container = document.getElementById(id);
     var form;
     var variableElement;
+   
     if (id == null) {
         form = document.getElementsByTagName('form')[0];
         variableElement = document.getElementById(variableName);
     }
     else {
-        form = container.contentWindow.document.getElementsByTagName('form')[0];
+        
+        form = container.contentWindow.document.getElementsByTagName('form')[0]; 
         variableElement = container.contentWindow.document.getElementById(variableName);
     }
     
-    if (variableElement == null) {
+    if (variableElement == null || variableElement == "null") {
         return null;
     }
     else {
@@ -46,7 +49,7 @@ function getDisplayVariable(variableName, id = null) {
     }
 }
 
-function removeDisplayVariable(variableName, id = null) {
+function removeVar(variableName, id = null) {
     var container = document.getElementById(id);
     var form;
     var variableElement;
@@ -64,7 +67,7 @@ function removeDisplayVariable(variableName, id = null) {
     }
 }
 
-function clearDisplayVariables(id = null) {
+function clearVars(id = null) {
     var container = document.getElementById(id);
     var form;
     if (id == null) {
@@ -92,18 +95,18 @@ function updateDisplay(id = null) {
 }
 
 window.onscroll = function (e) { 
-    if (getDisplayVariable("scrollX") != null) {
-        setDisplayVariable("scrollX", window.scrollX);
-        setDisplayVariable("scrollY", window.scrollY);
+    if (getVar("scrollX") != null) {
+        setVar("scrollX", window.scrollX);
+        setVar("scrollY", window.scrollY);
     }   
 }
 
 function rememberScrollPosition(id = null) {
-    setDisplayVariable("scrollX", window.scrollX);
-    setDisplayVariable("scrollY", window.scrollY); 
+    setVar("scrollX", window.scrollX);
+    setVar("scrollY", window.scrollY); 
 }
 
 function forgetScrollPosition(id = null) {
-    removeDisplayVariable("scrollX", id);
-    removeDisplayVariable("ScrollY", id);
+    removeVar("scrollX", id);
+    removeVar("ScrollY", id);
 }

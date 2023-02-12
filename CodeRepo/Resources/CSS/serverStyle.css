@@ -20,7 +20,10 @@
 			color: red;
          }
 
-		 #menuTitle {
+		 #ticketHeaderText, #menuTitle {
+			font-size: 2rem;
 			font-weight: bold;
-			padding-inline: 100px 100px;
 		 }
+
+		 
+		 

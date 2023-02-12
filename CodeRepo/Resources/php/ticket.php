@@ -6,10 +6,70 @@
 <link rel="stylesheet" href="../CSS/ticketStyle.css">
 <script src="../JavaScript/displayInterface.js"></script>
 <script>
-    
+    // ========================= TASKS WHEN TICKET IS LOADED ==============================
+    // after the ticket has loaded
     function loaded() {
-        //initialize update id
-        setDisplayVariable("lastUpdate", Date.now());
+        // set the ticket timestamp, so anything listening to it can update.
+        setVar("lastUpdate", Date.now());
+        var tick = getVar("ticket");
+        
+        // if the ticket number has been specified
+        if (tick != null) {
+            setVar("ticketNumber", tick, "ticketListener");
+            updateDisplay("ticketListener");
+            
+            var oldTime = getVar("recordedModificationTime");
+            var newTime = getVar("modificationTime", "ticketListener");
+
+            // but you haven't yet retrieved a timestamp
+            if (getVar("recordedModificationTime") == null) { 
+                //  get the timestamp from the listener
+                var modTime = getVar("modificationTime", "ticketListener");
+                setVar("recordedModificationTime", modTime);
+            }
+
+
+            // if you previusly had items selected
+            var selItems = getVar("selectedTicketItem");
+            if (selItems != null) {
+                selItems = selItems.split(",");
+                // and there were more than 1 selected,
+                if (selItems.length > 1) {
+                    for(let i = 0; i < selItems.length; i++){
+                        // Some of them might be visible or exist anymore
+                        // check if you can still see them (exists and visible), and if so
+                        // set them as "multiselect" 
+                        var lookAt = document.querySelector("#" + selItems[i]);
+                        if (lookAt != null) {
+                            lookAt.classList.add("selected");
+                            lookAt.classList.add("multiselect");
+                        }
+        	            
+    	            }
+                }
+                // otherwise the selected item mgiht not be visible or exist anymore
+                // check if you can still see it (exists and visible), and if so
+                // set it as "selected"
+                else {
+                    let lookAt = document.querySelector("#" + selItems);
+                    if (lookAt != null) {
+                        lookAt.classList.add("selected");
+                    }
+                }
+            }
+
+            // if we just added a ticket item, we need to ensure we scroll to the bottom and select it.
+            <?php 
+                if(isset($_POST['command']) && $_POST['command'] == "add" ) {
+                    echo("selectLast();");
+                }
+            ?>
+
+            //begin listening for updates to the ticket.
+            setInterval(checkExternalTicketUpdate, 1000); 
+            rememberScrollPosition();
+        }
+        
 
         //create ticket item select listeners
         var elements = document.getElementsByClassName('ticketItem');
@@ -20,12 +80,26 @@
             }
         }
 
-        rememberScrollPosition();
+       
     }
     addEventListener('load', loaded);
-    
-   
 
+    // function that listens for an external change in the ticket timestamp.
+    // if a change has been detected, reload with the changes.
+    function checkExternalTicketUpdate() {
+        var oldTime = getVar("recordedModificationTime");
+        var newTime = getVar("modificationTime", "ticketListener");
+        if (oldTime != newTime && newTime != null) {
+            setVar("recordedModificationTime", newTime);
+            if (oldTime != null) {
+                document.getElementById("ticketForm").submit();
+                
+            }
+        }
+    }
+    
+    // ========================= TICKET ITEM SELECT FUNCTIONS ==============================
+   
     const LONG_TIME_TOUCH_LENGTH = 250;
     var targetTicketItem = null;
     var longTouchEnabled = false;
@@ -34,22 +108,25 @@
         if (this === undefined) { return; }
         targetTicketItem = this;
         targetTicketItem.classList.add("selected");
-        if (getDisplayVariable("selectedTicketItem") != null) {
+        if (getVar("selectedTicketItem") != null && getVar("selectedTicketItem") != this.id) {
             longTouchTimer = setTimeout(longTouch, LONG_TIME_TOUCH_LENGTH);
         }
 	}
 
+    // if oyu pressed on a ticket item, you already have another one selected, and the minimum required time
+    // for multiselect has elapsed, change the selected item to "multiselect" 
     function longTouch() {
          longTouchEnabled = true;
          targetTicketItem.classList.add("multiselect");
 
         // if there is exactly 1 other item selected, make it multi-select as well.
-         var alreadySelected = getDisplayVariable("selectedTicketItem");
-         if (alreadySelected.indexOf(",") == -1) {
+         var alreadySelected = getVar("selectedTicketItem");
+         if (alreadySelected != null) {
             document.getElementById(alreadySelected).classList.add("multiselect");
          }
     }
 
+    // when you've made your current selection
     function pointerUp() {
         if (targetTicketItem == null) { return; }
         
@@ -58,6 +135,7 @@
         }
 
         var oldSelectedItems = document.getElementsByClassName("ticketItem");
+        // if you only have 1 item selected, adjust the state of applicable ticket items to reflect that.
         if (!longTouchEnabled) {
     	    /*this iterates through the list returned, if there is no case where multiple items are selected concurrently,
     	    you can just use oldSelectedItems[0].classList.remove("selected"); instead*/
@@ -67,20 +145,36 @@
     	    }
     	    targetTicketItem.classList.add("selected");
             targetTicketItem.classList.remove("multiselect");
-            setDisplayVariable("selectedTicketItem", targetTicketItem.id);
+            setVar("selectedTicketItem", targetTicketItem.id);
         }
+        // or you have multiple items selected
         else {
-            setDisplayVariable("selectedTicketItem", getDisplayVariable("selectedTicketItem") + "," + targetTicketItem.id); 
+            setVar("selectedTicketItem", getVar("selectedTicketItem") + "," + targetTicketItem.id); 
         }
-        setDisplayVariable("lastUpdate", Date.now()); 
+
+        // set the ticket timestamp so anything listening to it can update.
+        setVar("lastUpdate", Date.now()); 
         targetTicketItem = null;
         longTouchEnabled = false;
+    }
+
+    function selectLast() {
+        var ticks = document.getElementsByClassName("ticketItem");
+        if (ticks.length > 0) {
+            for(let i = 0; i < ticks.length; i++){
+        	    ticks[i].classList.remove("selected");
+                ticks[i].classList.remove("multiselect");
+    	    }
+    	    ticks[ticks.length - 1].classList.add("selected");
+            ticks[ticks.length - 1].classList.remove("multiselect");
+            setVar("selectedTicketItem", ticks[ticks.length - 1].id);
+        }
     }
 
 </script>
 </head>
 <body>
-<form id = "ticketForm" action="ticket.php" method="post" class = "ticketForm">
+<form id="ticketForm" action="ticket.php" method="post" class= "ticketForm">
 
     <?php
         include 'connect_disconnect.php';
@@ -133,12 +227,13 @@
 					
 			}
             catch (Exception $e) {
-                $errorMessage = $e->getMessage();
-				echo('<h1>' .$errorMessage. '</h1>');
+            //    $errorMessage = $e->getMessage();
+             
             }				
 		} 
-        
-        if (isset($_POST['ticket'])) {
+        unset($_POST['command'], $_POST['modificationNotes'], $_POST['overrideValue'], $_POST['overrideNote'], $_POST['authorizationUsername'], $_POST['toSeat'], $_POST['toSplit']);
+        include 'display.php';
+        if (isset($_POST['ticket']) && isset($_POST['recordedModificationTime'])) {
             $sql = "SELECT * FROM ticketItems WHERE ticketId =" .$_POST['ticket'];
             
             
@@ -229,10 +324,8 @@
 
             }
         }
-        else {
-            echo("<H1 id='test'>No Ticket Selected</H1>");
-        }
     ?>
     </form>
+    <iframe id="ticketListener" frameborder='0' width=100% height=100% src="../../ServerView/ticketListener.php" style="display: none;"></iframe>
     </body>
     </html>

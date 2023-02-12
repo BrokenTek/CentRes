@@ -1,9 +1,19 @@
 .selected {
-    background-color: #8EA9DB;
+    background-color: #F6941D;
+    border: 2px solid white;
    
 }
 
 .multiselect {
-    background-color: #063279;
+    background-color: #bf1e2e;
     color: white;
+    border: 2px solid white;
 }
+
+.ticketItem {
+    min-height: 4rem;
+    
+    margin: auto auto auto auto;
+    font-size: 1.25rem;
+    border: 2px solid #FFF;
+ }

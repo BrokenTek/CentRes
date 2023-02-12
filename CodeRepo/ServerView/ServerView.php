@@ -1,3 +1,4 @@
+<?php require "../Resources/php/sessionLogic.php"; ?>
 <html>
     <head>
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
@@ -30,12 +31,14 @@
                     checkMenuItemSelected();
                 }
                 else {
-                    removeDisplayVariable("menuContainer", selectedMenuItem);
+                    removeVar("menuContainer", selectedMenuItem);
                 }
 
                 // check if the selected menu item has changed.
                 // if so, this function will trigger stateChanged()
                 getSelectedTicketItem();
+
+                //configureView();
 
                 startUpdateLoopTimer();
             }
@@ -44,7 +47,7 @@
                 
                 
                 // initialize the table listener
-                setDisplayVariable('username', USERNAME, 'tableListener');
+                setVar('username', USERNAME, 'tableListener');
                 updateDisplay('tableListener');
 
                 startUpdateLoopTimer();
@@ -53,25 +56,25 @@
             
             // listen for menu item selection
             function checkMenuItemSelected() {
-                var selectedMenuItem = getDisplayVariable("selectedMenuItem", "menuContainer");
+                var selectedMenuItem = getVar("selectedMenuItem", "menuContainer");
                
                 // if a menu item was selected
                 if (selectedMenuItem != null) {
                    
                     // menu item selection acknowledged.
-                    removeDisplayVariable("selectedMenuItem", "menuContainer");
+                    removeVar("selectedMenuItem", "menuContainer");
                     
                     // signal the ticketContainer that a menu item was selected and needs to be added to the ticket
-    			    setDisplayVariable('command', 'add', 'ticketContainer');
-    			    setDisplayVariable('menuItem', selectedMenuItem, 'ticketContainer');
+    			    setVar('command', 'add', 'ticketContainer');
+    			    setVar('menuItem', selectedMenuItem, 'ticketContainer');
 
                     // testing variables REMOVE WEHN CONTROLS HAVE BEEN FULLY IMPLEMENTED
-                    setDisplayVariable('ticket', 1, 'ticketContainer');
-    			    setDisplayVariable('seat', 1, 'ticketContainer');
-    			    setDisplayVariable('split', 1, 'ticketContainer');
+                    setVar('ticket', 1, 'ticketContainer');
+    			    setVar('seat', 1, 'ticketContainer');
+    			    setVar('split', 1, 'ticketContainer');
 
                     // scroll down to bottom
-                    setDisplayVariable('scrollY', Number.MAX_SAFE_INTEGER , 'ticketContainer');
+                    setVar('scrollY', Number.MAX_SAFE_INTEGER , 'ticketContainer');
 
                     // make the ticketContaner commit the added item to the database
                     updateDisplay('ticketContainer');
@@ -84,13 +87,13 @@
             var lastTicketUpdate = 0;
             var selectedTicketItem = [];
             function getSelectedTicketItem() {
-                var lookAtTimestamp = parseInt(getDisplayVariable("lastUpdate", "ticketContainer"));
+                var lookAtTimestamp = parseInt(getVar("lastUpdate", "ticketContainer"));
                 // if the selected ticket item(s) have changed
                 if (lookAtTimestamp > lastTicketUpdate) {
                     lastTicketUpdate = lookAtTimestamp;
                     // record the changes
                     var ticketContainer = document.getElementById('ticketContainer');
-                    var selectedItems = getDisplayVariable("selectedTicketItem", "ticketContainer");
+                    var selectedItems = getVar("selectedTicketItem", "ticketContainer");
                     
                     // no items are selected
                     if (selectedItems == null) {
@@ -115,7 +118,7 @@
     <body>
         <form id="serverViewSession" class="sessionContainer" action="ServerView.php" method="POST">
             <!-- session.php must be included after the opening for tag. It adds  -->
-            <?php require "../Resources/php/session.php"; ?>
+            <?php require "../Resources/php/sessionHeader.php"; ?>
             <div id="serverViewContainer" class="sessionBody">
                 <div id="serverViewHeader">
                 <select name="table" id="cboTable">
@@ -143,7 +146,7 @@
                     </iframe>
                  
                     <div id="ticketHeader">
-                    <div id="ticketHeaderText">Ticket&nbsp;Number&nbsp;Goes&nbsp;Here</div>
+                    <div id="ticketHeaderText">Ticket&nbsp;114</div>
                     <select id="cboSplit">
                         <option value=1>1</option>
                         <option value=2>2</option>
@@ -182,6 +185,6 @@
         <script src="../Resources/JavaScript/eventListeners.js"> </script>
         
         
-        <iframe id="tableListener" src="tableListener.php" ">
+        <iframe id="tableListener" src="tableListener.php">
     </body>
 </html>

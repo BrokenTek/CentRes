@@ -1,19 +1,14 @@
 <html>
     <head>
-        <link rel="stylesheet" href="../Resources/CSS/serverStyle.css">
-        <link rel="stylesheet" href="../Resources/CSS/serverStructure.css">
-        <script src="../Resources/JavaScript/displayInterface.js"></script>
         <script>
-            setTimeout(reload, 5000);
-
             function reload() {
                 document.getElementById("tableSelectorForm").submit();
             }
+            setTimeout(reload, 5000);
         </script>
     </head>
     <body>
-        <form id="tableSelectorForm" action="tableListener.php" method="POST">
-            <!-- session.php must be included after the opening for tag. It adds  -->
+        <form id="tableSelectorForm" method="POST">
             <?php
                 include '../Resources/php/connect_disconnect.php';
                 if (isset($_POST['username'])) {

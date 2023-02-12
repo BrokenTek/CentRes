@@ -164,7 +164,8 @@ CREATE TABLE Tickets (
 	tableId VARCHAR(3),
 	timeRequested DATETIME NOT NULL DEFAULT NOW(),
 	timeSeated DATETIME,
-	timeClosed DATETIME
+	timeClosed DATETIME,
+	timeModified DATETIME NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE Splits (

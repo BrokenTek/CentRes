@@ -6,7 +6,7 @@
 		<script>
 			function createMenuSelectEventHandlers() {
 	    		var menuItemSelected = function() {
-					setDisplayVariable("selectedMenuItem", this.id);
+					setVar("selectedMenuItem", this.id);
 				};
 
 				var elements = document.getElementsByClassName("menuItem");
@@ -89,8 +89,8 @@ if ($result->num_rows > 0) {
 
 		// ** NEEDS TO HAVE THE DATA ATTRIBUTE PASSED INTO 'PRICE' BE THE CALCULATED PRICE^ AND CALCULATED MODS STR (COMMA DELIMINATED) **
 		// GOING TO NEED TO REVISIT FOR THE DATA-MODS ATTR (X)
-		echo "<span id='".$qc."' class='menuItem menuItemTitle' data-text='".$title."' data-price='".$price."' data-mods='X'><span class='menuItemTitle'>".$title."</span>";
-		echo "<span class='menuItemPrice'> $". $price ."</span></span>";
+		echo "<span id='".$qc."' class='menuItem menuItemTitle' data-text='".$title."' data-price='".$price."' data-mods='X'><span class='menuItemPrice'> $". $price ."</span><span class='menuItemTitle'>".$title."</span>";
+		echo "</span>";
 
 	}
 	include "../Resources/php/display.php";

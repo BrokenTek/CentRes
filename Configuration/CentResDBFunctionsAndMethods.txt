@@ -701,7 +701,7 @@ DELIMITER $$
 CREATE PROCEDURE createTicketItem(IN ticketNumber INT UNSIGNED, IN seatNumber TINYINT UNSIGNED, IN split TINYINT UNSIGNED, IN menuItemQC VARCHAR(10))
 BEGIN
 	DECLARE tbl VARCHAR(3);
-	DECLARE newItemIndex TINYINT UNSIGNED;
+	DECLARE newItemIndex SMALLINT UNSIGNED;
 	DECLARE calcPrice DECIMAL(6, 2);
 	DECLARE qty SMALLINT;
 	DECLARE req SMALLINT;
@@ -831,7 +831,7 @@ BEGIN
 		-- deletes split from ticket if this is the only item on it.
 		-- DELETE FROM Splits WHERE spltFlg & POWER(2, splitId) = POWER(2, splitId) AND 
 		 -- POWER(2, splitId) IN (SELECT splitFlag FROM TicketItems WHERE ticketId = (ticketItemNumber DIV 10000) 
-		 GROUP BY splitFlag HAVING count(*) = 1);
+		 -- GROUP BY splitFlag HAVING count(*) = 1);
 		
 		-- delete the actual ticket item
 		DELETE FROM TicketItems WHERE id = ticketItemNumber;

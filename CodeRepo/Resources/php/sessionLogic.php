@@ -40,39 +40,6 @@
 			$firstName = $fname;
 			$lastName = $lname;
 			
-			echo('
-				<script>
-					const USERNAME = "' .$uname. '";
-					const FIRST_NAME = "' .$fname. '";
-					const LAST_NAME = "' .$lname. '";
-					const ROLE = ' .$role. ';
-				</script>'
-			);
-
-			echo('<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
-			<script>
-				function logout() {
-					
-					
-
-					let div = document.createElement("input");
-					div.setAttribute("type","hidden");
-					div.setAttribute("name","logout");
-					div.setAttribute("value","true");
-					document.getElementsByClassName("sessionContainer")[0].append(div);
-					document.getElementsByClassName("sessionContainer")[0].submit();
-
-					
-					return;
-				}
-			</script>
-				<div class="sessionHeader">
-					<img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
-					<div id="sessionDetails">' .$username. '</div>
-					<button type="button" id="btnLogout" onclick="logout()">Logout</button>
-				</div>');
-
-			
 		}
 		catch (Exception $e) {	
 			// cookie exists, but sessionID doesn't exist in the DB or it's expired.

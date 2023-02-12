@@ -1,6 +1,10 @@
 html {
 	font-family: Helvetica;
-  }
+  user-select: none;
+}
+body {
+  margin: 0;
+}
 
   .sessionHeader {
     display: grid;
@@ -43,10 +47,13 @@ html {
 
   button:hover, .button:hover {
     background-color: #bf1e2e;
+    scale: 1.125;
   }
 
   .sessionBody {
     background-color: #FFE699;
+    opacity: .9;
+    margin: auto auto auto auto;
   }
 
   #loginBody{
@@ -54,19 +61,66 @@ html {
     grid-template-areas: "loginHeader loginHeader loginHeader"
                          "d login e"
                          "f g     h";
-    grid-template-columns: 1fr minmax(70vw, min-content) 1fr;
+    grid-template-columns: 1fr min-content 1fr;
     grid-template-rows: 1fr min-content 1fr;
     background-color: #777;
+    background-image: url("../Images/centres-background.jpg");
+
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
   }
+
+  
 
   #loginContainer {
     grid-area: login;
     margin: auto auto auto auto;
     background-color: #FFE699;
-    
+    transform: scale(1.5);
+    opacity: .9;
+    box-shadow: 5px 10px 8px #444;
+    animation: fadeIn .3s;
+    animation: blur .3s;
+   
   }
+
+  form {
+    background-color: #FFE699;
+  }
+
+  @keyframes fadeIn {
+    0% { opacity: 0; scale: .7; }
+    80% { opacity: .25; scale: .9;}
+    90% { opacity: .5; scale: .95; }
+    100% { opacity: .75; scale: 1;}
+  }
+
+  @keyframes blur {
+    0% { filter: blur(.75rem); }
+    50% { filter: blur(.25rem); }
+    90% { filter: blur(.125rem); }
+    100% { filter: blur(0);}
+  }
+
+  .sessionContainer {
+    animation: blur .4s;
+    background-color: #777;
+    background-image: url("../Images/centres-background.jpg");
+
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+   
+  }
+
+  
+ 
+
 #loginForm {
-  padding: 1rem 1rem 1rem 1rem;
+  margin: 1rem 1rem 1rem 1rem;
 }
   
   #loginHeader {
@@ -74,12 +128,14 @@ html {
     background-color: #333;
     color: white;
     grid-template-areas: "logo title . btnLogout";
-    grid-template-columns: min-content min-content 1fr min-content;
+    grid-template-columns: min-content min-content 1in min-content;
     grid-template-rows: min-content;
     font-weight: bold;
-    margin-bottom: 2rem;
     padding: .25rem .25rem .25rem .25rem;
-    
+  }
+
+  .sessionBubble {
+    background-color: red;
   }
 
 
