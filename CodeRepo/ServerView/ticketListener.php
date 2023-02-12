@@ -10,7 +10,7 @@
                 if (isset($_POST['ticketNumber']) && !isset($_POST['modificationTime'])) {
                     echo("addEventListener('load',reload);");
                 }
-                else {
+                elseif (isset($_POST['ticketNumber']) && isset($_POST['modificationTime'])) {
                     echo("setTimeout(reload, 1000);");
                 }
             ?>
@@ -28,7 +28,10 @@
                     $modifiedTime = connection()->query($sql)->fetch_assoc()['timeModified'];
                     $_POST['modificationTime'] = $modifiedTime;
                     include '../Resources/php/display.php';
-                }                
+                } 
+                else {
+                    unset($_POST['modificationTime']);
+                }               
             ?>
         </form>
     </body>

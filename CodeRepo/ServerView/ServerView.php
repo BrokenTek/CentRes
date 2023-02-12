@@ -21,6 +21,8 @@
             function updateLoop() {
                 stopUpdateLoopTimer();
 
+                checkTableAssignments();
+
                 // check if the servers tables have changed.
                     // remember the currently selectd table
                     //
@@ -46,13 +48,50 @@
             function loaded() {
                 
                 
-                // initialize the table listener
-                setVar('username', USERNAME, 'tableListener');
-                updateDisplay('tableListener');
+                //initialize the table listener
+                setVar('username', USERNAME, 'serverListener');
+                updateDisplay('serverListener');
+
+                //btnSubmit.addEventListener('pointerUp', submitButtonPressed);
+                //btnCancel.addEventListener('pointerUp', cancelButtonPressed);
+                //btnEdit.addEventListener('pointerup', editButtonPressed);
+                //btnRemove.addEventListener('pointerup', removeButtonPressed);
+                btnAction.addEventListener('pointerup', actionButtonPressed);
+
 
                 startUpdateLoopTimer();
             }
             addEventListener("load", loaded);
+
+            // check for the server's current table assignments
+            function checkTableAssignments() {
+                var tablesAdded = [];
+                var tablesRemoved = [];
+                var loggedTableElems = document.getElementsByClassName("assignedTable");
+                var currTables = [];
+                var checkAgainst = getVar("tableList", "serverListener").split(",");
+                for (let i = 0; i < loggedTableElems.length; i++) {
+                   currTables.push(loggedTableElems[i].id);
+                   // if the server was assigned a table, but was just removed from it
+                   if (checkAgainst.indexOf(loggedTableElems[i].id) == -1) {
+                     tablesRemoved.push(loggedTableElems[i].id);
+                   }
+                }
+
+                for (var i = 0; i < checkAgainst.length; i+=2) {
+                    // if the server has a new table assigned to them
+                   if (currTables.indexOf(checkAgainst[i]) == -1) {
+                    tablesAdded.push[checkAgainst[i]];
+                   } 
+                }
+
+                // remove all the tables server no longer is assigned to
+                for (let i = 0; i < tablesRemoved.length; i++) {
+                   //if (tablesRemoved = 0)
+                }
+
+
+             }
             
             // listen for menu item selection
             function checkMenuItemSelected() {
@@ -102,7 +141,25 @@
                     else { // one or more items are selected
                         selectedTicketItem = selectedItems.split(",");
                     }
+                    // configure controls
+
+                    var selItms = getVar("selectedTicketItem", "ticketContainer");
+                    if (selItms == null) {
+                        //alert("nothing selected");
+                    }
+                    else {
+                        //alert("something selected");
+                    }
                     stateChanged();
+                }
+            }
+
+            function actionButtonPressed() {
+                if (this.id == "btnToSplit") {
+                    this.id = "btnToSeat";
+                }
+                else {
+                    //alert(this.id);
                 }
             }
 
@@ -163,10 +220,11 @@
                     <?php require "loadModsWindow.php"; ?>
                     </div>
                     <div id="ticketFooter">
-                        <button type="button">Edit</button>
+                        <button type="button" id="btnEdit">Edit</button>
+                        <button type="button" id="btnRemove">Remove</button>
                         <div></div>
-                        <button type="button">Move To</button>
-                        <button type="button">Split With</button>
+                        <button type="button" id="btnAction">Move To</button>
+                        
                         <select id="cboMoveTicketItem">
                             <option value="">Select Split</option>
                             <option value="Split 1">Split 1</option>
@@ -185,6 +243,6 @@
         <script src="../Resources/JavaScript/eventListeners.js"> </script>
         
         
-        <iframe id="tableListener" src="tableListener.php">
+        <iframe id="serverListener" src="serverListener.php">
     </body>
 </html>
