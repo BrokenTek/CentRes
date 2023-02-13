@@ -4,7 +4,7 @@
             function reload() {
                 document.getElementById("tableSelectorForm").submit();
             }
-            setTimeout(reload, 20000);
+            setTimeout(reload, 1000);
         </script>
     </head>
     <body>
@@ -15,7 +15,6 @@
                     $_POST['tableList'] = "";
                     echo("Assigned Ticket/Table event listener");
                     echo("<br>Username: " .$_POST['username']);
-                    echo("<input type='hidden' name='username' value='" .$_POST['username']. "'>");
                     connection();
                     $sql = "SELECT Tickets.tableId AS tableId, Tickets.id AS ticketNumber  FROM TableAssignments INNER JOIN Tickets 
                                                                 ON TableAssignments.tableId = Tickets.tableId
@@ -51,7 +50,7 @@
                     $splits = connection()->query($sql);
                     
                     while ($splitCurr = $splits->fetch_assoc()) {
-                        $val = intval(log($splitCurr,2));
+                        $val = intval(log($splitCurr['splitFlag'],2));
                         if ($val == 0) {
                             $_POST['maxSplit'] = 0;
                             break;

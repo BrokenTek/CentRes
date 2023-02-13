@@ -1,3 +1,5 @@
+INSERT INTO Config (sessionTimeoutInMins) VALUES (30);
+
 -- todo switch to using menuItemPrice
 -- todo switch to using ticketItemPrice
 DROP TRIGGER IF EXISTS beforeInsertTableLog;
@@ -611,10 +613,10 @@ BEGIN
 	ELSE
 		SELECT roleLevel INTO allowedRoles FROM Employees WHERE userName = requestedUsername;
 		
-		IF (allowedRoles & requestedRoles <> requestedRoles) THEN
+		IF ((allowedRoles & requestedRoles) <> requestedRoles) THEN
 			-- Invalid Requested Roles
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'You do not have the authorization to login with the role you sepcified!';
+			SET MESSAGE_TEXT = 'You do not have the authorization to login with the role you specified!';
 		ELSEIF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername AND accessToken IS NOT NULL AND accessTokenExpiration > now()) = 1) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'You are already logged in elsewhere!';

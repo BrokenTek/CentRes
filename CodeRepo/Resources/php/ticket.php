@@ -231,8 +231,6 @@
              
             }				
 		} 
-        unset($_POST['command'], $_POST['modificationNotes'], $_POST['overrideValue'], $_POST['overrideNote'], $_POST['authorizationUsername'], $_POST['toSeat'], $_POST['toSplit']);
-        include 'display.php';
         if (isset($_POST['ticket']) && isset($_POST['recordedModificationTime'])) {
             $sql = "SELECT * FROM ticketItems WHERE ticketId =" .$_POST['ticket'];
             
@@ -324,6 +322,11 @@
 
             }
         }
+        else {
+            unset($_POST['recordedModificationTime'], $_POST['seat'], $_POST['split'], $_POST['selectedTicketItem']);
+        }
+        unset($_POST['command'], $_POST['modificationNotes'], $_POST['overrideValue'], $_POST['overrideNote'], $_POST['authorizationUsername'], $_POST['toSeat'], $_POST['toSplit']);
+        include 'display.php';
     ?>
     </form>
     <iframe id="ticketListener" frameborder='0' width=100% height=100% src="../../ServerView/ticketListener.php" style="display: none;"></iframe>

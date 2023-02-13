@@ -4,16 +4,16 @@
 		    REQUIRED CSS TO PROPERLY LAYOUT SERVER VIEW
 			============================================= */
 		
-		.sessionContainer {
-			margin: auto auto auto auto;
-		}
+		
 		#serverViewContainer {
 			display: grid;
 			grid-template-areas: "serverViewHeader serverViewHeader"
 								 "menuTitle        ticketHeader"
 		                         "menu             ticketAndOptions"
-							     "menu             ticketFooter";
+							     "empty            ticketFooter"
+								 "buffer           buffer";
 			grid-template-columns: 1fr 1fr;
+			grid-template-rows: min-content min-content 1fr min-content .125rem;
 			grid-auto-rows: min-content;
 		    border: 2px solid black;
 			
@@ -47,8 +47,19 @@
 			 display: grid;
 			 grid-template-columns: 1fr;
 			 grid-auto-rows: min-content;
-			 height: 75vh;
-			 
+			height: 100%;
+			min-height: 70vh;
+			width: 100%;	 
+		 }
+		 #menuContainer {
+			grid-area: menu;
+			 overflow-y: auto;
+			 display: grid;
+			 grid-template-columns: 1fr;
+			 grid-auto-rows: min-content;
+			height: 100%;
+			min-height: 70vh;
+			width: 100%;
 		 }
 		 #modsContainer {
 			 grid-area: ticketAndOptions;
@@ -56,7 +67,7 @@
 			 display: grid;
 			 grid-template-columns: 1fr;
 			 grid-auto-rows: min-content;
-			 height: 75vh;
+			 
 			
 		 }
 		 #menuTitle {
@@ -64,10 +75,7 @@
 			 font-size: 2rem;
 			font-weight: bold;
 		 }
-		 #menu {
-			grid-area: menu;
-			height: 80vh;
-		 }
+	
 		 #ticketHeader {
 			 grid-area: ticketHeader;
 			 display: grid;

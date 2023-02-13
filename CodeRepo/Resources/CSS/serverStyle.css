@@ -25,5 +25,25 @@
 			font-weight: bold;
 		 }
 
+		 #cboTable, #cboSeat, #cboSplit {
+			box-shadow: 0 0 10px 100px #eee inset;
+			border-radius: 1rem 1rem 1rem 1rem;
+			background-color: #F6941D;
+			color: black;
+			font-weight: bold;
+			font-size: 1.5rem;
+			margin: .25rem .25rem .25rem .25rem;
+			min-width: 5rem;
+			border: 2px solid black;
+			border-radius: .125rem;
+		  }
+
+		  #cboTable > option, #cboSeat > option, #cboSplit > option {
+			background-color: #333;
+			color: white;
+		  }
+
+		  
+
 		 
 		 

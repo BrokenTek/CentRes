@@ -4,6 +4,7 @@ foreach($_POST as $key => $value)
     echo("<input type='hidden' class='variable' id=" .$key. " name='" .$key. "' value='" .$value. "' style:'display: none;'>");
 }
 
+
 if (isset($_POST['scrollX']) OR isset($_POST['scrollY'])) {
     echo("<script>function moveToPreviousScrollPos() { window.scrollBy(");
         if (isset($_POST['scrollX'])) {
@@ -21,5 +22,6 @@ if (isset($_POST['scrollX']) OR isset($_POST['scrollY'])) {
         }
         echo(");}");
     echo(" addEventListener('load', moveToPreviousScrollPos)</script>");
-} 
+}
+echo("<input type='hidden' class='variable' id='connectionTest' name='connectionTest' value='true' style:'display: none;'>"); 
 ?>
