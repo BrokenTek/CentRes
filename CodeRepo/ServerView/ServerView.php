@@ -188,6 +188,7 @@
                     setVar('scrollY', Number.MAX_SAFE_INTEGER , 'ticketContainer');
 
                     // make the ticketContaner commit the added item to the database
+                    mitigateMenuFlicker();
                     updateDisplay('ticketContainer');
                 }
                 
@@ -251,7 +252,7 @@
                     document.querySelector("#ticketHeaderText").text = "Ticket:&nbsp;n/a";
                 }
                 else {
-                    mitigateMenuFlicker();
+                    //mitigateMenuFlicker();
                     setVar("ticket",document.querySelector("#cboTable").value,"serverListener");
                     updateDisplay("serverListener");
                     
@@ -263,8 +264,12 @@
                 tableSelectionPending = false;
             }
 
-            function migigateMenuFlicker() {
-                document.querySelector("#menuFlickerBackdrop").classList.remove("hidden");
+            function mitigateMenuFlicker() {
+                with (document.querySelector("#ticketFlickerBackdrop")) {
+                    classList.remove("hiding");
+                    classList.remove("hidden");
+                    classList.add("hiding");
+                }
             }
 
             function actionButtonPressed() {
@@ -328,7 +333,8 @@
                 </div>
                 <iframe id="ticketContainer" frameborder='0' src="../Resources/php/ticket.php">
                 </iframe>
-                <div id="menuFlickerBackdrop"></div>
+                <div id="ticketFlickerBackdrop"></div>
+                <div>LOADING</div>
                 <div id="modsContainer" style='display: none;'>
                     <?php require "loadModsWindow.php"; ?>
                 </div>

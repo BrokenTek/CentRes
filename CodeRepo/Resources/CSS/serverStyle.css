@@ -43,6 +43,29 @@
 			color: white;
 		  }
 
+		  #ticketFlickerBackdrop {
+			background-color: black;
+			grid-area: ticketAndOptions;
+		  }
+
+		  .hidden {
+			display: none;
+			z-index: -1;
+		  }
+
+		  .hiding {
+			z-index: 2;
+			animation: fadeOut .5s ease-out 2s;
+			animation-fill-mode: forwards;
+		  }
+
+		  @keyframes fadeOut {
+			0% { opacity: 1; z-index: 1;}
+			100% { opacity: 0; z-index: -1;}
+		  }
+
+		  
+
 		  
 
 		 

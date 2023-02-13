@@ -108,6 +108,8 @@ body > body{
     100% { opacity: .75; scale: 1;}
   }
 
+  
+
   @keyframes blur {
     0% { filter: blur(.75rem); }
     50% { filter: blur(.25rem); }
