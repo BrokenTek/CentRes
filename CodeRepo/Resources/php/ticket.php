@@ -2,6 +2,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <style>
+        body {
+            background-color: transparent;
+        }
+    </style>
 <link rel="stylesheet" href="../CSS/baseStyle.css">
 <link rel="stylesheet" href="../CSS/ticketStructure.css">
 <link rel="stylesheet" href="../CSS/ticketStyle.css">
@@ -274,9 +279,7 @@
             while($ticketItem = $ticketItems->fetch_assoc()) {
                 $sql = "SELECT ticketItemStatus(" .$ticketItem['id']. ") as status;";
                 $status = connection()->query($sql)->fetch_assoc()['status'];
-
-
-                //echo("<h1>Hello</h1>");
+                
                 $sql = "SELECT * FROM menuItems WHERE quickCode = '" .$ticketItem['menuItemQuickCode']. "'";
                 $menuItem = connection()->query($sql)->fetch_assoc();
                 if ($ticketItem['status'] == "Hidden") {
@@ -295,8 +298,9 @@
                     echo('<div class="ticketItemStatus"></div>');
                 }
                 else {
+
                     // when implementation is defined, calculate this value.
-                    $hasMods = true;
+                    $hasMods = false;
                     switch($ticketItem['status']) {
                         case "n/a":
                             echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem removable moveable' .$selectedFlag. '">');
@@ -313,46 +317,47 @@
                         case "Pending":
                             // if item has mods
                             if ($hasMods) {
-                                echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem editable removable moveable pending' .$selectedFlag. '">');
-                                echo('<div class="ticketItemStatus">✎</div>');
+                                echo("<h1>hola</h1>");
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem editable removable moveable pending' .$selectedFlag. '">');
+                                //echo('<div class="ticketItemStatus">✎</div>');
                             }
                             else {
-                                echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem removable moveable pending' .$selectedFlag. '">');
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem removable moveable pending' .$selectedFlag. '">');
                                 echo('<div class="ticketItemStatus"></div>');
                             }
                             break;
                         case "Preparing":
                             if ($hasMods) {
-                                echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem editable removable moveable' .$selectedFlag. '">');
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem editable removable moveable' .$selectedFlag. '">');
                                 echo('<div class="ticketItemStatus">✎⧖</div>');
                             }
                             else {
-                                echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem removable moveable' .$selectedFlag. '">');
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem removable moveable' .$selectedFlag. '">');
                                 echo('<div class="ticketItemStatus">⧖</div>');
                             }
                             break;
                         case "Updated":
                             if ($hasMods) {
-                                echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem editable removable moveable' .$selectedFlag. '">');
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem editable removable moveable' .$selectedFlag. '">');
                                 echo('<div class="ticketItemStatus">✎⧖⚠</div>');
                             }
                             else {
                                 //this is an unreachable path. Cant be updated if there aren't any mods.
-                                echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem removable moveable' .$selectedFlag. '">');
-                                echo('<div class="ticketItemStatus">⧖⚠</div>');
+                                //echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem removable moveable' .$selectedFlag. '">');
+                                //echo('<div class="ticketItemStatus">⧖⚠</div>');
                             }
                             break;
                         case "Removed":
-                            echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem' .$selectedFlag. '">');
+                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem' .$selectedFlag. '">');
                             echo('<div class="ticketItemStatus">🞮</div>');
                             break;
                     }
                 }
 
-                    echo('<div class="ticketItemNumber">' .$ticketItem['itemId']. '</div>
-                        <div class="ticketItemText">' .$menuItem['title']. "</div>");
+                echo('<div class="ticketItemNumber">' .$ticketItem['itemId']. '</div>
+                    <div class="ticketItemText">' .$menuItem['title']. "</div>");
                 
-                        if (is_null($ticketItem['overridePrice'])) {
+                if (is_null($ticketItem['overridePrice'])) {
                     echo('<div class="ticketItemPrice">' .$ticketItem['calculatedPrice']. '</div>');
                 }
                 else {

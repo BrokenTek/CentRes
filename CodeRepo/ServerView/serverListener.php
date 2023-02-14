@@ -22,8 +22,10 @@
                                                                 WHERE TableAssignments.employeeId = idFromUsername('" .$_POST['username']. "') ORDER BY Tickets.tableId;";
                     $ownedTables = connection()->query($sql);
                     if (mysqli_num_rows($ownedTables) > 0) {
+                        $row = $ownedTables->fetch_assoc();
+                        $_POST['tableList'] = $row['tableId'] .",". $row['ticketNumber'];
                         while($row = $ownedTables->fetch_assoc()) {
-                            $_POST['tableList'] .= $row['tableId'] .",". $row['ticketNumber'];
+                            $_POST['tableList'] .= "," . $row['tableId'] .",". $row['ticketNumber'];
                         }
                     }
                     else {

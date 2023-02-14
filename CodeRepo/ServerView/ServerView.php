@@ -25,11 +25,11 @@
 
                 // if a seat and split are selected and the mod window is not open,
                 // check if a menu item was selected. otherwise ignore if you clicked a menu item.
-                if (true) {
+                if (cboTable.selectedIndex > 0 && cboSeat.selectedIndex > 0 && cboSplit.selectedIndex > 0) {
                     checkMenuItemSelected();
                 }
                 else {
-                    removeVar("menuContainer", selectedMenuItem);
+                    removeVar("selectedMenuItem", "menuContainer");
                 }
 
                 populateSeats();
@@ -52,7 +52,7 @@
                 updateDisplay('serverListener');
                 checkTableAssignments();
 
-                cboTable.addEventListener('change',tableSelectionChanged);
+                
                 //btnSubmit.addEventListener('pointerUp', submitButtonPressed);
                 //btnCancel.addEventListener('pointerUp', cancelButtonPressed);
                 //btnEdit.addEventListener('pointerup', editButtonPressed);
@@ -199,16 +199,11 @@
     			    setVar('command', 'add', 'ticketContainer');
     			    setVar('menuItem', selectedMenuItem, 'ticketContainer');
 
-                    // testing variables REMOVE WEHN CONTROLS HAVE BEEN FULLY IMPLEMENTED
-                    setVar('ticket', 1, 'ticketContainer');
-    			    setVar('seat', 1, 'ticketContainer');
-    			    setVar('split', 1, 'ticketContainer');
-
                     // scroll down to bottom
                     setVar('scrollY', Number.MAX_SAFE_INTEGER , 'ticketContainer');
 
                     // make the ticketContaner commit the added item to the database
-                    mitigateMenuFlicker();
+                    //mitigateMenuFlicker();
                     updateDisplay('ticketContainer');
                 }
                 
@@ -441,7 +436,7 @@
             <?php require "../Resources/php/sessionHeader.php"; ?>
             <div id="serverViewContainer" class="sessionBody">
                 <div id="serverViewHeader">
-                    <select name="table" id="cboTable">
+                    <select name="table" id="cboTable" onchange="tableSelectionChanged()">
                         <option value="selectTable" id="selectTable" value="selectTable">Getting Your Tables</option>
                         <!-- options are dynamically added and removed here with JavaScript -->
                     </select>
@@ -460,12 +455,12 @@
                 
                 <div id="ticketHeader">
                     <div id="ticketHeaderText">Ticket:&nbsp;n/a</div>
-                    <select id="cboSeat" name="seatNumber" onchange="selectedSeatChanged()">
-                        <option value="selectSeat" id="selectSeat" value="selectSeat">Select Seat</option>
+                    <select id="cboSeat" name="seatNumber" onchange="selectedSeatChanged()" disabled>
+                        <option value="selectSeat" id="selectSeat" value="selectSeat">Seat</option>
                         <!-- options are dynamically added and removed here with JavaScript -->
                     </select>
-                    <select id="cboSplit" onchange="selectedSplitChanged()">
-                        <option value="selectSplit" id="selectSplit" value="selectSplit">Select Split</option>
+                    <select id="cboSplit" onchange="selectedSplitChanged()" disabled>
+                        <option value="selectSplit" id="selectSplit" value="selectSplit">Split</option>
                         <!-- options are dynamically added and removed here with JavaScript -->
                     </select>
                 </div>
