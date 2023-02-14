@@ -9,6 +9,13 @@ function setVar(variableName, value, id = null) {
     else {
         form = container.contentWindow.document.getElementsByTagName('form')[0];
         variableElement = container.contentWindow.document.getElementById(variableName);
+
+        // the page was unavailable when attempting to set the variable...
+        // reprocess the request until successful.
+        if (form == null) {
+            setTimeout(setVar(variableName), 250);
+            return;
+        }
     }
 
     if (variableElement != null) {
@@ -36,13 +43,15 @@ function getVar(variableName, id = null) {
         variableElement = document.getElementById(variableName);
     }
     else {
-        
         form = container.contentWindow.document.getElementsByTagName('form')[0]; 
         variableElement = container.contentWindow.document.getElementById(variableName);
+        if (form == null) {
+            throw "Variable unavailable";
+        }
     }
     
     if (variableElement == null || variableElement == "null") {
-        return null;
+        return undefined;
     }
     else {
         return variableElement.getAttribute("value");
@@ -60,6 +69,10 @@ function removeVar(variableName, id = null) {
     else {
         form = container.contentWindow.document.getElementsByTagName('form')[0];
         variableElement = container.contentWindow.document.getElementById(variableName);
+        if (form == null) {
+            setTimeout(removeVar(variableName, id), 250);
+            return;
+        }
     }
 
     if (variableElement != null) {
@@ -75,6 +88,10 @@ function clearVars(id = null) {
     }
     else {
         form = container.contentWindow.document.getElementsByTagName('form')[0];
+        if (form == null) {
+            setTimeout(clearVars(id), 250);
+            return;
+        }
     }
     var vars = ticketForm.getElementsByClassName('variable');
     for (var i = vars.length - 1; i >= 0; i--) {
@@ -90,6 +107,10 @@ function updateDisplay(id = null) {
     }
     else {
         form = container.contentWindow.document.getElementsByTagName('form')[0];
+        if (form == null) {
+            setTimeout(updateDisplay(id), 250);
+            return;
+        }
     }
     form.submit();
 }

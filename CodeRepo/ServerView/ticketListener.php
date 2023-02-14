@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
         <script>
@@ -27,6 +28,19 @@
                     $sql = "SELECT timeModified FROM Tickets WHERE id = " .$_POST['ticketNumber']. ";";
                     $modifiedTime = connection()->query($sql)->fetch_assoc()['timeModified'];
                     $_POST['modificationTime'] = $modifiedTime;
+                     
+                    $sql = "SELECT splitId, totalAmountPaid FROM Splits WHERE ticketId = " .$_POST['ticketNumber']. ";";
+                    $ticketPaidStatuses = connection()->query($sql);
+                    if (mysqli_num_rows($ticketPaidStatuses) > 0) {
+                        $paidStatus = $ticketPaidStatuses->fetch_assoc();
+                        $_POST['paidStatuses'] = intval($paidStatus['splitId']) .",". ( $paidStatus['totalAmountPaid'] == null ? "Unpaid" : "Paid");
+                        while($paidStatus = $ticketPaidStatuses->fetch_assoc()) {
+                            $_POST['paidStatuses'] .= ",". intval($paidStatus['splitId']) .",". ( $paidStatus['totalAmountPaid'] == null ? "Unpaid" : "Paid");
+                        }
+                    }
+                    else {
+                        $_POST['paidStatuses'] = "No Splits";
+                    }
                     include '../Resources/php/display.php';
                 } 
                 else {

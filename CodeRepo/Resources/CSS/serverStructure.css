@@ -79,8 +79,8 @@
 		 #ticketHeader {
 			 grid-area: ticketHeader;
 			 display: grid;
-			 grid-template-areas: "ticketHeaderText . cboSplit";
-			 grid-template-columns: min-content 1fr min-content;
+			 grid-template-areas: "ticketHeaderText . cboSeat cboSplit";
+			 grid-template-columns: min-content 1fr min-content min-content;
 		 }
 		 #ticketHeaderText {
 			 grid-area: ticketHeaderText;

@@ -1,4 +1,5 @@
 <?php require "../Resources/php/sessionLogic.php"; ?>
+<!DOCTYPE html>
 <html>
     <head>
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
@@ -31,16 +32,14 @@
                     removeVar("menuContainer", selectedMenuItem);
                 }
 
+                populateSeats();
+                populateSplits();
+
                 // check if the selected menu item has changed.
                 // if so, this function will trigger stateChanged()
                 getSelectedTicketItem();
 
                 //configureView();
-
-                //process any request that failed
-                if (tableSelectionPending) {
-                    tableSelectionChanged();
-                }
 
                 startUpdateLoopTimer();
             }
@@ -67,11 +66,16 @@
 
             // check for the server's current table assignments
             function checkTableAssignments() {
-
-                // due to the async nature of components, some requests might fail
-                if (getVar("connectionTest", "serverListener") != "true") {
+                var checkStr;
+                try {
+                    checkStr = getVar("tableList", "serverListener");
+                }
+                catch (err) {
+                     // due to the async nature of components, some requests might fail
+                    setTimeout(checkTableAssignments, 250);
                     return;
                 }
+
                 var cboTable = document.querySelector("#cboTable");
 
                 var tablesAdded = [];
@@ -79,7 +83,7 @@
                 var tablesRemoved = [];
                 var loggedTableElems = cboTable.options;
                 var currTables = [];
-                var checkStr = getVar("tableList", "serverListener");
+                
                 var checkAgainst = (checkStr == null ? [] : checkStr.split(","));
 
                 for (let i = 0; i < loggedTableElems.length; i++) {
@@ -155,19 +159,35 @@
                     }
 
                     if (cboTable.options.length == 1) {
-                        cboTable.text = "No Tables";                         
+                        document.querySelector("#selectTable").text="No Tables";
+                        cboTable.disabled = true;                         
                     }
                     else {
-                        cboTable.text = "Select Table";
-                        cboTable.disabled = false;                       
+                        document.querySelector("#selectTable").text="Select Table";
+                        cboTable.disabled = false;
                     }
 
+                }
+                if (cboTable.options.length == 1) {
+                    cboTable.text = "No Tables"; 
+                    cboTable.disabled = true;                         
+                }
+                else {
+                    cboTable.text = "Select Table";
+                    cboTable.disabled = false;
                 }
             }
             
             // listen for menu item selection
             function checkMenuItemSelected() {
-                var selectedMenuItem = getVar("selectedMenuItem", "menuContainer");
+                var selectedMenuItem;
+                try {
+                    selectedMenuItem = getVar("selectedMenuItem", "menuContainer");
+                }
+                catch (err) {
+                    setTimeout(checkMenuItemSelected, 250);
+                    return;
+                }
                
                 // if a menu item was selected
                 if (selectedMenuItem != null) {
@@ -199,13 +219,24 @@
             var lastTicketUpdate = 0;
             var selectedTicketItem = [];
             function getSelectedTicketItem() {
-                var lookAtTimestamp = parseInt(getVar("lastUpdate", "ticketContainer"));
+                // listner was reloading at time of request.
+                var lookAtTimeStamp;
+                var selectedItems;
+                try {
+                    lookAtTimeStamp = parseInt(getVar("lastUpdate", "ticketContainer"));
+                    selectedItems = getVar("selectedTicketItem", "ticketContainer");
+                }
+                catch (err) {
+                    setTimeout(getSelectedTicketItem, 250);
+                    return;
+                }
+
                 // if the selected ticket item(s) have changed
-                if (lookAtTimestamp > lastTicketUpdate) {
-                    lastTicketUpdate = lookAtTimestamp;
+                if (lookAtTimeStamp > lastTicketUpdate) {
+                    lastTicketUpdate = lookAtTimeStamp;
                     // record the changes
                     var ticketContainer = document.getElementById('ticketContainer');
-                    var selectedItems = getVar("selectedTicketItem", "ticketContainer");
+                    
                     
                     // no items are selected
                     if (selectedItems == null) {
@@ -216,8 +247,7 @@
                     }
                     // configure controls
 
-                    var selItms = getVar("selectedTicketItem", "ticketContainer");
-                    if (selItms == null) {
+                    if (selectedItems == null) {
                         //alert("nothing selected");
                     }
                     else {
@@ -227,17 +257,15 @@
                 }
             }
 
-            var tableSelectionPending = false;
             function tableSelectionChanged() {
                 //no table selected
-                if (document.querySelector("#cboTable").value == "selectTable") {
+                if (document.querySelector("#cboTable").selectedIndex == 0) {
                     removeVar("ticket", "ticketContainer");
-                    updateDisplay("ticketContainer");
-                    document.querySelector("#cboSeat").disabled = true;
-                    document.querySelector("#cboSeat").innerHTML = "";
+                   
+                    updateDisplay("ticketContainer");                    
                     
                     document.querySelector("#cboSplit").disabled = true;
-                    document.querySelector("#cboSplit").innerTML = "";
+                    document.querySelector("#cboSplit").innerHTML = "";
                     
                     document.querySelector("#btnSubmit").disabled = true;
                     document.querySelector("#btnCancel").disabled = true;
@@ -249,20 +277,137 @@
                     document.querySelector("#btnMoveTo").disabled = true;
                     document.querySelector("#cboMoveTicketItem").disabled = true;
 
-                    document.querySelector("#ticketHeaderText").text = "Ticket:&nbsp;n/a";
+                    document.querySelector("#ticketHeaderText").innerHTML = "Ticket:&nbsp;n/a";
+
+                    removeVar("ticket","serverListener");
+                    updateDisplay("serverListener");
+                    
+                    removeVar("ticket","ticketContainer");
+                    updateDisplay("ticketContainer");
+
+
+                    populateSeats();
+                    populateSplits();
                 }
                 else {
                     //mitigateMenuFlicker();
                     setVar("ticket",document.querySelector("#cboTable").value,"serverListener");
-                    updateDisplay("serverListener");
+                    setTimeout(updateDisplay("serverListener"), 250);
                     
                     setVar("ticket",document.querySelector("#cboTable").value,"ticketContainer");
                     updateDisplay("ticketContainer");
 
-                    document.querySelector("#ticketHeaderText").text = "Ticket:&nbsp;" + document.querySelector("#cboTable").value;
+                    populateSeats();
+                    populateSplits();
+
+                    document.querySelector("#ticketHeaderText").innerHTML = "Ticket:&nbsp;" + document.querySelector("#cboTable").value;
                 }
-                tableSelectionPending = false;
             }
+
+            function populateSeats() {
+                var maxSeat;
+                try {
+                    maxSeat = getVar("maxSeat", "serverListener");
+                }
+                catch (err) {
+                    setTimeout(populateSeats, 250);
+                    return;
+                }
+                
+                var cboSeat = document.querySelector("#cboSeat");
+                if (maxSeat == null && cboSeat.options.length > 1) {
+                    cboSeat.disabled = true;
+                    cboSeat.innerHTML = "<option id='allSeats' name='selectedSeat' value='allSeats'>Seat</option>";
+                }
+                else if (maxSeat > cboSeat.options.length - 1) {
+                    let index = cboSeat.options.length; 
+                    for (let i = index; i <= maxSeat; i++) {
+                        var newSeatOption = document.createElement('option');
+                        with (newSeatOption) {
+                            setAttribute("name", "selectedSeat");
+                            setAttribute("value", i);
+                            setAttribute("id", "seat" + i);
+                            text = "Seat " + i;
+                        }
+                        cboSeat.appendChild(newSeatOption);
+                        cboSeat.options[0].text = "All Seats";
+                    }
+                    cboSeat.disabled = false;
+                }
+                else if (maxSeat < cboSeat.options.length - 1) {
+                    while (maxSeat < cboSeat.options.length - 1) {
+                        cboSeat.options[cboSeat.options.length - 1].remove();
+                    }
+                    if (cboSeat.selectedIndex >= cboSeat.options.length - 2) {
+                        //seat is no longer valid
+                        updateDisplay("ticketContainer");
+                    }
+                }                
+            }
+
+            function populateSplits() {
+                var maxSplit;
+                try {
+                    maxSplit = getVar("maxSplit", "serverListener");
+                }
+                catch (err) {
+                    setTimeout(populateSplits, 250);
+                    return;
+                }
+                
+                var cboSplit = document.querySelector("#cboSplit");
+                if (maxSplit == null && cboSplit.options.length > 1) {
+                    cboSplit.disabled = true;
+                    cboSplit.innerHTML = "<option id='allSplits' name='selectedSplit' value='allSplits'>Split</option>";
+                }
+                else if (maxSplit > cboSplit.options.length - 1) {
+                    let index = cboSplit.options.length; 
+                    for (let i = index; i <= maxSplit; i++) {
+                        var newSplitOption = document.createElement('option');
+                        with (newSplitOption) {
+                            setAttribute("name", "selectedSplit");
+                            setAttribute("value", i);
+                            setAttribute("id", "split" + i);
+                            text = "Split " + i;
+                        }
+                        cboSplit.appendChild(newSplitOption);
+                        cboSplit.options[0].text = "All Splits";
+                    }
+                    cboSplit.disabled = false;
+                }
+                else if (maxSplit < cboSplit.options.length - 1) {
+                    while (maxSplit < cboSplit.options.length - 1) {
+                        cboSplit.options[cboSplit.options.length - 1].remove();
+                    }
+                    if (cboSplit.selectedIndex >= cboSplit.options.length - 2) {
+                        //split is no longer valid
+                        updateDisplay("ticketContainer");
+                    }
+                }                
+            }
+
+            function selectedSeatChanged() {
+                var cboSeat = document.querySelector("#cboSeat");
+                if (cboSeat.selectedIndex == 0) {
+                    removeVar("seat", "ticketContainer");
+                }
+                else {
+                    setVar("seat",cboSeat.selectedIndex, "ticketContainer");
+                }
+                updateDisplay("ticketContainer");
+            }
+
+            function selectedSplitChanged() {
+                var cboSplit = document.querySelector("#cboSplit");
+                if (cboSplit.selectedIndex == 0) {
+                    removeVar("split", "ticketContainer");
+                }
+                else {
+                    setVar("split",cboSplit.selectedIndex, "ticketContainer");
+                }
+                updateDisplay("ticketContainer");
+            }
+
 
             function mitigateMenuFlicker() {
                 with (document.querySelector("#ticketFlickerBackdrop")) {
@@ -297,14 +442,8 @@
             <div id="serverViewContainer" class="sessionBody">
                 <div id="serverViewHeader">
                     <select name="table" id="cboTable">
-                        <option value="selectTable" id="selectTable" value="selectTable">No Tables</option>
+                        <option value="selectTable" id="selectTable" value="selectTable">Getting Your Tables</option>
                         <!-- options are dynamically added and removed here with JavaScript -->
-                    </select>
-                    <select id="cboSeat" name="seatNumber" onchange="stateChanged()">
-                        <option value="">Select Seat</option>
-                        <option value="1">Table 1</option>
-                        <option value="2">Table 2</option>
-                        <option value="3">Table 3</option>
                     </select>
                     <div id="headerButtonGroup">
                         <button type="button" id="btnSubmit">SUBMIT</button>
@@ -321,14 +460,13 @@
                 
                 <div id="ticketHeader">
                     <div id="ticketHeaderText">Ticket:&nbsp;n/a</div>
-                    <select id="cboSplit">
-                        <option value=1>1</option>
-                        <option value=2>2</option>
-                        <option value=3>3</option>
-                        <option value=4>4</option>
-                        <option value=5>5</option>
-                        <option value=6>6</option>
-                        <option value=7>7</option>
+                    <select id="cboSeat" name="seatNumber" onchange="selectedSeatChanged()">
+                        <option value="selectSeat" id="selectSeat" value="selectSeat">Select Seat</option>
+                        <!-- options are dynamically added and removed here with JavaScript -->
+                    </select>
+                    <select id="cboSplit" onchange="selectedSplitChanged()">
+                        <option value="selectSplit" id="selectSplit" value="selectSplit">Select Split</option>
+                        <!-- options are dynamically added and removed here with JavaScript -->
                     </select>
                 </div>
                 <iframe id="ticketContainer" frameborder='0' src="../Resources/php/ticket.php">

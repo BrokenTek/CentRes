@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
         <script>
@@ -40,9 +41,8 @@
                     
                     if (mysqli_num_rows($seats) > 0) {
                         while ($seatCurr = $seats->fetch_assoc()) {
-                            $_POST['maxSeat'] = intval($seatCurr);
+                            $_POST['maxSeat'] = intval($seatCurr['seat']) + 2;
                         }
-                        $_POST['maxSeat'] += 1;
                     }
 
                     $_POST['maxSplit'] = 2;

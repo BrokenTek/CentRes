@@ -10,8 +10,6 @@
  disconnect() an be called any amount of times and will not generate an error.
 -->
 
-<html>
-<body>
 <?php
 
 global $conn;
@@ -51,6 +49,3 @@ function disconnect() {
 	unset($GLOBALS['conn']);	
 }
 ?>
-
-</body>
-</html>

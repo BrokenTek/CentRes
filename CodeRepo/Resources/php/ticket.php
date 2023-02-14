@@ -1,4 +1,5 @@
 
+<!DOCTYPE html>
 <html>
 <head>
 <link rel="stylesheet" href="../CSS/baseStyle.css">
@@ -9,7 +10,19 @@
     // ========================= TASKS WHEN TICKET IS LOADED ==============================
     // after the ticket has loaded
     function loaded() {
+        var newTime;
+        var paidStatuses;
+        try {
+            newTime = getVar("modificationTime", "ticketListener");
+            paidStatuses = getVar("paidStatuses", "ticketListener");
+        }
+        catch (err) {
+            setTimeout(loaded, 250);
+            return;
+        }
+        
         // set the ticket timestamp, so anything listening to it can update.
+        setVar("paidStatuses", paidStatuses);
         setVar("lastUpdate", Date.now());
         var tick = getVar("ticket");
         
@@ -19,13 +32,12 @@
             updateDisplay("ticketListener");
             
             var oldTime = getVar("recordedModificationTime");
-            var newTime = getVar("modificationTime", "ticketListener");
+            
 
             // but you haven't yet retrieved a timestamp
             if (getVar("recordedModificationTime") == null) { 
                 //  get the timestamp from the listener
-                var modTime = getVar("modificationTime", "ticketListener");
-                setVar("recordedModificationTime", modTime);
+                setVar("recordedModificationTime", newTime);
             }
 
 
@@ -88,7 +100,18 @@
     // if a change has been detected, reload with the changes.
     function checkExternalTicketUpdate() {
         var oldTime = getVar("recordedModificationTime");
-        var newTime = getVar("modificationTime", "ticketListener");
+        var newTime;
+        var paidStatuses;
+        try {
+            newTime = getVar("modificationTime", "ticketListener");
+            paidStatuses = getVar("modificationTime", "ticketListener");
+        }
+        catch (err) {
+            setTimeout(checkExternalTicketUpdate, 250);
+            return;
+        }
+       
+        setVar("paidStatuses", paidStatuses);
         if (oldTime != newTime && newTime != null) {
             setVar("recordedModificationTime", newTime);
             if (oldTime != null) {
@@ -121,7 +144,7 @@
 
         // if there is exactly 1 other item selected, make it multi-select as well.
          var alreadySelected = getVar("selectedTicketItem");
-         if (alreadySelected != null) {
+         if (alreadySelected != null && alreadySelected.indexOf(",") == -1) {
             document.getElementById(alreadySelected).classList.add("multiselect");
          }
     }
@@ -232,29 +255,104 @@
             }				
 		} 
         if (isset($_POST['ticket']) && isset($_POST['recordedModificationTime'])) {
-            $sql = "SELECT * FROM ticketItems WHERE ticketId =" .$_POST['ticket'];
-            
-            
+            $sql = "SELECT TicketItems.*, ticketItemStatus(TicketItems.id) as status, IF(Splits.totalAmountPaid IS NULL, 'Unpaid', 'Paid') as splitPayStatus
+                    FROM ticketItems INNER JOIN Splits ON TicketItems.ticketId = Splits.ticketId
+                    WHERE TicketItems.ticketId = " .$_POST['ticket'];
+
+                    
+
             if (isset($_POST['seat'])) {
                 $sql .= " AND seat=" .$_POST['seat'];
             }
             if (isset($_POST['split'])) {
                 $bitMask = POW(2,$_POST['split']);
-                $sql .= " AND splitFlag & " .$bitMask. " = "  .$bitMask;
+                $sql .= " AND (splitFlag & " .$bitMask. ") = "  .$bitMask;
             }
             $sql .= ";";
-
             $ticketItems = connection()->query($sql);
 
             while($ticketItem = $ticketItems->fetch_assoc()) {
+                $sql = "SELECT ticketItemStatus(" .$ticketItem['id']. ") as status;";
+                $status = connection()->query($sql)->fetch_assoc()['status'];
+
+
+                //echo("<h1>Hello</h1>");
                 $sql = "SELECT * FROM menuItems WHERE quickCode = '" .$ticketItem['menuItemQuickCode']. "'";
                 $menuItem = connection()->query($sql)->fetch_assoc();
+                if ($ticketItem['status'] == "Hidden") {
+                    break;
+                }
 
-                echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '">
-                        <div class="ticketItemStatus"></div>
-                        <div class="ticketItemNumber">' .$ticketItem['itemId']. '</div>
+                $selectedFlag = "";
+                if (isset($_POST['selectedTicketItem']) && strpos($_POST['selectedTicketItem'], "ticketItem".$ticketItem['id']) ) {
+                    $selectedFlag .= " selected";
+                    if (strpos($_POST['selectedTicketItem'],",")) {
+                        $selectedFlag .= " multiselect";
+                    } 
+                }
+                if ($ticketItem['splitPayStatus'] == "Paid") {
+                    echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem' .$selectedFlag. '">');
+                    echo('<div class="ticketItemStatus"></div>');
+                }
+                else {
+                    // when implementation is defined, calculate this value.
+                    $hasMods = true;
+                    switch($ticketItem['status']) {
+                        case "n/a":
+                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem removable moveable' .$selectedFlag. '">');
+                            echo('<div class="ticketItemStatus"></div>');
+                            break;
+                        case "Delivered":
+                            echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem moveable' .$selectedFlag. '">');
+                            echo('<div class="ticketItemStatus">✔✔</div>');
+                            break;
+                        case "Ready":
+                            echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem moveable' .$selectedFlag. '">');
+                            echo('<div class="ticketItemStatus">✔</div>');
+                            break;
+                        case "Pending":
+                            // if item has mods
+                            if ($hasMods) {
+                                echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem editable removable moveable pending' .$selectedFlag. '">');
+                                echo('<div class="ticketItemStatus">✎</div>');
+                            }
+                            else {
+                                echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem removable moveable pending' .$selectedFlag. '">');
+                                echo('<div class="ticketItemStatus"></div>');
+                            }
+                            break;
+                        case "Preparing":
+                            if ($hasMods) {
+                                echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem editable removable moveable' .$selectedFlag. '">');
+                                echo('<div class="ticketItemStatus">✎⧖</div>');
+                            }
+                            else {
+                                echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem removable moveable' .$selectedFlag. '">');
+                                echo('<div class="ticketItemStatus">⧖</div>');
+                            }
+                            break;
+                        case "Updated":
+                            if ($hasMods) {
+                                echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem editable removable moveable' .$selectedFlag. '">');
+                                echo('<div class="ticketItemStatus">✎⧖⚠</div>');
+                            }
+                            else {
+                                //this is an unreachable path. Cant be updated if there aren't any mods.
+                                echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem removable moveable' .$selectedFlag. '">');
+                                echo('<div class="ticketItemStatus">⧖⚠</div>');
+                            }
+                            break;
+                        case "Removed":
+                            echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem' .$selectedFlag. '">');
+                            echo('<div class="ticketItemStatus">🞮</div>');
+                            break;
+                    }
+                }
+
+                    echo('<div class="ticketItemNumber">' .$ticketItem['itemId']. '</div>
                         <div class="ticketItemText">' .$menuItem['title']. "</div>");
-                if (is_null($ticketItem['overridePrice'])) {
+                
+                        if (is_null($ticketItem['overridePrice'])) {
                     echo('<div class="ticketItemPrice">' .$ticketItem['calculatedPrice']. '</div>');
                 }
                 else {

@@ -1,3 +1,4 @@
+DELETE FROM Config;
 INSERT INTO Config (sessionTimeoutInMins) VALUES (30);
 
 -- todo switch to using menuItemPrice
@@ -487,6 +488,7 @@ CREATE FUNCTION menuItemModifications(qc VARCHAR(10), parentQC VARCHAR(10)) RETU
 BEGIN
 	DECLARE inString VARCHAR(10);
 	DECLARE myString VARCHAR(500);
+	-- SET myString = '';
 
 	DECLARE done INT DEFAULT FALSE;
 	DECLARE myCursor CURSOR
@@ -504,7 +506,12 @@ BEGIN
 		IF (done = 1) THEN
 			LEAVE modItemsLoop;
 		END IF;
-		UPDATE myString SET myString = myString + ',' + inString;
+		-- IF (myString = '') THEN
+		--	UPDATE myString SET myString = inString;
+		-- ELSE
+			UPDATE myString SET myString = myString + ',' + inString;
+		-- END IF;
+		
 		
 	END LOOP modItemsLoop;
 	CLOSE myCursor;
@@ -517,12 +524,16 @@ BEGIN
 		IF (done = 1) THEN
 			LEAVE modItemsLoop2;
 		END IF;
-		UPDATE myString SET myString = myString + ',' + inString;
+		-- IF (myString = '') THEN
+		--	UPDATE myString SET myString = inString;
+		-- ELSE
+			UPDATE myString SET myString = myString + ',' + inString;
+		-- END IF;
 		
 	END LOOP modItemsLoop2;
 	CLOSE myCursor2;
 
-	RETURN myString + ',';
+	RETURN myString;
 
 END$$
 DELIMITER ;
@@ -671,7 +682,7 @@ BEGIN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Ticket Item Number Not Found!';
 	ELSE
-		SELECT itemId, flag, submitTime, readyTime, deliveredTime INTO menItm, flg, sub, red, del FROM TicketItems WHERE id = ticketNum;
+		SELECT menuItemQuickCode, flag, submitTime, readyTime, deliveredTime INTO menItm, flg, sub, red, del FROM TicketItems WHERE id = ticketNum;
 		SELECT route into rte FROM MenuItems WHERE quickCode = menItm;
 		IF (rte IS NULL) THEN
 			RETURN 'n/a';
