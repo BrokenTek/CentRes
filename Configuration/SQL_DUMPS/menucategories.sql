@@ -45,8 +45,7 @@ INSERT INTO `menucategories` (`quickCode`, `title`, `description`, `route`, `vis
 ('2y10ubmoNa0xafSV2ttaOmjK2eIh4wtKOpBz7', 'Freshly Baked', NULL, NULL, 1, NULL),
 ('2y10vEO1WFFbKg4DzHujvYHlLOszyst7NtTWg', 'Steak', NULL, NULL, 1, NULL),
 ('2y10yEJ/Kw1mzuLW8ODRuAirzOfjfmuWPKQsJ', 'Sodas', NULL, NULL, 1, NULL),
-('2y10Z1G6yOvdARbDAxATivFi9./9tvJTUCuO.', 'Entrees', NULL, NULL, 1, NULL),
-('root', 'root', NULL, NULL, 1, NULL);
+('2y10Z1G6yOvdARbDAxATivFi9./9tvJTUCuO.', 'Entrees', NULL, NULL, 1, NULL);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
