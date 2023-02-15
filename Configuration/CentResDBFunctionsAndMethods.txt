@@ -34,6 +34,7 @@ DROP FUNCTION IF EXISTS menuItemModifications;
 DROP FUNCTION IF EXISTS mipHelperFunction;
 DROP FUNCTION IF EXISTS ticketItemStatus;
 DROP FUNCTION IF EXISTS ticketSplitFlag;
+DROP FUNCTION IF EXISTS ticketItemPayStatus;
 
 DROP TRIGGER IF EXISTS beforeAddMenuCategory;
 DROP TRIGGER IF EXISTS beforeAddMenuItem;
@@ -864,3 +865,27 @@ DELIMITER ;
 -- addTicketItemToSplit(ticket, split)
 
 -- moveTicketItemToSplit(ticket, split)
+
+
+DELIMITER $$
+CREATE FUNCTION ticketItemPayStatus(tickItemNum INT UNSIGNED) RETURNS VARCHAR(7)
+BEGIN
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE splitFlg TINYINT UNSIGNED;
+	DECLARE countSplits INT UNSIGNED;
+	DECLARE paidSplits INT UNSIGNED;
+
+	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM ticketItems WHERE ticketId = tickItemNum;
+
+	SELECT COUNT(*) INTO countSplits FROM Splits WHERE ticketId = tickNum AND (POWER(splitId, 2) & splitFlg = POWER(splitId, 2));
+	SELECT COUNT(*) INTO paidSplits FROM Splits WHERE ticketId = tickNum AND (POWER(splitId, 2) & splitFlg = POWER(splitId, 2)) AND totalAmountPaid IS NOT NULL;
+	IF (paidSplits = 0) THEN
+		RETURN 'Unpaid';
+	ELSEIF (countSplits = paidSplits) THEN
+		RETURN 'Paid';
+	ELSE
+		RETURN 'Partial';
+	END IF;
+	
+END$$
+DELIMITER ;

@@ -12,7 +12,11 @@ VALUES
 ('larry_mgr',8,'$2y$10$4asMBSoeQrzuhatxDyt2/OE6zU5EeUPpiwL6hH1Z3g58EYyp0ULkq','fine','larry');
 
 
-
+DELETE FROM MenuAssociations;
+DELETE FROM MenuItems;
+DELETE FROM MenuCategories;
+DELETE FROM MenuModificationItems;
+DELETE FROM MenuModificationCategories;
 /* 1) INSERT CATEGORIES */
 
 INSERT INTO menucategories (quickCode, title)

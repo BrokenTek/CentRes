@@ -54,19 +54,17 @@
                     while ($splitCurr = $splits->fetch_assoc()) {
                         $val = intval(log($splitCurr['splitFlag'],2));
                         if ($val == 0) {
-                            $_POST['maxSplit'] = 0;
+                            $_POST['maxSplit'] = 9;
                             break;
                         }
                         else {
                             $_POST['maxSplit'] = $val;
                         }
                     }
-                    if ($_POST['maxSplit'] > 0 && $_POST['maxSplit'] < 9) {
-                        $_POST['maxSplit'] += 1;
+                    if (mysqli_num_rows($splits) > 0) {
+                        $_POST['maxSplit'] = intval(fmod($_POST['maxSplit'] + 1,10));
                     }
-                    elseif ($_POST['maxSplit'] == 9) {
-                        $_POST['maxSplit'] = 0; 
-                    }
+                    
                 }
                 else {
                     unset($_POST['maxSeat'], $_POST['maxSplit']);

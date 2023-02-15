@@ -83,8 +83,10 @@
             ?>
 
             //begin listening for updates to the ticket.
-            setInterval(checkExternalTicketUpdate, 1000); 
+            setInterval(checkExternalTicketUpdate, 1000);
+            setState();
             rememberScrollPosition();
+            setState();
         }
         
 
@@ -109,7 +111,7 @@
         var paidStatuses;
         try {
             newTime = getVar("modificationTime", "ticketListener");
-            paidStatuses = getVar("modificationTime", "ticketListener");
+            paidStatuses = getVar("paidStatuses", "ticketListener");
         }
         catch (err) {
             setTimeout(checkExternalTicketUpdate, 250);
@@ -124,6 +126,33 @@
                 
             }
         }
+    }
+
+    function setState() {
+        // this will set variables to control the state of the buttons on the serverView
+        var enabledButtons = "";
+        if (document.querySelectorAll(".pending").length > 0) {
+            enabledButtons += "CancelSubmit";
+        }
+        if (document.querySelectorAll(".selected").length  > 0) {
+            // can edit
+            if (document.querySelectorAll(".selected.editable").length > 0 && document.querySelectorAll(".multiselect.editable").length == 0) {
+                enabledButtons += "Edit";
+            }
+            // can remove
+            if (document.querySelectorAll(".selected.removable").length == document.querySelectorAll(".selected").length) {
+                enabledButtons += "Remove";
+            }
+            // can move
+            if (document.querySelectorAll(".selected.moveable").length == document.querySelectorAll(".selected").length) {
+                enabledButtons += "Move";
+            }
+            if (document.querySelectorAll(".selected.splittable").length == document.querySelectorAll(".selected").length) {
+                enabledButtons += "Split";
+            }
+        }
+        setVar("enabledButtons", enabledButtons)
+        
     }
     
     // ========================= TICKET ITEM SELECT FUNCTIONS ==============================
@@ -184,6 +213,7 @@
         setVar("lastUpdate", Date.now()); 
         targetTicketItem = null;
         longTouchEnabled = false;
+        setState();
     }
 
     function selectLast() {
@@ -260,9 +290,8 @@
             }				
 		} 
         if (isset($_POST['ticket']) && isset($_POST['recordedModificationTime'])) {
-            $sql = "SELECT TicketItems.*, ticketItemStatus(TicketItems.id) as status, IF(Splits.totalAmountPaid IS NULL, 'Unpaid', 'Paid') as splitPayStatus
-                    FROM ticketItems INNER JOIN Splits ON TicketItems.ticketId = Splits.ticketId
-                    WHERE TicketItems.ticketId = " .$_POST['ticket'];
+            $sql = "SELECT *, ticketItemStatus(TicketItems.id) as status, ticketItemPayStatus(TicketItems.id) as splitPayStatus
+                    FROM ticketItems WHERE TicketItems.ticketId = " .$_POST['ticket'];
 
                     
 
@@ -274,8 +303,9 @@
                 $sql .= " AND (splitFlag & " .$bitMask. ") = "  .$bitMask;
             }
             $sql .= ";";
-            $ticketItems = connection()->query($sql);
 
+            $ticketItems = connection()->query($sql);
+           
             while($ticketItem = $ticketItems->fetch_assoc()) {
                 $sql = "SELECT ticketItemStatus(" .$ticketItem['id']. ") as status;";
                 $status = connection()->query($sql)->fetch_assoc()['status'];
@@ -294,7 +324,11 @@
                     } 
                 }
                 if ($ticketItem['splitPayStatus'] == "Paid") {
-                    echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem' .$selectedFlag. '">');
+                    echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem paid' .$selectedFlag. '">');
+                    echo('<div class="ticketItemStatus"></div>');
+                }
+                elseif ($ticketItem['splitPayStatus'] == "Partial") {
+                    echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem partialPay' .$selectedFlag. '">');
                     echo('<div class="ticketItemStatus"></div>');
                 }
                 else {
@@ -303,42 +337,42 @@
                     $hasMods = false;
                     switch($ticketItem['status']) {
                         case "n/a":
-                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem removable moveable' .$selectedFlag. '">');
+                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid splittable removable moveable untracked' .$selectedFlag. '">');
                             echo('<div class="ticketItemStatus"></div>');
                             break;
                         case "Delivered":
-                            echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem moveable' .$selectedFlag. '">');
+                            echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem splittable unpaid moveable delivered' .$selectedFlag. '">');
                             echo('<div class="ticketItemStatus">✔✔</div>');
                             break;
                         case "Ready":
-                            echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem moveable' .$selectedFlag. '">');
+                            echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem splittable unpaid moveable ready' .$selectedFlag. '">');
                             echo('<div class="ticketItemStatus">✔</div>');
                             break;
                         case "Pending":
                             // if item has mods
                             if ($hasMods) {
                                 echo("<h1>hola</h1>");
-                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem editable removable moveable pending' .$selectedFlag. '">');
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem splittable unpaid editable removable moveable pending' .$selectedFlag. '">');
                                 //echo('<div class="ticketItemStatus">✎</div>');
                             }
                             else {
-                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem removable moveable pending' .$selectedFlag. '">');
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem splittable unpaid removable moveable pending' .$selectedFlag. '">');
                                 echo('<div class="ticketItemStatus"></div>');
                             }
                             break;
                         case "Preparing":
                             if ($hasMods) {
-                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem editable removable moveable' .$selectedFlag. '">');
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem splittable unpaid editable removable moveable preparing' .$selectedFlag. '">');
                                 echo('<div class="ticketItemStatus">✎⧖</div>');
                             }
                             else {
-                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem removable moveable' .$selectedFlag. '">');
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem splittable unpaid removable moveable preparing' .$selectedFlag. '">');
                                 echo('<div class="ticketItemStatus">⧖</div>');
                             }
                             break;
                         case "Updated":
                             if ($hasMods) {
-                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem editable removable moveable' .$selectedFlag. '">');
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem splittable unpaid editable removable moveable updated' .$selectedFlag. '">');
                                 echo('<div class="ticketItemStatus">✎⧖⚠</div>');
                             }
                             else {
@@ -348,7 +382,11 @@
                             }
                             break;
                         case "Removed":
-                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem' .$selectedFlag. '">');
+                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removed' .$selectedFlag. '">');
+                            echo('<div class="ticketItemStatus">🞮</div>');
+                            break;
+                        case "Hidden":
+                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removed hidden' .$selectedFlag. '">');
                             echo('<div class="ticketItemStatus">🞮</div>');
                             break;
                     }
@@ -427,6 +465,7 @@
         }
         else {
             unset($_POST['recordedModificationTime'], $_POST['seat'], $_POST['split'], $_POST['selectedTicketItem']);
+            $_POST['enabledButtons'] = "";
         }
         unset($_POST['command'], $_POST['modificationNotes'], $_POST['overrideValue'], $_POST['overrideNote'], $_POST['authorizationUsername'], $_POST['toSeat'], $_POST['toSplit']);
         include 'display.php';
