@@ -22,7 +22,13 @@ function setVar(variableName, value, id = null) {
         variableElement.setAttribute('value', value);
     }
     else {
-        variableElement = document.createElement('input');
+        if (id == null){
+            variableElement = document.createElement('input');
+        }
+        else {
+            variableElement = container.contentWindow.document.createElement('input');
+        }
+        
         variableElement.setAttribute('type', 'hidden');
         variableElement.setAttribute('class', 'variable');
         variableElement.setAttribute('id', variableName);
@@ -117,7 +123,6 @@ function updateDisplay(id = null) {
             }
         }
         catch (err) {
-            alert("Failed to connect to database.\nPlease try again");
             return;
         }
     }

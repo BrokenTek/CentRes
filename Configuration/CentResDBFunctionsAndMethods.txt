@@ -554,10 +554,10 @@ DELIMITER $$
 CREATE FUNCTION ticketItemPrice(ticketItemId INT UNSIGNED) RETURNS DECIMAL(6, 2)
 BEGIN
 	DECLARE miQuickCode VARCHAR(10);
-	DECLARE price DECIMAL(6, 2);
+	DECLARE prc DECIMAL(6, 2);
 	SELECT menuItemQuickCode INTO miQuickCode FROM TicketItems WHERE id = ticketItemId;
-	SELECT basePrice INTO price FROM MenuItems WHERE quickCode = miQuickCode;
-	RETURN price;	
+	SELECT price INTO prc FROM MenuItems WHERE quickCode = miQuickCode;
+	RETURN prc;	
 END$$
 DELIMITER ;
 
@@ -1045,9 +1045,9 @@ BEGIN
 	UPDATE Tickets SET timeModified = NOW() WHERE id = ticketNumber;
 	
 	IF ((SELECT COUNT(*) FROM TicketItems WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf) = 0) THEN
-		DELETE FROM Splits WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf;
+		DELETE FROM Splits WHERE ticketId = ticketNumber AND (POWER(2, splitId) & sf) = sf;
 	ELSE
-		UPDATE Splits SET timeModified = NOW() WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf;
+		UPDATE Splits SET timeModified = NOW() WHERE ticketId = ticketNumber AND (POWER(2, splitId) & sf) = sf;
 	END IF;
 END$$
 DELIMITER ;

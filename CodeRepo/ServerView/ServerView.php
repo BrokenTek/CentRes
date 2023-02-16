@@ -490,8 +490,15 @@
 
                 document.querySelector("#modEditorContainer").classList.add("active");
                 setVar("selectedItem",selTicket.replace("ticketItem",""), "modEditorContainer");
-                alert(getVar("selectedItem", "modEditorContainer"));
+                //alert(getVar("selectedItem", "modEditorContainer"));
+               try {
                 updateDisplay("modEditorContainer");
+                
+               }
+               catch (err) {
+                alert(err);
+               }
+                
                 
                 //startUpdateLoopTimer();
 
@@ -574,7 +581,7 @@
                 </div>
                 <iframe id="ticketContainer" frameborder='0' src="../Resources/php/ticket.php">
                 </iframe>
-                <iframe id="modEditorContainer" frameborder='0' src="../Resources/php/modsWindowCARSON.php">
+                <iframe id="modEditorContainer" frameborder='0' width="100%" height="100%" src="../Resources/php/modsWindowCARSON.php">
                 </iframe>
                 <div id="ticketFlickerBackdrop"></div>
                 <div>LOADING</div>
