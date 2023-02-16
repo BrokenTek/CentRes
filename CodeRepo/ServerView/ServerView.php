@@ -37,7 +37,19 @@
 
                 // check if the selected menu item has changed.
                 // if so, this function will trigger stateChanged()
-                getSelectedTicketItem();
+                if (document.querySelector("#ticketContainer").getAttribute("src") == "../Resources/php/ticket.php") {
+                    getSelectedTicketItem();
+                }
+                else {
+                    var status = getVar("status", "ticketContainer");
+                    if (status != "await") {
+                        if (status = "canceled") {
+                            alert("modification has been canceled");
+                        }
+                        document.querySelector("#ticketContainer").setAttribute("src","../Resources/php/ticket.php");
+                        alert(querySelector("#cboTicket").value);
+                    } 
+                }
 
                 //configureView();
 
@@ -56,11 +68,12 @@
                 updateButtonStates();
 
                 
-                //btnSubmit.addEventListener('pointerUp', submitButtonPressed);
-                //btnCancel.addEventListener('pointerUp', cancelButtonPressed);
-                //btnEdit.addEventListener('pointerup', editButtonPressed);
-                //btnRemove.addEventListener('pointerup', removeButtonPressed);
-                //btnAction.addEventListener('pointerup', actionButtonPressed);
+                btnSubmit.addEventListener('pointerUp', submitButtonPressed);
+                btnCancel.addEventListener('pointerUp', cancelButtonPressed);
+                btnEdit.addEventListener('pointerup', editButtonPressed);
+                btnRemove.addEventListener('pointerup', removeButtonPressed);
+                btnMove.addEventListener('pointerup', moveButtonPressed);
+                btnSplit.addEventListener('pointerup', splitButtonPressed);
 
 
                 startUpdateLoopTimer();
@@ -281,18 +294,25 @@
 
             function tableSelectionChanged() {
                 //no table selected
+                removeVar("selectedTicketItem", "ticketContainer");
+                updateButtonStates();
+                document.querySelector("#cboSeat").selectedIndex = 0;
+                document.querySelector("#cboSplit").selectedIndex = 0;
+                populateSeats();
+                populateSplits();
+                setVar("enabledButtons", "");
                 if (document.querySelector("#cboTable").selectedIndex == 0) {
-                    removeVar("ticket", "ticketContainer");
-                   
-                    updateDisplay("ticketContainer");                    
-                    
+                                       
                     document.querySelector("#cboSplit").disabled = true;
-                    document.querySelector("#cboSplit").innerHTML = "";
+                    //document.querySelector("#cboSplit").innerHTML = "Split";
+
+                    document.querySelector("#cboSeat").disabled = true;
+                    //document.querySelector("#cboSplit").innerHTML = "";
                     
-                    document.querySelector("#btnSubmit").disabled = true;
+                    document.getElementById("btnSubmit").disabled = true;
                     document.querySelector("#btnCancel").disabled = true;
                     document.querySelector("#btnPrintReceipt").disabled = true;
-                    
+        
                     document.querySelector("#btnEdit").disabled = true;
                     document.querySelector("#btnRemove").disabled = true;
                     document.querySelector("#btnSplit").disabled = true;
@@ -302,31 +322,27 @@
                     document.querySelector("#ticketHeaderText").innerHTML = "Ticket:&nbsp;n/a";
                     document.querySelector("#cboMoveTicketItem").innerHTML = "";
 
+                    removeVar("ticket", "ticketContainer");
+                    updateDisplay("ticketContainer"); 
+                    
                     removeVar("ticket","serverListener");
                     updateDisplay("serverListener");
-                    
-                    removeVar("ticket","ticketContainer");
-                    updateDisplay("ticketContainer");
-
-
-                   
+                                       
                 }
                 else {
                     setVar("ticket",document.querySelector("#cboTable").value,"serverListener");
                     updateDisplay("serverListener");
                     
                     setVar("ticket",document.querySelector("#cboTable").value,"ticketContainer");
+                    removeVar("seat", "ticketContainer");
+                    removeVar("split", "ticketContainer");
+                    document.querySelector("#cboSeat").selectedIndex = 0;
+                    document.querySelector("#cboSplit").selectedIndex = 0;
                     updateDisplay("ticketContainer");
 
                     document.querySelector("#ticketHeaderText").innerHTML = "Ticket:&nbsp;" + document.querySelector("#cboTable").value;
                 }
-                removeVar("selectedTicketItem", "ticketContainer");
-                document.querySelector("#cboSeat").selectedIndex = 0;
-                document.querySelector("#cboSplit").selectedIndex = 0;
-                populateSeats();
-                populateSplits();
-                setVar("enabledButtons", "");
-                updateButtonStates();
+                
             }
 
             function populateSeats() {
@@ -449,6 +465,61 @@
                 updateButtonStates();
             }
 
+            // =========================== BUTTON PRESS EVENTS =====================================
+
+            function submitButtonPressed() {
+                alert("Submit");
+
+            }
+
+            function cancelButtonPressed() {
+                alert("Cancel");
+
+            }
+
+            function editButtonPressed() {
+                var selTicket;
+                try {
+                    selTicket = getVar("selectedTicketItem", "ticketContainer");
+                }
+                catch (err) {
+                    setTimeout(editButtonPressed, 250);
+                    return;
+                }
+                stopUpdateLoopTimer();
+
+                document.querySelector("#modEditorContainer").classList.add("active");
+                setVar("selectedItem",selTicket.replace("ticketItem",""), "modEditorContainer");
+                alert(getVar("selectedItem", "modEditorContainer"));
+                updateDisplay("modEditorContainer");
+                
+                //startUpdateLoopTimer();
+
+            }
+
+            function removeButtonPressed() {
+                alert("Remove");
+                getVar()
+
+            }
+
+            function moveButtonPressed() {
+                alert("Move");
+
+            }
+
+            function splitButtonPressed() {
+                alert("Split");
+                
+            }
+
+
+             //btnSubmit.addEventListener('pointerUp', submitButtonPressed);
+                //btnCancel.addEventListener('pointerUp', cancelButtonPressed);
+                //btnEdit.addEventListener('pointerup', editButtonPressed);
+                //btnRemove.addEventListener('pointerup', removeButtonPressed);
+                //btnAction.addEventListener('pointerup', actionButtonPressed);
+
             function actionButtonPressed() {
                 if (this.id == "btnToSplit") {
                     this.id = "btnToSeat";
@@ -503,6 +574,8 @@
                 </div>
                 <iframe id="ticketContainer" frameborder='0' src="../Resources/php/ticket.php">
                 </iframe>
+                <iframe id="modEditorContainer" frameborder='0' src="../Resources/php/modsWindowCARSON.php">
+                </iframe>
                 <div id="ticketFlickerBackdrop"></div>
                 <div>LOADING</div>
                 <div id="modsContainer" style='display: none;'>
@@ -515,12 +588,7 @@
                     <button type="button" id="btnSplit" disabled>Split With</button>
                     <button type="button" id="btnMove" disabled>Move To</button>
                     
-                    <select id="cboMoveTicketItem" disabled>
-                        <option value="">Select Split</option>
-                        <option value="Split 1">Split 1</option>
-                        <option value="2">Split 2</option>
-                        <option value="3">Split 3</option>
-                    </select>
+                    <select id="cboMoveTicketItem" disabled></select>
                 </div>
             </div>
         </form>
@@ -533,7 +601,7 @@
         <script src="../Resources/JavaScript/eventListeners.js"> </script>
         
         
-        <iframe id="serverListener" src="serverListener.php" style="color: white;">
+        <iframe id="serverListener" src="serverListener.php" style="display: none;">
         </div>
     </body>
 </html>

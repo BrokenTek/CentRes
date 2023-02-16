@@ -17,8 +17,6 @@ DROP FUNCTION IF EXISTS userPasswordHash;
 DROP FUNCTION IF EXISTS usernameFromId;
 DROP FUNCTION IF EXISTS idFromUsername;
 
-DROP PROCEDURE IF EXISTS createTicket;
-DROP PROCEDURE IF EXISTS createTicketItem;
 DROP PROCEDURE IF EXISTS assignEmployeeToTable; -- TODO
 DROP PROCEDURE IF EXISTS removeEmployeeFromTable; -- TODO
 DROP PROCEDURE IF EXISTS assignTicketToTable; -- TODO
@@ -50,11 +48,21 @@ DROP TRIGGER IF EXISTS afterDeleteMenuModificationCategory;
 DROP TRIGGER IF EXISTS afterDeleteMenuModificationItem;
 
 DROP PROCEDURE IF EXISTS createTicket;
+DROP PROCEDURE IF EXISTS removeTicket;
 DROP PROCEDURE IF EXISTS createTicketItem;
-DROP PROCEDURE IF EXISTS modifyTicketItem;
 DROP PROCEDURE IF EXISTS removeTicketItem;
+DROP PROCEDURE IF EXISTS modifyTicketItem;
 DROP PROCEDURE IF EXISTS overrideTicketItemPrice;
-
+DROP PROCEDURE IF EXISTS moveTicketItemToSplit;
+DROP PROCEDURE IF EXISTS moveTicketItemToSeat;
+DROP PROCEDURE IF EXISTS removeTicketItemFromSplit;
+DROP PROCEDURE IF EXISTS addTicketItemToSplit;
+DROP PROCEDURE IF EXISTS markTicketItemAsReady;
+DROP PROCEDURE IF EXISTS hideTicketItem;
+DROP PROCEDURE IF EXISTS updateTicketSplitTimeStamp;
+DROP PROCEDURE IF EXISTS updateTicketSplitsTimeStamp;
+DROP PROCEDURE IF EXISTS submitPendingTicketItems;
+DROP PROCEDURE IF EXISTS cancelPendingTicketItems;
 
 
 DELIMITER $$
@@ -710,6 +718,15 @@ BEGIN
 END$$
 DELIMITER ;
 
+DELIMITER $$
+CREATE PROCEDURE removeTicket(IN ticketNumber INT UNSIGNED)
+BEGIN
+	DELETE FROM TicketItems WHERE ticketId = ticketNumber;
+	DELETE FROM Splits WHERE ticketId = ticketNumber;
+	DELETE FROM Tickets WHERE id = ticketNumber;
+END$$
+DELIMITER ;
+
 -- todo switch to using menuItemPrice
 DELIMITER $$
 CREATE PROCEDURE createTicketItem(IN ticketNumber INT UNSIGNED, IN seatNumber TINYINT UNSIGNED, IN split TINYINT UNSIGNED, IN menuItemQC VARCHAR(10))
@@ -743,8 +760,8 @@ BEGIN
 		ELSE
 			-- record a menu item was requested.
 			UPDATE MenuItems SET requests = req + 1 WHERE quickCode = menuItemQC;
-			-- negative qty is unchecked.... Thinks like drinks and stuff not routed to the
-			-- kitchen should not keep track of quantity.
+			-- null qty is unchecked.... Thinks like drinks and stuff not routed to the
+			-- kitchen or bar should not keep track of quantity.
 			IF (IFNULL(qty, 1) = 0) THEN
 				SIGNAL SQLSTATE '45000'
 				SET MESSAGE_TEXT = 'Menu Item Is Out of Stock!';
@@ -766,6 +783,7 @@ BEGIN
 				IF (qty IS NOT NULL) THEN
 					UPDATE MenuItems SET quantity = qty - 1 WHERE quickCode = menuItemQC;
 				END IF; 
+				CALL updateTicketSplitTimeStamp(ticketNumber, split);
 			END IF;
 			
 		END IF; 
@@ -773,16 +791,20 @@ BEGIN
 END$$
 DELIMITER ;
 
+
 -- need to use real price calcualtion
 DELIMITER $$
 CREATE PROCEDURE modifyTicketItem(IN ticketItemNumber INT UNSIGNED, IN modNotes VARCHAR(500))
 BEGIN
 	DECLARE stat VARCHAR(20);
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE splitFlg SMALLINT UNSIGNED;
+	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
 	IF ((SELECT COUNT(*) FROM TicketItems WHERE id = ticketItemNumber) = 0) THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Ticket Item Number Doesn''t Exist!';
 	ELSE
-		SELECT ticketItemStatus(ticketNumber) INTO stat;
+		SELECT ticketItemStatus(ticketItemNumber) INTO stat; 
 		IF (stat in ('Delivered', 'Ready', 'Removed')) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Removed/Ready/Delivered Ticket Items Cannot Be Modified!';
@@ -792,6 +814,7 @@ BEGIN
 			IF (stat = 'Preparing') THEN
 				UPDATE TicketItems SET flag = 'Updated' WHERE id = ticketItemNumber;
 			END IF; 
+			CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 		END IF;
 	END IF;
 END$$
@@ -802,7 +825,10 @@ CREATE PROCEDURE overrideTicketItemPrice(IN ticketItemNumber INT UNSIGNED, IN ad
 BEGIN
 	DECLARE empId INT UNSIGNED;
 	DECLARE stat VARCHAR(30);
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE splitFlg SMALLINT UNSIGNED;
 	SELECT ticketItemStatus(ticketItemNumber) INTO stat;
+	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
 	IF ((SELECT COUNT(*) FROM TicketItems WHERE id = ticketItemNumber) = 0) THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Ticket Item Number Doesn''t Exist!';
@@ -819,6 +845,7 @@ BEGIN
 							   overrideAuthorization = empId,
 							   overrideTimeStamp = NOW()
 						   WHERE id = ticketItemNumber;
+		CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 	END IF;
 END$$
 DELIMITER ;
@@ -827,11 +854,12 @@ DELIMITER $$
 CREATE PROCEDURE removeTicketItem(IN ticketItemNumber INT UNSIGNED)
 BEGIN
 	DECLARE stat VARCHAR(20);
-	DECLARE spltFlg SMALLINT UNSIGNED;
 	DECLARE qc VARCHAR(40);
 	DECLARE qty SMALLINT UNSIGNED;
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE splitFlg SMALLINT UNSIGNED;
 	SELECT ticketItemStatus(ticketItemNumber) INTO stat;
-	SELECT menuItemQuickCode INTO qc FROM TicketItems WHERE id = ticketItemNumber;
+	SELECT menuItemQuickCode, ticketId, splitFlag INTO qc, tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
 	SELECT quantity INTO qty FROM MenuItems WHERE quickCode = qc;
 	IF (stat IN ('Ready', 'Delivered', 'Hidden')) THEN
 		-- Hidden is a subcategory of Delivered. The manager hides the item from the ticket and price ignored.
@@ -839,14 +867,7 @@ BEGIN
 		SET MESSAGE_TEXT = 'Ready/Delivered Ticket Items Cannot Be Removed!';
 	ELSEIF (stat IN ('Updated', 'Preparing', 'Removed')) THEN
 		UPDATE TicketItems SET flag = 'Removed' WHERE id = ticketItemNumber;
-	ELSE
-		SELECT splitFlag into spltFlg FROM TicketItems WHERE ticketId = ticketItemNumber;
-		
-		-- deletes split from ticket if this is the only item on it.
-		-- DELETE FROM Splits WHERE spltFlg & POWER(2, splitId) = POWER(2, splitId) AND 
-		 -- POWER(2, splitId) IN (SELECT splitFlag FROM TicketItems WHERE ticketId = (ticketItemNumber DIV 10000) 
-		 -- GROUP BY splitFlag HAVING count(*) = 1);
-		
+	ELSE		
 		-- delete the actual ticket item
 		DELETE FROM TicketItems WHERE id = ticketItemNumber;
 		
@@ -854,17 +875,182 @@ BEGIN
 		IF (qty IS NOT NULL) THEN
 			UPDATE MenuItems SET quantity = qty + 1 WHERE quickCode = qc;
 		END IF;
+		CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 	END IF;
 END$$
 DELIMITER ;
 
--- moveTicketItemToSeat(ticket, seat)
+DELIMITER $$
+CREATE PROCEDURE moveTicketItemToSeat(IN ticketItemNumber INT UNSIGNED, IN toSeat TINYINT UNSIGNED)
+BEGIN
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE splitFlg SMALLINT UNSIGNED;
+	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
+	UPDATE TicketItems SET seat = toSeat WHERE id = ticketItemNumber;
+	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
+END$$
+DELIMITER ;
 
--- removeTicketItemFromSplit(ticket, split)
+DELIMITER $$
+CREATE PROCEDURE moveTicketItemToSplit(IN ticketItemNumber INT UNSIGNED, IN fromSplit SMALLINT UNSIGNED, IN toSplit SMALLINT UNSIGNED)
+BEGIN
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE fromFlg SMALLINT UNSIGNED;
+	DECLARE toFlg SMALLINT UNSIGNED;
+	DECLARE oldSplitFlg SMALLINT UNSIGNED;
+	DECLARE changeFlg SMALLINT UNSIGNED;
+	DECLARE splitMask SMALLINT UNSIGNED;
+	DECLARE newSplitFlg SMALLINT UNSIGNED;
+	
+	SELECT ticketId, splitFlag INTO tickNum, oldSplitFlg FROM TicketItems WHERE id = ticketItemNumber;
 
--- addTicketItemToSplit(ticket, split)
+	SET fromFlg = POWER(2, fromSplit);
+	SET toFlg = POWER(2, toSplit);
+	SET changeFlg = fromFlg | toFlg;
+	SET splitMask = fromFlg XOR 1023;
+	SET newSplitFlg = oldSplitFlg & splitMask;
 
--- moveTicketItemToSplit(ticket, split)
+	UPDATE TicketItems SET splitFlag = newSplitFlg WHERE id = ticketItemNumber;
+	CALL updateTicketSplitsTimeStamp(tickNum, changeFlg);
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE removeTicketItemFromSplit(IN ticketItemNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
+BEGIN
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE oldSplitFlg SMALLINT UNSIGNED;
+	DECLARE splitMask SMALLINT UNSIGNED;
+	DECLARE splitFlg SMALLINT UNSIGNED;
+	DECLARE newSplitFlg SMALLINT UNSIGNED;
+	
+	DECLARE changeFlg SMALLINT UNSIGNED;
+	
+	SELECT ticketId, splitFlag INTO tickNum, oldSplitFlg FROM TicketItems WHERE id = ticketItemNumber;
+
+	SET splitFlg = POWER(2, split);
+	SET splitMask = splitFlg XOR 1023;
+	SET newSplitFlg = oldSplitFlg & splitMask;
+	SET changeFlg = newSplitFlg | splitFlg;
+
+	UPDATE TicketItems SET splitFlag = newSplitFlg WHERE id = ticketItemNumber;
+	CALL updateTicketSplitsTimeStamp(tickNum, changeFlg);
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE addTicketItemToSplit(IN ticketItemNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
+BEGIN
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE oldSplitFlg SMALLINT UNSIGNED;
+	DECLARE splitFlg SMALLINT UNSIGNED;	
+	DECLARE changeFlg SMALLINT UNSIGNED;
+	
+	SELECT ticketId, splitFlag INTO tickNum, oldSplitFlg FROM TicketItems WHERE id = ticketItemNumber;
+
+	SET splitFlg = POWER(2, split);
+	SET changeFlg = splitFlag | oldSplitFlg;
+
+	UPDATE TicketItems SET splitFlag = changeFlg WHERE id = ticketItemNumber;
+	CALL updateTicketSplitsTimeStamp(tickNum, changeFlg);
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE markTicketItemAsReady(IN ticketItemNumber INT UNSIGNED)
+BEGIN
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE splitFlg SMALLINT UNSIGNED;
+	
+	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
+
+	UPDATE TicketItems SET readyTime = NOW() WHERE id = ticketItemNumber;
+	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE hideTicketItem(IN ticketItemNumber INT UNSIGNED)
+BEGIN
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE splitFlg SMALLINT UNSIGNED;
+	DECLARE flg VARCHAR(20);
+	SELECT ticketItemStatus(ticketItemNumber) INTO flg;
+	
+	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
+
+	IF (flg NOT IN ('Removed', 'Hidden')) THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Only Removed Ticket Items May Be Hidden!';
+	ELSE
+		UPDATE TicketItems SET flag = 'Hidden' WHERE id = ticketItemNumber;
+		CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
+	END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE updateTicketSplitTimeStamp(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
+BEGIN
+	DECLARE sf SMALLINT UNSIGNED;
+	SELECT POWER(2, split) INTO sf;
+	UPDATE Tickets SET timeModified = NOW() WHERE id = ticketNumber;
+	
+	IF ((SELECT COUNT(*) FROM TicketItems WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf) = 0) THEN
+		DELETE FROM Splits WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf;
+	ELSE
+		UPDATE Splits SET timeModified = NOW() WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf;
+	END IF;
+END$$
+DELIMITER ;
+
+-- passing in a split value of 10 indicates submit all ticket items for specified ticket
+-- otherwise submits a single split 0 - 9.
+DELIMITER $$
+CREATE PROCEDURE submitPendingTicketItems(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
+BEGIN
+	DECLARE sf SMALLINT UNSIGNED;
+	IF (split = 10) THEN
+		SET sf = 1023;
+	ELSE
+		SELECT POWER(2, split) INTO sf;
+	END IF;
+	UPDATE TicketsItems SET timeSubmitted = NOW() WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf AND ticketItemStatus(id) <> 'n/a';
+	CALL updateTicketSplitsTimeStamp(ticketNumber, 1023);
+END$$
+DELIMITER ;
+
+-- passing in a split value of 10 indicates submit all ticket items for specified ticket
+-- otherwise submits a single split 0 - 9.
+DELIMITER $$
+CREATE PROCEDURE cancelPendingTicketItems(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
+BEGIN
+	DECLARE sf SMALLINT UNSIGNED;
+	IF (split = 10) THEN
+		SET sf = 1023;
+	ELSE
+		SELECT POWER(2, split) INTO sf;
+	END IF;
+	DELETE FROM TicketsItems WHERE timeSubmitted IS NULL AND ticketId = ticketNumber AND (splitFlag & sf) = sf AND ticketItemStatus(id) <> 'n/a';
+	CALL updateTicketSplitsTimeStamp(ticketNumber, 1023);
+END$$
+DELIMITER ;
+
+
+
+
+DELIMITER $$
+CREATE PROCEDURE updateTicketSplitsTimeStamp(IN ticketNumber INT UNSIGNED, IN sf SMALLINT UNSIGNED)
+BEGIN
+	UPDATE Tickets SET timeModified = NOW() WHERE id = ticketNumber;
+	
+	IF ((SELECT COUNT(*) FROM TicketItems WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf) = 0) THEN
+		DELETE FROM Splits WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf;
+	ELSE
+		UPDATE Splits SET timeModified = NOW() WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf;
+	END IF;
+END$$
+DELIMITER ;
 
 
 DELIMITER $$

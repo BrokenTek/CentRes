@@ -19,18 +19,21 @@ function setVar(variableName, value, id = null) {
     }
 
     if (variableElement != null) {
-        variableElement.remove();
+        variableElement.setAttribute('value', value);
+    }
+    else {
+        variableElement = document.createElement('input');
+        variableElement.setAttribute('type', 'hidden');
+        variableElement.setAttribute('class', 'variable');
+        variableElement.setAttribute('id', variableName);
+        variableElement.setAttribute('name', variableName);
+        variableElement.setAttribute('value', value);
+        variableElement.setAttribute('style', 'display: none;');
+        form.appendChild(variableElement);
     }
 
    
-    variableElement = document.createElement('input');
-    variableElement.setAttribute('type', 'hidden');
-    variableElement.setAttribute('class', 'variable');
-    variableElement.setAttribute('id', variableName);
-    variableElement.setAttribute('name', variableName);
-    variableElement.setAttribute('value', value);
-    variableElement.setAttribute('style', 'display: none;');
-    form.appendChild(variableElement);
+    
 }
 
 function getVar(variableName, id = null) {
@@ -106,9 +109,15 @@ function updateDisplay(id = null) {
         form = document.getElementsByTagName('form')[0];
     }
     else {
-        form = container.contentWindow.document.getElementsByTagName('form')[0];
-        if (form == null) {
-            setTimeout(updateDisplay(id), 250);
+        try {
+            form = container.contentWindow.document.getElementsByTagName('form')[0];
+            if (form == null) {
+                setTimeout(updateDisplay(id), 250);
+               return;
+            }
+        }
+        catch (err) {
+            alert("Failed to connect to database.\nPlease try again");
             return;
         }
     }

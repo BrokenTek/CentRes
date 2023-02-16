@@ -61,15 +61,19 @@
 			min-height: 70vh;
 			width: 100%;
 		 }
-		 #modsContainer {
+		 #modEditorContainer {
 			 grid-area: ticketAndOptions;
 			 overflow: auto;
 			 display: grid;
 			 grid-template-columns: 1fr;
 			 grid-auto-rows: min-content;
-			 
-			
+			 display: none;	
 		 }
+		 #modEditorContainer.active {
+			display: initial;
+			z-index: 2;
+		 }
+
 		 #menuTitle {
 			 grid-area: menuTitle;
 			 font-size: 2rem;

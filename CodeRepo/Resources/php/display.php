@@ -23,5 +23,4 @@ if (isset($_POST['scrollX']) OR isset($_POST['scrollY'])) {
         echo(");}");
     echo(" addEventListener('load', moveToPreviousScrollPos)</script>");
 }
-echo("<input type='hidden' class='variable' id='connectionTest' name='connectionTest' value='true' style:'display: none;'>"); 
 ?>

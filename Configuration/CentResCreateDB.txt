@@ -180,6 +180,7 @@ CREATE TABLE Splits (
 	totalAmountPaid DECIMAL(6, 2) UNSIGNED,
 	calculatedSubtotal DECIMAL(6, 2) UNSIGNED,
 	calculatedTax DECIMAL(6, 2) UNSIGNED,
+	timeModified DATETIME NOT NULL DEFAULT NOW(),
 	PRIMARY KEY (ticketId, splitId),
 	FOREIGN KEY (overrideAuthorization) References Employees(id)
 	ON DELETE CASCADE ON UPDATE CASCADE

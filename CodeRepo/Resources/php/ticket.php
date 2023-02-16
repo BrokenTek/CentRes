@@ -27,8 +27,13 @@
         }
         
         // set the ticket timestamp, so anything listening to it can update.
-        setVar("paidStatuses", paidStatuses);
-        setVar("lastUpdate", Date.now());
+        if (getVar("paidStatuses") != paidStatuses) {
+            setVar("paidStatuses", paidStatuses);
+        }
+        if (newTime != getVar("recordedModificationTime")) {
+            setVar("lastUpdate", Date.now());
+        }
+        
         var tick = getVar("ticket");
         
         // if the ticket number has been specified
@@ -117,8 +122,10 @@
             setTimeout(checkExternalTicketUpdate, 250);
             return;
         }
-       
-        setVar("paidStatuses", paidStatuses);
+        
+        if (paidStatuses != getVar(paidStatuses)) {
+            setVar("paidStatuses", paidStatuses);
+        }
         if (oldTime != newTime && newTime != null) {
             setVar("recordedModificationTime", newTime);
             if (oldTime != null) {
@@ -243,44 +250,59 @@
                                                       .$_POST['seat']. ", "
                                                      .$_POST['split']. ", '"
                                                    .$_POST['menuItem']. "');";
+                    connection()->query($sql);
 				}
-				elseif ($_POST['command'] == 'modify') {
-					$sql = "CALL modifyTicketItem("        .$_POST['ticketItem']. ", '" 
-                                                    .$_POST['modificationNotes']. "');";
-				}
-				elseif ($_POST['command'] == 'override') {
-					$sql = "CALL overrideTicketItemPrice("            .$_POST['ticketItem']. ", " 
-                                                                   .$_POST['overrideValue']. ", '"
-                                                                    .$_POST['overrideNote']. "','" 
-                                                           .$_POST['authorizationUsername']. "');";
-				}
-				elseif ($_POST['command'] == 'remove') {
-					$sql = "CALL removeTicketItem(" .$_POST['ticketItem']. ");";
-				}
-				elseif ($_POST['command'] == 'cancelPending') {
+                elseif ($_POST['command'] == 'cancelPending') {
 					$sql = "CALL cancelPendingTicketItems(" .$_POST['ticket']. ");";
+                    connection()->query($sql);
 				}
-				elseif ($_POST['command'] == 'submitPending') {
+                elseif ($_POST['command'] == 'submitPending') {
 					$sql = "CALL submitPendingTicketItems(" .$_POST['ticket']. ");";
+                    connection()->query($sql);
 				}
-                elseif ($_POST['command'] == 'moveToSeat') {
-					$sql = "CALL moveTicketItemToSeat(" .$_POST['ticketItem']. ", "
-                                                           .$_POST['toSeat']. ");";
-				}
-                elseif ($_POST['command'] == 'moveToSplit') {
-					$sql = "CALL moveTicketItemToSplit(" .$_POST['ticketItem']. ", " 
-                                                            .$_POST['toSplit']. ");";
-				}
-                elseif ($_POST['command'] == 'removeFromSplit') {
-					$sql = "CALL removeTicketItemFromSplit(" .$_POST['ticketItem']. ", ";
-				}
-                elseif ($_POST['command'] == 'addToSplit') {
-					$sql = "CALL addTicketItemToSplit(" .$_POST['ticketItem']. ", " 
-                                                           .$_POST['toSplit']. ");";
-				}
-                elseif ($_POST['command'] == 'markAsReady') {
-					$sql = "CALL markTicketItemAsReady(" .$_POST['ticketItem']. ");";
-				}
+				elseif (isset($_POST['ticketItem'])) {
+                    $ticketItems = explode(",", $_POST['ticketItem']);
+                    foreach ($ticketItems as $ticketItem) {
+                        if ($_POST['command'] == 'modify') {
+                            $sql = "CALL modifyTicketItem("                 .$ticketItem. ", '" 
+                                                            .$_POST['modificationNotes']. "');";
+                        }
+                        elseif ($_POST['command'] == 'override') {
+                            $sql = "CALL overrideTicketItemPrice("                     .$ticketItem. ", " 
+                                                                           .$_POST['overrideValue']. ", '"
+                                                                            .$_POST['overrideNote']. "','" 
+                                                                   .$_POST['authorizationUsername']. "');";
+                        }
+                        elseif ($_POST['command'] == 'remove') {
+                            $sql = "CALL removeTicketItem(" .$ticketItem. ");";
+                            
+                        }
+                        elseif ($_POST['command'] == 'moveToSeat') {
+                            $sql = "CALL moveTicketItemToSeat("         .$ticketItem. ", "
+                                                                   .$_POST['toSeat']. ");";
+                        }
+                        elseif ($_POST['command'] == 'moveToSplit') {
+                            $sql = "CALL moveTicketItemToSplit("          .$ticketItem. ", " 
+                                                                    .$_POST['toSplit']. ");";
+                        }
+                        elseif ($_POST['command'] == 'removeFromSplit') {
+                            $sql = "CALL removeTicketItemFromSplit(" .$ticketItem. ", ";
+                            
+                        }
+                        elseif ($_POST['command'] == 'addToSplit') {
+                            $sql = "CALL addTicketItemToSplit("          .$ticketItem. ", " 
+                                                                   .$_POST['toSplit']. ");";
+                        }
+                        elseif ($_POST['command'] == 'markAsReady') {
+                            $sql = "CALL markTicketItemAsReady(" .$ticketItem. ");";
+                        }
+                        connection()->query($sql);
+                    }
+                }
+
+                // signal an update was made to the ticket, so all listeners can recognize the
+                // change and act appropriately 
+                $sql = "UPDATE Tickets SET timeModified = NOW() WHERE id = " .$_POST['ticket']. ";";
                 connection()->query($sql);
 					
 			}
@@ -334,45 +356,45 @@
                 else {
 
                     // when implementation is defined, calculate this value.
-                    $hasMods = false;
+                    $hasMods = true;
+                    $moveable = (isset($_POST['split']) ? " moveable splittable" : "");
                     switch($ticketItem['status']) {
                         case "n/a":
-                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid splittable removable moveable untracked' .$selectedFlag. '">');
+                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removable' .$moveable. ' untracked' .$selectedFlag. '">');
                             echo('<div class="ticketItemStatus"></div>');
                             break;
                         case "Delivered":
-                            echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem splittable unpaid moveable delivered' .$selectedFlag. '">');
+                            echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' delivered' .$selectedFlag. '">');
                             echo('<div class="ticketItemStatus">✔✔</div>');
                             break;
                         case "Ready":
-                            echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem splittable unpaid moveable ready' .$selectedFlag. '">');
+                            echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' ready' .$selectedFlag. '">');
                             echo('<div class="ticketItemStatus">✔</div>');
                             break;
                         case "Pending":
                             // if item has mods
                             if ($hasMods) {
-                                echo("<h1>hola</h1>");
-                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem splittable unpaid editable removable moveable pending' .$selectedFlag. '">');
-                                //echo('<div class="ticketItemStatus">✎</div>');
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid editable removable' .$moveable. ' pending' .$selectedFlag. '">');
+                                echo('<div class="ticketItemStatus">✎</div>');
                             }
                             else {
-                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem splittable unpaid removable moveable pending' .$selectedFlag. '">');
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removable' .$moveable. ' pending' .$selectedFlag. '">');
                                 echo('<div class="ticketItemStatus"></div>');
                             }
                             break;
                         case "Preparing":
                             if ($hasMods) {
-                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem splittable unpaid editable removable moveable preparing' .$selectedFlag. '">');
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid editable removable' .$moveable. ' preparing' .$selectedFlag. '">');
                                 echo('<div class="ticketItemStatus">✎⧖</div>');
                             }
                             else {
-                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem splittable unpaid removable moveable preparing' .$selectedFlag. '">');
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removable' .$moveable. ' preparing' .$selectedFlag. '">');
                                 echo('<div class="ticketItemStatus">⧖</div>');
                             }
                             break;
                         case "Updated":
                             if ($hasMods) {
-                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem splittable unpaid editable removable moveable updated' .$selectedFlag. '">');
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid editable removable' .$moveable. ' updated' .$selectedFlag. '">');
                                 echo('<div class="ticketItemStatus">✎⧖⚠</div>');
                             }
                             else {
