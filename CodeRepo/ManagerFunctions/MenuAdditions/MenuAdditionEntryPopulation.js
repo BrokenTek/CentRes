@@ -1,5 +1,3 @@
-// NOT GETTING THE entry-cat FROM THE FORM! REFER TO CSC289-GITHUB
-
 var RootEntryField;
 var LabelIncrement = 0; // testing label
 var ExistingCategoriesArray;
@@ -38,6 +36,7 @@ function GetModAssociationToItem() {
 
     RootItemType = document.getElementById('root_item-type')
     var ExistingItemsString = document.getElementById('list-of-items').innerHTML;
+    ExistingItemsString = ExistingItemsString.substring(0, ExistingItemsString.length-1);
     ExistingItemsArray = ExistingItemsString.split(',');
 
     for (let i=0; i<ExistingItemsArray.length; i++) {
@@ -205,6 +204,7 @@ function GetItemEntryCategory() {
     
     RootEntryType = document.getElementById('root_entry-type');
     var ExistingCategoriesString = document.getElementById('list-of-categories').innerHTML;
+    ExistingCategoriesString = ExistingCategoriesString.substring(0, ExistingCategoriesString.length-1);
     ExistingCategoriesArray = ExistingCategoriesString.split(',');
 
     for (let i=0; i<ExistingCategoriesArray.length; i++) {

@@ -1,9 +1,6 @@
-<!-- NOT GETTING THE entry-cat FROM THE FORM! REFER TO CSC289-GITHUB -->
-
-
 <?php
 
-include '../Resources/php/connect_disconnect.php';
+include '..\..\Resources\php\connect_disconnect.php';
 
 $entryType = $_POST['entry-type-form'];
 $numEntries = $_POST['numEntries'];

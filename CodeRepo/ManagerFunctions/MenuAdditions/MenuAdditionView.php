@@ -1,5 +1,4 @@
-<!-- NOT GETTING THE entry-cat FROM THE FORM! REFER TO CSC289-GITHUB -->
-
+<!DOCTYPE html>
 <html>
 <head>
     <title>Add Items To Menu</title>
@@ -7,15 +6,29 @@
     <script src='MenuAdditionEntryPopulation.js'></script>
 </head>
 <body>
-
-<!-- ******************NOTE FOR ANDY, I HAVE NOT TESTED THIS. IF IT DOESN'T WORK, REMOVE THIS FIRST php
-    AND JUST ADD A MENU CATEGORY WITH QUICKCODE root AND TITLE root !!!!!!! ***************************** -->
-
-<!-- Add root so that this script works. Very necessary -->
+<!-- Add root so that this script works IF ROOT DOES NOT EXIST, NOTHING CAN BE ADDED. This is done below -->
 <?php
-    include '../Resources/php/connect_disconnect.php';
-    $sql = "INSERT INTO menucategories (quickCode, title)
-    VALUES ('root', 'root')';";
+    // INCLUDE connect() FOR USE IN FILE(s)
+    include '..\..\Resources\php\connect_disconnect.php';
+
+    // LOOK FOR EXISTINCE OF 'root' IN THE 'quickcodes' TABLE.
+    $exists = false;
+    $sql = "SELECT id FROM quickcodes WHERE FIND_IN_SET('root', id) < 0";
+    $result = connection()->query($sql);
+
+    // SET $EXISTS TO true IF ANYTHING IS RETURNED
+    if ($result->num_rows == 0) {
+        $exists = true;
+    }
+
+    // ADD 'root' TO 'menucategories' WITH A 'title' OF 'root' AND 
+    //  'quickcode' OF 'root' ONLY IF IT DOES NOT EXIST ALREADY.
+    //  THIS VALUE MUST EXIST TO CREATE ROOT CATEGORIES!!!
+    if ($exists != true) {
+        $sql = "INSERT INTO menucategories (quickCode, title)
+        VALUES ('root', 'root');";
+        connection()->query($sql);
+    }
 
 ?>
 
@@ -25,7 +38,7 @@
         // include '../Resources/php/connect_disconnect.php';
 
         // Get All Menu Categories
-        $sql = "SELECT * FROM menucategories";
+        $sql = "SELECT * FROM menucategories WHERE quickcode != 'root';";
         $result = connection()->query($sql);
 
         echo "<p id='list-of-categories' style='display: none;'>";
@@ -94,7 +107,7 @@
 </div>
 
 
-<!-- Category Selection Block: Shows after selection of 'menu item (item)' from first block -->
+<!-- Category Selection Block: Shows after selection of 'menu item (item)' or 'sub category (sub)' from first block -->
 <div id='selection-entry-type' style='display: none;'>
     <p><em>Existing Category List</em></p>   
         <select id='root_entry-type'>
@@ -102,22 +115,10 @@
     <button type='button' id='category-selected' value='cat'>Select This Category</button>
 </div>
 
-<!-- Number Of Items To Add Block: Shows after selection of either: Category Selection OR *directly*
-    after chosen input type is 'menu items' -->
-
+<!-- Number Of Items To Add  -->
 <div id='selection-populatable-fields' style='display: none;'>
     <p><em>Select A Number To Display Multiple Entry Fields</em></p>
         <select id='entry-count' style='margin:5px;'>
-            <!-- <option value='1'>1</option>
-            <option value='2'>2</option>
-            <option value='3'>3</option>
-            <option value='4'>4</option>
-            <option value='5'>5</option>
-            <option value='6'>6</option>
-            <option value='7'>7</option>
-            <option value='8'>8</option>
-            <option value='9'>9</option>
-            <option value='10'>10</option> -->
         </select>
         <button type='button' id='entry-count-chosen' value='Create Entries'>Create Entries</button>
         <button type='button' id='entry-count-chosen_mod' value='Create Entries Mods' style='display:none;'>Create Mod Entries</button>
