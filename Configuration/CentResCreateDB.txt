@@ -75,6 +75,7 @@ CREATE TABLE MenuModificationCategories (
 	title VARCHAR(75) NOT NULL,
 	description VARCHAR(1000),
 	defaultPrice DECIMAL(6, 2) UNSIGNED,
+	priceOrModificationValue DECIMAL(6, 2),
 	selfDescriptive BOOLEAN NOT NULL DEFAULT FALSE,
 	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
