@@ -185,6 +185,31 @@ body > body{
     100% { opacity: 1;}
     }
 
+    @keyframes highlightFlash {
+      0% { background-color: initial; transform: scale(1);}
+      50% { background-color: #bf1e2e; transform: scale(.9); }
+      100% { background-color: initial; transform: scale(1);}
+      }
+
+    .message {
+      background-color: black;
+      color: white;
+      border: 3px solid white;
+      padding: .5rem .5rem .5rem .5rem;
+    }
+
+    .ticketForm {
+      background-color: black;
+    }
+
+    .ticketItem {
+      background-color: #FFE699;
+    }
+
+    .highlighted {
+      animation: highlightFlash .5s ease-in-out 2 backwards;
+    }
+
 
 
 

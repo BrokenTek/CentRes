@@ -11,7 +11,6 @@
             function loaded() {
                 
                 
-                // initialize the table listener
                 setVar('username', USERNAME, 'serverListener');
                 updateDisplay('serverListener');
                 checkTableAssignments();
@@ -19,12 +18,10 @@
                 setVar("enabledButtons", "");
                 updateButtonStates();
 
-                document.querySelector("#btnSubmit").addEventListener('pointerup', (event) => {submitButtonPressed(event)});
-                document.querySelector("#btnCancel").addEventListener('pointerup', (event) => {cancelButtonPressed(event)});
-                document.querySelector("#btnEdit").addEventListener('pointerup', (event) => {editButtonPressed(event)});
-                document.querySelector("#btnRemove").addEventListener('pointerup', (event) => {removeButtonPressed(event)});
-                document.querySelector("#btnMove").addEventListener('pointerup', (event) => {moveButtonPressed(event)});
-                document.querySelector("#btnSplit").addEventListener('pointerup', (event) => {splitButtonPressed(event)});
+                // initialize the table listener
+                
+
+                
                 
 
                 startUpdateLoopTimer();
@@ -43,39 +40,96 @@
 
             function updateLoop() {
                 stopUpdateLoopTimer();
+            
+                var cboTable = document.querySelector("#cboTable");
+                var cboSeat = document.querySelector("#cboSeat");
+                var cboSplit = document.querySelector("#cboSplit");
+                var ticketContainer = document.querySelector("#ticketContainer");
 
                 // check the loaded "assigned" tables and check against
                 // what is being reported by the server listener.
                 if (document.querySelector("#modEditorContainer.active") == null) {
                     checkTableAssignments();
-                    populateSeats();
-                    populateSplits();
+                   
                     getSelectedTicketItem();
                     // if a seat and split are selected and the mod window is not open,
                     // check if a menu item was selected. otherwise ignore if you clicked a menu item.
+                    try {
+                            if (!(getVar("selectedMenuItem", "menuContainer") === undefined)) {
+                                if (cboSeat.selectedIndex == 0 || cboSplit.selectedIndex == 0) {
+                                    document.querySelector("#ticketContainer").contentWindow.document.getElementById("ticketHeader").classList.add("highlighted");
+                                    setTimeout(() => {
+                                    document.querySelector("#ticketContainer").contentWindow.document.getElementById("ticketHeader").classList.remove("highlighted");
+                                }, 1100);
+                                removeVar("selectedMenuItem", "menuContainer");
+                                }
+                            }
+                        }
+                    catch (err) { }
+                    populateSeats(cboTable.selectedIndex > 0 && cboSeat.options.length == 1);
+                    populateSplits(cboTable.selectedIndex > 0 && cboSplit.options.length == 1); 
                     if (cboTable.selectedIndex > 0 && cboSeat.selectedIndex > 0 && cboSplit.selectedIndex > 0) {
                         checkMenuItemSelected();
                     }
-                    else {
-                        try {
-                            removeVar("selectedMenuItem", "menuContainer");
-                        }
-                        catch (err) { }
-                    }
                 }
-                else {
-                    removeVar("selectedMenuItem", "menuContainer");
+                else { 
                     try {
-                        hideModWindow();
+                        removeVar("selectedMenuItem", "menuContainer");
                     } 
                     catch (err) { }
+                    hideModWindow();
                 }
-                // check if the selected menu item has changed.
-                // if so, this function will trigger stateChanged()
-                
 
-                //configureView();
+                //update check
+                var ticketRefresh = false;
+                // verify ticket, seats, and splits have loaded... If not, attempt to reload
+                try {
+                    if (cboTable.selectedIndex > 0 && (getVar("ticket", "ticketContainer") == null )) { 
+                        setVar("ticket", cboTable.value, "ticketContainer" );
+                        ticketRefresh = true;                    
+                    }
+                    if (cboTable.selectedIndex > 0 &&
+                        ticketContainer.contentWindow.document.getElementById("ticketHeader") != null &&
+                        ticketContainer.contentWindow.document.getElementById("ticketHeader").innerText == "No Ticket/Table Selected") {
+                            ticketContainer.contentWindow.document.getElementById("ticketHeader").innerText = "Well this is embarrasing!<br>Sit Tight!<br>Fetching Ticket.".
+                            setVar("ticket", cboTable.value, "ticketContainer" );
+                            ticketRefresh = true;
+                    }
+                }
+                catch (err) { 
+                    //ticketContainer.contentWindow.document.getElementById("ticketHeader").innerText = "Attempting to Retrieve Ticket";
+                }
 
+                 // verify the seat is set
+                try {
+                    if (cboTable.selectedIndex > 0 && cboSeat.options.length == 1) { 
+                        //alert("seat no load");
+                        populateSeats(true);
+                    }
+                }
+                catch (err) {
+                    
+                }
+
+                 // verify the split is set
+                try {
+                    if (cboTable.selectedIndex > 0 && cboSplit.options.length < 2) { 
+                        //alert("split no load");
+                        populateSplits(true);
+                    }
+                }
+                catch (err) {
+                    
+                }
+
+                if (ticketRefresh) {
+                    try {
+                        updateDisplay("ticket");
+                    }
+                    catch(err) {
+                        alert("refresh failed");
+                     }
+                }
                 startUpdateLoopTimer();
             }
 
@@ -256,13 +310,11 @@
                     setTimeout(checkMenuItemSelected, 250);
                     return;
                 }
-               
                 // if a menu item was selected
-                if (selectedMenuItem != null) {
-
+                if (!(selectedMenuItem === undefined)) {
+                    
                     // menu item selection acknowledged.
                     removeVar("selectedMenuItem", "menuContainer");
-                    
                     // signal the ticketContainer that a menu item was selected and needs to be added to the ticket
     			    setVar('command', 'add', 'ticketContainer');
     			    setVar('menuItem', selectedMenuItem, 'ticketContainer');
@@ -408,20 +460,20 @@
                     setVar("ticket",document.querySelector("#cboTable").value,"serverListener");
                     try {
                         updateDisplay("serverListener");
+                        setVar("ticket",document.querySelector("#cboTable").value,"ticketContainer");
+                        updateDisplay("ticketContainer");
                     }
                     catch (err) {
                         alert("Fail");
                     }
                     document.querySelector("#ticketContainer").classList.add("clear");
                     setTimeout(() => {
-                        document.querySelector("#ticketContainer").classList.remove("clear")} ,1500);
-                    //document.querySelector("#ticketContainer").setAttribute("src", "../Resources/php/ticket.php");
-                    setVar("ticket",document.querySelector("#cboTable").value,"ticketContainer");
-                    updateDisplay("ticketContainer");
-                   
+                        document.querySelector("#ticketContainer").classList.remove("clear")} ,1500
+                    );
+                                      
                     //setVar("ignoreUpdate", "ticketContainer");
 
-                    document.querySelector("#ticketHeaderText").innerHTML = "Ticket:&nbsp;" + document.querySelector("#cboTable").value;
+                    document.querySelector("#ticketHeaderText").innerHTML = "-&nbsp;-&nbsp;-";
                     
                     cboSeat.disabled = false;
                     cboSeat.options[0].text = "All Seats";
@@ -429,8 +481,8 @@
                     cboSplit.disabled = false;
                     cboSplit.options[0].text = "All Splits";
                     
-                    populateSeats();
-                    populateSplits();
+                    populateSeats(true);
+                    populateSplits(true);
 
                     setTimeout(() => {
                     var cboSeat = document.querySelector("#cboSeat");
@@ -446,8 +498,9 @@
                         removeVar("split","ticketContainer");
                         cboSeat.selectedIndex = 0;
                         cboSplit.selectedIndex = 0;
+                        document.querySelector("#ticketHeaderText").innerHTML = "Ticket:&nbsp;" + document.querySelector("#cboTable").value;
                     }
-                   }, 1000);
+                   }, 1250);
 
                 }
                 
@@ -455,7 +508,7 @@
                 
             }
 
-            function populateSeats() {
+            function populateSeats(forceReset = false) {
                 var maxSeat;
                 try {
                     maxSeat = getVar("maxSeat", "serverListener");
@@ -466,7 +519,27 @@
                 }
                 var changed = false;
                 var cboSeat = document.querySelector("#cboSeat");
-                if (maxSeat === undefined && cboSeat.options.length > 1) {
+                if (forceReset) {
+                    if (maxSeat == null) {
+                        setTimeout(() => {
+                            populateSeats(true);
+                        }, 250);
+                        return;
+                    }
+                    cboSeat.innerHTML = "<option id='allSeats' name='selectedSeat' value='allSeats'>Seat</option>";
+                    for (let i = 1; i <= maxSeat; i++) {
+                        var newSeatOption = document.createElement('option');
+                        with (newSeatOption) {
+                            setAttribute("name", "selectedSeat");
+                            setAttribute("value", i);
+                            setAttribute("id", "seat" + i);
+                            text = "Seat " + i;
+                        }
+                        cboSeat.appendChild(newSeatOption);
+                        return;
+                    }
+                }
+                if (maxSeat == null && cboSeat.options.length > 1) {
                     cboSeat.innerHTML = "<option id='allSeats' name='selectedSeat' value='allSeats'>Seat</option>";
                     changed = true;
                 }
@@ -496,10 +569,13 @@
                 }            
             }
 
-            function populateSplits() {
+            function populateSplits(forceReset = false) {
                 var maxSplit;
                 try {
                     maxSplit = getVar("maxSplit", "serverListener");
+                    if (maxSplit == 0) {
+                        maxSplit = 10;
+                    }
                 }
                 catch (err) {
                     setTimeout(populateSplits, 250);
@@ -507,7 +583,27 @@
                 }
                 var changed = false;
                 var cboSplit = document.querySelector("#cboSplit");
-                if (maxSplit === undefined && cboSplit.options.length > 1) {
+                if (forceReset) {
+                    if (maxSplit == null) {
+                        setTimeout(() => {
+                            populateSplits(true);
+                        }, 250);
+                        return;
+                    }
+                    cboSplit.innerHTML = "<option id='allSplits' name='selectedSplit' value='allSplits'>Split</option>";
+                    for (let i = 1; i <= maxSplit; i++) {
+                        var newSplitOption = document.createElement('option');
+                        with (newSplitOption) {
+                            setAttribute("name", "selectedSplit");
+                            setAttribute("value", i % 10);
+                            setAttribute("id", "split" + (i % 10));
+                            text = "Split " + (i % 10);
+                        }
+                        cboSplit.appendChild(newSplitOption);
+                        return;
+                    }
+                }
+                if (maxSplit == null && cboSplit.options.length > 1) {
                     cboSplit.innerHTML = "<option id='allSplits' name='selectedSplit' value='allSplits'>Split</option>";
                     changed = true;
                 }
@@ -517,9 +613,9 @@
                         var newSplitOption = document.createElement('option');
                         with (newSplitOption) {
                             setAttribute("name", "selectedSplit");
-                            setAttribute("value", i);
-                            setAttribute("id", "split" + i);
-                            text = "Split " + i;
+                            setAttribute("value", (i % 10));
+                            setAttribute("id", "split" + (i % 10));
+                            text = "Split " + (i % 10);
                         }
                         cboSplit.appendChild(newSplitOption);
                         changed = true;

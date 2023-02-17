@@ -318,18 +318,41 @@
             $sql = "SELECT *, ticketItemStatus(TicketItems.id) as status, ticketItemPayStatus(TicketItems.id) as splitPayStatus
                     FROM ticketItems WHERE TicketItems.ticketId = " .$_POST['ticket'];
 
+            $header = "";
                     
 
             if (isset($_POST['seat'])) {
                 $sql .= " AND seat=" .$_POST['seat'];
             }
+            else {
+                $header = "<u>Seat</u>";
+            }
             if (isset($_POST['split'])) {
                 $bitMask = POW(2,$_POST['split']);
                 $sql .= " AND (splitFlag & " .$bitMask. ") = "  .$bitMask;
             }
+            elseif ($header == "") {
+                $header = "<u>Split</u>";
+            }
+            else {
+                $header .= " and <u>Split</u>";
+            }
             $sql .= ";";
 
+            if ($header != "") {
+                $header = "Choose a " .$header. " to Add Menu Items";
+            }
+
             $ticketItems = connection()->query($sql);
+
+            if (mysqli_num_rows($ticketItems) == 0 && $header == "") {
+                $header = "Add a Menu Item to Get Started";
+            }
+            
+            if ($header != "") {
+                echo("<h1 class='message' id='ticketHeader'>" .$header. "</h1>");
+            }
+
            
             while($ticketItem = $ticketItems->fetch_assoc()) {
                 $sql = "SELECT ticketItemStatus(" .$ticketItem['id']. ") as status;";
@@ -490,6 +513,7 @@
             }
         }
         else {
+            echo("<h1 class='message' id='ticketHeader'>No Ticket/Table Selected</h1>");
             unset($_POST['recordedModificationTime'], $_POST['recordedModificationTime'], $_POST['seat'], $_POST['split'], $_POST['selectedTicketItem']);
             $_POST['enabledButtons'] = "";
         }

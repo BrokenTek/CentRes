@@ -117,7 +117,7 @@ for ($i=0; $i<$numEntries; $i++) {
         $sql = "SELECT quickCode FROM
         menuitems WHERE title = '" . $itemTitle . "';";
         $result = connection()->query($sql);
-        if ($result->num_rows > 0) {
+        if (mysqli_num_rows($result) > 0) {
             while ($row = $result->fetch_assoc()) {
                 $parentQC = $row['quickCode'];
             }
