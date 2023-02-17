@@ -9,7 +9,12 @@
         <script type="text/javascript">
             // ================ ON LOAD FUNCTIONS =========================
             function loaded() {
-                
+                document.querySelector("#btnSubmit").addEventListener('pointerup', (event) => {submitButtonPressed(event)});
+                document.querySelector("#btnCancel").addEventListener('pointerup', (event) => {cancelButtonPressed(event)});
+                document.querySelector("#btnEdit").addEventListener('pointerup', (event) => {editButtonPressed(event)});
+                document.querySelector("#btnRemove").addEventListener('pointerup', (event) => {removeButtonPressed(event)});
+                document.querySelector("#btnMove").addEventListener('pointerup', (event) => {moveButtonPressed(event)});
+                document.querySelector("#btnSplit").addEventListener('pointerup', (event) => {splitButtonPressed(event)});
                 
                 setVar('username', USERNAME, 'serverListener');
                 updateDisplay('serverListener');
