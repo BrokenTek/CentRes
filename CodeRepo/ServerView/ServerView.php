@@ -7,6 +7,31 @@
         <link rel="stylesheet" href="../Resources/CSS/serverStructure.css">
         <script src="../Resources/JavaScript/displayInterface.js"></script>
         <script type="text/javascript">
+            // ================ ON LOAD FUNCTIONS =========================
+            function loaded() {
+                
+                
+                // initialize the table listener
+                setVar('username', USERNAME, 'serverListener');
+                updateDisplay('serverListener');
+                checkTableAssignments();
+
+                setVar("enabledButtons", "");
+                updateButtonStates();
+
+                document.querySelector("#btnSubmit").addEventListener('pointerup', (event) => {submitButtonPressed(event)});
+                document.querySelector("#btnCancel").addEventListener('pointerup', (event) => {cancelButtonPressed(event)});
+                document.querySelector("#btnEdit").addEventListener('pointerup', (event) => {editButtonPressed(event)});
+                document.querySelector("#btnRemove").addEventListener('pointerup', (event) => {removeButtonPressed(event)});
+                document.querySelector("#btnMove").addEventListener('pointerup', (event) => {moveButtonPressed(event)});
+                document.querySelector("#btnSplit").addEventListener('pointerup', (event) => {splitButtonPressed(event)});
+                
+
+                startUpdateLoopTimer();
+            }
+            addEventListener("load", loaded);
+            
+            // ================ MAIN EVENT LOOP =========================
             var updateLoopTimer;
            
             function startUpdateLoopTimer() {
@@ -21,64 +46,90 @@
 
                 // check the loaded "assigned" tables and check against
                 // what is being reported by the server listener.
-                checkTableAssignments();
-
-                // if a seat and split are selected and the mod window is not open,
-                // check if a menu item was selected. otherwise ignore if you clicked a menu item.
-                if (cboTable.selectedIndex > 0 && cboSeat.selectedIndex > 0 && cboSplit.selectedIndex > 0) {
-                    checkMenuItemSelected();
+                if (document.querySelector("#modEditorContainer.active") == null) {
+                    checkTableAssignments();
+                    populateSeats();
+                    populateSplits();
+                    getSelectedTicketItem();
+                    // if a seat and split are selected and the mod window is not open,
+                    // check if a menu item was selected. otherwise ignore if you clicked a menu item.
+                    if (cboTable.selectedIndex > 0 && cboSeat.selectedIndex > 0 && cboSplit.selectedIndex > 0) {
+                        checkMenuItemSelected();
+                    }
+                    else {
+                        try {
+                            removeVar("selectedMenuItem", "menuContainer");
+                        }
+                        catch (err) { }
+                    }
                 }
                 else {
                     removeVar("selectedMenuItem", "menuContainer");
+                    try {
+                        hideModWindow();
+                    } 
+                    catch (err) { }
                 }
-
-                populateSeats();
-                populateSplits();
-
                 // check if the selected menu item has changed.
                 // if so, this function will trigger stateChanged()
-                if (document.querySelector("#ticketContainer").getAttribute("src") == "../Resources/php/ticket.php") {
-                    getSelectedTicketItem();
-                }
-                else {
-                    var status = getVar("status", "ticketContainer");
-                    if (status != "await") {
-                        if (status = "canceled") {
-                            alert("modification has been canceled");
-                        }
-                        document.querySelector("#ticketContainer").setAttribute("src","../Resources/php/ticket.php");
-                        alert(querySelector("#cboTicket").value);
-                    } 
-                }
+                
 
                 //configureView();
 
                 startUpdateLoopTimer();
             }
 
-            function loaded() {
-                
-                
-                // initialize the table listener
-                setVar('username', USERNAME, 'serverListener');
-                updateDisplay('serverListener');
-                checkTableAssignments();
-
-                setVar("enabledButtons", "");
-                updateButtonStates();
-
-                
-                btnSubmit.addEventListener('pointerUp', submitButtonPressed);
-                btnCancel.addEventListener('pointerUp', cancelButtonPressed);
-                btnEdit.addEventListener('pointerup', editButtonPressed);
-                btnRemove.addEventListener('pointerup', removeButtonPressed);
-                btnMove.addEventListener('pointerup', moveButtonPressed);
-                btnSplit.addEventListener('pointerup', splitButtonPressed);
-
-
-                startUpdateLoopTimer();
+            function showModWindow() {
+                try {
+                    stopUpdateLoopTimer();
+                    document.querySelector("#ticketContainer").classList.add("clear");
+                    selTicket = getVar("selectedTicketItem", "ticketContainer");
+                    setVar("selectedItem",selTicket.replace("ticketItem",""), "modEditorContainer");
+                    updateDisplay("modEditorContainer");
+                    document.querySelector("#modEditorContainer").classList.add("active");
+                    document.querySelector("#ticketContainer").classList.add("hidden");
+                    document.querySelector("#cboTable").disabled = true;
+                    document.querySelector("#cboSeat").disabled = true;
+                    document.querySelector("#cboSplit").disabled = true;
+                    document.querySelector("#btnSubmit").disabled = true;
+                    document.querySelector("#btnCancel").disabled = true;
+                    document.querySelector("#btnPrintReceipt").disabled = true;
+                    
+                    document.querySelector("#btnEdit").disabled = true;
+                    document.querySelector("#btnRemove").disabled = true;
+                    document.querySelector("#btnSplit").disabled = true;
+                    document.querySelector("#btnMove").disabled = true;
+                    document.querySelector("#cboMove").disabled = true;
+                    startUpdateLoopTimer();
+                }
+                catch (err) {
+                    setTimeout(showModWindow, 500);
+                }
             }
-            addEventListener("load", loaded);
+
+            function hideModWindow() {
+                try {
+                    var status = getVar("status", "modEditorContainer");
+                    if (status == 'await') {
+                        //setVar("recordedModificationTime", Date.now() + 6000, "ticketContainer");
+                        setTimeout(() => {
+                        document.querySelector("#ticketContainer").classList.remove("clear")} ,750);
+                        setVar("ignoreUpdate", "yes please", "ticketContainer");
+                        updateDisplay("ticketContainer");
+                        document.querySelector("#modEditorContainer").setAttribute("src", "../Resources/php/modsWindowCARSON.php");
+                        document.querySelector("#modEditorContainer").classList.remove("active"); 
+                        document.querySelector("#cboTable").removeAttribute("disabled");
+                        document.querySelector("#cboSeat").removeAttribute("disabled");
+                        document.querySelector("#cboSplit").removeAttribute("disabled");
+                        updateButtonStates();
+                        document.querySelector("#ticketContainer").classList.remove("hidden");
+                    }
+                }
+                catch (err) {
+                    setTimeout(hideModWindow, 250);
+                }
+            }
+            
 
             // check for the server's current table assignments
             function checkTableAssignments() {
@@ -161,7 +212,7 @@
                             document.querySelector("#btnRemove").disabled = true;
                             document.querySelector("#btnSplit").disabled = true;
                             document.querySelector("#btnMove").disabled = true;
-                            document.querySelector("#cboMoveTicketItem").disabled = true;
+                            document.querySelector("#cboMove").disabled = true;
                             updateButtonStates();
 
                         }
@@ -218,31 +269,54 @@
 
                     // scroll down to bottom
                     setVar('scrollY', Number.MAX_SAFE_INTEGER , 'ticketContainer');
+                    setVar("ignoreUpdate", "Yes please" ,"ticketContainer");
+                    updateDisplay('ticketContainer');
 
                     // make the ticketContaner commit the added item to the database
                     //mitigateMenuFlicker();
-                    updateDisplay('ticketContainer');
+                    //setVar("ignoreUpdate", "ticketContainer");
+                    //document.querySelector("#ticketContainer").classList.remove("clear");
+
+                    showTicketContainer();
+                    
+                    
                     
                 }	
                 
             }
 
+            function showTicketContainer() {
+                try {
+                    getVar("ticket", "ticketContainer");
+                    document.querySelector("#ticketContainer").classList.remove("clear");
+                }
+                catch (err) {
+                    try {
+                        setTimeout(showTicketContainer, 250);
+                    }
+                    catch (err) {
+                        alert("menu load failed");
+                    }
+                }
+            }
+            
+
             function updateButtonStates() {
                 try {
                     var updatedButtons = getVar("enabledButtons", "ticketContainer");
                     setVar("enabledButtons", updatedButtons);
-                        document.querySelector("#btnSubmit").disabled = updatedButtons.indexOf("Submit") == -1;
-                        document.querySelector("#btnCancel").disabled = updatedButtons.indexOf("Cancel") == -1;
-                        document.querySelector("#btnEdit").disabled = updatedButtons.indexOf("Edit") == -1;
-                        document.querySelector("#btnSubmit").disabled = updatedButtons.indexOf("Submit") == -1;
-                        document.querySelector("#btnRemove").disabled = updatedButtons.indexOf("Remove") == -1;
-                        document.querySelector("#btnMove").disabled = updatedButtons.indexOf("Move") == -1;
-                        document.querySelector("#btnSplit").disabled = updatedButtons.indexOf("Split") == -1;
+                    document.querySelector("#btnSubmit").disabled = updatedButtons.indexOf("Submit") == -1;
+                    document.querySelector("#btnCancel").disabled = updatedButtons.indexOf("Cancel") == -1;
+                    document.querySelector("#btnEdit").disabled = updatedButtons.indexOf("Edit") == -1;
+                    document.querySelector("#btnSubmit").disabled = updatedButtons.indexOf("Submit") == -1;
+                    document.querySelector("#btnRemove").disabled = updatedButtons.indexOf("Remove") == -1;
+                    document.querySelector("#btnMove").disabled = updatedButtons.indexOf("Move") == -1;
+                    document.querySelector("#btnSplit").disabled = updatedButtons.indexOf("Split") == -1;
 
-                        document.querySelector("#btnRemove").disabled = updatedButtons.indexOf("Remove") == -1;
-                        document.querySelector("#btnRemove").disabled = updatedButtons.indexOf("Remove") == -1;
-                        document.querySelector("#btnRemove").disabled = updatedButtons.indexOf("Remove") == -1;
-                        document.querySelector("#cboMoveTicketItem").disabled = updatedButtons.indexOf("Move") == -1 && updatedButtons.indexOf("Split");
+                    document.querySelector("#btnRemove").disabled = updatedButtons.indexOf("Remove") == -1;
+                    document.querySelector("#btnRemove").disabled = updatedButtons.indexOf("Remove") == -1;
+                    document.querySelector("#btnRemove").disabled = updatedButtons.indexOf("Remove") == -1;
+                    document.querySelector("#cboMove").disabled = updatedButtons.indexOf("Move") == -1 && updatedButtons.indexOf("Split");
                 }
                 catch (err) {
                     setTimeout(updateButtonStates, 250);
@@ -296,20 +370,19 @@
                 //no table selected
                 removeVar("selectedTicketItem", "ticketContainer");
                 updateButtonStates();
-                document.querySelector("#cboSeat").selectedIndex = 0;
-                document.querySelector("#cboSplit").selectedIndex = 0;
-                populateSeats();
-                populateSplits();
+            
                 setVar("enabledButtons", "");
+                var cboSeat = document.querySelector("#cboSeat");
+                var cboSplit = document.querySelector("#cboSplit");
                 if (document.querySelector("#cboTable").selectedIndex == 0) {
-                                       
-                    document.querySelector("#cboSplit").disabled = true;
-                    //document.querySelector("#cboSplit").innerHTML = "Split";
-
-                    document.querySelector("#cboSeat").disabled = true;
-                    //document.querySelector("#cboSplit").innerHTML = "";
                     
-                    document.getElementById("btnSubmit").disabled = true;
+                    cboSeat.disabled = true;
+                    cboSeat.options[0].text = "Seat";
+
+                    cboSplit.disabled = true;
+                    cboSplit.options[0].text = "Split";
+                    
+                    document.querySelector("#btnSubmit").disabled = true;
                     document.querySelector("#btnCancel").disabled = true;
                     document.querySelector("#btnPrintReceipt").disabled = true;
         
@@ -317,31 +390,68 @@
                     document.querySelector("#btnRemove").disabled = true;
                     document.querySelector("#btnSplit").disabled = true;
                     document.querySelector("#btnMove").disabled = true;
-                    document.querySelector("#cboMoveTicketItem").disabled = true;
+                    document.querySelector("#cboMove").disabled = true;
 
                     document.querySelector("#ticketHeaderText").innerHTML = "Ticket:&nbsp;n/a";
-                    document.querySelector("#cboMoveTicketItem").innerHTML = "";
+                    document.querySelector("#cboMove").innerHTML = "";
 
                     removeVar("ticket", "ticketContainer");
+                    //setVar("ignoreUpdate", "ticketContainer");
                     updateDisplay("ticketContainer"); 
                     
                     removeVar("ticket","serverListener");
                     updateDisplay("serverListener");
+                   
                                        
                 }
                 else {
                     setVar("ticket",document.querySelector("#cboTable").value,"serverListener");
-                    updateDisplay("serverListener");
-                    
+                    try {
+                        updateDisplay("serverListener");
+                    }
+                    catch (err) {
+                        alert("Fail");
+                    }
+                    document.querySelector("#ticketContainer").classList.add("clear");
+                    setTimeout(() => {
+                        document.querySelector("#ticketContainer").classList.remove("clear")} ,1500);
+                    //document.querySelector("#ticketContainer").setAttribute("src", "../Resources/php/ticket.php");
                     setVar("ticket",document.querySelector("#cboTable").value,"ticketContainer");
-                    removeVar("seat", "ticketContainer");
-                    removeVar("split", "ticketContainer");
-                    document.querySelector("#cboSeat").selectedIndex = 0;
-                    document.querySelector("#cboSplit").selectedIndex = 0;
                     updateDisplay("ticketContainer");
+                   
+                    //setVar("ignoreUpdate", "ticketContainer");
 
                     document.querySelector("#ticketHeaderText").innerHTML = "Ticket:&nbsp;" + document.querySelector("#cboTable").value;
+                    
+                    cboSeat.disabled = false;
+                    cboSeat.options[0].text = "All Seats";
+
+                    cboSplit.disabled = false;
+                    cboSplit.options[0].text = "All Splits";
+                    
+                    populateSeats();
+                    populateSplits();
+
+                    setTimeout(() => {
+                    var cboSeat = document.querySelector("#cboSeat");
+                    var cboSplit = document.querySelector("#cboSplit");
+                    if (cboSplit.options.length == 3 && cboSeat.options.length == 3) {
+                        setVar("seat",1,"ticketContainer");
+                        setVar("split",1,"ticketContainer");
+                        cboSeat.selectedIndex = 1;
+                        cboSplit.selectedIndex = 1;
+                    }
+                    else {
+                        removeVar("seat","ticketContainer");
+                        removeVar("split","ticketContainer");
+                        cboSeat.selectedIndex = 0;
+                        cboSplit.selectedIndex = 0;
+                    }
+                   }, 1000);
+
                 }
+                
+                
                 
             }
 
@@ -354,11 +464,11 @@
                     setTimeout(populateSeats, 250);
                     return;
                 }
-                
+                var changed = false;
                 var cboSeat = document.querySelector("#cboSeat");
-                if (maxSeat == null && cboSeat.options.length > 1) {
-                    cboSeat.disabled = true;
+                if (maxSeat === undefined && cboSeat.options.length > 1) {
                     cboSeat.innerHTML = "<option id='allSeats' name='selectedSeat' value='allSeats'>Seat</option>";
+                    changed = true;
                 }
                 else if (maxSeat > cboSeat.options.length - 1) {
                     let index = cboSeat.options.length; 
@@ -371,19 +481,19 @@
                             text = "Seat " + i;
                         }
                         cboSeat.appendChild(newSeatOption);
-                        cboSeat.options[0].text = "All Seats";
+                        changed = true;
                     }
-                    cboSeat.disabled = false;
                 }
                 else if (maxSeat < cboSeat.options.length - 1) {
                     while (maxSeat < cboSeat.options.length - 1) {
                         cboSeat.options[cboSeat.options.length - 1].remove();
+                        changed = true;
                     }
                     if (cboSeat.selectedIndex >= cboSeat.options.length - 2) {
                         //seat is no longer valid
                         updateDisplay("ticketContainer");
                     }
-                }               
+                }            
             }
 
             function populateSplits() {
@@ -395,15 +505,11 @@
                     setTimeout(populateSplits, 250);
                     return;
                 }
-
-                if (maxSplit == 0) {
-                    maxSplit = 10;
-                }
-                
+                var changed = false;
                 var cboSplit = document.querySelector("#cboSplit");
-                if (maxSplit == null && cboSplit.options.length > 1) {
-                    cboSplit.disabled = true;
+                if (maxSplit === undefined && cboSplit.options.length > 1) {
                     cboSplit.innerHTML = "<option id='allSplits' name='selectedSplit' value='allSplits'>Split</option>";
+                    changed = true;
                 }
                 else if (maxSplit > cboSplit.options.length - 1) {
                     let index = cboSplit.options.length; 
@@ -411,31 +517,24 @@
                         var newSplitOption = document.createElement('option');
                         with (newSplitOption) {
                             setAttribute("name", "selectedSplit");
-                            if (i < 10) {
-                                setAttribute("value", i);
-                                setAttribute("id", "split" + i);
-                                text = "Split " + i;
-                            }
-                            else {
-                                setAttribute("value", 0);
-                                setAttribute("id", "split0");
-                                text = "Split 0";
-                            }
+                            setAttribute("value", i);
+                            setAttribute("id", "split" + i);
+                            text = "Split " + i;
                         }
                         cboSplit.appendChild(newSplitOption);
-                        cboSplit.options[0].text = "All Splits";
+                        changed = true;
                     }
-                    cboSplit.disabled = false;
                 }
                 else if (maxSplit < cboSplit.options.length - 1) {
                     while (maxSplit < cboSplit.options.length - 1) {
                         cboSplit.options[cboSplit.options.length - 1].remove();
+                        changed = true;
                     }
                     if (cboSplit.selectedIndex >= cboSplit.options.length - 2) {
                         //split is no longer valid
                         updateDisplay("ticketContainer");
                     }
-                }                
+                }           
             }
 
             function selectedSeatChanged() {
@@ -467,55 +566,50 @@
 
             // =========================== BUTTON PRESS EVENTS =====================================
 
-            function submitButtonPressed() {
+            function submitButtonPressed(e) {
+                if (e.target.getAttribute("disabled") == '') {
+                    return;
+                }
                 alert("Submit");
 
             }
 
-            function cancelButtonPressed() {
+            function cancelButtonPressed(e) {
+                if (e.target.getAttribute("disabled") == '') {
+                    return;
+                }
                 alert("Cancel");
 
             }
 
-            function editButtonPressed() {
-                var selTicket;
-                try {
-                    selTicket = getVar("selectedTicketItem", "ticketContainer");
-                }
-                catch (err) {
-                    setTimeout(editButtonPressed, 250);
+            function editButtonPressed(e) {
+                if (e.target.getAttribute("disabled") == '') {
                     return;
                 }
-                stopUpdateLoopTimer();
-
-                document.querySelector("#modEditorContainer").classList.add("active");
-                setVar("selectedItem",selTicket.replace("ticketItem",""), "modEditorContainer");
-                //alert(getVar("selectedItem", "modEditorContainer"));
-               try {
-                updateDisplay("modEditorContainer");
-                
-               }
-               catch (err) {
-                alert(err);
-               }
-                
-                
-                //startUpdateLoopTimer();
-
+                showModWindow();
             }
 
-            function removeButtonPressed() {
+            function removeButtonPressed(e) {
+                if (e.target.getAttribute("disabled") == '') {
+                    return;
+                }
                 alert("Remove");
                 getVar()
 
             }
 
-            function moveButtonPressed() {
+            function moveButtonPressed(e) {
+                if (e.target.getAttribute("disabled") == '') {
+                    return;
+                }
                 alert("Move");
 
             }
 
-            function splitButtonPressed() {
+            function splitButtonPressed(e) {
+                if (e.target.getAttribute("disabled") == '') {
+                    return;
+                }
                 alert("Split");
                 
             }
@@ -595,7 +689,7 @@
                     <button type="button" id="btnSplit" disabled>Split With</button>
                     <button type="button" id="btnMove" disabled>Move To</button>
                     
-                    <select id="cboMoveTicketItem" disabled></select>
+                    <select id="cboMove" disabled></select>
                 </div>
             </div>
         </form>

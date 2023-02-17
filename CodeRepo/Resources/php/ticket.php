@@ -89,7 +89,6 @@
 
             //begin listening for updates to the ticket.
             setInterval(checkExternalTicketUpdate, 1000);
-            setState();
             rememberScrollPosition();
             setState();
         }
@@ -122,6 +121,11 @@
             setTimeout(checkExternalTicketUpdate, 250);
             return;
         }
+        if (getVar("ignoreUpdate") != null) {
+            //removeVar("ignoreUpdate");
+            setVar("recordedModificationTime", newTime);
+            return;
+        }
         
         if (paidStatuses != getVar(paidStatuses)) {
             setVar("paidStatuses", paidStatuses);
@@ -129,8 +133,7 @@
         if (oldTime != newTime && newTime != null) {
             setVar("recordedModificationTime", newTime);
             if (oldTime != null) {
-                document.getElementById("ticketForm").submit();
-                
+                document.getElementById("ticketForm").submit(); 
             }
         }
     }
@@ -357,7 +360,8 @@
 
                     // when implementation is defined, calculate this value.
                     $hasMods = true;
-                    $moveable = (isset($_POST['split']) ? " moveable splittable" : "");
+                    //
+                    $moveable = " moveable splittable";
                     switch($ticketItem['status']) {
                         case "n/a":
                             echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removable' .$moveable. ' untracked' .$selectedFlag. '">');
@@ -486,7 +490,7 @@
             }
         }
         else {
-            unset($_POST['recordedModificationTime'], $_POST['seat'], $_POST['split'], $_POST['selectedTicketItem']);
+            unset($_POST['recordedModificationTime'], $_POST['recordedModificationTime'], $_POST['seat'], $_POST['split'], $_POST['selectedTicketItem']);
             $_POST['enabledButtons'] = "";
         }
         unset($_POST['command'], $_POST['modificationNotes'], $_POST['overrideValue'], $_POST['overrideNote'], $_POST['authorizationUsername'], $_POST['toSeat'], $_POST['toSplit']);

@@ -78,8 +78,13 @@ function removeVar(variableName, id = null) {
     else {
         form = container.contentWindow.document.getElementsByTagName('form')[0];
         variableElement = container.contentWindow.document.getElementById(variableName);
-        if (form == null) {
-            setTimeout(removeVar(variableName, id), 250);
+        try {
+            if (form == null) {
+                setTimeout(removeVar(variableName, id), 250);
+                return;
+            }
+        }
+        catch (err) {
             return;
         }
     }

@@ -161,6 +161,30 @@ body > body{
     background-color: red;
   }
 
+  #modEditorContainer.active {
+    animation: fadeIn 1s 0s backwards;
+    }
+
+  .apperaing {
+    animation: fadeIn 2s 0s forwards;
+  }
+
+    #modEditorContainer > form {
+    background-color: transparent;
+    }
+
+    
+
+    @keyframes fadeOut {
+    0% { opacity: 1; z-index: 2;}
+    100% { opacity: 0; z-index: -1;}
+    }
+
+    @keyframes fadeIn {
+    0% { opacity: 0;}
+    100% { opacity: 1;}
+    }
+
 
 
 
