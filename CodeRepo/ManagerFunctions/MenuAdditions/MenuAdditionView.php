@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 <head>
     <title>Add Items To Menu</title>
@@ -6,18 +5,19 @@
     <script src='MenuAdditionEntryPopulation.js'></script>
 </head>
 <body>
-<!-- Add root so that this script works IF ROOT DOES NOT EXIST, NOTHING CAN BE ADDED. This is done below -->
+<!-- Add root so that this script works IF ROOT DOES NOT EXIST. Very necessary -->
 <?php
     // INCLUDE connect() FOR USE IN FILE(s)
     include '..\..\Resources\php\connect_disconnect.php';
 
     // LOOK FOR EXISTINCE OF 'root' IN THE 'quickcodes' TABLE.
     $exists = false;
-    $sql = "SELECT id FROM quickcodes WHERE FIND_IN_SET('root', id) < 0";
+    //$sql = "SELECT id FROM quickcodes WHERE FIND_IN_SET('root', id) < 0";
+    $sql = "SELECT quickCode FROM menucategories WHERE quickCode = 'root';";
     $result = connection()->query($sql);
 
     // SET $EXISTS TO true IF ANYTHING IS RETURNED
-    if ($result->num_rows == 0) {
+    if ($result->num_rows > 0) {
         $exists = true;
     }
 

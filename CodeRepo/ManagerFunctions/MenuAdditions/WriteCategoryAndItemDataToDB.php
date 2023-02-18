@@ -1,3 +1,6 @@
+<!-- NOT GETTING THE entry-cat FROM THE FORM! REFER TO CSC289-GITHUB -->
+
+
 <?php
 
 include '..\..\Resources\php\connect_disconnect.php';
@@ -92,9 +95,14 @@ for ($i=0; $i<$numEntries; $i++) {
     }
 
     elseif ($entryType == 'mod') {
-        $modTitle = $_POST[('entry-title' . strval($i))] ?? null;
-        $itemTitle = $_POST[('entry-item-title' . strval($i))] ?? null;
-        $mandatoryOrOptional = $_POST['entry-mand_opt' . strval($i)] ?? null;
+        $modTitle = $_POST[('entry-title' . strval($i))] ?? null;           
+        $itemTitle = $_POST[('entry-item-title' . strval($i))] ?? null;         
+        $mandatoryOrOptional = $_POST[('entry-mand_opt' . strval($i))] ?? null;
+
+
+// $parentQC isnt being defined because $itemTitle is not being passed in. **** FIX THIS ****
+
+        echo "ITEM TITLE" . $itemTitle;
 
         // CREATE QUICKCODE
         // INCREMENT QC FOR UNIQUE VALUE
@@ -115,17 +123,20 @@ for ($i=0; $i<$numEntries; $i++) {
         connection()->query($sql);
 
         $sql = "SELECT quickCode FROM
-        menuitems WHERE title = '" . $itemTitle . "';";
+        menuitems WHERE title = '". $itemTitle ."';";
         $result = connection()->query($sql);
-        if (mysqli_num_rows($result) > 0) {
+        if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $parentQC = $row['quickCode'];
+                echo $parentQC;
             }
         }
 
-        $sql = "INSERT into menuassociations (parentQuickCode, childQuickCode)
-        VALUES ('" . $parentQC . "', '" . $quickCode . "');";
-        connection()->query($sql);
+
+        
+        $sql2 = "INSERT into menuassociations (parentQuickCode, childQuickCode)
+        VALUES ('" .$parentQC. "', '" .$quickCode. "');";
+        connection()->query($sql2);
     }
 }
 echo " Completed Entries";
