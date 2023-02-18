@@ -4,21 +4,17 @@
 		
          .ticketItem {
 			display: grid;
-			grid-template-columns: 2rem  2rem 1fr 5rem;
+			grid-template-columns: 3rem  2rem 1fr 5rem;
          }
 		 
 		 .ticketItem * {
 			 min-height: 1.25em;
-			 max-height: 1.25em;
 		 }
          .removeTicketItemBtn, ticketItemStatus {
 			grid-column: 1;
          }
 		 
-		 .ticketItemStatus {
-			 
-			 font-size: 1.25em;
-		 }
+		 
          .ticketItemNumber {
          grid-column: 2;
          }

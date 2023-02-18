@@ -12,7 +12,7 @@
 		                         "menu             ticketAndOptions"
 							     "empty            ticketFooter"
 								 "buffer           buffer";
-			grid-template-columns: 1fr 1fr;
+			grid-template-columns: 40fr 60fr;
 			grid-template-rows: min-content min-content 1fr min-content .125rem;
 			grid-auto-rows: min-content;
 		    border: 2px solid black;

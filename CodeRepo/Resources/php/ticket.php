@@ -256,11 +256,12 @@
                     connection()->query($sql);
 				}
                 elseif ($_POST['command'] == 'cancelPending') {
-					$sql = "CALL cancelPendingTicketItems(" .$_POST['ticket']. ");";
+                    $sql = "CALL cancelPendingTicketItems(" .$_POST['ticket']. ", ". (isset($_POST['split']) ? $_POST['split'] : "10") . ");";
+                    echo("<h1>" .$sql. "</h1>");
                     connection()->query($sql);
 				}
                 elseif ($_POST['command'] == 'submitPending') {
-					$sql = "CALL submitPendingTicketItems(" .$_POST['ticket']. ");";
+					$sql = "CALL submitPendingTicketItems(" .$_POST['ticket']. ", ". (isset($_POST['split']) ? $_POST['split'] : "10") . ");";
                     connection()->query($sql);
 				}
 				elseif (isset($_POST['ticketItem'])) {
@@ -311,6 +312,7 @@
 			}
             catch (Exception $e) {
             //    $errorMessage = $e->getMessage();
+            echo("<h1>" .$e->getMessage(). "</h1>");
              
             }				
 		} 
@@ -412,7 +414,7 @@
                         case "Preparing":
                             if ($hasMods) {
                                 echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid editable removable' .$moveable. ' preparing' .$selectedFlag. '">');
-                                echo('<div class="ticketItemStatus">✎⧖</div>');
+                                echo('<div class="ticketItemStatus">✎<br>⧖</div>');
                             }
                             else {
                                 echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removable' .$moveable. ' preparing' .$selectedFlag. '">');

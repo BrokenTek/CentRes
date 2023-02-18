@@ -33,6 +33,7 @@ DROP FUNCTION IF EXISTS mipHelperFunction;
 DROP FUNCTION IF EXISTS ticketItemStatus;
 DROP FUNCTION IF EXISTS ticketSplitFlag;
 DROP FUNCTION IF EXISTS ticketItemPayStatus;
+DROP FUNCTION IF EXISTS routable;
 
 DROP TRIGGER IF EXISTS beforeAddMenuCategory;
 DROP TRIGGER IF EXISTS beforeAddMenuItem;
@@ -933,7 +934,11 @@ BEGIN
 	SET newSplitFlg = oldSplitFlg & splitMask;
 	SET changeFlg = newSplitFlg | splitFlg;
 
-	UPDATE TicketItems SET splitFlag = newSplitFlg WHERE id = ticketItemNumber;
+	IF (newSplitFlg > 0) THEN
+		UPDATE TicketItems SET splitFlag = newSplitFlg WHERE id = ticketItemNumber;
+	ELSE
+		DELETE FROM TicketItems WHERE id = ticketItemNumber;
+	END IF;
 	CALL updateTicketSplitsTimeStamp(tickNum, changeFlg);
 END$$
 DELIMITER ;
@@ -997,9 +1002,9 @@ BEGIN
 	UPDATE Tickets SET timeModified = NOW() WHERE id = ticketNumber;
 	
 	IF ((SELECT COUNT(*) FROM TicketItems WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf) = 0) THEN
-		DELETE FROM Splits WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf;
+		DELETE FROM Splits WHERE ticketId = ticketNumber AND splitId = split;
 	ELSE
-		UPDATE Splits SET timeModified = NOW() WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf;
+		UPDATE Splits SET timeModified = NOW() WHERE ticketId = ticketNumber AND splitId = split;
 	END IF;
 END$$
 DELIMITER ;
@@ -1011,11 +1016,11 @@ CREATE PROCEDURE submitPendingTicketItems(IN ticketNumber INT UNSIGNED, IN split
 BEGIN
 	DECLARE sf SMALLINT UNSIGNED;
 	IF (split = 10) THEN
-		SET sf = 1023;
+		UPDATE TicketItems SET submitTime = NOW() WHERE ticketId = ticketNumber AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
 	ELSE
 		SELECT POWER(2, split) INTO sf;
+		UPDATE TicketItems SET submitTime = NOW() WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
 	END IF;
-	UPDATE TicketsItems SET timeSubmitted = NOW() WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf AND ticketItemStatus(id) <> 'n/a';
 	CALL updateTicketSplitsTimeStamp(ticketNumber, 1023);
 END$$
 DELIMITER ;
@@ -1027,12 +1032,12 @@ CREATE PROCEDURE cancelPendingTicketItems(IN ticketNumber INT UNSIGNED, IN split
 BEGIN
 	DECLARE sf SMALLINT UNSIGNED;
 	IF (split = 10) THEN
-		SET sf = 1023;
+		DELETE FROM TicketItems WHERE submitTime IS NULL AND ticketId = ticketNumber AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
 	ELSE
 		SELECT POWER(2, split) INTO sf;
+		DELETE FROM TicketItems WHERE submitTime IS NULL AND ticketId = ticketNumber AND (splitFlag & sf) = sf AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
 	END IF;
-	DELETE FROM TicketsItems WHERE timeSubmitted IS NULL AND ticketId = ticketNumber AND (splitFlag & sf) = sf AND ticketItemStatus(id) <> 'n/a';
-	CALL updateTicketSplitsTimeStamp(ticketNumber, 1023);
+	CALL updateTicketSplitsTimeStamp(ticketNumber, sf);
 END$$
 DELIMITER ;
 
@@ -1055,6 +1060,29 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE FUNCTION ticketItemPayStatus(tickItemNum INT UNSIGNED) RETURNS VARCHAR(7)
+BEGIN
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE splitFlg TINYINT UNSIGNED;
+	DECLARE countSplits INT UNSIGNED;
+	DECLARE paidSplits INT UNSIGNED;
+
+	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM ticketItems WHERE ticketId = tickItemNum;
+
+	SELECT COUNT(*) INTO countSplits FROM Splits WHERE ticketId = tickNum AND (POWER(splitId, 2) & splitFlg = POWER(splitId, 2));
+	SELECT COUNT(*) INTO paidSplits FROM Splits WHERE ticketId = tickNum AND (POWER(splitId, 2) & splitFlg = POWER(splitId, 2)) AND totalAmountPaid IS NOT NULL;
+	IF (paidSplits = 0) THEN
+		RETURN 'Unpaid';
+	ELSEIF (countSplits = paidSplits) THEN
+		RETURN 'Paid';
+	ELSE
+		RETURN 'Partial';
+	END IF;
+	
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE FUNCTION routable(tickItemNum INT UNSIGNED) RETURNS VARCHAR(7)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
 	DECLARE splitFlg TINYINT UNSIGNED;

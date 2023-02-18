@@ -8,8 +8,16 @@ summary {
 	background-color: #bf1e2e;
 	color: white;
 	border: 2px solid white;
-	min-height: 4rem;
+	min-height: 2rem;
 	margin-block: auto;
+}
+
+details > details {
+	padding-left: 2rem;
+}
+
+details > .menuItem {
+	margin-left: 2rem;
 }
 
 

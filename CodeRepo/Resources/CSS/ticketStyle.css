@@ -21,3 +21,8 @@
  body {
     background-color: red;
  }
+
+ .ticketItemStatus {
+    font-size: .8rem;
+    min-width: 4rem;
+ }

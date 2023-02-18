@@ -668,49 +668,48 @@
             // =========================== BUTTON PRESS EVENTS =====================================
 
             function submitButtonPressed(e) {
-                if (e.target.getAttribute("disabled") == '') {
-                    return;
-                }
-                alert("Submit");
-
+                if (e.target.getAttribute("disabled") == '') { return; }
+                setVar("ignoreUpdate", "yes please", "ticketContainer");
+                setVar("command", "submitPending" ,"ticketContainer");
+                updateDisplay("ticketContainer");
             }
 
             function cancelButtonPressed(e) {
-                if (e.target.getAttribute("disabled") == '') {
-                    return;
-                }
-                alert("Cancel");
+                if (e.target.getAttribute("disabled") == '') { return; }
+                setVar("ignoreUpdate", "yes please", "ticketContainer");
+                setVar("command", "cancelPending" ,"ticketContainer");
+                updateDisplay("ticketContainer");
 
             }
 
             function editButtonPressed(e) {
-                if (e.target.getAttribute("disabled") == '') {
-                    return;
-                }
+                if (e.target.getAttribute("disabled") == '') { return; }
                 showModWindow();
             }
 
             function removeButtonPressed(e) {
-                if (e.target.getAttribute("disabled") == '') {
-                    return;
+                if (e.target.getAttribute("disabled") == '') { return; }
+                let str = "";
+                let selItems = document.querySelector("#ticketContainer").contentWindow.document.getElementsByClassName("selected");
+                for (let i = 0; i < selItems.length; i++) {
+                    str += "," + selItems[i].id;
                 }
-                alert("Remove");
-                getVar()
+                str = str.replaceAll("ticketItem","").substring(1);
+                setVar("ignoreUpdate", "yes please", "ticketContainer");
+                setVar("command", "remove", "ticketContainer");
+                setVar("ticketItem", str, "ticketContainer");
+                updateDisplay("ticketContainer");
 
             }
 
             function moveButtonPressed(e) {
-                if (e.target.getAttribute("disabled") == '') {
-                    return;
-                }
+                if (e.target.getAttribute("disabled") == '') { return; }
                 alert("Move");
 
             }
 
             function splitButtonPressed(e) {
-                if (e.target.getAttribute("disabled") == '') {
-                    return;
-                }
+                if (e.target.getAttribute("disabled") == '') { return; }
                 alert("Split");
                 
             }
