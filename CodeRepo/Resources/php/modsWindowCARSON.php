@@ -36,7 +36,7 @@
                         
                         //===================================================================================================
                         echo("<script>signalStatus('pending');</script>");
-                        echo("<h1>You mod window content goes here : ". $_POST['selectedItem'] ."</h1>");
+                        echo("<h2>Modifications for: ". $_POST['selectedItem'] ."</h2>");
 
                         $ticketItemModQCs = array();
                         $selectedItemMods = array();
@@ -52,6 +52,7 @@
                         
                         $sql = "SELECT childQuickCode FROM menuassociations WHERE parentQuickCode = '$menuItemQuickCode';";
                         $result = connection()->query($sql);
+
                         if($result->num_rows > 0) {
                             while($row = $result->fetch_assoc()) {
                                 array_push($ticketItemModQCs, $row['childQuickCode']);
@@ -68,16 +69,21 @@
                         }
 
                         if (substr($selectedItemMods[1], -3) == 'One') {
-                            echo "<select id='modOneChoice'>";
+                            echo "<hr><select id='modOneChoice'>";
                         
-                        for ($i=0; $i<sizeof($selectedItemMods); $i++) {
-                                echo "<option value='" . $selectedItemMods[$i] . "'>" . $selectedItemMods[$i] . "</option>";    
-                            }
-                        echo "</select>";
+                            for ($i=0; $i<sizeof($selectedItemMods); $i++) {
+                                    echo "<option value='" . $selectedItemMods[$i] . "'>" . explode(',' ,$selectedItemMods[$i])[0] . "</option>";   
+                                }
+                            echo "</select><br>";
                         }
 
                         else {
-                            // THIS IS WHERE RADIO ECHOS WILL GO
+                            
+
+                            for ($i=0; $i<sizeof($selectedItemMods); $i++) {
+                                echo "<br><input type='radio' id='menuAnyChoice' value='" . $selectedItemMods[$i] ."'>";
+                            }
+
                         }
 
 
