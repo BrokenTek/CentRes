@@ -4,7 +4,7 @@
 		
          .ticketItem {
 			display: grid;
-			grid-template-columns: 3rem  2rem 1fr 5rem;
+			grid-template-columns: 3rem  4rem 1fr 5rem;
          }
 		 
 		 .ticketItem * {

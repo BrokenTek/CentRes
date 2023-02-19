@@ -173,6 +173,10 @@ body > body{
     background-color: transparent;
     }
 
+    .toggled {
+      animation: toggleAnimate 1.5s 0s ease forwards;
+    }
+
     
 
     @keyframes fadeOut {
@@ -186,10 +190,16 @@ body > body{
     }
 
     @keyframes highlightFlash {
-      0% { background-color: initial; transform: scale(1);}
+      0% { background-color: revert; transform: scale(1);}
       50% { background-color: #bf1e2e; transform: scale(.9); }
-      100% { background-color: initial; transform: scale(1);}
+      100% { background-color: revert; transform: scale(1);}
       }
+
+      @keyframes toggleAnimate {
+        0% { background-color: #F6941D; transform: scale(1); border-radius: 0;}
+        50% { background-color: #42280e; transform: scale(.9); border-radius: 1rem; }
+        100% { background-color: #42280e; transform: scale(1); border-radius: 0;}
+        }
 
     .message {
       background-color: black;

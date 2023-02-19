@@ -33,7 +33,7 @@ DROP FUNCTION IF EXISTS mipHelperFunction;
 DROP FUNCTION IF EXISTS ticketItemStatus;
 DROP FUNCTION IF EXISTS ticketSplitFlag;
 DROP FUNCTION IF EXISTS ticketItemPayStatus;
-DROP FUNCTION IF EXISTS routable;
+DROP FUNCTION IF EXISTS splitString;
 
 DROP TRIGGER IF EXISTS beforeAddMenuCategory;
 DROP TRIGGER IF EXISTS beforeAddMenuItem;
@@ -50,6 +50,8 @@ DROP TRIGGER IF EXISTS afterDeleteMenuModificationItem;
 
 DROP PROCEDURE IF EXISTS createTicket;
 DROP PROCEDURE IF EXISTS removeTicket;
+DROP PROCEDURE IF EXISTS addSplit;
+DROP PROCEDURE IF EXISTS removeSplit;
 DROP PROCEDURE IF EXISTS createTicketItem;
 DROP PROCEDURE IF EXISTS removeTicketItem;
 DROP PROCEDURE IF EXISTS modifyTicketItem;
@@ -767,11 +769,7 @@ BEGIN
 				SIGNAL SQLSTATE '45000'
 				SET MESSAGE_TEXT = 'Menu Item Is Out of Stock!';
 			ELSE
-				-- new split. Add Split record.
-				IF ((SELECT COUNT(*) FROM Splits WHERE ticketId = ticketNumber AND splitId = split) = 0) THEN
-					INSERT INTO Splits (ticketId, splitId) VALUES (ticketNumber, split);
-				END IF;
-
+				
 				-- find the next available item number in ticket.
 				SELECT (IFNULL(MAX(itemId),0) +1) INTO newItemIndex FROM TicketItems WHERE ticketId = ticketNumber;
 
@@ -779,6 +777,8 @@ BEGIN
 				INSERT INTO TicketItems (id, splitFlag, seat, menuItemQuickCode, calculatedPrice, calculatedPriceWithMods) VALUES (ticketNumber * 10000 + newItemIndex, POWER(2, split),  seatNumber, menuItemQC, calcPrice, calcPrice);
 				-- SET newTicketItemID = ticketNumber * 10000 + newItemIndex;
 
+				-- create the split if it doesn't exist
+				CALL addSplit(ticketNumber, split);
 
 				-- decrease the inventory by 1
 				IF (qty IS NOT NULL) THEN
@@ -859,8 +859,11 @@ BEGIN
 	DECLARE qty SMALLINT UNSIGNED;
 	DECLARE tickNum INT UNSIGNED;
 	DECLARE splitFlg SMALLINT UNSIGNED;
+	DECLARE ticketNumber INT UNSIGNED;
+	DECLARE split SMALLINT UNSIGNED;
 	SELECT ticketItemStatus(ticketItemNumber) INTO stat;
 	SELECT menuItemQuickCode, ticketId, splitFlag INTO qc, tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
+	SELECT LOG(2, splitFlg) INTO split;
 	SELECT quantity INTO qty FROM MenuItems WHERE quickCode = qc;
 	IF (stat IN ('Ready', 'Delivered', 'Hidden')) THEN
 		-- Hidden is a subcategory of Delivered. The manager hides the item from the ticket and price ignored.
@@ -871,6 +874,9 @@ BEGIN
 	ELSE		
 		-- delete the actual ticket item
 		DELETE FROM TicketItems WHERE id = ticketItemNumber;
+
+		-- delete the split if it's now empty
+		CALL removeSplit(tickNum, split);
 		
 		-- increment quantity by 1 in inventory
 		IF (qty IS NOT NULL) THEN
@@ -899,20 +905,23 @@ BEGIN
 	DECLARE fromFlg SMALLINT UNSIGNED;
 	DECLARE toFlg SMALLINT UNSIGNED;
 	DECLARE oldSplitFlg SMALLINT UNSIGNED;
-	DECLARE changeFlg SMALLINT UNSIGNED;
-	DECLARE splitMask SMALLINT UNSIGNED;
 	DECLARE newSplitFlg SMALLINT UNSIGNED;
 	
 	SELECT ticketId, splitFlag INTO tickNum, oldSplitFlg FROM TicketItems WHERE id = ticketItemNumber;
 
 	SET fromFlg = POWER(2, fromSplit);
 	SET toFlg = POWER(2, toSplit);
-	SET changeFlg = fromFlg | toFlg;
-	SET splitMask = fromFlg XOR 1023;
-	SET newSplitFlg = oldSplitFlg & splitMask;
+	SET newSplitFlg = ((~fromFlg) & oldSplitFlg) | toFlg;
 
 	UPDATE TicketItems SET splitFlag = newSplitFlg WHERE id = ticketItemNumber;
-	CALL updateTicketSplitsTimeStamp(tickNum, changeFlg);
+
+	-- delete the old split if there's nothing in it anymore.
+	CALL removeSplit(tickNum, fromSplit);
+
+	-- create the new split if it doesn't exist.
+	CALL addSplit(tickNum, toSplit);
+
+	CALL updateTicketSplitsTimeStamp(tickNum, fromFlg | toFlg);
 END$$
 DELIMITER ;
 
@@ -939,6 +948,10 @@ BEGIN
 	ELSE
 		DELETE FROM TicketItems WHERE id = ticketItemNumber;
 	END IF;
+
+	-- delete the old split if there's nothing in it anymore.
+	CALL removeSplit(tickNum, split);
+	
 	CALL updateTicketSplitsTimeStamp(tickNum, changeFlg);
 END$$
 DELIMITER ;
@@ -954,9 +967,13 @@ BEGIN
 	SELECT ticketId, splitFlag INTO tickNum, oldSplitFlg FROM TicketItems WHERE id = ticketItemNumber;
 
 	SET splitFlg = POWER(2, split);
-	SET changeFlg = splitFlag | oldSplitFlg;
+	SET changeFlg = splitFlg | oldSplitFlg;
 
 	UPDATE TicketItems SET splitFlag = changeFlg WHERE id = ticketItemNumber;
+
+	-- create the split if it doesn't exist
+	CALL addSplit(tickNum DIV 10000, split);
+
 	CALL updateTicketSplitsTimeStamp(tickNum, changeFlg);
 END$$
 DELIMITER ;
@@ -1041,9 +1058,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-
-
-
 DELIMITER $$
 CREATE PROCEDURE updateTicketSplitsTimeStamp(IN ticketNumber INT UNSIGNED, IN sf SMALLINT UNSIGNED)
 BEGIN
@@ -1082,24 +1096,73 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE FUNCTION routable(tickItemNum INT UNSIGNED) RETURNS VARCHAR(7)
+CREATE PROCEDURE addSplit(IN ticketNumber INT UNSIGNED, IN splitNumber SMALLINT UNSIGNED)
 BEGIN
-	DECLARE tickNum INT UNSIGNED;
-	DECLARE splitFlg TINYINT UNSIGNED;
-	DECLARE countSplits INT UNSIGNED;
-	DECLARE paidSplits INT UNSIGNED;
-
-	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM ticketItems WHERE ticketId = tickItemNum;
-
-	SELECT COUNT(*) INTO countSplits FROM Splits WHERE ticketId = tickNum AND (POWER(splitId, 2) & splitFlg = POWER(splitId, 2));
-	SELECT COUNT(*) INTO paidSplits FROM Splits WHERE ticketId = tickNum AND (POWER(splitId, 2) & splitFlg = POWER(splitId, 2)) AND totalAmountPaid IS NOT NULL;
-	IF (paidSplits = 0) THEN
-		RETURN 'Unpaid';
-	ELSEIF (countSplits = paidSplits) THEN
-		RETURN 'Paid';
-	ELSE
-		RETURN 'Partial';
+	-- new split. Add Split record.
+	IF ((SELECT COUNT(*) FROM Splits WHERE ticketId = ticketNumber AND splitId = splitNumber) = 0) THEN
+		INSERT INTO Splits (ticketId, splitId) VALUES (ticketNumber, splitNumber);
 	END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE removeSplit(IN ticketNumber INT UNSIGNED, IN splitNumber SMALLINT UNSIGNED)
+BEGIN
+	-- new split. Add Split record.
+	IF ((SELECT COUNT(*) FROM Splits WHERE ticketId = ticketNumber AND splitId = splitNumber) = 0) THEN
+		DELETE FROM Splits WHERE ticketId = ticketNumber AND splitId = splitNumber;
+	END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE FUNCTION splitString(ticketItemId INT UNSIGNED) RETURNS VARCHAR(25)
+BEGIN
+	DECLARE myStr VARCHAR(10);
+	DECLARE splitFlg SMALLINT UNSIGNED;
+	DECLARE len TINYINT UNSIGNED;
+	SET myStr = "";
+	SELECT splitFlag INTO splitFlg FROM TicketItems WHERE id = ticketItemId;
 	
+	IF (splitFlg > 511) THEN
+		SET myStr = CONCAT(myStr, '/', '9');
+		SET splitFlg = splitFlg & 511; 
+	END IF; 
+	IF (splitFlg > 255) THEN
+		SET myStr = CONCAT(myStr, '/', '8');
+		SET splitFlg = splitFlg & 255;
+	END IF; 
+	IF (splitFlg > 127) THEN
+		SET myStr = CONCAT(myStr, '/', '7');
+		SET splitFlg = splitFlg & 127;
+	END IF; 
+	IF (splitFlg > 63) THEN
+		SET myStr = CONCAT(myStr, '/', '6');
+		SET splitFlg = splitFlg & 63;
+	END IF; 
+	IF (splitFlg > 31) THEN
+		SET myStr = CONCAT(myStr, '/', '5');
+		SET splitFlg = splitFlg & 31;
+	END IF; 
+	IF (splitFlg > 15) THEN
+		SET myStr = CONCAT(myStr, '/', '4');
+		SET splitFlg = splitFlg & 15;
+	END IF; 
+	IF (splitFlg > 7) THEN
+		SET myStr = CONCAT(myStr, '/', '3');
+		SET splitFlg = splitFlg & 7;
+	END IF; 
+	IF (splitFlg > 3) THEN
+		SET myStr = CONCAT(myStr, '/', '2');
+		SET splitFlg = splitFlg & 3;
+	END IF; 
+	IF (splitFlg > 1) THEN
+		SET myStr = CONCAT(myStr, '/', '1');
+		SET splitFlg = splitFlg & 1;
+	END IF; 
+	IF (splitFlg = 1) THEN
+		SET myStr = CONCAT(myStr, '/', '0');
+	END IF; 
+	RETURN myStr;	
 END$$
 DELIMITER ;

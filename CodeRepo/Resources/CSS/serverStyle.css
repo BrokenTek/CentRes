@@ -62,3 +62,7 @@
 		  .clear {
 			opacity: 0;
 		  }
+
+		  #btnMove {
+			min-height: 4rem;
+		  }

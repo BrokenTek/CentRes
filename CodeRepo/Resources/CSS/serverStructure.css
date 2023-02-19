@@ -10,8 +10,7 @@
 			grid-template-areas: "serverViewHeader serverViewHeader"
 								 "menuTitle        ticketHeader"
 		                         "menu             ticketAndOptions"
-							     "empty            ticketFooter"
-								 "buffer           buffer";
+							     "empty            ticketFooter";
 			grid-template-columns: 40fr 60fr;
 			grid-template-rows: min-content min-content 1fr min-content .125rem;
 			grid-auto-rows: min-content;

@@ -286,11 +286,13 @@
                                                                    .$_POST['toSeat']. ");";
                         }
                         elseif ($_POST['command'] == 'moveToSplit') {
-                            $sql = "CALL moveTicketItemToSplit("          .$ticketItem. ", " 
+                            $sql = "CALL moveTicketItemToSplit("          .$ticketItem. ", "
+                                                                  .$_POST['fromSplit']. ", "
                                                                     .$_POST['toSplit']. ");";
                         }
                         elseif ($_POST['command'] == 'removeFromSplit') {
-                            $sql = "CALL removeTicketItemFromSplit(" .$ticketItem. ", ";
+                            $sql = "CALL removeTicketItemFromSplit(" .$ticketItem. ", "
+                                                                     .$_POST['split']. ")";
                             
                         }
                         elseif ($_POST['command'] == 'addToSplit') {
@@ -303,18 +305,15 @@
                         connection()->query($sql);
                     }
                 }
-
-                // signal an update was made to the ticket, so all listeners can recognize the
-                // change and act appropriately 
-                $sql = "UPDATE Tickets SET timeModified = NOW() WHERE id = " .$_POST['ticket']. ";";
-                connection()->query($sql);
 					
 			}
             catch (Exception $e) {
             //    $errorMessage = $e->getMessage();
+           
             echo("<h1>" .$e->getMessage(). "</h1>");
-             
-            }				
+            echo("<h1>" .$sql. "</h1>");
+            }
+            			
 		} 
         if (isset($_POST['ticket']) && isset($_POST['recordedModificationTime'])) {
             $sql = "SELECT *, ticketItemStatus(TicketItems.id) as status, ticketItemPayStatus(TicketItems.id) as splitPayStatus
@@ -366,6 +365,21 @@
                     break;
                 }
 
+                $sql = "SELECT splitString(" .$ticketItem['id']. ") AS splitString;";
+                $splitString = substr(connection()->query($sql)->fetch_assoc()['splitString'],1);
+                try {
+                    
+                }
+                catch (Exception $e) {
+                    //    $errorMessage = $e->getMessage();
+                   
+                    echo("<h1>" .$e->getMessage(). "</h1>");
+                    echo("<h1>" .$sql. "</h1>");
+                    die("asdasdads");
+                    echo("<script>alert(" .$sql. ");</script>");
+                }
+                
+                
                 $selectedFlag = "";
                 if (isset($_POST['selectedTicketItem']) && strpos($_POST['selectedTicketItem'], "ticketItem".$ticketItem['id']) ) {
                     $selectedFlag .= " selected";
@@ -414,7 +428,7 @@
                         case "Preparing":
                             if ($hasMods) {
                                 echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid editable removable' .$moveable. ' preparing' .$selectedFlag. '">');
-                                echo('<div class="ticketItemStatus">✎<br>⧖</div>');
+                                echo('<div class="ticketItemStatus">✎⧖</div>');
                             }
                             else {
                                 echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removable' .$moveable. ' preparing' .$selectedFlag. '">');
@@ -443,7 +457,7 @@
                     }
                 }
 
-                echo('<div class="ticketItemNumber">' .$ticketItem['itemId']. '</div>
+                echo('<div class="ticketItemNumber">' .$splitString. '</div>
                     <div class="ticketItemText">' .$menuItem['title']. "</div>");
                 
                 if (is_null($ticketItem['overridePrice'])) {
