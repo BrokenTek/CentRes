@@ -38,8 +38,7 @@
         
         // if the ticket number has been specified
         if (tick != null) {
-            setVar("ticketNumber", tick, "ticketListener");
-            updateDisplay("ticketListener");
+            setVar("ticketNumber", tick, "ticketListener", true);
             
             var oldTime = getVar("recordedModificationTime");
             
@@ -122,7 +121,7 @@
             return;
         }
         if (getVar("ignoreUpdate") != null) {
-            //removeVar("ignoreUpdate");
+            removeVar("ignoreUpdate");
             setVar("recordedModificationTime", newTime);
             return;
         }
@@ -172,7 +171,7 @@
     var longTouchEnabled = false;
     var longTouchTimer = null;
 	function pointerDown() {
-        if (this === undefined) { return; }
+        if (this === undefined || this.classList.contains('disabled')) { return; }
         targetTicketItem = this;
         targetTicketItem.classList.add("selected");
         if (getVar("selectedTicketItem") != null && getVar("selectedTicketItem") != this.id) {
@@ -322,7 +321,7 @@
             $sql = "SELECT COUNT(*) as existingTicketItems FROM TicketItems WHERE ticketId = " .$_POST['ticket']. ";";
             $existingTicketItems = connection()->query($sql)->fetch_assoc()['existingTicketItems'];
             if ($existingTicketItems == 0) {
-                echo("<h1 class='message' >New Ticket</h1>");
+                echo("<h1 class='message' >Empty Ticket</h1>");
                 $_POST['seat'] = 1;
                 $_POST['split'] = 1;
             }
@@ -373,6 +372,9 @@
 
                 $sql = "SELECT splitString(" .$ticketItem['id']. ") AS splitString;";
                 $splitString = substr(connection()->query($sql)->fetch_assoc()['splitString'],1);
+                if (!isset($_POST['seat'])) {
+                    $splitString = "<b>" .$ticketItem['seat'] . "</b>·" . $splitString;
+                }
                 try {
                     
                 }
@@ -391,11 +393,11 @@
                 }
                 if ($ticketItem['splitPayStatus'] == "Paid") {
                     echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem paid' .$selectedFlag. '">');
-                    echo('<div class="ticketItemStatus"></div>');
+                    echo('<div class="ticketItemStatus">$</div>');
                 }
                 elseif ($ticketItem['splitPayStatus'] == "Partial") {
                     echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem partialPay' .$selectedFlag. '">');
-                    echo('<div class="ticketItemStatus"></div>');
+                    echo('<div class="ticketItemStatus">$*</div>');
                 }
                 else {
 
@@ -409,11 +411,11 @@
                             echo('<div class="ticketItemStatus"></div>');
                             break;
                         case "Delivered":
-                            echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' delivered' .$selectedFlag. '">');
+                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' delivered' .$selectedFlag. '">');
                             echo('<div class="ticketItemStatus">✔✔</div>');
                             break;
                         case "Ready":
-                            echo('<div class="ticketItem" id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' ready' .$selectedFlag. '">');
+                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' ready' .$selectedFlag. '">');
                             echo('<div class="ticketItemStatus">✔</div>');
                             break;
                         case "Pending":
@@ -449,11 +451,11 @@
                             }
                             break;
                         case "Removed":
-                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removed' .$selectedFlag. '">');
+                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem disabled unpaid removed' .$selectedFlag. '" disabled>');
                             echo('<div class="ticketItemStatus">🞮</div>');
                             break;
                         case "Hidden":
-                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removed hidden' .$selectedFlag. '">');
+                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem disabled unpaid removed hidden' .$selectedFlag. '" disabled>');
                             echo('<div class="ticketItemStatus">🞮</div>');
                             break;
                     }

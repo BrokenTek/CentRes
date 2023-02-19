@@ -1,4 +1,4 @@
-function setVar(variableName, value, id = null) {
+function setVar(variableName, value, id = null, update = false) {
     var container = document.getElementById(id);
     var form;
     var variableElement;
@@ -38,8 +38,9 @@ function setVar(variableName, value, id = null) {
         form.appendChild(variableElement);
     }
 
-   
-    
+    if (update) {
+        updateDisplay(id);
+    }
 }
 
 function getVar(variableName, id = null) {
@@ -67,7 +68,7 @@ function getVar(variableName, id = null) {
     }
 }
 
-function removeVar(variableName, id = null) {
+function removeVar(variableName, id = null, update = false) {
     var container = document.getElementById(id);
     var form;
     var variableElement;
@@ -92,9 +93,13 @@ function removeVar(variableName, id = null) {
     if (variableElement != null) {
         variableElement.remove();
     }
+
+    if (update) {
+        updateDisplay(id);
+    }
 }
 
-function clearVars(id = null) {
+function clearVars(id = null, update = false) {
     var container = document.getElementById(id);
     var form;
     if (id == null) {
@@ -110,6 +115,10 @@ function clearVars(id = null) {
     var vars = ticketForm.getElementsByClassName('variable');
     for (var i = vars.length - 1; i >= 0; i--) {
         vars[i].remove();
+    }
+
+    if (update) {
+        updateDisplay(id);
     }
 }
 

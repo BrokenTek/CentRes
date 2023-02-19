@@ -1,7 +1,5 @@
 <!-- This is where the create_user HTML form is sent to create a user in the database. -->
 
-<html>
-<body>
 
 <?php
 include '../Resources/php/connect_disconnect.php';
@@ -24,13 +22,14 @@ $fname = $_POST['fname'];
 $pword = $_POST['pword'];
 $prole = $_POST['prole'];
 
-createUser($uname, $lname, $fname, $pword, $prole);
+try {
+	createUser($uname, $lname, $fname, $pword, $prole);
+	header("Location: ../LoginView/login.php");
+}
+catch (Exception $e) {
+	header("Location: create_user.html");
+}
 
 disconnect();
 
 ?>
-
-<h2>User Created</h2>
-
-</body>	
-</html>

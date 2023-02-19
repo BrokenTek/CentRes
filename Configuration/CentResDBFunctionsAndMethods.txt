@@ -909,7 +909,12 @@ BEGIN
 	
 	SELECT ticketId, splitFlag INTO tickNum, oldSplitFlg FROM TicketItems WHERE id = ticketItemNumber;
 
-	SET fromFlg = POWER(2, fromSplit);
+	IF (fromSplit = 10) THEN
+		SET fromFlg = 1023;
+	ELSE
+		SET fromFlg = POWER(2, fromSplit);
+	END IF;
+	
 	SET toFlg = POWER(2, toSplit);
 	SET newSplitFlg = ((~fromFlg) & oldSplitFlg) | toFlg;
 

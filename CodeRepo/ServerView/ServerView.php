@@ -44,8 +44,7 @@
                 btnMove.addEventListener('pointerup', (event) => {moveButtonPressed(event)});
                 btnSplit.addEventListener('pointerup', (event) => {splitButtonPressed(event)});
                 
-                setVar('username', USERNAME, 'serverListener');
-                updateDisplay('serverListener');
+                setVar('username', USERNAME, 'serverListener', true);
                 checkTableAssignments();
 
                 setVar("enabledButtons", "");
@@ -193,8 +192,7 @@
                     stopUpdateLoopTimer();
                     ticketContainer.classList.add("clear");
                     selTicket = getVar("selectedTicketItem", "ticketContainer");
-                    setVar("selectedItem",selTicket.replace("ticketItem",""), "modEditorContainer");
-                    updateDisplay("modEditorContainer");
+                    setVar("selectedItem",selTicket.replace("ticketItem",""), "modEditorContainer", true);
                     modEditorContainer.classList.add("active");
                     ticketContainer.classList.add("hidden");
                     cboTable.disabled = true;
@@ -225,12 +223,11 @@
                         modEditorContainer.classList.remove("active"); 
                         //setVar("recordedModificationTime", Date.now() + 6000, "ticketContainer");
                         setTimeout(() => { ticketContainer.classList.remove("clear")} ,750);
-                        setVar("ignoreUpdate", "yes please", "ticketContainer");
-                        updateDisplay("ticketContainer");
+                        setVar("ignoreUpdate", "yes please", "ticketContainer", true);
                         modEditorContainer.setAttribute("src", "../Resources/php/modsWindowCARSON.php");
                         cboTable.removeAttribute("disabled");
                         cboSeat.removeAttribute("disabled");
-                        sboSplit.removeAttribute("disabled");
+                        cboSplit.removeAttribute("disabled");
                         updateButtonStates();
                         ticketContainer.classList.remove("hidden");
                         }
@@ -304,8 +301,7 @@
                         // hide the menu and disable all of the controls
 
                         if (tablesRemoved[i] == selectedTable) {
-                            removeVar("ticket", "ticketContainer");
-                            updateDisplay("ticketContainer");
+                            removeVar("ticket", "ticketContainer", true);
                             cboSeat.disabled = true;
                             cboSeat.innerHTML = "";
                             
@@ -378,8 +374,7 @@
 
                     // scroll down to bottom
                     setVar('scrollY', Number.MAX_SAFE_INTEGER , 'ticketContainer');
-                    setVar("ignoreUpdate", "Yes please" ,"ticketContainer");
-                    updateDisplay('ticketContainer');
+                    setVar("ignoreUpdate", "Yes please" ,"ticketContainer", true);
 
                     // make the ticketContaner commit the added item to the database
                     //mitigateMenuFlicker();
@@ -509,24 +504,19 @@
 
                     ticketHeader.innerHTML = "Ticket:&nbsp;n/a";
 
-                    removeVar("ticket", "ticketContainer");
+                    removeVar("ticket", "ticketContainer", true);
                     //setVar("ignoreUpdate", "ticketContainer");
-                    updateDisplay("ticketContainer"); 
                     
-                    removeVar("ticket","serverListener");
-                    updateDisplay("serverListener");
+                    removeVar("ticket","serverListener", true);
                    
                                        
                 }
                 else {
                     
                     try {
-                        setVar("ticket",cboTable.value,"serverListener");
+                        setVar("ticket",cboTable.value,"serverListener", true);
                         setVar("ticket",cboTable.value,"ticketContainer");
-                        updateDisplay("serverListener");
-                        setVar("ticket",cboTable.value,"ticketContainer");
-                        setVar("ignoreUpdate", "yes please", "ticketContainer");
-                        updateDisplay("ticketContainer");
+                        setVar("ignoreUpdate", "yes please", "ticketContainer", true);
                     }
                     catch (err) {
                         alert("Fail");
@@ -608,7 +598,7 @@
                     }
                     if (cboSeat.selectedIndex >= cboSeat.options.length - 2) {
                         //seat is no longer valid
-                        updateDisplay("ticketContainer");
+                        removeVar("seat", "ticketContainer", true);
                     }
                 }            
             }
@@ -678,28 +668,36 @@
 
             function selectedSeatChanged() {
                 try {
-                    if (cboSeat.selectedIndex == 0) {
-                        removeVar("seat", "ticketContainer");
-                    }
-                    else {
-                        setVar("seat",cboSeat.selectedIndex, "ticketContainer");
-                    }
                     var toggledControl = document.getElementsByClassName("toggled");
-                    if (toggledControl.length == 1 && toggledControl[0].id == "btnMove" && cboSeat.selectedIndex > 0) {
+                    var prevSel = getVar("seat", "ticketContainer");
+                    var selSplit = getVar("split", "ticketContainer");
+                    var command = "";
+                    if (toggledControl.length == 1 && cboSeat.selectedIndex > 0) {
                         let selItems = ticketContainer.contentWindow.document.getElementsByClassName("selected");
                         let str = "";
                         for (let i = 0; i < selItems.length; i++) {
                             str += "," + selItems[i].id;
                         }
                         str = str.replaceAll("ticketItem","").substring(1);
-
+                        command = "moveToSeat";
                         setVar("ignoreUpdate", "yes please", "ticketContainer");
-                        setVar("command", "moveToSeat", "ticketContainer");
+                        setVar("command", command, "ticketContainer");
                         setVar("ticketItem", str, "ticketContainer");
-                        setVar("toSeat", cboSeat.selectedIndex, "ticketContainer");
-                        
+                        setVar("toSeat", cboSeat.selectedIndex, "ticketContainer");   
                     }
-                    updateDisplay("ticketContainer");
+                    if (prevSel == null && selSplit == null && command != "") {
+                        cboSeat.selectedIndex = 0;
+                        updateDisplay("ticketContainer");
+                    }
+                    else {
+                        if (cboSeat.selectedIndex == 0) {
+                            removeVar("seat", "ticketContainer", true);
+                        }
+                        else {
+                            setVar("seat",cboSeat.selectedIndex, "ticketContainer", true);
+                        }
+                    }
+                    
                     setTimeout(updateButtonStates, 1000);
 
                     cboSeat.disabled = false;
@@ -713,8 +711,10 @@
 
             function selectedSplitChanged() {
                 try {
-                
                     var toggledControl = document.getElementsByClassName("toggled");
+                    var prevSel = getVar("split", "ticketContainer");
+                    var selSeat = getVar("seat", "ticketContainer");
+                    var command = "";
                     if (toggledControl.length == 1 && cboSplit.selectedIndex > 0) {
                         let selItems = ticketContainer.contentWindow.document.getElementsByClassName("selected");
                         let str = "";
@@ -722,35 +722,50 @@
                             str += "," + selItems[i].id;
                         }
                         str = str.replaceAll("ticketItem","").substring(1);
+                        
                         if (toggledControl[0].id == "btnMove") {
-                            setVar("command", "moveToSplit", "ticketContainer");
-                            setVar("fromSplit", getVar("split", "ticketContainer"), "ticketContainer");
+                            command = "moveToSplit";
+                            setVar("command", command, "ticketContainer");
+                            let fromSplit = getVar("split", "ticketContainer");
+                            if (fromSplit == null) {
+                                setVar("fromSplit", 10, "ticketContainer");
+                            }
+                            else {
+                                setVar("fromSplit", prevSel, "ticketContainer");
+                            }
+                            
                         }
                         else {
-                            setVar("command", "addToSplit", "ticketContainer");
+                            command = "addToSplit";
+                            setVar("command", command, "ticketContainer");
                         }
-                        
                         setVar("toSplit", (cboSplit.selectedIndex < 10 ? cboSplit.selectedIndex : 0), "ticketContainer");
                         setVar("ticketItem", str, "ticketContainer");
                         setVar("ignoreUpdate", "yes please", "ticketContainer");
+
+                        btnMove.classList.remove("toggled");
+                        btnSplit.classList.remove("toggled");
+                        cboSeat.disabled = false;
                     }
-                    if (cboSplit.selectedIndex == 0) {
-                        removeVar("split", "ticketContainer");
-                    }
-                    else if (cboSplit.selectedIndex < 10)  {
-                        setVar("split",cboSplit.selectedIndex, "ticketContainer");
+                    if (prevSel == null && selSeat == null && command != "") {
+                        cboSplit.selectedIndex = 0;
+                        updateDisplay("ticketContainer");
                     }
                     else {
-                        setVar("split",0, "ticketContainer");
+                        if (cboSplit.selectedIndex == 0) {
+                            removeVar("split", "ticketContainer", true);
+                        }
+                        else if (cboSplit.selectedIndex < 10)  {
+                            setVar("split",cboSplit.selectedIndex, "ticketContainer", true);
+                        }
+                        else {
+                            setVar("split",0, "ticketContainer", true);
+                        }
                     }
-
-                    updateDisplay("ticketContainer");
+                    
                     setTimeout(updateButtonStates, 250);
 
-                    btnMove.classList.remove("toggled");
-                    btnSplit.classList.remove("toggled");
-                    cboSeat.disabled = false;
-                    cboSplit.disabled = false;
+                   
                 }
                 catch (err) {
                     setTimeout(selectedSplitChanged, 250);
@@ -762,16 +777,13 @@
             function submitButtonPressed(e) {
                 if (e.target.getAttribute("disabled") == '') { return; }
                 setVar("ignoreUpdate", "yes please", "ticketContainer");
-                setVar("command", "submitPending" ,"ticketContainer");
-                updateDisplay("ticketContainer");
+                setVar("command", "submitPending" ,"ticketContainer", true);
             }
 
             function cancelButtonPressed(e) {
                 if (e.target.getAttribute("disabled") == '') { return; }
                 setVar("ignoreUpdate", "yes please", "ticketContainer");
-                setVar("command", "cancelPending" ,"ticketContainer");
-                updateDisplay("ticketContainer");
-
+                setVar("command", "cancelPending" ,"ticketContainer", true);
             }
 
             function editButtonPressed(e) {
@@ -793,13 +805,12 @@
                 str = str.replaceAll("ticketItem","").substring(1);
                 //setVar("ignoreUpdate", "yes please", "ticketContainer");
 
-                // if a split is selected, just remove it from the split. Otherwise delete the entire item from any/all splits.
+                setVar("ignoreUpdate", "yes please", "ticketContainer");
                 setVar("command", "remove", "ticketContainer");
-                setVar("ticketItem", str, "ticketContainer");
+                setVar("ticketItem", str, "ticketContainer", true);
 
                 cboSeat.disabled = false;
                 cboSplit.disabled = false;
-                updateDisplay("ticketContainer");
 
             }
 
@@ -807,13 +818,6 @@
                 if (e.target.getAttribute("disabled") == '') { return; }
                 btnSplit.classList.remove("toggled");
                 btnMove.classList.toggle("toggled");
-
-                if (btnMove.classList.contains("toggled") && cboSplit.selectedIndex == 0) {
-                    cboSplit.disabled = true;
-                }
-                else {
-                    cboSplit.disabled = false;
-                }
 
                 cboSeat.disabled = false;        
             }
@@ -823,7 +827,7 @@
                 btnMove.classList.remove("toggled");
                 btnSplit.classList.toggle("toggled");
 
-                cboSplit.disabled = false;
+               
                 cboSeat.disabled = (document.getElementsByClassName("toggled").length == 1);
             }
 

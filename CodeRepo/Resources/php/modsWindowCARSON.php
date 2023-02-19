@@ -36,7 +36,8 @@
                         
                         //===================================================================================================
                         echo("<script>signalStatus('pending');</script>");
-                        echo("<h2>Modifications for: ". $_POST['selectedItem'] ."</h2>");
+                        
+                        echo("<h2>Modifications for Ticket Item: ". $_POST['selectedItem'] ."</h2>");
 
                         $ticketItemModQCs = array();
                         $selectedItemMods = array();
@@ -68,7 +69,7 @@
                             }
                         }
 
-                        if (substr($selectedItemMods[1], -3) == 'One') {
+                       /*  if (substr($selectedItemMods[1], -3) == 'One') {
                             echo "<hr><select id='modOneChoice'>";
                         
                             for ($i=0; $i<sizeof($selectedItemMods); $i++) {
@@ -84,7 +85,7 @@
                                 echo "<br><input type='radio' id='menuAnyChoice' value='" . $selectedItemMods[$i] ."'>";
                             }
 
-                        }
+                        } */
 
 
 

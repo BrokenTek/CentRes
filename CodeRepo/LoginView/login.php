@@ -13,7 +13,7 @@
 		$sql = "SELECT roleLevel FROM Employees WHERE userName = '" .$_POST['uname']. "';";
 		$result = connection()->query($sql);
 		if (mysqli_num_rows ($result) == 1) {
-			$allowedRoles = connection()->query($sql)->fetch_assoc()['roleLevel'];
+			$allowedRoles = $result->fetch_assoc()['roleLevel'];
 		}	
 	}
 	
@@ -64,6 +64,11 @@
 	<meta charset="utf-8">
 	<!-- <link rel="stylesheet" href="style.css"> -->
 	<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
+	<script>
+		function redirectToCreateAccount() {
+			window.location.href = "../CreateUserView/create_user.html";
+		}
+	</script>
 </head>
 <body id="loginBody">
 
@@ -71,7 +76,7 @@
 	<div id="loginHeader">
 					<img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
 					<div id="loginTitle">CentRes Employee Portal</div>
-					<button type="button" id="btnLogout" onclick="logout()">Create Account</button>
+					<button type="button" id="btnCreateAccount" onclick="redirectToCreateAccount()">I'm New</button>
 				</div>
 	<div>
 		<form action="login.php" method="POST" id="loginForm">
@@ -109,7 +114,7 @@
 					echo "<option>Select Your Role</option>";
 					while($row = $definedRoles->fetch_assoc()) {
 						if( $row['id'] & $allowedRoles = $row['id']) {
-							echo ('<option value=' .$row['id']. '>' .$row['title']. ' - ' .$row['id']. '</option>');
+							echo ('<option value=' .$row['id']. '>' .$row['title']. '</option>');
 						}
 					}
 					echo "</select>";

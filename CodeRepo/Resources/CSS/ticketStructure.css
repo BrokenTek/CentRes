@@ -2,26 +2,37 @@
 	REQUIRED CSS TO PROPERLY LAYOUT A TICKET ITEM
 	============================================= */
 		
-         .ticketItem {
-			display: grid;
-			grid-template-columns: 3rem  4rem 1fr 5rem;
-         }
+      .ticketItem {
+		   display: grid;
+		   grid-template-columns: 8fr  2fr 2fr 2fr; 
+      }
+
+      .ticketItemText, .ticketItemOverrideNote, .modText, .modCustom  {
+         grid-column: 1;   
+      }
+
+      .ticketItemStatus {
+			grid-column: 2;
+      }
 		 
-		 .ticketItem * {
-			 min-height: 1.25em;
-		 }
-         .removeTicketItemBtn, ticketItemStatus {
-			grid-column: 1;
-         }
-		 
-		 
-         .ticketItemNumber {
-         grid-column: 2;
-         }
-         .ticketItemText, .ticketItemOverrideNote, .modText, .modCustom  {
+		.ticketItemNumber {
          grid-column: 3;
-         
-         }
-         .ticketItemPrice, .ticketItemOverridePrice, .modPrice {
+      }
+      
+      .ticketItemPrice, .ticketItemOverridePrice, .modPrice {
          grid-column: 4;
-         }
+      }
+
+      .ticketItemText, .ticketItemStatus, .ticketItemNumber, .ticketItemPrice {
+         grid-row: 1;
+      }
+
+      
+		 
+		 
+      
+
+            
+     
+
+      
