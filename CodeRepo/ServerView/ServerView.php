@@ -97,12 +97,22 @@
                         }
                     catch (err) { }
                     var tick;
+                    var seat;
+                    var split;
                     try {
                         tick = getVar("ticket", "ticketContainer");
+                        seat = getVar("seat", "ticketContainer");
+                        split = getVar("split", "ticketContainer");
                         populateSeats((cboTable.selectedIndex > 0 || tick != null) && cboSeat.options.length == 1);
                         populateSplits((cboTable.selectedIndex > 0 || tick != null) && cboSplit.options.length == 1);
                         if (cboTable.selectedIndex > 0 && cboSeat.selectedIndex > 0 && cboSplit.selectedIndex > 0) {
                             checkMenuItemSelected();
+                        }
+                        if (seat != null && cboSeat.selectedIndex != seat) {
+                            cboSeat.selectedIndex = seat;
+                        }
+                        if (split != null && cboSplit.selectedIndex != split) {
+                            cboSplit.selectedIndex = split;
                         }
                     }
                     catch (err) {
@@ -115,6 +125,14 @@
                     } 
                     catch (err) { }
                     hideModWindow();
+                }
+                if (cboTable.selectedIndex == 0) {
+                    cboSeat.options[0].text = "Seat";
+                    cboSplit.options[0].text = "Split";
+                }
+                else {
+                    cboSeat.options[0].text = "All Seats";
+                    cboSplit.options[0].text = "All Splits";
                 }
 
                 //update check
@@ -483,6 +501,9 @@
                     btnSplit.disabled = true;
                     btnMove.disabled = true;
 
+                    populateSeats(true);
+                    populateSplits(true);
+
                     btnMove.classList.remove("toggled");
                     btnSplit.classList.remove("toggled");
 
@@ -498,50 +519,35 @@
                                        
                 }
                 else {
-                    setVar("ticket",cboTable.value,"serverListener");
-                    setVar("ticket",cboTable.value,"ticketContainer");
+                    
                     try {
+                        setVar("ticket",cboTable.value,"serverListener");
+                        setVar("ticket",cboTable.value,"ticketContainer");
                         updateDisplay("serverListener");
                         setVar("ticket",cboTable.value,"ticketContainer");
+                        setVar("ignoreUpdate", "yes please", "ticketContainer");
                         updateDisplay("ticketContainer");
                     }
                     catch (err) {
                         alert("Fail");
                     }
-                    ticketContainer.classList.add("clear");
-                    setTimeout(() => {
-                        ticketContainer.classList.remove("clear")} ,1500
-                    );
-                                      
-                    //setVar("ignoreUpdate", "ticketContainer");
-
+                    
+                    updateButtonStates();
                     ticketHeader.innerHTML = "-&nbsp;-&nbsp;-";
                     
+                    var seat = getVar("seat", "ticketContainer");
+                    var split = getVar("split", "ticketContainer");
+
                     cboSeat.disabled = false;
-                    cboSeat.options[0].text = "All Seats";
-
                     cboSplit.disabled = false;
-                    cboSplit.options[0].text = "All Splits";
-
-                    if (cboSplit.options.length == 3 && cboSeat.options.length == 3) {
-                        setVar("seat",1,"ticketContainer");
-                        setVar("split",1,"ticketContainer");
-    
-                        cboSeat.selectedIndex = 1;
-                        cboSplit.selectedIndex = 1;
-
-                    }
-                    else {
-                        
-                        cboSeat.selectedIndex = 0;
-                        cboSplit.selectedIndex = 0;
-                    }
-                    updateButtonStates();
+                    
+                    cboSeat.selectedIndex = (seat == null ? 0 : seat);
+                    cboSplit.selectedIndex = (split == null ? 0 : split);
+                   
                     ticketHeader.innerHTML = "Ticket:&nbsp;" + cboTable.value;
-
+                    
                 }
-                populateSeats(true);
-                populateSplits(true);
+                
                 
                 
                 
@@ -788,12 +794,7 @@
                 //setVar("ignoreUpdate", "yes please", "ticketContainer");
 
                 // if a split is selected, just remove it from the split. Otherwise delete the entire item from any/all splits.
-                if (cboSplit.selectedIndex > 0) {
-                    setVar("command", "removeFromSplit", "ticketContainer");
-                }
-                else {
-                    setVar("command", "remove", "ticketContainer");
-                }
+                setVar("command", "remove", "ticketContainer");
                 setVar("ticketItem", str, "ticketContainer");
 
                 cboSeat.disabled = false;
@@ -864,7 +865,7 @@
                     <div id="headerButtonGroup">
                         <button type="button" id="btnSubmit">SUBMIT</button>
                         <button type="button" id="btnCancel">CANCEL</button>
-                        <button type="button" id="btnPrintReceipt">PRINT RECIEPT</button>
+                        <button type="button" id="btnPrintReceipt" style="display: none;">PRINT RECIEPT</button>
                     </div>
                 </div>
             
