@@ -107,7 +107,8 @@ CREATE TABLE MenuAssociations (
 
 CREATE TABLE TableShapes (
 	shapeName VARCHAR(50) PRIMARY KEY,
-	svgPathData VARCHAR(5000)
+	svgPathData VARCHAR(5000),
+	capacity TINYINT UNSIGNED NOT NULL DEFAULT 0
 );
 
 CREATE TABLE TableStatuses (
@@ -164,6 +165,7 @@ CREATE TABLE Tickets (
 	partySize INTEGER UNSIGNED NOT NULL,
 	tableId VARCHAR(3),
 	timeRequested DATETIME NOT NULL DEFAULT NOW(),
+	timeReserved DATETIME NOT NULL DEFAULT NOW(),
 	timeSeated DATETIME,
 	timeClosed DATETIME,
 	timeModified DATETIME NOT NULL DEFAULT NOW()

@@ -554,7 +554,7 @@ DELIMITER ;
 
 -- function needs to be recoded to include appropriate price calculation
 DELIMITER $$
-CREATE FUNCTION ticketItemPrice(ticketItemId INT UNSIGNED) RETURNS DECIMAL(6, 2)
+CREATE FUNCTION ticketItemPrice(ticketItemId INT UNSIGNED, split TINYINT UNSIGNED) RETURNS DECIMAL(6, 2)
 BEGIN
 	DECLARE miQuickCode VARCHAR(10);
 	DECLARE prc DECIMAL(6, 2);
@@ -714,9 +714,9 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE createTicket(IN ticketNickname VARCHAR(25), IN peopleCount INT UNSIGNED, OUT newTicketNumber INT UNSIGNED)
+CREATE PROCEDURE createTicket(IN ticketNickname VARCHAR(25), IN peopleCount INT UNSIGNED, IN timeReq DATETIME, OUT newTicketNumber INT UNSIGNED)
 BEGIN
-	INSERT INTO Tickets (nickname, partySize) VALUES (ticketNickname, peopleCount);
+	INSERT INTO Tickets (nickname, partySize, timeReqested) VALUES (ticketNickname, peopleCount, timeReq);
 	SELECT MAX(id) INTO newTicketNumber FROM Tickets; 
 END$$
 DELIMITER ;
