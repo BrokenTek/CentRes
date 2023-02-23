@@ -1,0 +1,27 @@
+            .highlighted{
+                border-color:orangered;
+            }
+            .selected{
+                border-width: thick;
+                border-style: solid;
+            }
+            .multiSelect{
+                border-width: thick;
+                border-style: double;
+            }
+            .unassigned{
+                background-color: beige;
+            }
+            .open{
+                /* can't think of a better ready-to-go color than a shade of green, notify Donovan if it clashes too much*/
+                background-color:yellowgreen;
+            }
+            .seated{
+                background-color: #F6941D;
+            }
+            .bussing{
+                background-color: #FFE699;
+            }
+            .disabled{
+                background-color: gray;
+            }
