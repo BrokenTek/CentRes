@@ -115,7 +115,7 @@ CREATE TABLE TableStatuses (
 );
 
 INSERT INTO TableStatuses VALUES
-	('Unavailable'),
+	('Disabled'),
 	('Unassigned'),
 	('Open'),
 	('Seated'),
