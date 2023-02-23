@@ -1,27 +1,25 @@
             .highlighted{
-                border-color:orangered;
+                stroke:orangered;
             }
             .selected{
-                border-width: thick;
-                border-style: solid;
+                stroke-width: 8px;
             }
             .multiSelect{
-                border-width: thick;
-                border-style: double;
+                stroke-width: 12px;
             }
             .unassigned{
-                background-color: beige;
+                fill: beige;
             }
             .open{
                 /* can't think of a better ready-to-go color than a shade of green, notify Donovan if it clashes too much*/
-                background-color:yellowgreen;
+                fill:yellowgreen;
             }
             .seated{
-                background-color: #F6941D;
+                fill: #F6941D;
             }
             .bussing{
-                background-color: #FFE699;
+                fill: #FFE699;
             }
             .disabled{
-                background-color: gray;
+                fill: gray;
             }
