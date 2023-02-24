@@ -2,6 +2,7 @@
 This template includes starter code that allows
 you to use display.php and displayInterface.js -->
 <!DOCTYPE html>
+<?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <html>
     <head>
         <!-- gives you access to setVar, getVar, removeVar, 
@@ -13,7 +14,7 @@ you to use display.php and displayInterface.js -->
         <form action="displayTemplate.php" method="POST">
             <!-- retain any POST vars. When updateDisplay() is called, these variables
             will be carried over -->
-            <?php include '../Resources/PHP/display.php'; ?>
+            <?php require_once '../Resources/php/display.php'; ?>
             <!-- PLACE YOUR CODE HERE -->
         </form>
         

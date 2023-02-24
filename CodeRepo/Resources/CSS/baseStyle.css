@@ -157,8 +157,9 @@ body > body{
     padding: .25rem .25rem .25rem .25rem;
   }
 
-  .sessionBubble {
+  table > tr.selected {
     background-color: red;
+    color: white;
   }
 
   #modEditorContainer.active {

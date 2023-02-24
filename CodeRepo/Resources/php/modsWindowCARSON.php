@@ -12,7 +12,7 @@
     <body>
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
             <?php
-                include 'connect_disconnect.php';
+                require_once 'connect_disconnect.php';
 
                 if(isset($_POST['selectedItem'])) {
                     $selectedItem = $_POST['selectedItem'];
@@ -99,7 +99,7 @@
                     }
                                  
                 }
-                include 'display.php';
+                require_once 'display.php';
             ?>
         </form>
     </body>

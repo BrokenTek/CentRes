@@ -49,6 +49,7 @@ DROP TRIGGER IF EXISTS afterDeleteMenuModificationCategory;
 DROP TRIGGER IF EXISTS afterDeleteMenuModificationItem;
 
 DROP PROCEDURE IF EXISTS createTicket;
+DROP PROCEDURE IF EXISTS createReservation;
 DROP PROCEDURE IF EXISTS removeTicket;
 DROP PROCEDURE IF EXISTS addSplit;
 DROP PROCEDURE IF EXISTS removeSplit;
@@ -714,9 +715,17 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE createTicket(IN ticketNickname VARCHAR(25), IN peopleCount INT UNSIGNED, IN timeReq DATETIME, OUT newTicketNumber INT UNSIGNED)
+CREATE PROCEDURE createTicket(IN ticketNickname VARCHAR(25), IN peopleCount INT UNSIGNED, OUT newTicketNumber INT UNSIGNED)
 BEGIN
-	INSERT INTO Tickets (nickname, partySize, timeReqested) VALUES (ticketNickname, peopleCount, timeReq);
+	INSERT INTO Tickets (nickname, partySize) VALUES (ticketNickname, peopleCount);
+	SELECT MAX(id) INTO newTicketNumber FROM Tickets; 
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE createReservation(IN ticketNickname VARCHAR(25), IN peopleCount INT UNSIGNED, IN requestedTime DATETIME, OUT newTicketNumber INT UNSIGNED)
+BEGIN
+	INSERT INTO Tickets (nickname, partySize, timeRequested) VALUES (ticketNickname, peopleCount, requestedTime);
 	SELECT MAX(id) INTO newTicketNumber FROM Tickets; 
 END$$
 DELIMITER ;

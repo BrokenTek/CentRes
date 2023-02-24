@@ -3,7 +3,7 @@
 
 <?php
 
-include '..\..\Resources\php\connect_disconnect.php';
+require_once '..\..\Resources\php\connect_disconnect.php';
 
 $entryType = $_POST['entry-type-form'];
 $numEntries = $_POST['numEntries'];

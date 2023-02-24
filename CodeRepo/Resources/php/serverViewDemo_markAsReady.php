@@ -1,5 +1,5 @@
 <?php
-    include 'connect_disconnect.php';
+    require_once 'connect_disconnect.php';
 
     $sql = "SELECT id from TicketItems WHERE ticketItemStatus(id) = 'Preparing';";
     

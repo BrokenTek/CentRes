@@ -8,7 +8,7 @@
 <!-- Add root so that this script works IF ROOT DOES NOT EXIST. Very necessary -->
 <?php
     // INCLUDE connect() FOR USE IN FILE(s)
-    include '..\..\Resources\php\connect_disconnect.php';
+    require_once '..\..\Resources\php\connect_disconnect.php';
 
     // LOOK FOR EXISTINCE OF 'root' IN THE 'quickcodes' TABLE.
     $exists = false;
@@ -35,7 +35,7 @@
 
 <!-- Populate Hidden Field With String Of Existing Categories -->
     <?php
-        // include '../Resources/php/connect_disconnect.php';
+        // require_once '../Resources/php/connect_disconnect.php';
 
         // Get All Menu Categories
         $sql = "SELECT * FROM menucategories WHERE quickcode != 'root';";

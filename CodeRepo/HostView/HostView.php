@@ -1,5 +1,5 @@
 <?php
-	include '../Resources/php/sessionLogic.php';
+	require_once '../Resources/php/sessionLogic.php';
 ?>
 <!DOCTYPE html>
 <html>

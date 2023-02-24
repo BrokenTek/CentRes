@@ -34,7 +34,7 @@
 	<body>
 		<form>
 <?php 
-include '../Resources/php/connect_disconnect.php';
+require_once '../Resources/php/connect_disconnect.php';
 connection();
 
 $sql = "SELECT childQuickCode, title

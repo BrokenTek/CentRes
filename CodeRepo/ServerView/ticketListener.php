@@ -20,7 +20,7 @@
     <body>
         <form id="ticketSelectorForm"  action="ticketListener.php" method="POST">
             <?php
-                include '../Resources/php/connect_disconnect.php';
+                require_once '../Resources/php/connect_disconnect.php';
 
                 // if the ticket number has been injected, get the timestamp.
                 if (isset($_POST['ticketNumber'])) {
@@ -41,7 +41,7 @@
                     else {
                         $_POST['paidStatuses'] = "No Splits";
                     }
-                    include '../Resources/php/display.php';
+                    require_once '../Resources/php/display.php';
                 } 
                 else {
                     unset($_POST['modificationTime']);

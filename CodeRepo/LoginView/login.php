@@ -1,5 +1,5 @@
 <?php
-	include '../Resources/php/connect_disconnect.php';
+	require_once '../Resources/php/connect_disconnect.php';
 	connection();
 	$sql = NULL;
 	$allowedRoles = NULL;
@@ -35,7 +35,7 @@
 			// username, password, and role have been validated
 		
 			// generate session token
-			$sessionToken = password_hash($_POST['uname'] . $_POST['pword'], PASSWORD_BCRYPT);
+			$sessionToken = password_hash($_POST['uname'] . $_POST['pword']. time(), PASSWORD_BCRYPT);
 					
 			// login to database and set session token, otherwise sessionToken is already in use or incorrect role selected.
 			$sql = "CALL login('" .$_POST['uname']. "', " .$_POST['role']. ", '" .$sessionToken. "');";
@@ -50,7 +50,7 @@
 			
 			
 			
-			setcookie($cookie_name, $sessionToken, time() + ($timeoutLength * 60), "/"); // 86400 is 1 day
+			setcookie($cookie_name, $sessionToken, time() + ($timeoutLength * 60), "/"); // value is in seconds... 86,400 per day, 60 per minute, 3600 per hour
 		}
 	}
 	catch (Exception $e) {

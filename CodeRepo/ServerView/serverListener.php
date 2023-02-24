@@ -11,7 +11,7 @@
     <body>
         <form id="tableSelectorForm" method="POST">
             <?php
-                include '../Resources/php/connect_disconnect.php';
+                require_once '../Resources/php/connect_disconnect.php';
                 if (isset($_POST['username'])) {
                     $_POST['tableList'] = "";
                     echo("Assigned Ticket/Table event listener");

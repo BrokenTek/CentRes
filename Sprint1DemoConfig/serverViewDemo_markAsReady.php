@@ -1,5 +1,5 @@
 <?php
-    include '../CodeRepo/Resources/php/connect_disconnect.php';
+    require_once '../CodeRepo/Resources/php/connect_disconnect.php';
 
     $sql = "SELECT id from TicketItems WHERE ticketItemStatus(id) = 'Preparing';";
     
