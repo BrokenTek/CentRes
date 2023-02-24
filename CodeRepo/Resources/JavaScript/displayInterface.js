@@ -2,7 +2,7 @@ function setVar(variableName, value, id = null, update = false) {
     var container = document.getElementById(id);
     var form;
     var variableElement;
-    if (id == null) {
+    if (id == undefined) {
         form = document.getElementsByTagName('form')[0];
         variableElement = document.getElementById(variableName);
     }
