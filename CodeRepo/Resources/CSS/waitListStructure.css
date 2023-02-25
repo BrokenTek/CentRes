@@ -1,0 +1,24 @@
+body > * {
+    background-color: black;
+    color: white;
+}
+#frmWaitList {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: 1fr min-content;
+}
+
+legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+legend > * {
+    margin-block: auto;
+}
+
+table {
+    overflow: clip;
+}
+
+

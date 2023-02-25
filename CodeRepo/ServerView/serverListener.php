@@ -69,7 +69,7 @@
                 else {
                     unset($_POST['maxSeat'], $_POST['maxSplit']);
                 }
-                require "../Resources/php/display.php";
+                require_once "../Resources/php/display.php";
                 disconnect();
             ?>
         </form>

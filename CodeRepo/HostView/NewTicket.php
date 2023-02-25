@@ -2,7 +2,12 @@
 <html>
 <head>
     <title>Create a Ticket</title>
+    <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
     <style>
+        body > * {
+            background-color: black;
+            color: white;
+        }
         fieldset {
             display: grid;
             grid-template-columns: min-content min-content;
@@ -58,7 +63,7 @@
                 with(lbl) {
                     setAttribute("id", "lblTimeRequested");
                     setAttribute("for","timeRequested");
-                    innerText="Date/Time:";
+                    innerText="When:";
                 }
 
                 with (document.getElementsByTagName("fieldset")[0]) {
@@ -110,12 +115,12 @@
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
         <fieldset>
             <legend>Create a Ticket</legend>
-            <label id="lblPartyNickname" for="nickname">Party&nbsp;Nickname:</label>
+            <label id="lblPartyNickname" for="nickname">Name:</label>
             <input id="txtNickname" type="text" name="nickname" required>
             
-            <label id="lblPartySize" for="partySize">Party&nbsp;Size:</label>
+            <label id="lblPartySize" for="partySize">Size:</label>
             <input id="numPartySize" type="number" name="partySize" required>
-            <label id="lblReservation" for="chkReservation">Reservation:</label>
+            <label id="lblReservation" for="chkReservation">Reserve:</label>
             <input id="chkReservation" type="checkbox" onclick="setTimeRequestedToNow()">
             <div id="divButtons">
                 <button id="btnBack" type="button" onclick="location.href='WaitList.php'">Back</button>

@@ -552,7 +552,7 @@ DELIMITER ;
 
 
 
--- function needs to be recoded to include appropriate price calculation
+-- function needs to be recoded to require_once appropriate price calculation
 DELIMITER $$
 CREATE FUNCTION ticketItemPrice(ticketItemId INT UNSIGNED) RETURNS DECIMAL(6, 2)
 BEGIN
@@ -835,7 +835,7 @@ BEGIN
 		SET MESSAGE_TEXT = 'Ticket Item Number Doesn''t Exist!';
 	ELSEIF (authorizationUsername IS NULL) THEN
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'Price Overrides Require Employee# to Log Event!';
+		SET MESSAGE_TEXT = 'Price Overrides require_once Employee# to Log Event!';
 	ELSEIF (stat NOT IN ('Delivered', 'Hidden')) THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Price Overrides Can Only Be Applied to Delivered Ticket Items!';

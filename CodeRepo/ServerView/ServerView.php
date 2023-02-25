@@ -1,4 +1,4 @@
-<?php require "../Resources/php/sessionLogic.php"; ?>
+<?php require_once "../Resources/php/sessionLogic.php"; ?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -859,7 +859,7 @@
     <body>
         <form id="serverViewSession" class="sessionContainer" action="ServerView.php" method="POST">
             <!-- session.php must be included after the opening for tag. It adds  -->
-            <?php require "../Resources/php/sessionHeader.php"; ?>
+            <?php require_once "../Resources/php/sessionHeader.php"; ?>
             <div id="serverViewContainer" class="sessionBody">
                 <div id="serverViewHeader">
                     <select name="table" id="cboTable" onchange="tableSelectionChanged()">

@@ -41,7 +41,7 @@ you to use display.php and displayInterface.js -->
         </script>
     </head>
     <body onload="allElementsLoaded()">
-        <!-- change the action to you filename -->
+        <!-- this form submits to itself -->
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
             

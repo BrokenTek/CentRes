@@ -94,7 +94,7 @@ if ($result->num_rows > 0) {
 		echo "</span>";
 
 	}
-	include "../Resources/php/display.php";
+	require_once "../Resources/php/display.php";
 ?>
 </form>
 </body>

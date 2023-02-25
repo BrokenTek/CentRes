@@ -10,7 +10,7 @@
 				grid-template-areas: "ifrServerList ifrRestaurantLayout ifrSelectedTable"
 									 "ifrWaitList   ifrRestaurantLayout ifrTicket"
 									 "ifrWaitTimes  ifrRestaurantLayout ifrTicket";
-				grid-template-columns: 1fr 3fr 1fr;
+				grid-template-columns: max-content 1fr max-content;
 				grid-template-rows: 2fr 2fr 1fr;
 			}
 
@@ -44,7 +44,7 @@
 	</head>
 	<body>
 		<form  id="hostViewSession" class="sessionContainer">
-			<?php require "../Resources/php/sessionHeader.php"; ?>
+			<?php require_once "../Resources/php/sessionHeader.php"; ?>
 			<div class="sessionBody">
 				<iframe id="ifrServerList" src="ServerList.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="ifrWaitList" src="WaitList.php" frameborder='0' width="100%" height="100%"></iframe>

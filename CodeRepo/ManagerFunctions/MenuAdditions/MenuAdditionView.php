@@ -7,7 +7,7 @@
 <body>
 <!-- Add root so that this script works IF ROOT DOES NOT EXIST. Very necessary -->
 <?php
-    // INCLUDE connect() FOR USE IN FILE(s)
+    // require_once connect() FOR USE IN FILE(s)
     require_once '..\..\Resources\php\connect_disconnect.php';
 
     // LOOK FOR EXISTINCE OF 'root' IN THE 'quickcodes' TABLE.

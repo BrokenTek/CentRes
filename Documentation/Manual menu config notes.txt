@@ -1,7 +1,7 @@
 1.	QuickCodes can't contain commas
 
 2.	MenuItemCategories can have at most 1 parent
-	If you want to include a MenuItemCategory in the menu and in more than 1 location
+	If you want to require_once a MenuItemCategory in the menu and in more than 1 location
 	use a MenuModificationCategory instead.
 	
 3. Menu items can be shared among different Menu Item CATEGORIES

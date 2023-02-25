@@ -157,8 +157,22 @@ body > body{
     padding: .25rem .25rem .25rem .25rem;
   }
 
-  table > tr.selected {
-    background-color: red;
+
+  legend {
+    color: white;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+table {
+    border: 2px solid white;
+    border-collapse: collapse;
+}
+ td {
+    border-left: .0625rem solid white;
+    border-right: .0625rem solid white;
+ }
+  tr.selected {
+    background-color: #bf1e2e;
     color: white;
   }
 

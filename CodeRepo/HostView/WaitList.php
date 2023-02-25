@@ -1,11 +1,16 @@
-<!-- DISPLAY TEMPLATE
-This template includes starter code that allows
-you to use display.php and displayInterface.js -->
 <!DOCTYPE html>
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
+<?php
+    if (isset($_POST['removeTicket'])) {
+        unset($_POST['selectedTicket']);
+        $sql = "DELETE FROM Tickets WHERE id = " .substr($_POST['removeTicket'], 6). ";";
+        connection()->query($sql);
+    }
+?>
 <html>
     <head>
-        <link rel="stylesheet" href="../CSS/baseStyle.css">
+        <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
+        <link rel="stylesheet" href="../Resources/CSS/waitListStructure.css">
         <!-- gives you access to setVar, getVar, removeVar, 
         clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>  
@@ -13,14 +18,24 @@ you to use display.php and displayInterface.js -->
             function createEventHandlers() {
                 let rows = document.getElementsByClassName("ticket");
                 for (var i = 0; i < rows.length; i++) {
-                    rows[i].addEventListener("pointerdown" , Hello);
+                    rows[i].addEventListener("pointerdown" , pressTicket);
                 }
+
             }
 
-            function Hello() {
+            function removeSelectedTicket() {
+                setVar('removeTicket', getVar('selectedTicket'));
+                updateDisplay();
+            }
+
+            function pressTicket() {
                 if (getVar("selectedTicket") == this.id) {
                     this.classList.remove("selected");
                     removeVar("selectedTicket");
+                    with (document.querySelector("#btnRemoveSelectedTicket")) {
+                        setAttribute('disabled', '');
+                        classList.add('disabled');
+                    }
                 }
                 else {
                    
@@ -30,14 +45,23 @@ you to use display.php and displayInterface.js -->
                     }
                     setVar("selectedTicket", this.id);
                     this.classList.add("selected");
+
+                    with (document.querySelector("#btnRemoveSelectedTicket")) {
+                        removeAttribute('disabled');
+                        classList.remove('disabled');
+                    }
                 }
             }
         </script>
     </head>
     <body onload="createEventHandlers()">
-        <legend>Wait List</legend>
+        <legend>
+            <div>Wait List</div>
+            <button type="button" onclick="location.href='NewTicket.php'" id="btnAddTicket">Add</button>
+            <button class="disabled" type="button" onclick="removeSelectedTicket()" disabled id="btnRemoveSelectedTicket" onclick="removeSelectedTicket()">Remove</button>
+        </legend>
         <!-- change the action to you filename -->
-        <form action="WaitList.php" method="POST">
+        <form action="WaitList.php" method="POST" id="frmWaitList">
             <!-- retain any POST vars. When updateDisplay() is called, these variables
             will be carried over -->
             <?php require_once '../Resources/PHP/display.php'; ?>
@@ -50,10 +74,9 @@ you to use display.php and displayInterface.js -->
                 }
 
                 $sql = "SELECT id as ticketNumber, timeRequested, timeReserved, nickname, partySize FROM Tickets WHERE timeSeated IS NULL
-                        ORDER BY timeRequested, timeReserved";
+                        AND timeRequested <= ADDTIME(NOW(), '24:0:0') ORDER BY timeRequested, timeReserved;";
                 $parties = connection()->query($sql);
-                echo("<table><tr><th>Time</th><th>Name</th><th>#</th></tr>");
-                echo("<tr id='addNewTicket'><td colspan=3>Add a New Ticket</td></tr>");
+                echo("<table id='tblWaitList'><tr><th>Time</th><th>Name</th><th>#</th></tr>");
                 while ($party = $parties->fetch_assoc()) {
                     $selStr = (isset($_POST['selectedTicket']) && $_POST['selectedTicket'] == "ticket" && $party['ticketNumber'] ? " ".$_POST['selectedTicket'] : "");
                     if ($party['timeRequested'] > $party['timeReserved']) {
@@ -68,8 +91,6 @@ you to use display.php and displayInterface.js -->
                 }
                 echo("</table>");
             ?>
-            <button type="button" onclick="location.href='NewTicket.php'">Add</button>
-            <button class="disabled" type="button" onclick="removeSelectedTicket()" disabled>Remove</button>
         </form>
     </body>
 </html>
