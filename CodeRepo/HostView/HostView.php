@@ -43,7 +43,7 @@
 		</script>
 	</head>
 	<body>
-		<form  id="hostViewSession" class="sessionContainer">
+		<form id="hostViewSession" class="sessionContainer" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
 			<?php require_once "../Resources/php/sessionHeader.php"; ?>
 			<div class="sessionBody">
 				<iframe id="ifrServerList" src="ServerList.php" frameborder='0' width="100%" height="100%"></iframe>

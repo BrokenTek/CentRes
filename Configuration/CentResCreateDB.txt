@@ -16,6 +16,21 @@ INSERT INTO EmployeeRoles VALUES
 	(4,'Host'),
 	(2, 'Server'),
 	(1, 'Back-of-House Anon');
+
+CREATE TABLE LoginRouteTable (
+		id TINYINT UNSIGNED PRIMARY KEY,
+		title VARCHAR(25),
+		route VARCHAR(200)
+);
+
+INSERT INTO LoginRouteTable VALUES
+	(1, 'Back-of-House Anon', NULL),
+	(2, 'Server', '../ServerView/ServerView.php'),
+	(6, 'Host', '../HostView/HostView.php'),
+	(9, 'Back of House Manager', NULL),
+	(14, 'Front of House Manager', '../HostView/HostView.php'),
+	(15, 'General Manager', '../HostView/HostView.php');
+
 	
 CREATE TABLE Employees(
 	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

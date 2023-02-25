@@ -3,7 +3,7 @@
 
 <?php
 require_once '../Resources/php/connect_disconnect.php';
-// connection();
+// 
 
 function createUser(string $userName, string $lastName, string $firstName, string $password, int $allowedRoles) {
 	$hash = password_hash($password, PASSWORD_BCRYPT);

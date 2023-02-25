@@ -167,7 +167,10 @@ table {
     border: 2px solid white;
     border-collapse: collapse;
 }
- td {
+th {
+  border-bottom: .0625rem solid white;
+}
+ td, th {
     border-left: .0625rem solid white;
     border-right: .0625rem solid white;
  }

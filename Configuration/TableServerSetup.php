@@ -1,6 +1,6 @@
 <?php
 require_once '../CodeRepo/Resources/php/connect_disconnect.php';
-connection();
+
 echo("<h1>Reset Data</h1><ol>");
 // Reset Everything
 $sql="DELETE FROM TableAssignments; ";

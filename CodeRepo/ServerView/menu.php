@@ -35,7 +35,7 @@
 		<form>
 <?php 
 require_once '../Resources/php/connect_disconnect.php';
-connection();
+
 
 $sql = "SELECT childQuickCode, title
 		FROM MenuAssociations 

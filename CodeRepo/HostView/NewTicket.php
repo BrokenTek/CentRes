@@ -12,6 +12,7 @@
             display: grid;
             grid-template-columns: min-content min-content;
             grid-auto-rows: min-content;
+            border: none;
         }
 
         fieldset > * {
@@ -84,7 +85,7 @@
     <?php
     require_once '../Resources/php/connect_disconnect.php';
     date_default_timezone_set('America/New_York');
-
+    $errorMessage = "";
     if (isset($_POST["createTicket"])) {
         $nickname = $_POST["nickname"];
         $partySize = $_POST["partySize"];
@@ -105,7 +106,7 @@
             $timeRequested = $row["timeRequested"];
             echo "<p>Ticket created for $nickname: $partySize</p>";
         } catch (mysqli_sql_exception $e) {
-            echo "An error has occured.\nTry changing the party name.";
+            $errorMessage =  "<div>An error has occured.\nTry changing the party name.</div>";
         }
     }
 
@@ -127,6 +128,7 @@
                 <button id="btnCreate" type="submit" name="createTicket">Create Ticket</button>
             </div>
         </fieldset>
+        <?php if (isset($errorMessage)) { echo($errorMessage); } ?>
     </form>
    
 </body>

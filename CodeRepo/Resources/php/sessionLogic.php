@@ -25,16 +25,7 @@
 			$fname = $row['firstName'];
 			$lname = $row['lastName'];
 
-			if (isset($_POST['logout'])) {
-				$sql = "CALL logout('" .$uname. "');";
-				$result = connection()->query($sql);
-				$_COOKIE[$cookie_name] = NULL;
-				header("Location: ../LoginView/Login.php");
-			}
-			else {
-				//check validated. 
-				$session_valid = true;
-			}
+			$session_valid = true;
 					
 			$username = $uname;
 			$firstName = $fname;

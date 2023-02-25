@@ -17,8 +17,7 @@ legend > * {
     margin-block: auto;
 }
 
-table {
-    overflow: clip;
+.reservation > *:first-child::after {
+    content: " ☎";
 }
-
 

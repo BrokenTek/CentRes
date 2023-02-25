@@ -16,7 +16,7 @@
                     $_POST['tableList'] = "";
                     echo("Assigned Ticket/Table event listener");
                     echo("<br>Username: " .$_POST['username']);
-                    connection();
+                    
                     $sql = "SELECT Tickets.tableId AS tableId, Tickets.id AS ticketNumber  FROM TableAssignments INNER JOIN Tickets 
                                                                 ON TableAssignments.tableId = Tickets.tableId
                                                                 WHERE TableAssignments.employeeId = idFromUsername('" .$_POST['username']. "') ORDER BY Tickets.tableId;";

@@ -1,5 +1,5 @@
 DELETE FROM Config;
-INSERT INTO Config (sessionTimeoutInMins) VALUES (30);
+INSERT INTO Config (sessionTimeoutInMins) VALUES (3600);
 
 -- todo switch to using menuItemPrice
 -- todo switch to using ticketItemPrice

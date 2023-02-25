@@ -24,7 +24,7 @@
 
                 // if the ticket number has been injected, get the timestamp.
                 if (isset($_POST['ticketNumber'])) {
-                    connection();
+                    
                     $sql = "SELECT timeModified FROM Tickets WHERE id = " .$_POST['ticketNumber']. ";";
                     $modifiedTime = connection()->query($sql)->fetch_assoc()['timeModified'];
                     $_POST['modificationTime'] = $modifiedTime;

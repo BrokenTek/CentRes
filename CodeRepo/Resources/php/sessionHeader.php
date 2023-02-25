@@ -28,10 +28,12 @@
             function logout() {
                 let div = document.createElement("input");
                 div.setAttribute("type","hidden");
-                div.setAttribute("name","logout");
-                div.setAttribute("value","true");
-                document.getElementsByClassName("sessionContainer")[0].append(div);
-                document.getElementsByClassName("sessionContainer")[0].submit();
+                div.setAttribute("name","logoutUsername");
+                div.setAttribute("value",USERNAME);
+                let frm = document.getElementsByTagName("form")[0];
+                frm.append(div);
+                frm.setAttribute("action","../LoginView/login.php");
+                frm.submit();
             }
         </script>
     

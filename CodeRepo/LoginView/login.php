@@ -1,12 +1,18 @@
 <?php
 	require_once '../Resources/php/connect_disconnect.php';
-	connection();
+	
 	$sql = NULL;
 	$allowedRoles = NULL;
 	$errorMessage = NULL;
 	
 	$cookie_name = "804288a34eb7a49b349be68fc6437621cbf25e10d82f4268bb795eca277adedb6a3367add5bfb7cbffb50df150e2e78d26b276f37d32d96cd76746065df58a30cde25c4d9803aa7214dc8f6a985bf8643c341f229b5834964b0f371915d5677e4b579fbab42844cd63ddc3148e4250591277cfc521906bc30cfedd765974c2009ae5fe451ab1890e5ebbfa120ad18934c972618dbe3e";;
 	
+	if (isset($_POST['logoutUsername'])) {
+		$sql = "CALL logout('" .$_POST['logoutUsername']. "');";
+		connection()->query($sql);
+		$_COOKIE[$cookie_name] = NULL;		
+	}
+
 	//attempt to get allowed roles if unverifed username has been submitted
 	if (isset($_POST['uname'])) {
 		//if username exists, get the allowed roles value
@@ -22,7 +28,7 @@
 			// unvalidated username and password entered
 		
 			// confirm valid username & get password hash, otherwise invalid username.
-			connection();
+			
 			$sql = "SELECT userPasswordHash('" .$_POST['uname']. "') AS userPasswordHash;";
 			$passResult = connection()->query($sql)->fetch_assoc()['userPasswordHash'];
 
@@ -42,9 +48,9 @@
 			connection()->query($sql);	
 			
 			// LOGIN SUCCESSFUL..... redirect to the appropriate page.
-			header("Location: ../ServerView/ServerView.php");
 			
-			connection();
+			header("Location: " .$_POST['route']);
+			
 			$sql = "SELECT sessionTimeoutInMins FROM Config;";
 			$timeoutLength = connection()->query($sql)->fetch_assoc()['sessionTimeoutInMins'];
 			
@@ -64,6 +70,7 @@
 	<meta charset="utf-8">
 	<!-- <link rel="stylesheet" href="style.css"> -->
 	<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
+	<script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
 	<script>
 		function redirectToCreateAccount() {
 			window.location.href = "../CreateUserView/create_user.html";
@@ -74,10 +81,10 @@
 
 	<div id="loginContainer">
 	<div id="loginHeader">
-					<img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
-					<div id="loginTitle">CentRes Employee Portal</div>
-					<button type="button" id="btnCreateAccount" onclick="redirectToCreateAccount()">I'm New</button>
-				</div>
+		<img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
+		<div id="loginTitle">CentRes Employee Portal</div>
+			<button type="button" id="btnCreateAccount" onclick="redirectToCreateAccount()">I'm New</button>
+		</div>
 	<div>
 		<form action="login.php" method="POST" id="loginForm">
 
@@ -97,7 +104,7 @@
 				$sql = "SELECT loggedIn('" .$_POST['uname']. "') AS loggedIn";
 				try {
 					if (connection()->query($sql)->fetch_assoc()['loggedIn']) {
-						$errorMessage = "You are already logged in on another device or tab!";
+						$errorMessage = "You are already logged in elsewhere!";
 					}
 				}
 				catch (Exception $e) {
@@ -106,15 +113,18 @@
 				
 		
 				if (!isset($errorMessage)) {
-					$sql = "SELECT * FROM employeeroles";
+					$sql = "SELECT roleLevel from Employees WHERE id = idFromUsername('" .$_POST['uname']. "');";
+					$allowedRoles = connection()->query($sql)->fetch_assoc()['roleLevel'];
+
+					$sql = "SELECT * FROM LoginRouteTable";
 					$definedRoles = connection()->query($sql);
 			
 					echo "<label> Select Your Role </label>";
 					echo "<select name='role' id='cboLoginRole' onchange='autoLogin()'>";
 					echo "<option>Select Your Role</option>";
 					while($row = $definedRoles->fetch_assoc()) {
-						if( $row['id'] & $allowedRoles = $row['id']) {
-							echo ('<option value=' .$row['id']. '>' .$row['title']. '</option>');
+						if((intval($row['id']) & intval($allowedRoles)) == intval($row['id'])) {
+							echo ('<option route="' .$row['route']. '" value=' .$row['id']. '>' .$row['title']. '</option>');
 						}
 					}
 					echo "</select>";
@@ -132,6 +142,8 @@
 			echo("<button id='btnClearLogin' onclick='clearLogin()' >Clear</button>
 			<script>
 				function autoLogin() {
+					let cboLoginRole = document.querySelector('#cboLoginRole');
+					setVar('route', cboLoginRole.options[cboLoginRole.selectedIndex].getAttribute('route'));
 					document.getElementById('loginForm').submit();
 				}
 				function clearLogin() {

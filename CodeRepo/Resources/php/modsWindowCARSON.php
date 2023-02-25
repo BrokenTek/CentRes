@@ -24,7 +24,7 @@
                 }
                 else {
                     if (isset($_POST['newModValue'])) {
-                        connection();
+                        
                         $sql = "CALL modifyTicketItem(" .$_POST['selectedItem']. ", '" .$_POST['newModValue']. "');";
                         connection()->query($sql);
                         echo("<script>signalStatus('await');</script>");
