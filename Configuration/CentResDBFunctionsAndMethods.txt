@@ -249,7 +249,7 @@ BEGIN
 		-- if you're assigning a ticket to a table, but it's occupied or disabled	
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Cannot assign a Ticket to an Unassigned or Occupied Table!';
-	ELSEIF (NEW.action = 'Bused' AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status = 'Bussing') = 0) THEN	
+	ELSEIF (NEW.action = 'SetBused' AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status = 'Bussing') = 0) THEN	
 		-- if you're setting the bused flag but the table isn't flagged as bussing
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Specified Table is not marked for bussing. Cannot set status to bused.';
@@ -354,7 +354,7 @@ BEGIN
 		((SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId and status = 'Bussing')) = 0) THEN
 			UPDATE Tables SET status = 'Unassigned' WHERE id = NEW.tableId;
 		END IF;
-	ELSEIF (NEW.action = 'Bused') THEN
+	ELSEIF (NEW.action = 'SetBused') THEN
 		IF ((SELECT COUNT(*) FROM TableAssignments WHERE tableId = NEW.TableId) = 0) THEN
 			UPDATE Tables SET status = 'Unassigned' WHERE id = NEW.tableId;
 		ELSE

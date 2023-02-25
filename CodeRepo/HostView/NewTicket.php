@@ -77,7 +77,7 @@
 </head>
 <body onload="declareReservationCheck()">
     <?php
-    require '../Resources/php/connect_disconnect.php';
+    require_once '../Resources/php/connect_disconnect.php';
     date_default_timezone_set('America/New_York');
 
     if (isset($_POST["createTicket"])) {

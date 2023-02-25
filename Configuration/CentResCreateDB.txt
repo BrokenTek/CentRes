@@ -146,7 +146,7 @@ CREATE TABLE TableAssignments (
 CREATE TABLE TableLog (
 	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	tableId VARCHAR(3) NOT NULL,
-	action ENUM('Add', 'Remove', 'Bused', 'Disable', 'Enable') NOT NULL,
+	action ENUM('Add', 'Remove', 'SetBused', 'Disable', 'Enable') NOT NULL,
 	timeStamp TIMESTAMP DEFAULT NOW(),
 	authorizationId INT UNSIGNED,
 	employeeId INT UNSIGNED,
