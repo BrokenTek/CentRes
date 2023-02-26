@@ -37,7 +37,7 @@ echo("<li>Reset Tables</li>");
     - This is for testing purposes only. It includes one employee record for each of our current permission levels. For server testing, use shemp.
     - They all have the SAME PASSWORD. That password is: shmoe */
 	echo("<h2>Create employees with same password of  'shmoe'</h2><ul>");
-	echo("<li>larry_mgr is the manager (permission level 8)</li>");
+	echo("<li>larry_mgr is the manager (permission level 14)</li>");
 	echo("<li>moe and shemp are servers (permission level 2)</li>");
 	echo("<li>curly is a host (permission level 4)</li></ul></li>");
 $sql="
@@ -46,7 +46,7 @@ VALUES
 ('moe',2,'$2y$10\$iuY4GXUh76y3BfFlbw/OV.3YVkySZt//BLTbsgKIWjDBqyntWkLeu','howard','moe'),
 ('shemp',2,'$2y$10\$gYxSiQOCWGPz8dmpdtDbWeVHW32CQtXJn3zW4iUYoo47q.09sU67C','howard','shemp'),
 ('curly',4,'$2y$10\$oE2O7N0HDOjfov10/O.IjOYhzhVDkns43Ve2MUENXvSQ38/OoqMRC','howard','curly'),
-('larry_mgr',8,'$2y$10$4asMBSoeQrzuhatxDyt2/OE6zU5EeUPpiwL6hH1Z3g58EYyp0ULkq','fine','larry');
+('larry_mgr',14,'$2y$10$4asMBSoeQrzuhatxDyt2/OE6zU5EeUPpiwL6hH1Z3g58EYyp0ULkq','fine','larry');
 ";
 echo($sql);
 connection()->query($sql);
