@@ -97,9 +97,6 @@
 
 <?php		
 			
-			
-			
-			
 			if (isset($_POST['uname'])) {		
 				$sql = "SELECT loggedIn('" .$_POST['uname']. "') AS loggedIn";
 				try {
@@ -122,14 +119,38 @@
 					echo "<label> Select Your Role </label>";
 					echo "<select name='role' id='cboLoginRole' onchange='autoLogin()'>";
 					echo "<option>Select Your Role</option>";
+					$allowedRoleCount = 0;
+					$allowedRoute = "";
 					while($row = $definedRoles->fetch_assoc()) {
 						if((intval($row['id']) & intval($allowedRoles)) == intval($row['id'])) {
 							echo ('<option route="' .$row['route']. '" value=' .$row['id']. '>' .$row['title']. '</option>');
+							$allowedRoleCount += 1;
+							$allowedRoute = $row['route'];
 						}
 					}
 					echo "</select>";
 				
 					echo('<br><br>');
+					if ($allowedRoleCount == 1) {
+						echo("
+							<script>
+								function autoRoute() {
+									let cboLoginRole = document.querySelector('#cboLoginRole');
+									if (cboLoginRole.options.length == 2) {
+										cboLoginRole.selectedIndex = 1;
+										setVar('role', cboLoginRole.options[1].getAttribute('value'));
+										setVar('route',cboLoginRole.options[1].getAttribute('route'));
+										document.getElementById('loginForm').submit();
+									}
+									else {
+										setTimeout(autoRoute(), 250);
+									}
+								}
+
+								autoRoute();
+							</script>
+						");
+					}
 				}
 				else {
 					echo('<input type="submit" value="Select Role" id="btnSelectRole">');

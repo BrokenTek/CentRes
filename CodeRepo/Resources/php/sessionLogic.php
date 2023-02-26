@@ -31,6 +31,7 @@
 			$GOLBALS['username'] = $uname;
 			$GOLBALS['firstName'] = $fname;
 			$GOLBALS['lastName'] = $lname;
+			$GOLBALS['loggedIn'] = true;
 			
 		}
 		catch (Exception $e) {	
@@ -38,11 +39,13 @@
 			// remove the cookie
 			$_COOKIE[$cookie_name] = NULL;
 			header("Location: ../LoginView/Login.php");
+			$GOLBALS['loggedIn'] = false;
 		}					
 	}
 	else {
 		$_COOKIE[$cookie_name] = NULL;
 		header("Location: ../LoginView/Login.php");
+		$GOLBALS['loggedIn'] = false;
 	}	
 
 	unset($uname, $uid, $fname, $lname, $sql, $row);
@@ -50,11 +53,10 @@
 	disconnect();
 
 	function restrictAccess($allowedRole, $actualRole) {
-		echo("<h1>Attempting to restrict</h1>");
-		if ((intval($actualRole) & intval($allowedRole)) != intval($actualRole)) {
+		if ((intval($actualRole) & intval($allowedRole)) == intval(0)) {
 			$sql = "SELECT * FROM LoginRouteTable WHERE id = $actualRole;";
 			$route = connection()->query($sql)->fetch_assoc()['route'];
-
+			
 			header("Location: $route");
 		}
 	}
