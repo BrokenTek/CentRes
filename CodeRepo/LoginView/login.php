@@ -39,6 +39,21 @@
 		}
 		elseif (isset($_POST['role'])) {
 			// username, password, and role have been validated
+
+			// check if somebody is already logged in on this machine, if so, log them out.
+			// Only 1 person is allowed to be logged in at a time on a device.
+			if (isset($_COOKIE[$cookie_name])) {
+				$sql = "SELECT * FROM Employees WHERE accessToken = '" .$_COOKIE[$cookie_name].
+				       "' AND accessTokenExpiration > NOW()";
+				$existingLocalSession = connection()->query($sql);
+				if (mysqli_num_rows($existingLocalSession) == 1) {
+					echo("<h1>Error</h1>");
+					$username = $existingLocalSession->fetch_assoc()['userName'];
+					$sql = "CALL logout('$username');";
+					connection()->query($sql);
+				}
+				
+			}
 		
 			// generate session token
 			$sessionToken = password_hash($_POST['uname'] . $_POST['pword']. time(), PASSWORD_BCRYPT);
@@ -87,12 +102,12 @@
 		</div>
 	<div>
 		<form action="login.php" method="POST" id="loginForm">
-
+			<?php $readonlyStr = isset($errorMessage) ? "" : " readonly"; ?>
 			<label for="uname" id="lblLoginUsername">Enter Your Username</label>
-			<input type=text id='txtLoginUsername' name='uname' <?php if (isset($_POST['uname'])) { echo('value="' . $_POST['uname'] . '"');} echo( '>'); ?>
+			<input type=text id='txtLoginUsername' name='uname' <?php if (isset($_POST['uname'])) { echo('value="' .$_POST['uname']. '"' .$readonlyStr. '>');} ?>
 			<br><br>
 			<label for="pword" id="lblLoginPassword">Enter Your Password</label>
-			<input type=password id='pwdLoginPassword' name='pword' <?php if (isset($_POST['pword'])) { echo('value="' . $_POST['pword'] . '"');} echo ('>'); ?>
+			<input type=password id='pwdLoginPassword' name='pword' <?php if (isset($_POST['pword'])) { echo('value="' .$_POST['pword']. '"' .$readonlyStr. '>');} ?>
 			<br><br>
 
 <?php		
