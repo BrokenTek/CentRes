@@ -248,6 +248,8 @@ Otherwise will reroute to logon page -->
 
     <?php
         require_once 'connect_disconnect.php';
+        $header = "";
+        $header2 = "";
 		if (isset($_POST['command'])) {
 			try {
 				if ($_POST['command'] == 'add' ) {
@@ -310,13 +312,10 @@ Otherwise will reroute to logon page -->
 			}
             catch (Exception $e) {
             //    $errorMessage = $e->getMessage();
-           
-            echo("<h1>" .$e->getMessage(). "</h1>");
-            echo("<h1>" .$sql. "</h1>");
+                $header2 = $e->getMessage();
             }
             			
-		} 
-        $header = "";
+		}
         if (!isset($_POST['recordedModificationTime'])) {
             $_POST['recordedModificationTime'] = 0;
         }
@@ -533,6 +532,10 @@ Otherwise will reroute to logon page -->
 
                 echo("</div>");
 
+            }
+
+            if ($header2 != "") {
+                echo("<h1 class='message highlighted' id='ticketHeader2'>" .$header2. "</h1>");
             }
            
         }
