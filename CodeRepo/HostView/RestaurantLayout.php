@@ -13,7 +13,7 @@
 
     <script>
         function clickVerify() {
-            alert("Clicd oN @ tbL i dId");
+            alert("Javascript TEST: You clicked on the table styled with a green color using external CSS");
         }
 
 
@@ -27,7 +27,7 @@
     
     <svg viewBox="0 0 1280 720">
 
-            <svg onclick='clickVerify()' id="L01" class="longtable" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg onpointerdown='clickVerify()' id="L01" class="longtable" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect class="open" width="5%" height="5%" fill="grey" stroke="black" stroke-opacity="0.75" />                  
             </svg>
 

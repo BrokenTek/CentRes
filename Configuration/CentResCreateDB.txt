@@ -146,7 +146,7 @@ CREATE TABLE Tables (
 	gridSpanX TINYINT UNSIGNED,
 	gridSpanY TINYINT UNSIGNED,
 	transformData VARCHAR(5000),
-	status VARCHAR(30),
+	status VARCHAR(30) NOT NULL DEFAULT 'Unassigned',
 	FOREIGN KEY (shape) REFERENCES TableShapes(shapeName)
 	ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (status) REFERENCES TableStatuses(id)

@@ -29,7 +29,7 @@ echo("<li>Reset Tables</li>");
 	
 	// Create tables with that shape... In our later sprints SVG path data will have to be included
 	// so we know how to draw the table on the Host View.
-	$sql="INSERT INTO tables (id, shape) VALUES ('T01', 'square'), ('T02', 'square'), ('T03', 'square'), ('T04', 'square'), ('T05', 'square');";
+	$sql="INSERT INTO tables (id, shape) VALUES ('T01', 'square'), ('T02', 'square'), ('T03', 'square'), ('T04', 'square'), ('T05', 'square'), ('T06', 'square'), ('T07', 'square'), ('T08', 'square');";
 	connection()->query($sql);
 
 	echo("<li>Create Employees");
@@ -85,9 +85,26 @@ connection()->query($sql);
 	$sql="INSERT INTO tablelog (tableId, action, timeStamp, authorizationId, employeeId) VALUES ('T03', 'Add', current_timestamp(), idFromUsername('curly'), idFromUsername('moe'));";
 	echo($sql);
 	connection()->query($sql);
+
+	// table to illustrate bussing occupied
+	echo("<li>Assiged Moe to T4</li>");
+	// assign Moe to table T04
+	$sql="INSERT INTO tablelog (tableId, action, timeStamp, authorizationId, employeeId) VALUES ('T04', 'Add', current_timestamp(), idFromUsername('curly'), idFromUsername('moe'));";
+	echo($sql);
+	connection()->query($sql);
+
+	// table to illustrate open
+	echo("<li>Assiged Moe to T5</li>");
+	// assign Moe to table T05
+	$sql="INSERT INTO tablelog (tableId, action, timeStamp, authorizationId, employeeId) VALUES ('T05', 'Add', current_timestamp(), idFromUsername('curly'), idFromUsername('moe'));";
+	echo($sql);
+	connection()->query($sql);
 	
-	echo("</ol><h2>!T04 and T05 are unoccupied</h2></ol>");
-	// leave table T04 and T05 unassigned for testing purposes.
+	//T6 illustrates bussing unoccupied
+
+	//T7 illustrates unassigned
+
+	//T8 illustrates disabled
 
 // Pretending to be the host/hostess, create new tickets when a group enters the restaurant and assign them to a table
 echo("<h1>Assigning new tickets to tables</h1><ol>");
@@ -130,6 +147,16 @@ $newTick = connection()->query($sql)->fetch_assoc()['newTicketNum'];
 $sql = "INSERT INTO `tablelog` (tableId, action, timeStamp, authorizationId, ticketId) VALUES ('T03', 'Add', current_timestamp(), idFromUsername('curly'), " .$newTick. ");";
 echo("<BR>" .$sql);
 connection()->query($sql);
+
+// set bussing with/withoug assigned servers
+$sql = "UPDATE Tables SET status = 'Bussing' WHERE id in ('T04','T06');";
+connection()->query($sql);
+
+// set T08 disabled
+$sql = "UPDATE Tables SET status = 'Disabled' WHERE id = 'T08';";
+connection()->query($sql);
+
+
 
 echo("<h1>Curly has logged out from Host role</h1><ol>");
 $sql="CALL logout('curly');";
