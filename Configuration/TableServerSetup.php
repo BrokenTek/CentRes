@@ -45,7 +45,7 @@ INSERT INTO employees (userName, roleLevel, passwordBCrypt, lastName, firstName)
 VALUES 
 ('moe',2,'$2y$10\$iuY4GXUh76y3BfFlbw/OV.3YVkySZt//BLTbsgKIWjDBqyntWkLeu','howard','moe'),
 ('shemp',2,'$2y$10\$gYxSiQOCWGPz8dmpdtDbWeVHW32CQtXJn3zW4iUYoo47q.09sU67C','howard','shemp'),
-('curly',4,'$2y$10\$oE2O7N0HDOjfov10/O.IjOYhzhVDkns43Ve2MUENXvSQ38/OoqMRC','howard','curly'),
+('curly',6,'$2y$10\$oE2O7N0HDOjfov10/O.IjOYhzhVDkns43Ve2MUENXvSQ38/OoqMRC','howard','curly'),
 ('larry_mgr',14,'$2y$10$4asMBSoeQrzuhatxDyt2/OE6zU5EeUPpiwL6hH1Z3g58EYyp0ULkq','fine','larry');
 ";
 echo($sql);
