@@ -1,4 +1,7 @@
 
+<!-- ensures you are logged in before rendering page.
+Otherwise will reroute to logon page -->
+<?php require_once 'sessionLogic.php'; restrictAccess(7, $GOLBALS['role']); ?>
 <!DOCTYPE html>
 <html>
 <head>

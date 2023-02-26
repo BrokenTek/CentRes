@@ -1,27 +1,29 @@
 <?php
+    
 
-    // check corresponding accessToken in database exists and is valid
-    $sql = "SELECT sessionRole('" .$_COOKIE[$cookie_name].  "') AS sessionRole;";
-    $role = connection()->query($sql)->fetch_assoc()['sessionRole'];
-    
-    // session validated and session role determined.... get the session username
-    $sql = "SELECT sessionUsername('" .$_COOKIE[$cookie_name].  "') AS sessionUsername;";
-    $uname = connection()->query($sql)->fetch_assoc()['sessionUsername'];
-    
-    //$get First and Last Name
-    $sql = "SELECT firstName, lastName FROM Employees where userName = '" .$uname. "';";
-    $row = connection()->query($sql)->fetch_assoc();
-    $fname = $row['firstName'];
-    $lname = $row['lastName'];
-    
+    $rolesString = "const ROLES = {};";
+    $sql = "SELECT * FROM LoginRouteTable;";
+    $roles = connection()->query($sql);
+    if (mysqli_num_rows($roles) > 0) {
+        $rol = $roles->fetch_assoc();
+        $roleStr = "const ROLES = {" .$rol['id']. ": '" .$rol['title']. "'";
+        while($rol = $roles->fetch_assoc()) {
+            $roleStr .= ", " .$rol['id']. ": '" .$rol['title']. "'";
+        }
+        $roleStr .= "};";
+    }
+
+
     echo('
         <script>
-            const USERNAME = "' .$uname. '";
-            const FIRST_NAME = "' .$fname. '";
-            const LAST_NAME = "' .$lname. '";
-            const ROLE = ' .$role. ';
-        </script>'
-    );
+            const USERNAME = "' .$GOLBALS['username']. '";
+            const USER_ID = "' .$GOLBALS['userId']. '";
+            const FIRST_NAME = "' .$GOLBALS['firstName']. '";
+            const LAST_NAME = "' .$GOLBALS['lastName']. '";
+            const ROLE = ' .$GOLBALS['role']. ';'
+            .$roleStr.
+        '</script>
+    ');
 
     echo('<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <script>
@@ -39,7 +41,7 @@
     
         <div class="sessionHeader">
             <img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
-            <div id="sessionDetails">' .$username. '</div>
+            <div id="sessionDetails">' .$GOLBALS['username']. '</div>
             <button type="button" id="btnLogout" onclick="logout()">Logout</button>
         </div>');
 ?>

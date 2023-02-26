@@ -116,7 +116,7 @@
 					$sql = "SELECT roleLevel from Employees WHERE id = idFromUsername('" .$_POST['uname']. "');";
 					$allowedRoles = connection()->query($sql)->fetch_assoc()['roleLevel'];
 
-					$sql = "SELECT * FROM LoginRouteTable";
+					$sql = "SELECT * FROM LoginRouteTable;";
 					$definedRoles = connection()->query($sql);
 			
 					echo "<label> Select Your Role </label>";

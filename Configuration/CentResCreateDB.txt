@@ -234,4 +234,4 @@ CREATE TABLE TicketItems (
 
 CREATE TABLE Config (
 	sessionTimeoutInMins INT UNSIGNED NOT NULL DEFAULT 5
-)
+);

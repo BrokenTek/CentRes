@@ -13,23 +13,24 @@
 			
 			// check corresponding accessToken in database exists and is valid
 			$sql = "SELECT sessionRole('" .$_COOKIE[$cookie_name].  "') AS sessionRole;";
-			$role = connection()->query($sql)->fetch_assoc()['sessionRole'];
+			$GOLBALS['role'] = connection()->query($sql)->fetch_assoc()['sessionRole'];
 			
 			// session validated and session role determined.... get the session username
 			$sql = "SELECT sessionUsername('" .$_COOKIE[$cookie_name].  "') AS sessionUsername;";
 			$uname = connection()->query($sql)->fetch_assoc()['sessionUsername'];
 			
 			//$get First and Last Name
-			$sql = "SELECT firstName, lastName FROM Employees where userName = '" .$uname. "';";
+			$sql = "SELECT id, firstName, lastName FROM Employees where userName = '" .$uname. "';";
 			$row = connection()->query($sql)->fetch_assoc();
 			$fname = $row['firstName'];
 			$lname = $row['lastName'];
+			$uid = $row['lastName'];
 
 			$session_valid = true;
-					
-			$username = $uname;
-			$firstName = $fname;
-			$lastName = $lname;
+			$GOLBALS['userId'] = $uid;
+			$GOLBALS['username'] = $uname;
+			$GOLBALS['firstName'] = $fname;
+			$GOLBALS['lastName'] = $lname;
 			
 		}
 		catch (Exception $e) {	
@@ -44,7 +45,17 @@
 		header("Location: ../LoginView/Login.php");
 	}	
 
-	unset($uname, $fname, $lname, $sql, $row);
+	unset($uname, $uid, $fname, $lname, $sql, $row);
 
 	disconnect();
+
+	function restrictAccess($allowedRole, $actualRole) {
+		echo("<h1>Attempting to restrict</h1>");
+		if ((intval($actualRole) & intval($allowedRole)) != intval($actualRole)) {
+			$sql = "SELECT * FROM LoginRouteTable WHERE id = $actualRole;";
+			$route = connection()->query($sql)->fetch_assoc()['route'];
+
+			header("Location: $route");
+		}
+	}
 ?>

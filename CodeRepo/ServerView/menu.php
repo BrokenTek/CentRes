@@ -1,3 +1,6 @@
+<!-- ensures you are logged in before rendering page.
+Otherwise will reroute to logon page -->
+<?php require_once '../Resources/php/sessionLogic.php'; ?>
 <!DOCTYPE html>
 <html>
     <head>

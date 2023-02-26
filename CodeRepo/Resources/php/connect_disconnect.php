@@ -38,7 +38,7 @@ function connection() {
 // Disconnect From The Persistent Database Connection. This Is Necessary
 function disconnect() {
 	try {
-		if (!is_null($GLOBALS['conn'])) {
+		if (isset($GLOBALS['conn']) && !is_null($GLOBALS['conn'])) {
 			mysqli_close($GLOBALS['conn']);
 		}
 		
