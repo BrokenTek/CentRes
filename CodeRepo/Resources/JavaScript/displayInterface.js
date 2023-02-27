@@ -89,25 +89,9 @@ function removeVar(variableName, id = null, update = false) {
             return;
         }
     }
-
-function renameVar(oldVariableName, newVariableName, id = null) {
-    if (getVar(oldVariableName, id) === undefined) {
-        throw "renameVar error! Variable doesn't exist";
-    }
-    if (getVar(newVariableName, id) !== undefined) {
-        throw "renameVar error! Variable already exists";
-    }
-    setVar(getVar(oldVariableName, id));
-    removeVar(oldVariableName, id);
-
-    if (variableElement != null) {
-        variableElement.remove();
-    }
-
-    if (update) {
-        updateDisplay(id);
-    }
 }
+
+
 
 function clearVars(id = null, update = false) {
     var container = document.getElementById(id);
@@ -214,14 +198,7 @@ function toggleSortKey(elementId, columnName, refresh = true) {
     if (!keyFound) {
         setVar(sortKeyPrefix + keyIndex, columnName + " ASC");
     }
-    if (refresh) {updateDisplay();}
-}
-
-function clearSortKeys(elementId) {
-    let keyIndex = 1;
-    let sortKeyPrefix = elementId + "SortKey";
-    while (getVar(sortKeyPrefix + keyIndex) !== undefined) {
-        removeVar(sortKeyPrefix + keyIndex);
+    if (refresh) { 
+        updateDisplay();
     }
-    updateDisplay();
 }
