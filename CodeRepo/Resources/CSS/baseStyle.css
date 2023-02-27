@@ -163,6 +163,9 @@ body > body{
     font-size: 1.25rem;
     font-weight: bold;
 }
+fieldset {
+  border: none;
+}
 table {
     border: 2px solid white;
     border-collapse: collapse;

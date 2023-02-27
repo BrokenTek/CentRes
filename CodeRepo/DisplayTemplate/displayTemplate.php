@@ -56,7 +56,7 @@ you'll be routed to whatever the home page is for your specified role level -->
             
             <!-- If you want to forget/not carry over variables, use PHP unset function
             to remove these variables -->
-            <?php unset($thisVariableIWantToForget) ?>;
+            <?php unset($_POST['thisVariableIWantToForget'], $_POST['thisOtherVariableIDontNeed']) ?>;
 
             <!-- retain any POST vars. When updateDisplay() is called or the form is submitted,
             these variables will be carried over -->
