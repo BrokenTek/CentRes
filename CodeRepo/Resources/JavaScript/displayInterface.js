@@ -56,7 +56,7 @@ function getVar(variableName, id = null) {
         form = container.contentWindow.document.getElementsByTagName('form')[0]; 
         variableElement = container.contentWindow.document.getElementById(variableName);
         if (form == null) {
-            throw "Variable unavailable";
+            throw "getVar error! Variable unavailable";
         }
     }
     
@@ -89,6 +89,16 @@ function removeVar(variableName, id = null, update = false) {
             return;
         }
     }
+
+function renameVar(oldVariableName, newVariableName, id = null) {
+    if (getVar(oldVariableName, id) === undefined) {
+        throw "renameVar error! Variable doesn't exist";
+    }
+    if (getVar(newVariableName, id) !== undefined) {
+        throw "renameVar error! Variable already exists";
+    }
+    setVar(getVar(oldVariableName, id));
+    removeVar(oldVariableName, id);
 
     if (variableElement != null) {
         variableElement.remove();
@@ -143,6 +153,8 @@ function updateDisplay(id = null) {
     form.submit();
 }
 
+// =============================== LOCAL WINDOW ONLY FUNCTIONS ============================
+
 window.onscroll = function (e) { 
     if (getVar("scrollX") != null) {
         setVar("scrollX", window.scrollX);
@@ -150,12 +162,66 @@ window.onscroll = function (e) {
     }   
 }
 
-function rememberScrollPosition(id = null) {
+function rememberScrollPosition() {
     setVar("scrollX", window.scrollX);
     setVar("scrollY", window.scrollY); 
 }
 
-function forgetScrollPosition(id = null) {
+function forgetScrollPosition() {
     removeVar("scrollX", id);
     removeVar("ScrollY", id);
+}
+
+function toggleSortKey(elementId, columnName, refresh = true) {
+    if (document.getElementById(elementId) == null) {
+        throw("toggleSortKey Error! Element doesn't exist");
+    }
+    let keyIndex = 1;
+    let keyFound = false;
+    let offsetBy1 = false;
+    let sortKeyPrefix = elementId + "SortKey";
+    while (true) {
+        let value = getVar(sortKeyPrefix + keyIndex);
+
+        // end of key list
+        if (value === undefined) {
+            break;
+        }
+
+        // key was removed. All keys to right need to be left-shifted by 1
+        if (offsetBy1) {
+            renameVar(sortKeyPrefix + keyIndex, sortKeyPrefix + (keyIndex - 1));
+        }
+
+        // if key is the column you specified
+        if (value.replace(" ASC","").replace(" DESC","") == columnName) {
+            keyFound == true;
+
+            // toggle to DESC if it's ASC
+            if (value == columnName + " ASC") {
+                setVar(sortKeyPrefix + keyIndex, columnName + " DESC");
+            }
+            // remove the key if it's DESC
+            else {
+                removeVar(sortKeyPrefix + keyIndex);
+                // if there are any other keys to the right of this, left shift them by 1
+                offsetBy1 = true;
+            }
+        }
+        keyIndex ++;
+    }
+    // if the key wasn't found, append to the end of key list.
+    if (!keyFound) {
+        setVar(sortKeyPrefix + keyIndex, columnName + " ASC");
+    }
+    if (refresh) {updateDisplay();}
+}
+
+function clearSortKeys(elementId) {
+    let keyIndex = 1;
+    let sortKeyPrefix = elementId + "SortKey";
+    while (getVar(sortKeyPrefix + keyIndex) !== undefined) {
+        removeVar(sortKeyPrefix + keyIndex);
+    }
+    updateDisplay();
 }

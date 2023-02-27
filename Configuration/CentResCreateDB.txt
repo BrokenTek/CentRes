@@ -126,6 +126,11 @@ CREATE TABLE TableShapes (
 	capacity TINYINT UNSIGNED NOT NULL DEFAULT 0
 );
 
+CREATE TABLE StructureShapes (
+	shapeName VARCHAR(50) PRIMARY KEY,
+	svgPathData VARCHAR(5000),
+);
+
 CREATE TABLE TableStatuses (
 	id VARCHAR(30) PRIMARY KEY
 );
