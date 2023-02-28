@@ -24,7 +24,7 @@
 			$row = connection()->query($sql)->fetch_assoc();
 			$fname = $row['firstName'];
 			$lname = $row['lastName'];
-			$uid = $row['lastName'];
+			$uid = $row['id'];
 
 			$session_valid = true;
 			$GOLBALS['userId'] = $uid;
