@@ -25,4 +25,40 @@ if (isset($_POST['scrollX']) OR isset($_POST['scrollY'])) {
         echo(");}");
     echo(" addEventListener('load', moveToPreviousScrollPos)</script>");
 }
+
+function getSqlOrderByClause($tableId) {
+    $sql = "";
+    $sortKeyPrefix = tableId + ".SortKey";
+    $keyIndex = 1;
+    while (true) {
+        $key = $sortKeyPrefix + $keyIndex;
+        
+        if (!isset($_POST[$key])) {
+            break;
+        }
+        $sql .= ", " . $_POST[$key];
+        $keyIndex ++;
+    }
+    if (sql != "") {
+        $sql = " ORDER BY " . substr($sql, 2);
+    }
+    return $sql;
+
+}
+
+function sortKeyIndex($tableId, $columnId) {
+    $sortKeyPrefix = tableId + ".SortKey";
+    $keyIndex = 1;
+    while (true) {
+        $key = $sortKeyPrefix + $keyIndex;
+        
+        if (isset($_POST[$key])) {
+            if(($_POST[$key] == $columnId . " ASC") || ($_POST[$key] == $columnId . " DESC") ) {
+                return $keyIndex;
+            }
+        }
+        $keyIndex++;
+    }
+    return -1;
+}
 ?>

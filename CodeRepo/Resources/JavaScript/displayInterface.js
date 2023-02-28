@@ -159,14 +159,14 @@ function forgetScrollPosition() {
     removeVar("ScrollY", id);
 }
 
-function toggleSortKey(elementId, columnName, refresh = true) {
+function toggleSortKey(tableId, columnName, refresh = true) {
     if (document.getElementById(elementId) == null) {
         throw("toggleSortKey Error! Element doesn't exist");
     }
     let keyIndex = 1;
     let keyFound = false;
     let offsetBy1 = false;
-    let sortKeyPrefix = elementId + "SortKey";
+    let sortKeyPrefix = tableId + ".SortKey";
     while (true) {
         let value = getVar(sortKeyPrefix + keyIndex);
 
@@ -203,5 +203,19 @@ function toggleSortKey(elementId, columnName, refresh = true) {
     }
     if (refresh) { 
         updateDisplay();
+    }
+}
+
+function clearSortKeys(tableId) {
+    let sortKeyPrefix = tableId + ".SortKey";
+    while (true) {
+        let value = getVar(sortKeyPrefix + keyIndex);
+
+        // end of key list
+        if (value === undefined) {
+            break;
+        }
+        removeVar(sortKeyPrefix + keyIndex);
+        keyIndex ++;
     }
 }
