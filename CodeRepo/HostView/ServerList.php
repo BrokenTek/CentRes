@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(4, $GOLBALS['role'], $GOLBALS['loggedIn']); ?>
+<?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(4, $GLOBALS['role'], $GLOBALS['loggedIn']); ?>
 <html>
     <head>
         <title>Active Servers</title>

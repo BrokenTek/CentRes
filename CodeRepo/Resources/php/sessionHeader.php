@@ -16,11 +16,11 @@
 
     echo('
         <script>
-            const USERNAME = "' .$GOLBALS['username']. '";
-            const USER_ID = "' .$GOLBALS['userId']. '";
-            const FIRST_NAME = "' .$GOLBALS['firstName']. '";
-            const LAST_NAME = "' .$GOLBALS['lastName']. '";
-            const ROLE = ' .$GOLBALS['role']. ';'
+            const USERNAME = "' .$GLOBALS['username']. '";
+            const USER_ID = "' .$GLOBALS['userId']. '";
+            const FIRST_NAME = "' .$GLOBALS['firstName']. '";
+            const LAST_NAME = "' .$GLOBALS['lastName']. '";
+            const ROLE = ' .$GLOBALS['role']. ';'
             .$roleStr.
         '</script>
     ');
@@ -41,7 +41,7 @@
     
         <div class="sessionHeader">
             <img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
-            <div id="sessionDetails">' .$GOLBALS['username']. '</div>
+            <div id="sessionDetails">' .$GLOBALS['username']. '</div>
             <button type="button" id="btnLogout" onclick="logout()">Logout</button>
         </div>');
 ?>

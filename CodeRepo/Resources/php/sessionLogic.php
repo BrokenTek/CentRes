@@ -13,7 +13,7 @@
 			
 			// check corresponding accessToken in database exists and is valid
 			$sql = "SELECT sessionRole('" .$_COOKIE[$cookie_name].  "') AS sessionRole;";
-			$GOLBALS['role'] = connection()->query($sql)->fetch_assoc()['sessionRole'];
+			$GLOBALS['role'] = connection()->query($sql)->fetch_assoc()['sessionRole'];
 			
 			// session validated and session role determined.... get the session username
 			$sql = "SELECT sessionUsername('" .$_COOKIE[$cookie_name].  "') AS sessionUsername;";
@@ -27,11 +27,11 @@
 			$uid = $row['id'];
 
 			$session_valid = true;
-			$GOLBALS['userId'] = $uid;
-			$GOLBALS['username'] = $uname;
-			$GOLBALS['firstName'] = $fname;
-			$GOLBALS['lastName'] = $lname;
-			$GOLBALS['loggedIn'] = true;
+			$GLOBALS['userId'] = $uid;
+			$GLOBALS['username'] = $uname;
+			$GLOBALS['firstName'] = $fname;
+			$GLOBALS['lastName'] = $lname;
+			$GLOBALS['loggedIn'] = true;
 			
 		}
 		catch (Exception $e) {	
@@ -39,13 +39,13 @@
 			// remove the cookie
 			$_COOKIE[$cookie_name] = NULL;
 			header("Location: ../LoginView/Login.php");
-			$GOLBALS['loggedIn'] = false;
+			$GLOBALS['loggedIn'] = false;
 		}					
 	}
 	else {
 		$_COOKIE[$cookie_name] = NULL;
 		header("Location: ../LoginView/Login.php");
-		$GOLBALS['loggedIn'] = false;
+		$GLOBALS['loggedIn'] = false;
 	}	
 
 	unset($uname, $uid, $fname, $lname, $sql, $row);

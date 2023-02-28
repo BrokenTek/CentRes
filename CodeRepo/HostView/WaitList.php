@@ -1,6 +1,6 @@
 <!-- ensures you are logged in before rendering page.
 Otherwise will reroute to logon page -->
-<?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(4, $GOLBALS['role']); ?>
+<?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(4, $GLOBALS['role']); ?>
 <!DOCTYPE html>
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <?php

@@ -1,4 +1,4 @@
-<?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(4, $GOLBALS['role']); ?>
+<?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(4, $GLOBALS['role']); ?>
 <!DOCTYPE html>
 <html>
 	<head>
