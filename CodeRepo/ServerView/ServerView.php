@@ -364,8 +364,7 @@
                     return;
                 }
                 // if a menu item was selected
-                if (!(selectedMenuItem === undefined)) {
-                    
+                if (selectedMenuItem !== undefined) {
                     // menu item selection acknowledged.
                     removeVar("selectedMenuItem", "menuContainer");
                     // signal the ticketContainer that a menu item was selected and needs to be added to the ticket

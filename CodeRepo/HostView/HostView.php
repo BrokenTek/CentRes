@@ -9,7 +9,11 @@
 									 "ifrWaitList   ifrRestaurantLayout ifrTicket"
 									 "ifrWaitTimes  ifrRestaurantLayout ifrTicket";
 				grid-template-columns: max-content 1fr max-content;
-				grid-template-rows: 2fr 2fr 1fr;
+				grid-template-rows: min-content 1fr min-content;
+			}
+
+			.sessionContainer {
+				height: 100vh;
 			}
 
 			#ifrServerList {

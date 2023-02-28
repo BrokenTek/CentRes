@@ -89,6 +89,9 @@ function removeVar(variableName, id = null, update = false) {
             return;
         }
     }
+    if (variableElement != null) {
+        variableElement.remove();
+    }
 }
 
 

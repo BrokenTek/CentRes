@@ -4,19 +4,23 @@
 		    REQUIRED CSS TO PROPERLY LAYOUT SERVER VIEW
 			============================================= */
 		
-		
+
+		#serverViewSession {
+			width: calc(99vw - 3rem);
+			height: calc(99vh - 3rem);
+			padding-block: 1.5rem;
+			padding-inline: 1.5rem;
+			overflow: hidden;
+		}
 		#serverViewContainer {
 			display: grid;
-			grid-template-areas: "serverViewHeader serverViewHeader"
-								 "menuTitle        ticketHeader"
-		                         "menu             ticketAndOptions"
-							     "empty            ticketFooter";
-			grid-template-columns: 40fr 60fr;
-			grid-template-rows: min-content min-content 1fr min-content .125rem;
+			grid-template-areas: "serverViewHeader serverViewHeader serverViewHeader"
+								 "menuTitle        blank ticketHeader"
+		                         "menu             blank ticketAndOptions"
+							     "empty            blank ticketFooter";
+			grid-template-columns: 40fr 1rem 60fr;
+			grid-template-rows: min-content min-content 1fr min-content;
 			grid-auto-rows: min-content;
-		    border: 2px solid black;
-			
-			
          }
 		 #serverViewHeader {
 			 grid-area: serverViewHeader;
@@ -24,9 +28,7 @@
 			 grid-template-columns: min-content 1fr min-content 1fr min-content;
 			 grid-template-rows: min-content;
 			grid-template-areas: "cboTable . cboSeat . headerButtonGroup";
-		
 		 }
-
 		 
 		 #cboTable { 
 			grid-area: cboTable;

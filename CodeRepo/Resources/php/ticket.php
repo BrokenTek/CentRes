@@ -15,6 +15,7 @@ Otherwise will reroute to logon page -->
 <link rel="stylesheet" href="../CSS/ticketStyle.css">
 <script src="../JavaScript/displayInterface.js"></script>
 <script>
+    var addError = false;
     // ========================= TASKS WHEN TICKET IS LOADED ==============================
     // after the ticket has loaded
     function loaded() {
@@ -107,7 +108,6 @@ Otherwise will reroute to logon page -->
 
        
     }
-    addEventListener('load', loaded);
 
     // function that listens for an external change in the ticket timestamp.
     // if a change has been detected, reload with the changes.
@@ -235,21 +235,30 @@ Otherwise will reroute to logon page -->
         	    ticks[i].classList.remove("selected");
                 ticks[i].classList.remove("multiselect");
     	    }
-    	    ticks[ticks.length - 1].classList.add("selected");
-            ticks[ticks.length - 1].classList.remove("multiselect");
-            setVar("selectedTicketItem", ticks[ticks.length - 1].id);
+            if (addError) {
+                setTimeout(removeErrorMessage, 2500);
+            }
+            else {
+                ticks[ticks.length - 1].classList.add("selected");
+                ticks[ticks.length - 1].classList.remove("multiselect");
+                setVar("selectedTicketItem", ticks[ticks.length - 1].id);
+            }
         }
+    }
+
+    function removeErrorMessage() {
+        document.getElementById("ticketFooter").remove();
     }
 
 </script>
 </head>
-<body>
+<body onload="loaded()">
 <form id="ticketForm" action="ticket.php" method="post" class= "ticketForm">
 
     <?php
         require_once 'connect_disconnect.php';
         $header = "";
-        $header2 = "";
+        $footer = "";
 		if (isset($_POST['command'])) {
 			try {
 				if ($_POST['command'] == 'add' ) {
@@ -312,7 +321,7 @@ Otherwise will reroute to logon page -->
 			}
             catch (Exception $e) {
             //    $errorMessage = $e->getMessage();
-                $header2 = $e->getMessage();
+                $footer = $e->getMessage();
             }
             			
 		}
@@ -534,8 +543,9 @@ Otherwise will reroute to logon page -->
 
             }
 
-            if ($header2 != "") {
-                echo("<h1 class='message highlighted' id='ticketHeader2'>" .$header2. "</h1>");
+            if ($footer != "") {
+                echo("<h1 class='message highlighted' id='ticketFooter'>" .$footer. "</h1>");
+                echo("<script>addError = true;</script>");
             }
            
         }
