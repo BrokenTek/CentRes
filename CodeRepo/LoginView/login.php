@@ -92,7 +92,7 @@
 		}
 	</script>
 </head>
-<body id="loginBody">
+<body id="loginBody" onload="allElementsLoaded">
 
 	<div id="loginContainer">
 	<div id="loginHeader">
