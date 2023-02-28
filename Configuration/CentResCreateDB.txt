@@ -128,7 +128,7 @@ CREATE TABLE TableShapes (
 
 CREATE TABLE StructureShapes (
 	shapeName VARCHAR(50) PRIMARY KEY,
-	svgPathData VARCHAR(5000),
+	svgPathData VARCHAR(5000)
 );
 
 CREATE TABLE TableStatuses (
