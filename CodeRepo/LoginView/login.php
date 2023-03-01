@@ -90,9 +90,17 @@
 		function redirectToCreateAccount() {
 			window.location.href = "../CreateUserView/create_user.html";
 		}
+
+		function allElementsLoaded() {
+			<?php
+				if(isset($_POST['message'])) {
+					echo("setTimeout(alert('" .$_POST['message']. "'),2000);");
+				} 
+			?>
+		}
 	</script>
 </head>
-<body id="loginBody" onload="allElementsLoaded">
+<body id="loginBody" onload="allElementsLoaded()">
 
 	<div id="loginContainer">
 	<div id="loginHeader">

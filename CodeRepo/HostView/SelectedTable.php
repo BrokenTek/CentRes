@@ -22,28 +22,7 @@ you'll be routed to whatever the home page is for your specified role level -->
         <!-- remove this script tag -->
         <script>
             function allElementsLoaded() {
-                if (getVar("greeting") != null) {
-                    // variable carried over after updateDisplay() is called
-                    alert('After Refresh/Submit:\ngetVar("greeting")  >>>> ' + getVar("greeting"));
-                }
-                else {
-                    // show getVar returns undefined for anything that hasn't been set yet
-                    alert('getVar("greeting") >>>> ' + getVar("greeting"));
-
-                    // use setVar and show that getVar returns the value
-                    setVar("greeting", "Hello World");
-                    alert('setVar("greeting", "Hello World");\ngetVar("greeting") >>>> ' + getVar("greeting"));
-                    
-                    // use removeVar and show that getVar once again returns undefined
-                    removeVar("greeting");
-                    alert('removeVar("greeting");\ngetVar("greeting") >>>> ' + getVar("greeting"));
-
-                    // set greeting to "Hello Again" and updateDisplay(). Alert user page is about to submit/refresh
-                    // using updateDisplay()
-                    setVar("greeting", "Hello Again. Im still here");
-                    alert('setVar("greeting, "Hello Again". Im still here");\nupdateDisplay();\n\nvar will be retained after refresh/submit');
-                    updateDisplay();
-                }
+                
             }
 
             //Place your JavaScript Code here
