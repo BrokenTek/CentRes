@@ -15,33 +15,55 @@
 
     <script>
         function allElementsLoaded() {
-            // TODO
-            // add pointer down and pointer up event listeners
-            // to select/multi-select
-
-
+             //create table select listeners
+             var elements = document.getElementsByClassName('table');
+            if (elements != null) {
+                for (var i = 0; i < elements.length; i++) {
+                    elements[i].addEventListener('pointerdown',pointerDown);
+                    elements[i].addEventListener('pointerup', pointerUp);
+                }
+            }
             updateDisplay("tableStatusListener");
             updateTableStatuses();
             startListenerLoop();
+
+           
         }
 
         function updateTableStatuses() {
-            var newTableData = getVar("updatedTables", "tableStatusListener").split(",");
-            for (var i = 0; i < newTableData.length; i += 2 ) {
-                with (document.getElementById(newTableData[i]).classList) {
-                    remove("disabled","unassigned", "open", "seated", "bussing");
-                    add(newTableData[i+1]);
+            try {
+                var newTableData = getVar("updatedTables", "tableStatusListener").split(",");
+                for (var i = 0; i < newTableData.length; i += 2 ) {
+                    with (document.getElementById(newTableData[i]).classList) {
+                        remove("disabled","unassigned", "open", "seated", "bussing");
+                        add(newTableData[i+1]);
+                    }
                 }
+            }
+            catch (err) {
+                setTimeout(updateTableStatuses, 250);
             }
         }
 
         var listenerLoopTimer;
-        function listenerLoop() {
-            updateDisplay("tableStatusListneer");
-            if (getVar("updatedTables", "tableStatusListener") !== undefined) {
-                updateTableStatuses();
+        var update = true;
+        function listenerLoop(update = true) {
+            if (update) {
+                updateDisplay("tableStatusListener");
             }
+            try {
+                if (getVar("updatedTables", "tableStatusListener") !== undefined) {
+                    updateTableStatuses();
+                }
+            }
+            catch (err) {
+                update = false;
+                setTimeout(listenerLoop, 250);
+                return;
+            }
+            update = true;
             startListenerLoop();
+           
         }
         
         function startListenerLoop() {
@@ -60,6 +82,66 @@
             document.getElementById(tableId).classList.add("selected");
             setVar("selectedTable", tableId);
         }
+
+         // ========================= TICKET ITEM SELECT FUNCTIONS ==============================
+   
+    const LONG_TIME_TOUCH_LENGTH = 250;
+    var targetTable = null;
+    var longTouchEnabled = false;
+    var longTouchTimer = null;
+	function pointerDown() {
+        if (this === undefined) { return; }
+        targetTable = this;
+        targetTable.classList.add("selected");
+        if (getVar("selectedTable") != null && getVar("selectedTable") != this.id) {
+            longTouchTimer = setTimeout(longTouch, LONG_TIME_TOUCH_LENGTH);
+        }
+	}
+
+    // if oyu pressed on a ticket item, you already have another one selected, and the minimum required time
+    // for multiselect has elapsed, change the selected item to "multiselect" 
+    function longTouch() {
+         longTouchEnabled = true;
+         targetTable.classList.add("multiselect");
+
+        // if there is exactly 1 other item selected, make it multi-select as well.
+        var alreadySelected = getVar("selectedTable");
+        if (alreadySelected != null && alreadySelected.indexOf(",") == -1) {
+            document.getElementById(alreadySelected).classList.add("multiselect");
+        }
+    }
+
+    // when you've made your current selection
+    function pointerUp() {
+        if (targetTable == null) { return; }
+        
+        if (longTouchTimer != null) {
+            clearTimeout(longTouchTimer);
+        }
+
+        var oldSelectedItems = document.getElementsByClassName("table");
+        // if you only have 1 item selected, adjust the state of applicable ticket items to reflect that.
+        if (!longTouchEnabled) {
+    	    /*this iterates through the list returned, if there is no case where multiple items are selected concurrently,
+    	    you can just use oldSelectedItems[0].classList.remove("selected"); instead*/
+    	    for(let i = 0; i < oldSelectedItems.length; i++){
+        	    oldSelectedItems[i].classList.remove("selected");
+                oldSelectedItems[i].classList.remove("multiselect");
+    	    }
+    	    targetTable.classList.add("selected");
+            targetTable.classList.remove("multiselect");
+            setVar("selectedTable", targetTable.id);
+        }
+        // or you have multiple tables selected
+        else {
+            setVar("selectedTable", getVar("selectedTable") + "," + targetTable.id); 
+        }
+
+        // set the ticket timestamp so anything listening to it can update.
+        setVar("lastUpdate", Date.now()); 
+        targetTable = null;
+        longTouchEnabled = false;
+    }
 
 
     </script>
