@@ -103,7 +103,7 @@ Otherwise will reroute to logon page -->
             connection()->query($sql);
 			// Retrieve the new ticket number and the time it was requested from the Tickets table
             $sql = "SELECT @newTicketNumber AS newTicketNum, timeRequested FROM Tickets WHERE id = @newTicketNumber;";
-            $result = $conn->query($sql);
+            $result = connection()->query($sql);
             $row = $result->fetch_assoc();
             $newTicketNum = $row["newTicketNum"];
             $timeRequested = $row["timeRequested"];

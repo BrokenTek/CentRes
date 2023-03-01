@@ -161,7 +161,7 @@ function forgetScrollPosition() {
 
 function toggleSortKey(tableId, columnName, refresh = true) {
     if (document.getElementById(elementId) == null) {
-        throw("toggleSortKey Error! Element doesn't exist");
+        throw("toggleSortKey Error! Table doesn't exist");
     }
     let keyIndex = 1;
     let keyFound = false;

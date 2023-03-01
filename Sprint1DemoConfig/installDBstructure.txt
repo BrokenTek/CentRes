@@ -115,11 +115,11 @@ CREATE TABLE TableStatuses (
 );
 
 INSERT INTO TableStatuses VALUES
-	('Disabled'),
-	('Unassigned'),
-	('Open'),
-	('Seated'),
-	('Bussing');
+	('disabled'),
+	('unassigned'),
+	('open'),
+	('seated'),
+	('bussing');
 
 
 CREATE TABLE Tables (

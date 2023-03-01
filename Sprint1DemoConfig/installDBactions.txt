@@ -248,7 +248,7 @@ BEGIN
 		-- if you're assigning a ticket to a table, but it's occupied or unavailable	
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Cannot assign a Ticket to an Unassigned or Occupied Table!';
-	ELSEIF (NEW.action = 'Bused' AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status = 'Bussing') = 0) THEN	
+	ELSEIF (NEW.action = 'Bused' AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status = 'bussing') = 0) THEN	
 		-- if you're setting the bused flag but the table isn't flagged as bussing
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Specified Table is not marked for bussing. Cannot set status to bused.';
@@ -329,43 +329,43 @@ BEGIN
 	IF (NEW.action = 'Add' AND NEW.ticketId IS NOT NULL AND NEW.employeeId IS NOT NULL) THEN
 		UPDATE Tickets SET tableId = NEW.tableId, timeSeated = NOW() WHERE id = NEW.ticketId;
 		INSERT INTO TableAssignments VALUES(NEW.employeeId, NEW.tableId);
-		UPDATE Tables SET status = 'Seated' WHERE id = NEW.tableId;
+		UPDATE Tables SET status = 'seated' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Add' AND NEW.ticketId IS NOT NULL) THEN
 		UPDATE Tickets SET tableId = NEW.tableId, timeSeated = NOW() WHERE id = NEW.ticketId;
-		UPDATE Tables SET status = 'Seated' WHERE id = NEW.tableId;
+		UPDATE Tables SET status = 'seated' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Add' AND NEW.employeeId IS NOT NULL) THEN
 		INSERT INTO TableAssignments VALUES(NEW.employeeId, NEW.tableId);
 		IF (SELECT COUNT(*) FROM Tickets WHERE tableId = NEW.TableId > 0) THEN
-			UPDATE Tables SET status = 'Seated' WHERE id = NEW.tableId;
+			UPDATE Tables SET status = 'seated' WHERE id = NEW.tableId;
 		ELSE
-			UPDATE Tables SET status = 'Open' WHERE id = NEW.tableId;
+			UPDATE Tables SET status = 'open' WHERE id = NEW.tableId;
 		END IF;
 	ELSEIF (NEW.action = 'Remove' AND NEW.ticketId IS NOT NULL AND NEW.employeeId IS NOT NULL) THEN
 		DELETE FROM TableAssignments WHERE employeeId = NEW.employeeId AND tableId = NEW.tableId;
 		UPDATE Tickets SET tableId = NULL WHERE id = NEW.ticketId;
-		UPDATE Tables SET status = 'Bussing' WHERE id = NEW.tableId;
+		UPDATE Tables SET status = 'bussing' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Remove' AND NEW.ticketId IS NOT NULL) THEN
 		UPDATE Tickets SET tableId = NULL WHERE id = NEW.ticketId;
-		UPDATE Tables SET status = 'Bussing' WHERE id = NEW.tableId;
+		UPDATE Tables SET status = 'bussing' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Remove' AND NEW.employeeId IS NOT NULL) THEN
 		DELETE FROM TableAssignments WHERE employeeId = NEW.employeeId and tableId = NEW.tableId;
 		IF (((SELECT COUNT(*) FROM Tickets WHERE tableId = NEW.TableId) = 0) AND 
-		((SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId and status = 'Bussing')) = 0) THEN
-			UPDATE Tables SET status = 'Unassigned' WHERE id = NEW.tableId;
+		((SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId and status = 'bussing')) = 0) THEN
+			UPDATE Tables SET status = 'unassigned' WHERE id = NEW.tableId;
 		END IF;
 	ELSEIF (NEW.action = 'Bused') THEN
 		IF ((SELECT COUNT(*) FROM TableAssignments WHERE tableId = NEW.TableId) = 0) THEN
-			UPDATE Tables SET status = 'Unassigned' WHERE id = NEW.tableId;
+			UPDATE Tables SET status = 'unassigned' WHERE id = NEW.tableId;
 		ELSE
-			UPDATE Tables SET status = 'Open' WHERE id = NEW.tableId;
+			UPDATE Tables SET status = 'open' WHERE id = NEW.tableId;
 		END IF;
 	ELSEIF (NEW.action = 'Disable') THEN
 		UPDATE Tables SET status = 'Unavailable' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Enable') THEN
 		IF ((SELECT COUNT(*) FROM TableAssignments WHERE tableId = NEW.TableId) = 0) THEN
-			UPDATE Tables SET status = 'Unassigned' WHERE id = NEW.tableId;
+			UPDATE Tables SET status = 'unassigned' WHERE id = NEW.tableId;
 		ELSE
-			UPDATE Tables SET status = 'Open' WHERE id = NEW.tableId;
+			UPDATE Tables SET status = 'open' WHERE id = NEW.tableId;
 		END IF;
 	END IF;
 END$$

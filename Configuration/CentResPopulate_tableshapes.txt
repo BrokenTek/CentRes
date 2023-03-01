@@ -1,9 +1,9 @@
 INSERT INTO `tableshapes` (`shapeName`, `svgPathData`, `capacity`) VALUES
-('booth', '<path id=\"TABLEID\" class=\"tableshape booth\" d=\"M1 1H26M1 1V41H26V1M1 1H6.5M26 1H20.5M6.5 1V41M6.5 1H20.5M20.5 1V41\" fill=\"#808080\" stroke=\"black\" transform=\"translate(TRANSLATETUPLE)\"/>', 4),
-('hightop', '<path id=\"TABLEID\" class=\"tableshape hightop\" d=\"M17.2168 13.1429H23.5222M3.52593 41H38.4741C40.4156 41 41.6291 38.619 40.6583 36.7143L23.1843 2.42857C22.2135 0.523809 19.7865 0.52381 18.8157 2.42857L1.34167 36.7143C0.370887 38.619 1.58437 41 3.52593 41Z\" fill=\"#808080\" stroke=\"black\" transform=\"translate(TRANSLATETUPLE) scale(0.6 0.6)\" />\r\n', 3),
-('longtable', '<path id=\"TABLEID\" class=\"tableshape longtable\" d=\"M21 3.5H38M1 1H61V27.7692H1V1Z\" fill=\"#808080\" stroke=\"black\" transform=\"translate(TRANSLATETUPLE)\" />', 8),
-('round', '<path id=\"TABLEID\" class=\"tableshape round\" d=\"M16 38H26M16 4H26M41 21C41 32.0457 32.0457 41 21 41C9.9543 41 1 32.0457 1 21C1 9.9543 9.9543 1 21 1C32.0457 1 41 9.9543 41 21Z\" fill=\"#808080\" stroke=\"black\" transform=\"translate(TRANSLATETUPLE)\" />', 6),
-('square', '<path id=\"TABLEID\" class=\"tableshape square\" d=\"M11 3.5H21M1 1H31V31H1V1Z\" fill=\"#808080\" stroke=\"black\" transform=\"translate(TRANSLATETUPLE)\" />', 4),
-('twotop', '<path id=\"TABLEID\" class=\"tableshape twotop\" d=\"M1 16V1H14.9535V16M1 16V31H14.9535V16M1 16H14.9535\" fill=\"#808080\" stroke=\"black\" transform=\"translate(TRANSLATETUPLE)\"/>', 2);
+('booth', '<path id=\"TABLEID\" class=\"table unassigned booth\" d=\"M1 1H26M1 1V41H26V1M1 1H6.5M26 1H20.5M6.5 1V41M6.5 1H20.5M20.5 1V41\" transform=\"TRANSFORMDATA\" />', 4),
+('hightop', '<path id=\"TABLEID\" class=\"table unassigned hightop\" d=\"M17.2168 13.1429H23.5222M3.52593 41H38.4741C40.4156 41 41.6291 38.619 40.6583 36.7143L23.1843 2.42857C22.2135 0.523809 19.7865 0.52381 18.8157 2.42857L1.34167 36.7143C0.370887 38.619 1.58437 41 3.52593 41Z\" transform=\"scale(0.6 0.6) TRANSFORMDATA\" />\r\n', 3),
+('longtable', '<path id=\"TABLEID\" class=\"tableshape unassigned longtable\" d=\"M21 3.5H38M1 1H61V27.7692H1V1Z\" TRANSFORMDATA />', 8),
+('round', '<path id=\"TABLEID\" class=\"table unassigned round\" d=\"M16 38H26M16 4H26M41 21C41 32.0457 32.0457 41 21 41C9.9543 41 1 32.0457 1 21C1 9.9543 9.9543 1 21 1C32.0457 1 41 9.9543 41 21Z\" transform=\"TRANSFORMDATA\" />', 6),
+('square', '<path id=\"TABLEID\" class=\"table unassigned square\" d=\"M11 3.5H21M1 1H31V31H1V1Z\" transform=\"TRANSFORMDATA\" />', 4),
+('twotop', '<path id=\"TABLEID\" class=\"table unassigned twotop\" d=\"M1 16V1H14.9535V16M1 16V31H14.9535V16M1 16H14.9535\" transform=\"TRANSFORMDATA\" />', 2);
 
 

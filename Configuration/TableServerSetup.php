@@ -29,7 +29,15 @@ echo("<li>Reset Tables</li>");
 	
 	// Create tables with that shape... In our later sprints SVG path data will have to be included
 	// so we know how to draw the table on the Host View.
-	$sql="INSERT INTO tables (id, shape) VALUES ('T01', 'square'), ('T02', 'square'), ('T03', 'square'), ('T04', 'square'), ('T05', 'square'), ('T06', 'square'), ('T07', 'square'), ('T08', 'square');";
+	$sql="INSERT INTO tables (id, shape) VALUES 
+	('T01', 'square'), 
+	('T02', 'square'), 
+	('T03', 'square'), 
+	('T04', 'square'), 
+	('T05', 'square'), 
+	('T06', 'square'), 
+	('T07', 'square'), 
+	('T08', 'square');";
 	connection()->query($sql);
 
 	echo("<li>Create Employees");
@@ -149,11 +157,11 @@ echo("<BR>" .$sql);
 connection()->query($sql);
 
 // set bussing with/withoug assigned servers
-$sql = "UPDATE Tables SET status = 'Bussing' WHERE id in ('T04','T06');";
+$sql = "UPDATE Tables SET status = 'bussing' WHERE id in ('T04','T06');";
 connection()->query($sql);
 
 // set T08 disabled
-$sql = "UPDATE Tables SET status = 'Disabled' WHERE id = 'T08';";
+$sql = "UPDATE Tables SET status = 'disabled' WHERE id = 'T08';";
 connection()->query($sql);
 
 
