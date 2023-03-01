@@ -10,12 +10,12 @@
         <script>
             function allElementsLoaded() {
                 <?php
-                    if(!isset($_POST['gIndex'])) {
-                        $_POST['gIndex'] = 0;
+                    if(!isset($_POST['tableLogIndex'])) {
+                        $_POST['tableLogIndex'] = 0;
                     }
 
-                    $sql = "SELECT DISTINCT tableId, status FROM g INNER JOIN Tables
-                            ON g.tableId = Tables.id WHERE g.id > " .$_POST['gIndex']. ";";
+                    $sql = "SELECT DISTINCT tableId, status FROM tableLog INNER JOIN Tables
+                            ON tableLog.tableId = Tables.id WHERE tableLog.id > " .$_POST['tableLogIndex']. ";";
 
                     $updatedTables = connection()->query($sql);
                     if (mysqli_num_rows($result) > 0) {
@@ -28,8 +28,8 @@
                     }
 
                     $sql = "SELECT IFNULL(MAX(id),-1) as gIndex FROM g";
-                    $newIndex = connection()->query($sql)->fetch_assoc()['gIndex'];
-                    echo("setVar('gIndex', '$newIndex')");
+                    $newIndex = connection()->query($sql)->fetch_assoc()['tableLogIndex'];
+                    echo("setVar('tableLogIndex', '$newIndex')");
 
                     disconnect();
                 ?>

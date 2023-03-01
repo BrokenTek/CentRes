@@ -68,58 +68,61 @@
 
 <body onload="allElementsLoaded()">
     <form>
+        
+    <svg id='parentSvg' xmlns="http://www.w3.org/2000/svg" height="100vh" width="100vw">
+        
+        <script type="application/ecmascript">
+            <![CDATA[
+                function transformMe(evt) {
+                    // svg root element to access the createSVGTransform() function
+                    const svgroot = evt.target.parentNode;
+                    // SVGTransformList of the element that has been clicked on
+                    const tfmList = evt.target.transform.baseVal;
+
+                    // Create a separate transform object for each transform
+                    const translate = svgroot.createSVGTransform();
+                    translate.setTranslate(50,5);
+                    const rotate = svgroot.createSVGTransform();
+                    rotate.setRotate(10,0,0);
+                    const scale = svgroot.createSVGTransform();
+                    scale.setScale(0.8,0.8);
+
+                    // apply the transformations by appending the SVGTransform objects to the SVGTransformList associated with the element
+                    tfmList.appendItem(translate);
+                    tfmList.appendItem(rotate);
+                    tfmList.appendItem(scale);
+            }
+            ]]>
+        </script>
+
+        <!--   HARD CODED TABLES FOR DAVID TO TEST WITH IN SelectedTable.php -->
+        <path id="T01" onpointerdown="onClickTable('T01')" width="5vmin" height="10vmin" class="table booth" d="M1 16V1H14.9535V16M1 16V31H14.9535V16M1 16H14.9535" fill="#808080" stroke="black" stroke-opacity="0.75" transform="translate(0 0)" />
+        <circle id="T02" onpointerdown="onClickTable('T02')" class="table hightop" width="10vmin" height="10vmin" cx="5vmin" cy="5vmin" r="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(0 100)" />
+        <rect id="T03" onpointerdown="onClickTable('T03')" class="table longtable" width="10vmin" height="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(0 200)" />
+        <rect id="T04" onpointerdown="onClickTable('T04')" class="table square" width="10vmin" height="10vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(0 300)" />
+
+        <path id="T05" onpointerdown="onClickTable('T05')" width="5vmin" height="10vmin" class="table booth" d="M1 16V1H14.9535V16M1 16V31H14.9535V16M1 16H14.9535" fill="#808080" stroke="black" stroke-opacity="0.75" transform="translate(200 0)" />
+        <circle id="T06" onpointerdown="onClickTable('T06')" class="table hightop" width="10vmin" height="10vmin" cx="5vmin" cy="5vmin" r="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(200 100)" />
+        <rect id="T07" onpointerdown="onClickTable('T07')" class="table longtable" width="10vmin" height="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(200 200)" />
+        <rect id="T08" onpointerdown="onClickTable('T08')" class="table square" width="10vmin" height="10vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(200 300)" />
+
         <?php
             // Load all of the tables here
-            $sql = "SELECT id, transformData, TableShapes.shapeName, svgPathData FROM Tables JOIN TableShapes ON Tables.shape = TableShapes.shapeName;";
-            $tables = connection()->query($sql);
-			while ($row = $tables->fetch_assoc()) {
-                $sql = "SELECT svgPathData FROM TableShapes WHERE shapeName = ". $row['shapeName']. ";";
-                //echo(connection()->query($sql)->fetch_assoc()['svgPathData']);
-                //echo($row['svgPathData']. "<br>");
-                $tableStr = str_replace($row['svgPathData'],"TABLEID", $row['id']);
-                //echo($tableStr."<br>");
-                $tableStr = str_replace($tableStr, "TRANSFORMDATA", $row['transformData']);
-                //echo($tableStr."<br>");
-                //echo($tableStr);
-            }
             
-            // Load all of the structure/non table elements here
+                $sql = "SELECT id, transformData, shapeName, svgPathData FROM Tables JOIN TableShapes ON Tables.shape = TableShapes.shapeName;";
+                $tables = connection()->query($sql);
+                while ($row = $tables->fetch_assoc()) {
+                    try {
+                        $tableStr = str_replace("TABLEID", $row['id'], $row['svgPathData']);                
+                        $tableStr = str_replace("TRANSFORMDATA", $row['transformData'], $tableStr);
+                        echo("<$tableStr/>");
+                    }
+                        catch (Exception $e) {
+                        echo($e);
+                    }
+                }      
+                // Load all of the structure/non table elements here
         ?>
-    <svg id='parentSvg' xmlns="http://www.w3.org/2000/svg" height="100vh" width="100vw">
-    <script type="application/ecmascript">
-        <![CDATA[
-            function transformMe(evt) {
-                // svg root element to access the createSVGTransform() function
-                const svgroot = evt.target.parentNode;
-                // SVGTransformList of the element that has been clicked on
-                const tfmList = evt.target.transform.baseVal;
-
-                // Create a separate transform object for each transform
-                const translate = svgroot.createSVGTransform();
-                translate.setTranslate(50,5);
-                const rotate = svgroot.createSVGTransform();
-                rotate.setRotate(10,0,0);
-                const scale = svgroot.createSVGTransform();
-                scale.setScale(0.8,0.8);
-
-                // apply the transformations by appending the SVGTransform objects to the SVGTransformList associated with the element
-                tfmList.appendItem(translate);
-                tfmList.appendItem(rotate);
-                tfmList.appendItem(scale);
-        }
-        ]]>
-    </script>
-
-    <!--   HARD CODED TABLES FOR DAVID TO TEST WITH IN SelectedTable.php -->
-    <path id="T01" onpointerdown="onClickTable('T01')" width="5vmin" height="10vmin" class="table booth" d="M1 16V1H14.9535V16M1 16V31H14.9535V16M1 16H14.9535" fill="#808080" stroke="black" stroke-opacity="0.75" transform="translate(0 0)" />
-    <circle id="T02" onpointerdown="onClickTable('T02')" class="table hightop" width="10vmin" height="10vmin" cx="5vmin" cy="5vmin" r="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(0 100)" />
-    <rect id="T03" onpointerdown="onClickTable('T03')" class="table longtable" width="10vmin" height="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(0 200)" />
-    <rect id="T04" onpointerdown="onClickTable('T04')" class="table square" width="10vmin" height="10vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(0 300)" />
-
-    <path id="T05" onpointerdown="onClickTable('T05')" width="5vmin" height="10vmin" class="table booth" d="M1 16V1H14.9535V16M1 16V31H14.9535V16M1 16H14.9535" fill="#808080" stroke="black" stroke-opacity="0.75" transform="translate(200 0)" />
-    <circle id="T06" onpointerdown="onClickTable('T06')" class="table hightop" width="10vmin" height="10vmin" cx="5vmin" cy="5vmin" r="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(200 100)" />
-    <rect id="T07" onpointerdown="onClickTable('T07')" class="table longtable" width="10vmin" height="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(200 200)" />
-    <rect id="T08" onpointerdown="onClickTable('T08')" class="table square" width="10vmin" height="10vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(200 300)" />
 
     </svg>
 
