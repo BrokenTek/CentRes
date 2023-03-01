@@ -1,15 +1,11 @@
 INSERT INTO `tableshapes` (`shapeName`, `svgPathData`, `capacity`) VALUES
-('booth', 'path id="TABLEID" class="table unassigned booth" d="M1 1H26M1 1V41H26V1M1 1H6.5M26 1H20.5M6.5 1V41M6.5 1H20.5M20.5 1V41" transform="TRANSFORMDATA"', 4),
-('hightop', 'path id="TABLEID" class="table unassigned hightop" d="M17.2168 13.1429H23.5222M3.52593 41H38.4741C40.4156 41 41.6291 38.619 40.6583 36.7143L23.1843 2.42857C22.2135 0.523809 19.7865 0.52381 18.8157 2.42857L1.34167 36.7143C0.370887 38.619 1.58437 41 3.52593 41Z" transform="scale(0.6 0.6) TRANSFORMDATA"', 3),
-('longtable', 'path id="TABLEID" class="tableshape unassigned longtable" d="M21 3.5H38M1 1H61V27.7692H1V1Z" transform="TRANSFORMDATA"', 8),
-('round', 'path id="TABLEID" class="table unassigned round" d="M16 38H26M16 4H26M41 21C41 32.0457 32.0457 41 21 41C9.9543 41 1 32.0457 1 21C1 9.9543 9.9543 1 21 1C32.0457 1 41 9.9543 41 21Z" transform="TRANSFORMDATA"', 6),
-('square', 'path id="TABLEID" class="table unassigned square" d="M11 3.5H21M1 1H31V31H1V1Z" transform="TRANSFORMDATA"', 4),
-('twotop', 'path id="TABLEID" class="table unassigned twotop" d="M1 16V1H14.9535V16M1 16V31H14.9535V16M1 16H14.9535" transform="TRANSFORMDATA"', 2);
+('booth', 'path id="TABLEID" class="table unassigned booth" d="M1.10345 1H28.3978M1.10345 1V44.6709H28.3978V1M1.10345 1H7.1082M28.3978 1H22.393M7.1082 1V44.6709M7.1082 1H22.393M22.393 1V44.6709" transform="TRANSFORMDATA"', 4),
+('hightop', 'path id="TABLEID" class="table unassigned hightop" d="M13.5103 10.4063H18.3947M2.90495 31.9854H29.977C31.481 31.9854 32.421 30.141 31.669 28.6655L18.133 2.10662C17.381 0.631126 15.501 0.631127 14.749 2.10662L1.21295 28.6655C0.460948 30.141 1.40095 31.9854 2.90495 31.9854Z" transform="scale(0.6 0.6) TRANSFORMDATA"', 3),
+('longtable', 'path id="TABLEID" class="tableshape unassigned longtable" d="M34.6207 5.20259H63.1983M1 1H101.862V46H1V1Z" transform="TRANSFORMDATA"', 8),
+('round', 'path id="TABLEID" class="table unassigned round" d="M15.9756 37.2167H25.7639M15.9756 3.93649H25.7639M40.4463 20.5766C40.4463 31.3885 31.6816 40.1532 20.8697 40.1532C10.0579 40.1532 1.29311 31.3885 1.29311 20.5766C1.29311 9.76474 10.0579 1 20.8697 1C31.6816 1 40.4463 9.76474 40.4463 20.5766Z" transform="TRANSFORMDATA"', 6),
+('square', 'path id="TABLEID" class="table unassigned square" d="M12.5834 3.89584H24.1667M1 1H35.7501V18.3751V35.7501H1V1Z" transform="TRANSFORMDATA"', 4),
+('twotop', 'path id="TABLEID" class="table unassigned twotop" d="M0.603451 17.681V1H16.1207V17.681M0.603451 17.681V34.3621H16.1207V17.681M0.603451 17.681H16.1207" transform="TRANSFORMDATA"', 2);
 
 INSERT INTO `tables` (`id`, `shape`, `gridLocationX`, `gridLocationY`, `gridSpanX`, `gridSpanY`, `transformData`, `status`) VALUES
 ('NX1', 'booth', NULL, NULL, NULL, NULL, 'translate(200, 200) rotate(45, 0, 0)', 'unassigned'), 
 ('NX2', 'round', NULL, NULL, NULL, NULL, 'translate(100, 100)', 'unassigned');
-
-
-
-
