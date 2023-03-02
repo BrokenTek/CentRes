@@ -43,6 +43,7 @@
             catch (err) {
                 setTimeout(updateTableStatuses, 250);
             }
+            removeVar("updatedTables", "tableStatusListener");
         }
 
         var listenerLoopTimer;
@@ -67,13 +68,14 @@
         }
         
         function startListenerLoop() {
-            listenerLoop = setTimeout(listenerLoop, 1000);
+            listenerLoopTimer = setTimeout(listenerLoop, 1000);
         }
 
         function stopListenerLoop() {
             clearTimeout(listenerLoopTimer);
         }
 
+        // debug code. remove after testing SelectedTable.php
         function onClickTable(tableId) {
             var oldSelectedTables = document.getElementsByClassName("selected");
             for(var i = 0 ; i < oldSelectedTables.length; i++) {

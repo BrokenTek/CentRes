@@ -14,22 +14,27 @@
                         $_POST['tableLogIndex'] = 0;
                     }
 
-                    $sql = "SELECT DISTINCT tableId, status FROM tableLog INNER JOIN Tables
-                            ON tableLog.tableId = Tables.id WHERE tableLog.id > " .$_POST['tableLogIndex']. ";";
+                    $sql = "SELECT IFNULL(MAX(id),-1) as tableLogIndex FROM TableLog";
+                    $newIndex = connection()->query($sql)->fetch_assoc()['tableLogIndex'];
 
-                    $updatedTables = connection()->query($sql);
-                    if (mysqli_num_rows($result) > 0) {
-                        $table = $updatedTables->fetch_assoc();
-                        $updateString = $table['tableId'] .",". $table['status'];
-                        while ($table = $updatedTables->fetch_assoc()) {
-                            $updateString .= $table['tableId'] .",". $table['status'];
+                    if ($newIndex > $_POST['tableLogIndex']) {
+                        $sql = "SELECT DISTINCT tableId, status FROM tableLog INNER JOIN Tables
+                            ON tableLog.tableId = Tables.id WHERE tableLog.id > " .$_POST['tableLogIndex']. ";";
+                        $updatedTables = connection()->query($sql);
+                        if (mysqli_num_rows($updatedTables) > 0) {
+                            $table = $updatedTables->fetch_assoc();
+                            $updateString = $table['tableId'] .",". $table['status'];
+                            while ($table = $updatedTables->fetch_assoc()) {
+                                $updateString .= ",". $table['tableId'] .",". $table['status'];
+                            }
+                            
+                            echo("setVar('updatedTables', '$updateString');");
                         }
-                        echo("setVar('updatedTables', '$updateString')");
+                        
+                        echo("setVar('tableLogIndex', '$newIndex');");
                     }
 
-                    $sql = "SELECT IFNULL(MAX(id),-1) as gIndex FROM g";
-                    $newIndex = connection()->query($sql)->fetch_assoc()['tableLogIndex'];
-                    echo("setVar('tableLogIndex', '$newIndex')");
+                    
 
                     disconnect();
                 ?>
@@ -38,6 +43,7 @@
     </head>
     <body onload="allElementsLoaded()">
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+            <?php require_once '../Resources/php/display.php'; ?>
         </form>
     </body>
 </html>
