@@ -1,4 +1,8 @@
 function setVar(variableName, value, id = null, update = false) {
+    if (value == null || value === undefined) {
+        removeVar(variableName, id, update);
+        return;
+    }
     var container = document.getElementById(id);
     var form;
     var variableElement;

@@ -43,7 +43,6 @@
             catch (err) {
                 setTimeout(updateTableStatuses, 250);
             }
-            removeVar("updatedTables", "tableStatusListener");
         }
 
         var listenerLoopTimer;
@@ -75,28 +74,30 @@
             clearTimeout(listenerLoopTimer);
         }
 
-        // debug code. remove after testing SelectedTable.php
-        function onClickTable(tableId) {
-            var oldSelectedTables = document.getElementsByClassName("selected");
-            for(var i = 0 ; i < oldSelectedTables.length; i++) {
-                oldSelectedTables[i].classList.remove("selected");
-            }
-            document.getElementById(tableId).classList.add("selected");
-            setVar("selectedTable", tableId);
-        }
-
-         // ========================= TICKET ITEM SELECT FUNCTIONS ==============================
+         // ========================= TABLE SELECT FUNCTIONS ==============================
    
-    const LONG_TIME_TOUCH_LENGTH = 250;
+    const LONG_TIME_TOUCH_LENGTH = 500;
+    const DOUBLE_TOUCH_LENGTH = 500;
     var targetTable = null;
     var longTouchEnabled = false;
     var longTouchTimer = null;
+    var doubleTouchTimer = null;
 	function pointerDown() {
         if (this === undefined) { return; }
+        if (targetTable != null && this == targetTable) {
+            if (this.classList.contains("seated")) {
+                setVar("goToTable", targetTable.id);
+            }
+            clearInterval(doubleTouchTimer);
+        }
         targetTable = this;
         targetTable.classList.add("selected");
         if (getVar("selectedTable") != null && getVar("selectedTable") != this.id) {
             longTouchTimer = setTimeout(longTouch, LONG_TIME_TOUCH_LENGTH);
+        }
+        var classList = Array.from(targetTable.classList)
+        if (getVar("authorizationId") !== undefined && Array.from(targetTable.classList).indexOf("seated") > -1) {
+                doubleTouchTimer = setTimeout(doubleTouchDisable, DOUBLE_TOUCH_LENGTH);
         }
 	}
 
@@ -113,6 +114,11 @@
         }
     }
 
+    function doubleTouchDisable() {
+        clearTimeout(doubleTouchTimer);
+        targetTable = null;
+    }
+
     // when you've made your current selection
     function pointerUp() {
         if (targetTable == null) { return; }
@@ -120,7 +126,7 @@
         if (longTouchTimer != null) {
             clearTimeout(longTouchTimer);
         }
-
+        
         var oldSelectedItems = document.getElementsByClassName("table");
         // if you only have 1 item selected, adjust the state of applicable ticket items to reflect that.
         if (!longTouchEnabled) {
@@ -131,17 +137,16 @@
                 oldSelectedItems[i].classList.remove("multiselect");
     	    }
     	    targetTable.classList.add("selected");
-            targetTable.classList.remove("multiselect");
             setVar("selectedTable", targetTable.id);
         }
         // or you have multiple tables selected
         else {
             setVar("selectedTable", getVar("selectedTable") + "," + targetTable.id); 
         }
-
-        // set the ticket timestamp so anything listening to it can update.
-        setVar("lastUpdate", Date.now()); 
-        targetTable = null;
+        
+        if (doubleTouchTimer == null) {
+            targetTable = null;
+        }
         longTouchEnabled = false;
     }
 
@@ -180,15 +185,15 @@
         </script>
 
         <!--   HARD CODED TABLES FOR DAVID TO TEST WITH IN SelectedTable.php -->
-        <path id="T01" onpointerdown="onClickTable('T01')" width="5vmin" height="10vmin" class="table booth" d="M1 16V1H14.9535V16M1 16V31H14.9535V16M1 16H14.9535" fill="#808080" stroke="black" stroke-opacity="0.75" transform="translate(0 0)" />
-        <circle id="T02" onpointerdown="onClickTable('T02')" class="table hightop" width="10vmin" height="10vmin" cx="5vmin" cy="5vmin" r="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(0 100)" />
-        <rect id="T03" onpointerdown="onClickTable('T03')" class="table longtable" width="10vmin" height="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(0 200)" />
-        <rect id="T04" onpointerdown="onClickTable('T04')" class="table square" width="10vmin" height="10vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(0 300)" />
+        <path id="T01" width="5vmin" height="10vmin" class="table booth unassigned" d="M1 16V1H14.9535V16M1 16V31H14.9535V16M1 16H14.9535" fill="#808080" stroke="black" stroke-opacity="0.75" transform="translate(0 0)" />
+        <circle id="T02" class="table hightop unassigned" width="10vmin" height="10vmin" cx="5vmin" cy="5vmin" r="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(0 100)" />
+        <rect id="T03" class="table longtable unassigned" width="10vmin" height="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(0 200)" />
+        <rect id="T04" class="table square unassigned" width="10vmin" height="10vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(0 300)" />
 
-        <path id="T05" onpointerdown="onClickTable('T05')" width="5vmin" height="10vmin" class="table booth" d="M1 16V1H14.9535V16M1 16V31H14.9535V16M1 16H14.9535" fill="#808080" stroke="black" stroke-opacity="0.75" transform="translate(200 0)" />
-        <circle id="T06" onpointerdown="onClickTable('T06')" class="table hightop" width="10vmin" height="10vmin" cx="5vmin" cy="5vmin" r="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(200 100)" />
-        <rect id="T07" onpointerdown="onClickTable('T07')" class="table longtable" width="10vmin" height="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(200 200)" />
-        <rect id="T08" onpointerdown="onClickTable('T08')" class="table square" width="10vmin" height="10vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(200 300)" />
+        <path id="T05" width="5vmin" height="10vmin" class="table booth unassigned" d="M1 16V1H14.9535V16M1 16V31H14.9535V16M1 16H14.9535" fill="#808080" stroke="black" stroke-opacity="0.75" transform="translate(200 0)" />
+        <circle id="T06" class="table hightop unassigned" width="10vmin" height="10vmin" cx="5vmin" cy="5vmin" r="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(200 100)" />
+        <rect id="T07" class="table longtable unassigned" width="10vmin" height="5vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(200 200)" />
+        <rect id="T08" class="table square unassigned" width="10vmin" height="10vmin" fill="grey" stroke="black" stroke-opacity="0.75" transform="translate(200 300)" />
 
         <?php
             // Load all of the tables here

@@ -9,7 +9,10 @@ If you are logged in but don't have the correct role to view this page,
 you'll be routed to whatever the home page is for your specified role level -->
 <?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(4, $GLOBALS['role']); ?>
 <!-- CHANGE 255 TO THE ALLOWED ROLE LEVEL FOR THE PAGE -->
-
+<?php foreach($_POST as $key => $value) {
+  echo "$key: $value<br>";
+}
+?>
 <!DOCTYPE html>
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <html>
@@ -91,14 +94,8 @@ if (isset($_POST['verboseAction'])) {
         <!-- this form submits to itself -->
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
-            <label for="tableId">Select a table:</label>
-                <select name="tableId" id="tableId">
-                <option value="T01">T01</option>
-                <option value="T02">T02</option>
-                <option value="T03">T03</option>
-                <option value="T04">T04</option>
-
-                </select>
+           
+                
                 <br>
                 <button type="submit" name="tableSelected" value="true">Select Table</button>
 

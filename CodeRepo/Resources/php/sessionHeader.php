@@ -22,7 +22,14 @@
             const LAST_NAME = "' .$GLOBALS['lastName']. '";
             const ROLE = ' .$GLOBALS['role']. ';'
             .$roleStr.
-        '</script>
+        ' function navigateAway() {
+            var value = document.getElementById("managementNavigationSelector").value;
+            if (value != "") {
+                location.replace(value);
+            }
+            document.getElementById("managementNavigationSelector").selectedIndex = 0;    
+          }
+        </script>
     ');
 
     echo('<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
@@ -41,7 +48,21 @@
     
         <div class="sessionHeader">
             <img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
-            <div id="sessionDetails">' .$GLOBALS['username']. '</div>
-            <button type="button" id="btnLogout" onclick="logout()">Logout</button>
+            <div id="sessionDetails">' .$GLOBALS['username']. '</div>');
+
+    if (($GLOBALS['role'] & 8) == 8) {
+        echo("<div id='managementNavigation'>
+                <select name='cars' id='managementNavigationSelector' onchange='navigateAway()'>
+                    <option value=''>Navigate To</option>
+                    <option value='../HostView/HostView.php'>Host&nbsp;View</option>
+                    <option value = ''>Inventory/Popularity&nbsp;Window</option>
+                    <option value=''>Employee&nbsp;Roster</option>
+                    <option value=''>Menu&nbsp;Editor</option>
+                </select>
+            </div>
+        ");
+    }
+
+    echo('<button type="button" id="btnLogout" onclick="logout()">Logout</button>
         </div>');
 ?>

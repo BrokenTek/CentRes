@@ -45,6 +45,11 @@
                 btnSplit.addEventListener('pointerup', (event) => {splitButtonPressed(event)});
                 
                 setVar('username', USERNAME, 'serverListener', true);
+                if (getVar('staticTableId') !== undefined) {
+                    setVar('staticTableId', getVar('staticTableId'), 'serverListener');
+                    updateDisplay('serverListener');
+                }
+                
                 checkTableAssignments();
 
                 setVar("enabledButtons", "");
@@ -346,6 +351,14 @@
                 if (cboTable.options.length == 1) {
                     cboTable.text = "No Tables"; 
                     cboTable.disabled = true;                         
+                }
+                else if (cboTable.options.length == 2) {
+                    cboTable.text = "Select Table";
+                    cboTable.disabled = true;
+                    if (cboTable.selectedIndex != 1) {
+                        cboTable.selectedIndex = 1;
+                        tableSelectionChanged();
+                    }
                 }
                 else {
                     cboTable.text = "Select Table";
@@ -903,8 +916,9 @@
                     
                 </div>
             </div>
+            <?php require_once '../Resources/php/display.php'; ?>
         </form>
-        <iframe id="serverListener" src="serverListener.php" style="display: none;">
+        <iframe id="serverListener" src="../Resources/php/serverListener.php" style="display: none;">
         </div>
     </body>
 </html>

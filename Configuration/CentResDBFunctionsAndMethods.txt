@@ -240,7 +240,7 @@ BEGIN
 		SET MESSAGE_TEXT = 'Specifed ticket number does not exist!';
 	
 		-- If you are assigning a server to table, but they aren't logged in or don't have server roles for session
-	ELSEIF (NEW.tableId IS NOT NULL AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status IN ('Occupied', 'disabled')) = 1) THEN
+	ELSEIF (NEW.ticketId IS NOT NULL AND NEW.tableId IS NOT NULL AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status IN ('Occupied', 'disabled')) = 1) THEN
 		-- if you're assigning a ticket to a table, but it's occupied or disabled	
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Cannot assign a Ticket to an Unassigned or Occupied Table!';

@@ -39,64 +39,149 @@
 			#ifrRestaurantLayout {
 				grid-area: ifrRestaurantLayout;
 			}
+			
+			#ifrSelectedTable, #ifrWaitTimes {
+				//background-color: black;
+			}
 		</style>
 		<script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
 		<script>
 			function allElementsLoaded() {
 				setVar("authorizationId", USER_ID, "ifrSelectedTable");
+				if ((ROLE & 8) == 8) {
+                	setVar("authorizationId", USER_ID, "ifrRestaurantLayout");
+					verifyAuthProcessed = true;
+            	}
 				startEventLoopTimer();
 			}
 			
+			var verifyAuthProcessed = false;
 			var eventLoopTimer;
 
 			function eventLoop() {
 				try {
-					var selectionChanged = false;
+					if (verifyAuthProcessed && getVar("authorizationId", "ifrRestaurantLayout") === undefined) {
+						setTimeout(eventLoop, 250);
+					}
+					verifyAuthProcessed = false;
+					let goToTableId = getVar("goToTable", "ifrRestaurantLayout");
+					if (goToTableId !== undefined) {
+						setVar("staticTableId",goToTableId);
+						document.getElementsByTagName("form")[0].setAttribute("action", "../ServerView/ServerView.php");
+						updateDisplay();
+					}
+					let selectionChanged = false;
 
-					var serverLocal = getVar("selectedServer");
-					var serverExtern = getVar("selectedServer", "ifrServerList");
+					let serverLocal = getVar("selectedServer");
+					let serverExtern = getVar("selectedServer", "ifrServerList");
 					
-					var tableLocal = getVar("selectedTable");
-					var tableExtern = getVar("selectedTable", "ifrRestaurantLayout");
+					let tableLocal = getVar("selectedTable");
+					let tableExtern = getVar("selectedTable", "ifrRestaurantLayout");
+
+					let selectedTableUpdated = getVar("updated", "ifrSelectedTable");
+
+					let updateNeeded = false;
+					let highlightNeeded = false;
+
+					if (selectedTableUpdated) {
+						removeVar("updated", "ifrSelectedTable");
+						highlightNeeded = true;
+					}
 
 					if (serverLocal != serverExtern) {
 						selectionChanged = true;
 						if (serverExtern === undefined) {
 							removeVar("selectedServer");
+							removeVar("employeeId", "serverListener");
 							removeVar("employeeId", "ifrSelectedTable");
 						}
 						else {
 							setVar("selectedServer", serverExtern);
-							setVar("employeeId", serverExtern.substring(6), "ifrSelectedTable");
+							setVar("employeeId", serverExtern.substring(6), "serverListener");	
 						}
+						updateDisplay("serverListener");
+						highlightNeeded = true;
+						updateNeeded = true;
 					}
 
 					if (tableLocal != tableExtern) {
-						selectionChanged = true;
-						if (tableExtern === undefined) {
-							removeVar("selectedTable");
-							removeVar("tableId", "ifrSelectedTable");
-						}
-						else {
-							setVar("selectedTable", tableExtern);
+						removeVar("employeeId", "ifrSelectedTable");
+						setVar("selectedTable", tableExtern);
+						updateNeeded = true;
+					}
+					if (updateNeeded || highlightNeeded) {
+						updateDisplay("serverListener");
+						if (updateNeeded) { updateSelectedTable(); }
+						if (highlightNeeded) { hightlightTables(); }
+					}
 						
-							if (tableExtern.indexOf(",") > -1) {
-								removeVar("tableId", "ifrSelectedTable");
-							}
-							else {
-								setVar("tableId", tableExtern, "ifrSelectedTable");
-							}
-						}
-					}
-					if (selectionChanged) {
-						updateDisplay("ifrSelectedTable");
-					}
-					
 				}
 				catch (error) {
-
+					
 				}
 				startEventLoopTimer();
+			}
+
+			function highlightTables() {
+				try {
+					var selectedServer = getVar(selectedServer)
+					setVar("highlightedTables", getVar("tableList", "serverListener"), "ifrRestaurantLayout");
+					setVar("highlightedTables", (serverExtern === undefined ? "clear" : tableExtern), "ifrRestaurantLayout");
+				}
+				catch (error) {
+					setTimeout(highlightTables, 250);
+				}
+			}
+
+			function updateSelectedTable() {
+				try {
+					let tableList = getVar("tableList","serverListener");
+
+					let serverLocal = getVar("selectedServer");
+					if (serverLocal !== undefined) {
+						serverLocal = serverLocal.substring(6);
+					}
+					let serverExtern = getVar("selectedServer", "ifrSelectedTable");
+					
+					let tableLocal = getVar("selectedTable");
+					let tableExtern = getVar("selectedTable", "ifrSelectedTable");
+
+					let tableNew = undefined;
+					let serverNew = undefined;
+
+					let selectedTables = getVar("selectedTable", "ifrRestaurantLayout");
+
+					if (tableLocal !== undefined) {
+						tableNew = tableLocal;
+					}
+
+					if (serverLocal !== undefined) {
+						serverNew = serverLocal;
+					}
+
+					let updateRequired = false;
+					if (selectedTables !== undefined && selectedTables.indexOf(",") > -1) {
+						setVar("tableId", undefined, "ifrSelectedTable");
+						removeVar("employeeId", "ifrSelectedTable");
+						updateDisplay("ifrSelectedTable");
+						return;
+					}
+					if (tableExtern != tableNew) {
+						setVar("tableId", tableNew, "ifrSelectedTable");
+						updateRequired = true;
+					}
+					if (serverExtern != serverNew) {
+						setVar("employeeId", serverNew, "ifrSelectedTable");
+						updateRequired = true;
+					}
+					if (updateRequired) {
+						updateDisplay("ifrSelectedTable");
+					}
+				}
+				catch (err) {
+					alert("error");
+					setTimeout(updateSelectedTable, 250);
+				}
 			}
 
 			function stopEventLoopTimer() {
@@ -118,6 +203,7 @@
 				<iframe id="ifrSelectedTable" src="SelectedTable.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="ifrTicket" src="../Resources/php/ticket.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="ifrRestaurantLayout" src="RestaurantLayout.php" frameborder='0' width="100%" height="100%"></iframe>
+				<iframe id="serverListener" src="../Resources/php/serverListener.php" style="display: none;"></iframe>
 			</div>
 		</form>
 	</body>

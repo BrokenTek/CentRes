@@ -13,7 +13,7 @@
                     if(!isset($_POST['tableLogIndex'])) {
                         $_POST['tableLogIndex'] = 0;
                     }
-
+                    unset($_POST['updatedTables']);
                     $sql = "SELECT IFNULL(MAX(id),-1) as tableLogIndex FROM TableLog";
                     $newIndex = connection()->query($sql)->fetch_assoc()['tableLogIndex'];
 
@@ -30,7 +30,7 @@
                             
                             echo("setVar('updatedTables', '$updateString');");
                         }
-                        
+
                         echo("setVar('tableLogIndex', '$newIndex');");
                     }
 

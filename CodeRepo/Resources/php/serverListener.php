@@ -5,21 +5,35 @@
             function reload() {
                 document.getElementById("tableSelectorForm").submit();
             }
-            setTimeout(reload, 1000);
+            setTimeout(reload, 100000);
         </script>
     </head>
     <body>
         <form id="tableSelectorForm" method="POST">
             <?php
-                require_once '../Resources/php/connect_disconnect.php';
-                if (isset($_POST['username'])) {
+                require_once 'connect_disconnect.php';
+                $_POST['tableList'] = "";
+                if (isset($_POST['staticTableId'])) { 
+                    $sql = "SELECT id FROM Tickets WHERE tableId = '" .$_POST['staticTableId']. "';";
+                    $tick = connection()->query($sql);
+                    if (mysqli_num_rows($tick) == 1) {
+                        $tick = $tick->fetch_assoc()['id'];
+                        $_POST['tableList'] = $_POST['staticTableId'] .",". $tick ;
+                    }
+                    else {
+                        $_POST['tableList'] = $_POST['staticTableId'] .",";
+                    }
+                    
+                }
+                elseif (isset($_POST['username']) || isset($_POST['employeeId'])) {
+                    $userStr = (isset($_POST['employeeId']) ? $_POST['employeeId'] : "idFromUsername('" .$_POST['username']. "')" );
+                    
                     $_POST['tableList'] = "";
-                    echo("Assigned Ticket/Table event listener");
-                    echo("<br>Username: " .$_POST['username']);
+                    
                     
                     $sql = "SELECT Tickets.tableId AS tableId, Tickets.id AS ticketNumber  FROM TableAssignments INNER JOIN Tickets 
                                                                 ON TableAssignments.tableId = Tickets.tableId
-                                                                WHERE TableAssignments.employeeId = idFromUsername('" .$_POST['username']. "') ORDER BY Tickets.tableId;";
+                                                                WHERE TableAssignments.employeeId = $userStr ORDER BY Tickets.tableId;";
                     $ownedTables = connection()->query($sql);
                     if (mysqli_num_rows($ownedTables) > 0) {
                         $row = $ownedTables->fetch_assoc();
@@ -34,6 +48,7 @@
                 }
                 else {
                     unset($_POST['tableList']);
+                    
                 }
 
                 if (isset($_POST['ticket'])) {
@@ -69,7 +84,7 @@
                 else {
                     unset($_POST['maxSeat'], $_POST['maxSplit']);
                 }
-                require_once "../Resources/php/display.php";
+                require_once "display.php";
                 disconnect();
             ?>
         </form>
