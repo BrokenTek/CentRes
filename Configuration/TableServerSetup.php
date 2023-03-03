@@ -3,6 +3,8 @@ require_once '../CodeRepo/Resources/php/connect_disconnect.php';
 
 echo("<h1>Reset Data</h1><ol>");
 // Reset Everything
+$sql="DELETE FROM TableLog; ";
+connection()->query($sql);
 $sql="DELETE FROM TableAssignments; ";
 connection()->query($sql);
 $sql="DELETE FROM TableLog; ";

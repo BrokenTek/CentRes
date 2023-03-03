@@ -2,7 +2,11 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
 		<style>
+			iframe {
+				background-color: black;
+			}
 			.sessionBody {
 				display: grid;
 				grid-template-areas: "ifrServerList ifrRestaurantLayout ifrSelectedTable"
@@ -38,6 +42,7 @@
 
 			#ifrRestaurantLayout {
 				grid-area: ifrRestaurantLayout;
+				background-color: #777;
 			}
 			
 			#ifrSelectedTable, #ifrWaitTimes {
@@ -102,17 +107,19 @@
 						updateDisplay("serverListener");
 						highlightNeeded = true;
 						updateNeeded = true;
+						
 					}
 
 					if (tableLocal != tableExtern) {
 						removeVar("employeeId", "ifrSelectedTable");
+						removeVar("ticketId", "ifrSelectedTable");
 						setVar("selectedTable", tableExtern);
 						updateNeeded = true;
 					}
 					if (updateNeeded || highlightNeeded) {
 						updateDisplay("serverListener");
 						if (updateNeeded) { updateSelectedTable(); }
-						if (highlightNeeded) { hightlightTables(); }
+						if (highlightNeeded) { highlightTables(); }
 					}
 						
 				}
@@ -124,11 +131,13 @@
 
 			function highlightTables() {
 				try {
-					var selectedServer = getVar(selectedServer)
-					setVar("highlightedTables", getVar("tableList", "serverListener"), "ifrRestaurantLayout");
-					setVar("highlightedTables", (serverExtern === undefined ? "clear" : tableExtern), "ifrRestaurantLayout");
+					var selectedServer = getVar("selectedServer");
+					var tableList = getVar("tableList", "serverListener");
+					setVar("highlightedTables", tableList , "ifrRestaurantLayout");
+					setVar("highlightedTables", (selectedServer === undefined ? "clear" : tableList), "ifrRestaurantLayout");
 				}
 				catch (error) {
+					alert(error);
 					setTimeout(highlightTables, 250);
 				}
 			}

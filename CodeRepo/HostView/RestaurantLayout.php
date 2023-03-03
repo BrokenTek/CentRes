@@ -126,21 +126,31 @@
         if (longTouchTimer != null) {
             clearTimeout(longTouchTimer);
         }
-        
+
         var oldSelectedItems = document.getElementsByClassName("table");
         // if you only have 1 item selected, adjust the state of applicable ticket items to reflect that.
         if (!longTouchEnabled) {
     	    /*this iterates through the list returned, if there is no case where multiple items are selected concurrently,
     	    you can just use oldSelectedItems[0].classList.remove("selected"); instead*/
     	    for(let i = 0; i < oldSelectedItems.length; i++){
-        	    oldSelectedItems[i].classList.remove("selected");
-                oldSelectedItems[i].classList.remove("multiselect");
+                if (oldSelectedItems[i] != targetTable) {
+                    oldSelectedItems[i].classList.remove("selected");
+                }
+                try {
+                    oldSelectedItems[i].classList.remove("multiselect");
+                }
+                catch (err) {
+                    alert(oldSelectedItems[i]);
+                }
     	    }
-    	    targetTable.classList.add("selected");
             setVar("selectedTable", targetTable.id);
         }
         // or you have multiple tables selected
         else {
+            for(let i = 0; i < oldSelectedItems.length; i++){
+        	    oldSelectedItems[i].classList.add("multiselect");
+    	    }
+
             setVar("selectedTable", getVar("selectedTable") + "," + targetTable.id); 
         }
         

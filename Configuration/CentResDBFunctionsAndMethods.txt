@@ -335,7 +335,9 @@ BEGIN
 		IF (SELECT COUNT(*) FROM Tickets WHERE tableId = NEW.TableId > 0) THEN
 			UPDATE Tables SET status = 'seated' WHERE id = NEW.tableId;
 		ELSE
-			UPDATE Tables SET status = 'open' WHERE id = NEW.tableId;
+			IF ((SELECT COUNT(status) FROM Tables WHERE id = NEW.TableId AND status = 'bussing') = 0) THEN
+				UPDATE Tables SET status = 'open' WHERE id = NEW.tableId;
+			END IF;
 		END IF;
 	ELSEIF (NEW.action = 'Remove' AND NEW.ticketId IS NOT NULL AND NEW.employeeId IS NOT NULL) THEN
 		DELETE FROM TableAssignments WHERE employeeId = NEW.employeeId AND tableId = NEW.tableId;
