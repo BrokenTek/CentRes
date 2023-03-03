@@ -176,8 +176,14 @@
 						return;
 					}
 					if (tableExtern != tableNew) {
-						setVar("tableId", tableNew, "ifrSelectedTable");
-						updateRequired = true;
+						if (tableNew == "clear") {
+							removeVar("tableId", "ifrSelectedTable");
+							updateRequired = true;
+						}
+						else {
+							setVar("tableId", tableNew, "ifrSelectedTable");
+							updateRequired = true;
+						}
 					}
 					if (serverExtern != serverNew) {
 						setVar("employeeId", serverNew, "ifrSelectedTable");

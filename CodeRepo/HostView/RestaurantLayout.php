@@ -75,7 +75,6 @@
         }
 
          // ========================= TABLE SELECT FUNCTIONS ==============================
-   
     const LONG_TIME_TOUCH_LENGTH = 500;
     const DOUBLE_TOUCH_LENGTH = 500;
     var targetTable = null;
@@ -83,6 +82,7 @@
     var longTouchTimer = null;
     var doubleTouchTimer = null;
 	function pointerDown() {
+        event.stopPropagation();
         if (this === undefined) { return; }
         if (targetTable != null && this == targetTable) {
             if (this.classList.contains("seated")) {
@@ -100,6 +100,15 @@
                 doubleTouchTimer = setTimeout(doubleTouchDisable, DOUBLE_TOUCH_LENGTH);
         }
 	}
+
+    function pointerDownOnNothing() {
+        var oldSelectedItems = document.getElementsByClassName("table");
+        for(let i = 0; i < oldSelectedItems.length; i++){
+            oldSelectedItems[i].classList.remove("selected");
+            oldSelectedItems[i].classList.remove("multiselect");
+            setVar("selectedTable", "clear");
+        }
+    }
 
     // if oyu pressed on a ticket item, you already have another one selected, and the minimum required time
     // for multiselect has elapsed, change the selected item to "multiselect" 
@@ -168,7 +177,7 @@
 <body onload="allElementsLoaded()">
     <form>
         
-    <svg id='parentSvg' xmlns="http://www.w3.org/2000/svg" height="100vh" width="100vw">
+    <svg id='parentSvg' xmlns="http://www.w3.org/2000/svg" height="100vh" width="100vw" onpointerdown="pointerDownOnNothing()">
         
         <script type="application/ecmascript">
             <![CDATA[
