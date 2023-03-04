@@ -101,20 +101,7 @@
 
 					let updateNeeded = false;
 					let highlightNeeded = false;
-					
-					let selectedTicket = getVar("selectedTicket", "ifrWaitList");
-					 if (selectedTicket !== undefined){
-						selectedTicket = selectedTicket.substring(6);
-						updateNeeded = true;
-					 }
-					 setVar("ticketId", selectedTicket, "ifrSelectedTable");
-					 
-					
-					 if (selectedTableUpdated) {
-						removeVar("updated", "ifrSelectedTable");
-						highlightNeeded = true;
-					}
-
+										
 					if (ticketLocal !== undefined && ticketExtern === undefined) {
 						setVar("ticketId", ticketLocal, "ifrSelectedTable");
 						updateNeeded = true;
@@ -151,8 +138,7 @@
 						
 				}
 				catch (error) {
-					alert(error);
-					
+						
 				}
 				startEventLoopTimer();
 			}
