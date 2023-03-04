@@ -75,31 +75,25 @@
 						document.getElementsByTagName("form")[0].setAttribute("action", "../ServerView/ServerView.php");
 						updateDisplay();
 					}
+
 					let selectionChanged = false;
 
-					let serverLocal = getVar("selectedServer");
 					let serverExtern = getVar("selectedServer", "ifrServerList");
+					let serverLocal = getVar("selectedServer");
 					
-					let tableLocal = getVar("selectedTable");
 					let tableExtern = getVar("selectedTable", "ifrRestaurantLayout");
-					// wait list ticket update
-					let waitListToSelectedTable = getVar("flag", "ifrSelectedTable");
-					removeVar("flag", "ifrSelectedTable");
-					if ( waitListToSelectedTable == "refreshWaitList"){
-						UpdateDisplay("ifrWaitTimes");
-
-					}
-
+					let tableLocal = getVar("selectedTable");
+					
 					let selectedTableUpdated = getVar("updated", "ifrSelectedTable");
 
 					let waitListUpdateFlag = getVar("flag", "ifrSelectedTable");
 					
+					let ticketExtern = getVar("ticketId", "ifrSelectedTable");
 					let ticketLocal = getVar("selectedTicket", "ifrWaitList");
 					if (ticketLocal !== undefined) {
 						ticketLocal = ticketLocal.substring(6);
 					}
-					let ticketExtern = getVar("ticketId", "ifrSelectedTable");
-
+					
 					if (waitListUpdateFlag == "refreshWaitList") {
 						removeVar("flag", "ifrSelectedTable");
 						updateDisplay("ifrWaitList");
@@ -112,7 +106,6 @@
 					 if (selectedTicket !== undefined){
 						selectedTicket = selectedTicket.substring(6);
 						updateNeeded = true;
-						//alert(selectedTicket);
 					 }
 					 setVar("ticketId", selectedTicket, "ifrSelectedTable");
 					 
