@@ -136,7 +136,7 @@ you'll be routed to whatever the home page is for your specified role level -->
         
         <script>
             function allElementsLoaded() {
-              <?php if (isset($flag)) { echo("setVar('flag', '$flag'"); } ?>
+             <?php if (isset($flag)) { echo("setVar('flag', '$flag'"); } ?>
             }
             
             function executeAction(verboseAction, employeeId = null) {
