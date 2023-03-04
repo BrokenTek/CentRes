@@ -94,6 +94,7 @@ you'll be routed to whatever the home page is for your specified role level -->
         .lblServer, #lblTicket {
           grid-column: 3;
           padding-left: .25rem;
+          margin-block: auto;
         }
 
         .removeButton {

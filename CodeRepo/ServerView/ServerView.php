@@ -51,7 +51,7 @@
                     updateDisplay('serverListener');
                 }
                 
-                checkTableAssignments(true);
+                checkTableAssignments();
 
                 setVar("enabledButtons", "");
                 updateButtonStates();
@@ -242,7 +242,7 @@
             
 
             // check for the server's current table assignments
-            function checkTableAssignments(suppressMessages = false) {
+            function checkTableAssignments() {
                 var checkStr;
                 try {
                     checkStr = getVar("tableList", "serverListener");
@@ -363,7 +363,7 @@
                     cboTable.disabled = false;
                 }
 
-                if (tablesAdded.length > 0 || tablesRemoved.length > 0 && !suppressMessages) {
+                if (tablesAdded.length > 0 || tablesRemoved.length > 0) {
                     let msg = "Your table assignments have changed.\n\n";
                     if (tablesAdded.length > 0) {
                         var addedStr = tablesAdded[0];
@@ -381,7 +381,7 @@
                     }
                     alert(msg);
                 }
-                initalLoad = false;
+                loaded = true;
             }
             
             // listen for menu item selection

@@ -88,7 +88,7 @@ Otherwise will reroute to logon page -->
     <?php
     require_once '../Resources/php/connect_disconnect.php';
     date_default_timezone_set('America/New_York');
-    $errorMessage = "";
+    $message = "";
     if (isset($_POST["createTicket"])) {
         $nickname = $_POST["nickname"];
         $partySize = $_POST["partySize"];
@@ -107,9 +107,9 @@ Otherwise will reroute to logon page -->
             $row = $result->fetch_assoc();
             $newTicketNum = $row["newTicketNum"];
             $timeRequested = $row["timeRequested"];
-            echo "<p>Ticket created for $nickname: $partySize</p>";
+           $message = "<div>Ticket created for $nickname: $partySize</div>";
         } catch (mysqli_sql_exception $e) {
-            $errorMessage =  "<div>An error has occured.\nTry changing the party name.</div>";
+            $message =  "<div>An error has occured.\nTry changing the party name.</div>";
         }
     }
 
@@ -131,7 +131,7 @@ Otherwise will reroute to logon page -->
                 <button id="btnCreate" type="submit" name="createTicket">Create Ticket</button>
             </div>
         </fieldset>
-        <?php if (isset($errorMessage)) { echo($errorMessage); } ?>
+        <?php if (isset($message)) { echo($message); } ?>
     </form>
    
 </body>

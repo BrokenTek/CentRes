@@ -25,6 +25,9 @@ Otherwise will reroute to logon page -->
                     if (ticket != null) {
                         ticket.classList.add("selected");
                     }
+                    else {
+                        removeVar("selectedTicket");
+                    }
                 }
                 rememberScrollPosition();
                 let rows = document.getElementsByClassName("ticket");
@@ -67,7 +70,7 @@ Otherwise will reroute to logon page -->
     </head>
     <body onload="createEventHandlers()" class="intro">
         <legend>
-            <div>Wait List</div>
+            <div onpointerdown="updateDisplay()">Wait List</div>
             <button type="button" onclick="location.href='NewTicket.php'" id="btnAddTicket">Add</button>
             <button class="disabled" type="button" onclick="removeSelectedTicket()" disabled id="btnRemoveSelectedTicket" onclick="removeSelectedTicket()">Remove</button>
         </legend>

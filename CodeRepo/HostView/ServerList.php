@@ -51,7 +51,7 @@
         </style>
     </head>
     <body onload="allElementsLoaded()" class="intro">
-        <legend>Active&nbsp;Servers</legend>
+        <legend onpointerdown="updateDisplay()">Active&nbsp;Servers</legend>
         <form action = "<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method = "post">
             <table>
                 <tr>
@@ -68,6 +68,7 @@
                             LEFT JOIN(SELECT * FROM Tickets WHERE timeSeated IS NOT NULL AND timeClosed IS NULL) AS activetickets 
                             ON tableassignments.tableId = activetickets.tableId)
                             WHERE employees.id IN (SELECT employeeId FROM ActiveEmployees WHERE employeeRole & 2 = employeeRole)
+                            AND tableAssignments.tableID in (SELECT tableId FROM Tickets WHERE tableId IS NOT NULL)
                             GROUP BY servername
                             ORDER BY pplcount ASC, tblcount ASC;";
                     $result = connection()->query($sql);

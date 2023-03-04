@@ -98,6 +98,8 @@
 					if (waitListUpdateFlag == "refreshWaitList") {
 						removeVar("flag", "ifrSelectedTable");
 						updateDisplay("ifrWaitList");
+						updateDisplay("ifrServerList");
+						updateDisplay("ifrWaitTimes");
 					}
 
 					let updateNeeded = false;
