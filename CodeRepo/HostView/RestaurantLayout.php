@@ -9,6 +9,12 @@
     <meta charset='utf-8' />
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="../Resources/CSS/tableStyles.css" />
+    <style>
+        .multiselect {
+            background-color: #666;
+            filter: blur(2px);
+        }
+    </style>
     <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
     <script src="../Resources/JavaScript/SvgManipulation.js"></script>
     <!-- Will Need To Change CSS File Path Later -->
@@ -21,6 +27,8 @@
                 for (var i = 0; i < elements.length; i++) {
                     elements[i].addEventListener('pointerdown',pointerDown);
                     elements[i].addEventListener('pointerup', pointerUp);
+                    elements[i].addEventListener('pointerenter', pointerEnter);
+                    elements[i].addEventListener('pointerleave', pointerLeave);
                 }
             }
             updateDisplay("tableStatusListener");
@@ -75,99 +83,109 @@
         }
 
          // ========================= TABLE SELECT FUNCTIONS ==============================
-    const LONG_TIME_TOUCH_LENGTH = 500;
-    const DOUBLE_TOUCH_LENGTH = 500;
-    var targetTable = null;
-    var longTouchEnabled = false;
-    var longTouchTimer = null;
-    var doubleTouchTimer = null;
-	function pointerDown() {
-        event.stopPropagation();
-        if (this === undefined) { return; }
-        if (targetTable != null && this == targetTable) {
-            if (this.classList.contains("seated")) {
+         const DOUBLE_TOUCH_LENGTH = 500;
+        var targetTable = null;
+        var doubleTouchTimer = null;
+        var multiselectEnabled = false;
+        var pointerIsDown = false;
+        function pointerDown() {
+            if (this === undefined) { return; } else { event.stopPropagation(); }
+            pointerIsDown = true;
+            if (targetTable != null && this == targetTable) {
                 setVar("goToTable", targetTable.id);
+                clearInterval(doubleTouchTimer);
+                clearSelectedTables(this.id);
+                return;
             }
-            clearInterval(doubleTouchTimer);
-        }
-        targetTable = this;
-        targetTable.classList.add("selected");
-        if (getVar("selectedTable") != null && getVar("selectedTable") != this.id) {
-            longTouchTimer = setTimeout(longTouch, LONG_TIME_TOUCH_LENGTH);
-        }
-        var classList = Array.from(targetTable.classList)
-        if (getVar("authorizationId") !== undefined && Array.from(targetTable.classList).indexOf("seated") > -1) {
-                doubleTouchTimer = setTimeout(doubleTouchDisable, DOUBLE_TOUCH_LENGTH);
-        }
-	}
-
-    function pointerDownOnNothing() {
-        var oldSelectedItems = document.getElementsByClassName("table");
-        for(let i = 0; i < oldSelectedItems.length; i++){
-            oldSelectedItems[i].classList.remove("selected");
-            oldSelectedItems[i].classList.remove("multiselect");
-            setVar("selectedTable", "clear");
-        }
-    }
-
-    // if oyu pressed on a ticket item, you already have another one selected, and the minimum required time
-    // for multiselect has elapsed, change the selected item to "multiselect" 
-    function longTouch() {
-         longTouchEnabled = true;
-         targetTable.classList.add("multiselect");
-
-        // if there is exactly 1 other item selected, make it multi-select as well.
-        var alreadySelected = getVar("selectedTable");
-        if (alreadySelected != null && alreadySelected.indexOf(",") == -1) {
-            document.getElementById(alreadySelected).classList.add("multiselect");
-        }
-    }
-
-    function doubleTouchDisable() {
-        clearTimeout(doubleTouchTimer);
-        targetTable = null;
-    }
-
-    // when you've made your current selection
-    function pointerUp() {
-        if (targetTable == null) { return; }
-        
-        if (longTouchTimer != null) {
-            clearTimeout(longTouchTimer);
-        }
-
-        var oldSelectedItems = document.getElementsByClassName("table");
-        // if you only have 1 item selected, adjust the state of applicable ticket items to reflect that.
-        if (!longTouchEnabled) {
-    	    /*this iterates through the list returned, if there is no case where multiple items are selected concurrently,
-    	    you can just use oldSelectedItems[0].classList.remove("selected"); instead*/
-    	    for(let i = 0; i < oldSelectedItems.length; i++){
-                if (oldSelectedItems[i] != targetTable) {
-                    oldSelectedItems[i].classList.remove("selected");
+            else if (getVar("authorizationId") !== undefined && this.classList.contains("seated")) {
+                targetTable = this;
+                doubleTouchTimer = setTimeout(() => {
+                    targetTable = null;
+                }, DOUBLE_TOUCH_LENGTH);
+            }
+            if (!multiselectEnabled) {
+                let selTables = getVar("selectedTable");
+                if (selTables !== undefined && selTables.indexOf(",") > -1 && selTables.indexOf(this.id) > -1) {
+                    clearSelectedTables(this.id);
                 }
-                try {
-                    oldSelectedItems[i].classList.remove("multiselect");
+                else {
+                    let id = this.classList.contains("selected") ? null : this.id;
+                    clearSelectedTables(id);
                 }
-                catch (err) {
-                    alert(oldSelectedItems[i]);
-                }
-    	    }
-            setVar("selectedTable", targetTable.id);
+            }
+            else {
+                this.classList.toggle("selected");
+                updateSelectedTables();
+            }       
         }
-        // or you have multiple tables selected
-        else {
-            for(let i = 0; i < oldSelectedItems.length; i++){
-        	    oldSelectedItems[i].classList.add("multiselect");
-    	    }
 
-            setVar("selectedTable", getVar("selectedTable") + "," + targetTable.id); 
+        function pointerEnter() {
+            if (pointerIsDown) {
+                if (multiselectEnabled) {
+                    this.classList.toggle("selected");
+                    updateSelectedTables();
+                }
+                else {
+                    let lookAt = getVar("selectedTable");
+                    if (lookAt != null && lookAt.indexOf(",") == -1) {
+                        multiselectEnabled = true;
+                        document.getElementsByTagName("form")[0].classList.add("multiselect");
+                        this.classList.toggle("selected");
+                        updateSelectedTables();
+                    }
+                }
+                
+            }
         }
-        
-        if (doubleTouchTimer == null) {
+
+        function pointerLeave() {
             targetTable = null;
         }
-        longTouchEnabled = false;
-    }
+        function pointerDownOnNothing() {
+            if (multiselectEnabled) {
+                multiselectEnabled = false;
+                document.getElementsByTagName("form")[0].classList.remove("multiselect");
+            }
+            else {
+                var oldSelectedItems = document.getElementsByClassName("table");
+                for(let i = 0; i < oldSelectedItems.length; i++){
+                    oldSelectedItems[i].classList.remove("selected");
+                }
+                setVar("selectedTable", "clear");
+            }
+            
+        }
+
+        // when you've made your current selection
+        function pointerUp() {
+            pointerIsDown = false;
+            if (this === undefined) { return; } else { event.stopPropagation(); }
+        }
+
+        function updateSelectedTables() {
+            let selectedTables = document.getElementsByClassName("selected");
+            if (selectedTables.length == 0) {
+                removeVar("selectedTable");
+            }
+            else {
+                let selTableStr = selectedTables[0].id;
+                for(let i = 1; i < selectedTables.length; i++) {
+                    selTableStr += "," + selectedTables[i].id;
+                }
+                setVar("selectedTable", selTableStr);
+            }
+        }
+
+        function clearSelectedTables(id) {
+            setVar("selectedTable", id == null ? "clear" : id);
+            var selTables = document.getElementsByClassName("table") 
+            for (let i = 0; i < selTables.length; i++) {
+                selTables[i].classList.remove("selected");
+            }
+            if (id != null) { 
+                document.getElementById(id).classList.add("selected");
+            }    
+        }
 
 
     </script>

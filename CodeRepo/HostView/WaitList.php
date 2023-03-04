@@ -19,6 +19,14 @@ Otherwise will reroute to logon page -->
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>  
         <script>
             function createEventHandlers() {
+                let selectedTicket = getVar("selectedTicket");
+                if (selectedTicket !== undefined) {
+                    let ticket = document.getElementById(selectedTicket);
+                    if (ticket != null) {
+                        ticket.classList.add("selected");
+                    }
+                }
+                rememberScrollPosition();
                 let rows = document.getElementsByClassName("ticket");
                 for (var i = 0; i < rows.length; i++) {
                     rows[i].addEventListener("pointerdown" , pressTicket);
@@ -57,7 +65,7 @@ Otherwise will reroute to logon page -->
             }
         </script>
     </head>
-    <body onload="createEventHandlers()">
+    <body onload="createEventHandlers()" class="intro">
         <legend>
             <div>Wait List</div>
             <button type="button" onclick="location.href='NewTicket.php'" id="btnAddTicket">Add</button>

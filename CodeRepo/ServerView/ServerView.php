@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>CentRes: Host View</title>
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/serverStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/serverStructure.css">
@@ -50,7 +51,7 @@
                     updateDisplay('serverListener');
                 }
                 
-                checkTableAssignments();
+                checkTableAssignments(true);
 
                 setVar("enabledButtons", "");
                 updateButtonStates();
@@ -162,18 +163,16 @@
                  // verify the seat is set
                 try {
                     if (cboTable.selectedIndex > 0 && cboSeat.options.length == 1) { 
-                        //alert("seat no load");
                         populateSeats(true);
                     }
                 }
                 catch (err) {
-                    alert("odd");
+                    
                 }
 
                  // verify the split is set
                 try {
                     if (cboTable.selectedIndex > 0 && cboSplit.options.length < 2) { 
-                        //alert("split no load");
                         populateSplits(true);
                     }
                 }
@@ -186,8 +185,7 @@
                         updateDisplay("ticket");
                     }
                     catch(err) {
-                        alert("refresh failed");
-                     }
+                    }
                 }
                 startUpdateLoopTimer();
             }
@@ -244,7 +242,7 @@
             
 
             // check for the server's current table assignments
-            function checkTableAssignments() {
+            function checkTableAssignments(suppressMessages = false) {
                 var checkStr;
                 try {
                     checkStr = getVar("tableList", "serverListener");
@@ -306,27 +304,12 @@
                         // hide the menu and disable all of the controls
 
                         if (tablesRemoved[i] == selectedTable) {
-                            removeVar("ticket", "ticketContainer", true);
-                            cboSeat.disabled = true;
-                            cboSeat.innerHTML = "";
-                            
-                            cboSplit.disabled = true;
-                            cboSplit.innerTML = "";
-                            
-                            btnSubmit.disabled = true;
-                            btnCancel.disabled = true;
-                            document.querySelector("#btnPrintReceipt").disabled = true;
-                            
-                            btnEdit.disabled = true;
-                            btnRemove.disabled = true;
-                            btnSplit.disabled = true;
-                            btnMove.disabled = true;
-                            btnMove.disabled = true;
-
-                            btnMove.classList.remove("toggled");
-                            btnSplit.classList.remove("toggled");
-                            updateButtonStates();
-
+                            cboTable.selectedIndex = 0;
+                            removeVar("ticket", "ticketContainer");
+                            removeVar("seat", "ticketContainer");
+                            removeVar("split", "ticketContainer");
+                            tableSelectionChanged();
+                            updateDisplay("ticketContainer");
                         }
                         document.querySelector("#" + tablesRemoved[i]).remove();
                     }
@@ -340,7 +323,14 @@
 
                     if (cboTable.options.length == 1) {
                         document.querySelector("#selectTable").text="No Tables";
-                        cboTable.disabled = true;                         
+                        if (getVar("seat", "ticketContainer") != null) {
+                            removeVar("ticket", "ticketContainer");
+                            removeVar("seat", "ticketContainer");
+                            removeVar("split", "ticketContainer");
+                            tableSelectionChanged();
+                            updateDisplay("ticketContainer");
+                        }
+                        cboTable.disabled = true;                     
                     }
                     else {
                         document.querySelector("#selectTable").text="Select Table";
@@ -349,7 +339,15 @@
 
                 }
                 if (cboTable.options.length == 1) {
-                    cboTable.text = "No Tables"; 
+                    document.querySelector("#selectTable").text = "No Tables"; 
+                    
+                    if (getVar("seat", "ticketContainer") != null) {
+                        removeVar("ticket", "ticketContainer");
+                        removeVar("seat", "ticketContainer");
+                        removeVar("split", "ticketContainer");
+                        tableSelectionChanged();
+                        updateDisplay("ticketContainer");
+                    }
                     cboTable.disabled = true;                         
                 }
                 else if (cboTable.options.length == 2) {
@@ -364,6 +362,26 @@
                     cboTable.text = "Select Table";
                     cboTable.disabled = false;
                 }
+
+                if (tablesAdded.length > 0 || tablesRemoved.length > 0 && !suppressMessages) {
+                    let msg = "Your table assignments have changed.\n\n";
+                    if (tablesAdded.length > 0) {
+                        var addedStr = tablesAdded[0];
+                        for (let i = 1; i < tablesAdded.length; i++) {
+                            addedStr += "," & tablesAdded[i];
+                        }
+                        msg = "Tables Added: " + addedStr;
+                    }
+                    if (tablesRemoved.length > 0) {
+                        var removedStr = tablesRemoved[0];
+                        for (let i = 1; i < tablesRemoved.length; i++) {
+                            removedStr += "," & tablesRemoved[i];
+                        }
+                        msg += (msg == "" ? "" : '\n') + "Tables Removed: " + removedStr;
+                    }
+                    alert(msg);
+                }
+                initalLoad = false;
             }
             
             // listen for menu item selection
@@ -472,12 +490,7 @@
                     }
                     // configure controls
 
-                    if (selectedItems == null) {
-                        //alert("nothing selected");
-                    }
-                    else {
-                        //alert("something selected");
-                    }
+                    
                     updateButtonStates();
                    
                 }
@@ -486,6 +499,7 @@
             function tableSelectionChanged() {
                 //no table selected
                 removeVar("selectedTicketItem", "ticketContainer");
+                removeVar("ticket", "ticketContainer");
                 removeVar("seat","ticketContainer");
                 removeVar("split","ticketContainer");
                 updateButtonStates();
@@ -531,7 +545,7 @@
                         setVar("ignoreUpdate", "yes please", "ticketContainer", true);
                     }
                     catch (err) {
-                        alert("Fail");
+                        
                     }
                     
                     updateButtonStates();
@@ -842,25 +856,6 @@
                
                 cboSeat.disabled = (document.getElementsByClassName("toggled").length == 1);
             }
-
-
-             //btnSubmit.addEventListener('pointerUp', submitButtonPressed);
-                //btnCancel.addEventListener('pointerUp', cancelButtonPressed);
-                //btnEdit.addEventListener('pointerup', editButtonPressed);
-                //btnRemove.addEventListener('pointerup', removeButtonPressed);
-                //btnAction.addEventListener('pointerup', actionButtonPressed);
-
-            function actionButtonPressed() {
-                if (this.id == "btnToSplit") {
-                    this.id = "btnToSeat";
-                }
-                else {
-                    alert(this.id);
-                }
-            }
-
-            
-
         </script>
         <script src="../InDev/cwpribble.js"></script>
         <script src="../InDev/dbutshudiema.js"></script>

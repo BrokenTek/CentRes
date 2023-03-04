@@ -1,29 +1,34 @@
             .table {
-                stroke: black;
+                opacity: .4;
             }
             
             .highlighted{
                 stroke:orangered;
             }
             .selected{
-                stroke-width: 8px;
+                opacity: 1;
             }
             .multiSelect{
                 stroke-width: 12px;
             }
             .unassigned{
                 fill: beige;
+                color: beige;
             }
             .open{
                 /* can't think of a better ready-to-go color than a shade of green, notify Donovan if it clashes too much*/
                 fill:yellowgreen;
+                color: yellowgreen;
             }
             .seated{
                 fill: #F6941D;
+                color: #F6941D
             }
             .bussing{
                 fill: #FFE699;
+                color: #FFE699;
             }
             .disabled{
                 fill: gray;
+                color: gray;
             }

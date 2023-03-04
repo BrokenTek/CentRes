@@ -22,31 +22,32 @@
 
 			#ifrServerList {
 				grid-area: ifrServerList;
+				background-color: black;
 			}
 
 			#ifrWaitList {
 				grid-area: ifrWaitList;
+				background-color: black;
 			}
 
 			#ifrWaitTimes {
 				grid-area: ifrWaitTimes;
+				background-color: black;
 			}
 
 			#ifrSelectedTable {
 				grid-area: ifrSelectedTable;
+				background-color: black;
 			}
 
 			#ifrTicket {
 				grid-area: ifrTicket;
+				background-color: black;
 			}
 
 			#ifrRestaurantLayout {
 				grid-area: ifrRestaurantLayout;
 				background-color: #777;
-			}
-			
-			#ifrSelectedTable, #ifrWaitTimes {
-				//background-color: black;
 			}
 		</style>
 		<script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
@@ -138,7 +139,7 @@
 						
 				}
 				catch (error) {
-						
+				
 				}
 				startEventLoopTimer();
 			}
@@ -222,7 +223,7 @@
 			<!-- event loop goes here -->
 		</script>
 	</head>
-	<body onload="allElementsLoaded()">
+	<body onload="allElementsLoaded()" class="intro">
 		<form id="hostViewSession" class="sessionContainer" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
 			<?php require_once "../Resources/php/sessionHeader.php"; ?>
 			<div class="sessionBody">

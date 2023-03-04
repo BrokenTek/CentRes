@@ -125,7 +125,7 @@ you'll be routed to whatever the home page is for your specified role level -->
 
         </script>
     </head>
-    <body onload="allElementsLoaded()">
+    <body onload="allElementsLoaded()"  class="intro">
         <!-- this form submits to itself -->
         <form action="WaitTimes.php" method="POST">
             <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->

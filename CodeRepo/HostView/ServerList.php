@@ -8,10 +8,24 @@
         <script src= '../Resources/JavaScript/displayInterface.js'></script>
         <script>
             function allElementsLoaded() {
+                let selectedServer = getVar("selectedServer");
+                if (selectedServer !== undefined) {
+                    let server = document.getElementById(selectedServer);
+                    if (server != null) {
+                        server.classList.add("selected");
+                    }
+                    else {
+                        removeVar("selectedServer");
+                    }
+                }
                 var activeServers = document.getElementsByClassName("activeServer");
                 for (var i = 0; i < activeServers.length; i++) {
                     activeServers[i].addEventListener("pointerdown", serverClicked);
                 }
+                rememberScrollPosition();
+                setTimeout(() => {
+                    updateDisplay();
+                }, 60000);
             }
 
             function serverClicked() {
@@ -36,7 +50,7 @@
            
         </style>
     </head>
-    <body onload="allElementsLoaded()">
+    <body onload="allElementsLoaded()" class="intro">
         <legend>Active&nbsp;Servers</legend>
         <form action = "<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method = "post">
             <table>

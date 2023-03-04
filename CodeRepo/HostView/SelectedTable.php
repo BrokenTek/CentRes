@@ -34,6 +34,7 @@ you'll be routed to whatever the home page is for your specified role level -->
       case "removeTicket":
         $sqlCols .= ", action, ticketId";
         $sqlVals .= ", 'Remove', '$ticketId'";
+        $flag = "refreshWaitList";
         break;
       case "removeServer":
         $sqlCols .= ", action, employeeId";
@@ -67,8 +68,10 @@ you'll be routed to whatever the home page is for your specified role level -->
 
 <html>
     <head>
+      <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
+      <link rel="stylesheet" href="../Resources/CSS/tableStyles.css" />
       <style>
-        body {
+        *, form{
           background-color: black;
           color: white;
         }
@@ -149,7 +152,7 @@ you'll be routed to whatever the home page is for your specified role level -->
         </script>
     </head>
         
-    <body onload="allElementsLoaded()">
+    <body onload="allElementsLoaded()" class="intro">
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
           <?php
@@ -158,7 +161,7 @@ you'll be routed to whatever the home page is for your specified role level -->
               $sql = "SELECT status FROM Tables WHERE id='$tableId';";
               $status = connection()->query($sql)->fetch_assoc()['status'];
 
-              echo("<div id='lblTableId'>$tableId&nbsp;-&nbsp;$status</div>");
+              echo("<div id='lblTableId' class='$status'>$tableId&nbsp;-&nbsp;$status</div>");
               
               // Check if the server is already assigned to table. If so, ignore $employeeId var
               if(isset($employeeId)) {

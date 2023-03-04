@@ -341,10 +341,10 @@ BEGIN
 		END IF;
 	ELSEIF (NEW.action = 'Remove' AND NEW.ticketId IS NOT NULL AND NEW.employeeId IS NOT NULL) THEN
 		DELETE FROM TableAssignments WHERE employeeId = NEW.employeeId AND tableId = NEW.tableId;
-		UPDATE Tickets SET tableId = NULL WHERE id = NEW.ticketId;
+		UPDATE Tickets SET tableId = NULL, timeSeated = NULL WHERE id = NEW.ticketId;
 		UPDATE Tables SET status = 'bussing' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Remove' AND NEW.ticketId IS NOT NULL) THEN
-		UPDATE Tickets SET tableId = NULL WHERE id = NEW.ticketId;
+		UPDATE Tickets SET tableId = NULL, timeSeated = NULL WHERE id = NEW.ticketId;
 		UPDATE Tables SET status = 'bussing' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Remove' AND NEW.employeeId IS NOT NULL) THEN
 		DELETE FROM TableAssignments WHERE employeeId = NEW.employeeId and tableId = NEW.tableId;

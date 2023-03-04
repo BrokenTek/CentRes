@@ -121,6 +121,11 @@ html {
    
   }
 
+  .intro {
+    animation: fadeIn .3s;
+    animation: blur .3s;
+  }
+
   form {
     background-color: #FFE699;
   }

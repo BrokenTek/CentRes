@@ -5,7 +5,7 @@
             function reload() {
                 document.getElementById("tableSelectorForm").submit();
             }
-            setTimeout(reload, 100000);
+            setTimeout(reload, 1000);
         </script>
     </head>
     <body>
