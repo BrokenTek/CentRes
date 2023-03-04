@@ -82,6 +82,13 @@
 					
 					let tableLocal = getVar("selectedTable");
 					let tableExtern = getVar("selectedTable", "ifrRestaurantLayout");
+					// wait list ticket update
+					let waitListToSelectedTable = getVar("flag", "ifrSelectedTable");
+					removeVar("flag", "ifrSelectedTable");
+					if ( waitListToSelectedTable == "refreshWaitList"){
+						UpdateDisplay("ifrWaitTimes");
+
+					}
 
 					let selectedTableUpdated = getVar("updated", "ifrSelectedTable");
 
@@ -100,8 +107,17 @@
 
 					let updateNeeded = false;
 					let highlightNeeded = false;
-
-					if (selectedTableUpdated) {
+					
+					let selectedTicket = getVar("selectedTicket", "ifrWaitList");
+					 if (selectedTicket !== undefined){
+						selectedTicket = selectedTicket.substring(6);
+						updateNeeded = true;
+						//alert(selectedTicket);
+					 }
+					 setVar("ticketId", selectedTicket, "ifrSelectedTable");
+					 
+					
+					 if (selectedTableUpdated) {
 						removeVar("updated", "ifrSelectedTable");
 						highlightNeeded = true;
 					}
@@ -142,6 +158,7 @@
 						
 				}
 				catch (error) {
+					alert(error);
 					
 				}
 				startEventLoopTimer();
