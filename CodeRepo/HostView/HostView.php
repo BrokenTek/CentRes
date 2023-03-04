@@ -85,12 +85,30 @@
 
 					let selectedTableUpdated = getVar("updated", "ifrSelectedTable");
 
+					let waitListUpdateFlag = getVar("flag", "ifrSelectedTable");
+					
+					let ticketLocal = getVar("selectedTicket", "ifrWaitList");
+					if (ticketLocal !== undefined) {
+						ticketLocal = ticketLocal.substring(6);
+					}
+					let ticketExtern = getVar("ticketId", "ifrSelectedTable");
+
+					if (waitListUpdateFlag == "refreshWaitList") {
+						removeVar("flag", "ifrSelectedTable");
+						updateDisplay("ifrWaitList");
+					}
+
 					let updateNeeded = false;
 					let highlightNeeded = false;
 
 					if (selectedTableUpdated) {
 						removeVar("updated", "ifrSelectedTable");
 						highlightNeeded = true;
+					}
+
+					if (ticketLocal !== undefined && ticketExtern === undefined) {
+						setVar("ticketId", ticketLocal, "ifrSelectedTable");
+						updateNeeded = true;
 					}
 
 					if (serverLocal != serverExtern) {
