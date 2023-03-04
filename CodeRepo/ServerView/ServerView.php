@@ -368,14 +368,14 @@
                     if (tablesAdded.length > 0) {
                         var addedStr = tablesAdded[0];
                         for (let i = 1; i < tablesAdded.length; i++) {
-                            addedStr += "," & tablesAdded[i];
+                            addedStr += "," + tablesAdded[i];
                         }
                         msg = "Tables Added: " + addedStr;
                     }
                     if (tablesRemoved.length > 0) {
                         var removedStr = tablesRemoved[0];
                         for (let i = 1; i < tablesRemoved.length; i++) {
-                            removedStr += "," & tablesRemoved[i];
+                            removedStr += "," + tablesRemoved[i];
                         }
                         msg += (msg == "" ? "" : '\n') + "Tables Removed: " + removedStr;
                     }
