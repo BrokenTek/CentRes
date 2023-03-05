@@ -31,6 +31,7 @@
                     elements[i].addEventListener('pointerleave', pointerLeave);
                 }
             }
+            document.getElementsByTagName("form")[0].addEventListener('pointerup', disengageMultiselect);
             updateDisplay("tableStatusListener");
             updateTableStatuses();
             startListenerLoop();
@@ -55,7 +56,7 @@
 
         var listenerLoopTimer;
         var update = true;
-        function listenerLoop(update = true) {
+        function listenerLoop() {
             if (update) {
                 updateDisplay("tableStatusListener");
             }
@@ -64,10 +65,25 @@
                     updateTableStatuses();
                 }
             }
+
             catch (err) {
                 update = false;
                 setTimeout(listenerLoop, 250);
                 return;
+            }
+            let highlightedTables = getVar("highlightedTables");
+            if (highlightedTables !== undefined) {
+                removeVar("highlightedTables");
+                let allTables = document.getElementsByClassName("table");
+                let newTables = highlightedTables.split(",");
+                for (let i = 0; i < allTables.length; i++) {
+                    allTables[i].classList.remove("highlighted");
+                }
+                if (highlightedTables != "clear") {
+                    for (let i = 0; i < newTables.length; i+=2) {
+                        document.getElementById(newTables[i]).classList.add("highlighted");
+                    }
+                }
             }
             update = true;
             startListenerLoop();
@@ -157,9 +173,16 @@
         }
 
         // when you've made your current selection
-        function pointerUp() {
+        function pointerUp(disableMultiselect = false) {
+            
             pointerIsDown = false;
             if (this === undefined) { return; } else { event.stopPropagation(); }
+        }
+
+        function disengageMultiselect() {
+            pointerIsDown = false;
+            multiselectEnabled = false;
+            document.getElementsByTagName("form")[0].classList.remove("multiselect");
         }
 
         function updateSelectedTables() {

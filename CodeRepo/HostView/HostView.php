@@ -112,18 +112,14 @@
 
 					if (serverLocal != serverExtern) {
 						selectionChanged = true;
-						if (serverExtern === undefined) {
-							removeVar("selectedServer");
-							removeVar("employeeId", "serverListener");
-							removeVar("employeeId", "ifrSelectedTable");
-						}
-						else {
-							setVar("selectedServer", serverExtern);
-							setVar("employeeId", serverExtern.substring(6), "serverListener");	
-						}
-						updateDisplay("serverListener");
+						removeVar("tableList","serverListener");
+						setVar("selectedServer", serverExtern);
+						setVar("employeeId", serverExtern === undefined ? undefined : serverExtern.substring(6), "serverListener");
+						setVar("employeeId", serverExtern === undefined ? undefined : serverExtern.substring(6), "ifrSelectedTable");
+						updateDisplay(serverListener);
 						highlightNeeded = true;
 						updateNeeded = true;
+						
 						
 					}
 
@@ -150,11 +146,17 @@
 				try {
 					var selectedServer = getVar("selectedServer");
 					var tableList = getVar("tableList", "serverListener");
-					setVar("highlightedTables", tableList , "ifrRestaurantLayout");
-					setVar("highlightedTables", (selectedServer === undefined ? "clear" : tableList), "ifrRestaurantLayout");
+					if (selectedServer !== undefined && tableList == null) {
+						setTimeout(highlightTables, 250);
+						return;
+					}
+					else if (tableList !== undefined && selectedServer === undefined) {
+						setTimeout(highlightTables, 250);
+						return;
+					}
+					setVar("highlightedTables", (selectedServer === undefined ? "clear" : tableList) , "ifrRestaurantLayout");
 				}
 				catch (error) {
-					alert(error);
 					setTimeout(highlightTables, 250);
 				}
 			}
