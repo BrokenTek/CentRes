@@ -98,6 +98,36 @@ function removeVar(variableName, id = null, update = false) {
     }
 }
 
+function renameVar(oldVarName, newVarName, id = null, update = true) {
+    var container = document.getElementById(id);
+    var form;
+    var variableElement;
+    if (id == null) {
+        form = document.getElementsByTagName('form')[0];
+        variableElement = document.getElementById(oldVarName);
+    }
+    else {
+        form = container.contentWindow.document.getElementsByTagName('form')[0];
+        variableElement = container.contentWindow.document.getElementById(oldVarName);
+        try {
+            if (form == null) {
+                setTimeout(renameVar(oldVarName, newVarName, id, update), 250);
+                return;
+            }
+        }
+        catch (err) {
+            return;
+        }
+    }
+    if (variableElement != null) {
+        variableElement.id = newVarName;
+        variableElement.setAttribute("name",newVarName);
+    }
+    if (update) {
+        updateDisplay(id);
+    }
+}
+
 
 
 function clearVars(id = null, update = false) {
@@ -170,7 +200,7 @@ function toggleSortKey(tableId, columnName, refresh = true) {
     let keyIndex = 1;
     let keyFound = false;
     let offsetBy1 = false;
-    let sortKeyPrefix = tableId + ".SortKey";
+    let sortKeyPrefix = tableId + "_SortKey";
     while (true) {
         let value = getVar(sortKeyPrefix + keyIndex);
 
@@ -182,11 +212,16 @@ function toggleSortKey(tableId, columnName, refresh = true) {
         // key was removed. All keys to right need to be left-shifted by 1
         if (offsetBy1) {
             renameVar(sortKeyPrefix + keyIndex, sortKeyPrefix + (keyIndex - 1));
+            keyIndex++;
+            continue;
         }
 
         // if key is the column you specified
-        if (value.replace(" ASC","").replace(" DESC","") == columnName) {
-            keyFound == true;
+        let lookAt = value.replace(" ASC","");
+        lookAt = lookAt.replace(" DESC","");
+        if (lookAt == columnName) {
+           
+            keyFound = true;
 
             // toggle to DESC if it's ASC
             if (value == columnName + " ASC") {
@@ -201,6 +236,7 @@ function toggleSortKey(tableId, columnName, refresh = true) {
         }
         keyIndex ++;
     }
+   
     // if the key wasn't found, append to the end of key list.
     if (!keyFound) {
         setVar(sortKeyPrefix + keyIndex, columnName + " ASC");
@@ -211,7 +247,7 @@ function toggleSortKey(tableId, columnName, refresh = true) {
 }
 
 function clearSortKeys(tableId) {
-    let sortKeyPrefix = tableId + ".SortKey";
+    let sortKeyPrefix = tableId + "_SortKey";
     let keyIndex = 1;
     while (true) {
         let value = getVar(sortKeyPrefix + keyIndex);
