@@ -144,7 +144,7 @@
                     else{
                         anyTracked = true;
                         if(quantityToCompare == -1){
-                            quantityTocompare = parseInt(theItem.getElementsByClassName("qty")[0].innerText);
+                            quantityToCompare = parseInt(theItem.getElementsByClassName("qty")[0].innerText);
                         }
                         else if(quantityToCompare != parseInt(theItem.getElementsByClassName("qty")[0].innerText)) {sameQuantity = false;}
                     }
@@ -174,19 +174,21 @@
                 if(getVar('tblInventory_SortKey1')!=null){
                     let keyIndex = 1;
                     let unicodeBase = 9311;
-                    let keyPrefix = 'tblInventory.SortKey';
+                    let keyPrefix = 'tblInventory_SortKey';
                     while(getVar(keyPrefix + keyIndex)!= null){
+                        let keyToScan = getVar(keyPrefix + keyIndex);
                         for(let i = 0; i < tableHeaders.length; i++){
-                            if(getVar(keyPrefix + keyIndex).indexof(tableHeaders[i].id!= -1)){
-                                tableHeaders[i].text = "&#" + (unicodeBase + keyIndex)+";" +tableHeaders[i].text;
-                                if(getVar(keyPrefix + keyIndex).indexof("ASC")!=-1){
-                                    tableHeaders[i].text = tableHeaders[i].text +"&#9650;";
+                            if(keyToScan.indexOf(tableHeaders[i].getAttribute("sqlColumnId"))!= -1){
+                                tableHeaders[i].innerText = String.fromCharCode(unicodeBase + keyIndex) +tableHeaders[i].innerText;
+                                if(getVar(keyPrefix + keyIndex).indexOf("ASC")!=-1){
+                                    tableHeaders[i].innerText = tableHeaders[i].innerText +"\u25B2";
                                 }
                                 else{
-                                    tableHeaders[i].text = tableHeaders[i].text +"&#9660;";
+                                    tableHeaders[i].innerText = tableHeaders[i].innerText +"\u25BC";
                                 }
                             }
                         }
+                        keyIndex++;
                     }
                 }
                               
@@ -275,12 +277,12 @@
                         //updates the quantity of all selected items if the respective button was clicked.
                         //contains fail-safe for if untracked items are present in the selection
                         case 'updateQty':
-                            if (!empty($_POST['qtyTracked']) && $_POST['qtyTracked'] == true) {
+                            if (!empty($_POST['qtyTracked']) && $_POST['qtyTracked'] == true&&!empty($_POST['qty'])) {
                                 $sql = "UPDATE menuitems
                                         SET Quantity = ".$_POST['qty']."
                                         WHERE quickCode IN $inStr;";
                             }
-                            else {
+                            elseif(empty($_POST['qtyTracked'])||$_POST['qtyTracked'] == false) {
                                 $sql = "UPDATE menuitems
                                         SET Quantity = NULL
                                         WHERE quickCode IN $inStr;";
