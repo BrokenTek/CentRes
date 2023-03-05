@@ -3,7 +3,8 @@
             }
             
             .highlighted{
-                stroke:orangered;
+                stroke:#bf1e2e;
+                animation: highlighted 3s linear infinite;
             }
             .selected{
                 opacity: 1;
@@ -31,4 +32,16 @@
             .disabled{
                 fill: gray;
                 color: gray;
+            }
+
+            
+
+            @keyframes highlighted {
+                0%, 100% {
+                   stroke-width: 0px; 
+                }
+                
+                30%, 70% {
+                    stroke-width: 10px;
+                }
             }
