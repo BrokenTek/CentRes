@@ -48,6 +48,10 @@
                         add(newTableData[i+1]);
                     }
                 }
+                let selectedTable = getVar("selectedTable");
+                if (selectedTable !== undefined && ("," + newTableData + ",").indexOf("," + selectedTable + ",") > -1) {
+                    setVar("flag", "updateSelectedTable");
+                }
             }
             catch (err) {
                 setTimeout(updateTableStatuses, 250);

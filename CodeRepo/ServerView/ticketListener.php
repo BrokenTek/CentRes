@@ -25,9 +25,15 @@
                 // if the ticket number has been injected, get the timestamp.
                 if (isset($_POST['ticketNumber'])) {
                     
-                    $sql = "SELECT timeModified FROM Tickets WHERE id = " .$_POST['ticketNumber']. ";";
-                    $modifiedTime = connection()->query($sql)->fetch_assoc()['timeModified'];
-                    $_POST['modificationTime'] = $modifiedTime;
+                    $sql = "SELECT tableId, timeModified FROM Tickets WHERE id = " .$_POST['ticketNumber']. ";";
+                    $result = connection()->query($sql)->fetch_assoc();
+                    $_POST['modificationTime'] = $result['timeModified'];
+                    if($result['tableId'] != null) {
+                        $_POST['tableId'] = $result['tableId'];
+                    }
+                    else {
+                        unset($_POST['tableId']);
+                    }
                      
                     $sql = "SELECT splitId, totalAmountPaid FROM Splits WHERE ticketId = " .$_POST['ticketNumber']. ";";
                     $ticketPaidStatuses = connection()->query($sql);
@@ -45,7 +51,7 @@
                 } 
                 else {
                     unset($_POST['modificationTime']);
-                }               
+                }              
             ?>
         </form>
     </body>

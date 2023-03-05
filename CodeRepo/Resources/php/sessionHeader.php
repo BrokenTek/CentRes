@@ -52,12 +52,12 @@
 
     if (($GLOBALS['role'] & 8) == 8) {
         echo("<div id='managementNavigation'>
-                <select name='cars' id='managementNavigationSelector' onchange='navigateAway()'>
+                <select name='mgrNavDest' id='managementNavigationSelector' onchange='navigateAway()'>
                     <option value=''>Navigate To</option>
-                    <option value='../HostView/HostView.php'>Host&nbsp;View</option>
-                    <option value = ''>Inventory/Popularity&nbsp;Window</option>
-                    <option value=''>Employee&nbsp;Roster</option>
-                    <option value=''>Menu&nbsp;Editor</option>
+                    <option id='mgrNavHostView' value='../HostView/HostView.php'>Host&nbsp;View</option>
+                    <option id='mgrNavIPW' value = ''>Inventory/Popularity&nbsp;Window</option>
+                    <option id='mgrNavEmpRoster' value=''>Employee&nbsp;Roster</option>
+                    <option id='mgrNavMenuEditor' value=''>Menu&nbsp;Editor</option>
                 </select>
             </div>
         ");

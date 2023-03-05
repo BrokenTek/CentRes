@@ -46,8 +46,9 @@
                 btnSplit.addEventListener('pointerup', (event) => {splitButtonPressed(event)});
                 
                 setVar('username', USERNAME, 'serverListener', true);
-                if (getVar('staticTableId') !== undefined) {
-                    setVar('staticTableId', getVar('staticTableId'), 'serverListener');
+                let staticTableId = getVar('staticTableId');
+                if (staticTableId !== undefined) {
+                    setVar('staticTableId', staticTableId, 'serverListener');
                     updateDisplay('serverListener');
                 }
                 
@@ -78,6 +79,10 @@
 
             function updateLoop() {
                 stopUpdateLoopTimer();
+
+                if (getVar("staticTableId") !== undefined && getVar("tableId","ticketContainer") === undefined) {
+                    setTimeout(redirectToHostView, 5000);
+                }
             
                
 
@@ -188,6 +193,18 @@
                     }
                 }
                 startUpdateLoopTimer();
+            }
+
+            var ignoreFuturePolls = false;
+            function redirectToHostView() {
+                if (ignoreFuturePolls) {
+                    return;
+                }
+                if (getVar("tableId","ticketContainer") === undefined) {
+                    ignoreFuturePolls = true;
+                    alert("Ticket " + getVar("ticket", "ticketContainer") + " is not longer assigned to this table!\nRedirecting back to Host View.");
+                    location.replace(document.getElementById("mgrNavHostView").getAttribute("value"));
+                }        
             }
 
             function showModWindow() {
@@ -713,7 +730,6 @@
                     }
                     if (prevSel == null && selSplit == null && command != "") {
                         cboSeat.selectedIndex = 0;
-                        updateDisplay("ticketContainer");
                     }
                     else {
                         if (cboSeat.selectedIndex == 0) {
@@ -722,7 +738,9 @@
                         else {
                             setVar("seat",cboSeat.selectedIndex, "ticketContainer", true);
                         }
+                        
                     }
+                    updateDisplay("ticketContainer");
                     
                     setTimeout(updateButtonStates, 1000);
 
@@ -775,7 +793,6 @@
                     }
                     if (prevSel == null && selSeat == null && command != "") {
                         cboSplit.selectedIndex = 0;
-                        updateDisplay("ticketContainer");
                     }
                     else {
                         if (cboSplit.selectedIndex == 0) {
@@ -788,6 +805,7 @@
                             setVar("split",0, "ticketContainer", true);
                         }
                     }
+                    updateDisplay("ticketContainer");
                     
                     setTimeout(updateButtonStates, 250);
 

@@ -21,9 +21,12 @@ Otherwise will reroute to logon page -->
     function loaded() {
         var newTime;
         var paidStatuses;
+        var tableId;
         try {
             newTime = getVar("modificationTime", "ticketListener");
             paidStatuses = getVar("paidStatuses", "ticketListener");
+            tableId = getVar("tableId", "ticketListener");
+            setVar("tableId",tableId);
         }
         catch (err) {
             setTimeout(loaded, 250);
@@ -112,16 +115,21 @@ Otherwise will reroute to logon page -->
     // function that listens for an external change in the ticket timestamp.
     // if a change has been detected, reload with the changes.
     function checkExternalTicketUpdate() {
+        var tableId;
         var oldTime = getVar("recordedModificationTime");
         var newTime;
         var paidStatuses;
         try {
+            tableId = getVar("tableId", "ticketListener");
             newTime = getVar("modificationTime", "ticketListener");
             paidStatuses = getVar("paidStatuses", "ticketListener");
         }
         catch (err) {
             setTimeout(checkExternalTicketUpdate, 250);
             return;
+        }
+        if (tableId !== getVar("tableId")) {
+            setVar("tableId", tableId);
         }
         if (getVar("ignoreUpdate") != null) {
             removeVar("ignoreUpdate");
@@ -357,7 +365,6 @@ Otherwise will reroute to logon page -->
                 $header .= " and <u>Split</u>";
             }
             $sql .= ";";
-
             $ticketItems = connection()->query($sql);
 
             if ($header != "") {

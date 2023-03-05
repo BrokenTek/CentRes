@@ -88,6 +88,7 @@
 					let selectedTableUpdated = getVar("updated", "ifrSelectedTable");
 
 					let waitListUpdateFlag = getVar("flag", "ifrSelectedTable");
+					let selectedTableUpdateFlag = getVar("flag", "ifrRestaurantLayout");
 					
 					let ticketExtern = getVar("ticketId", "ifrSelectedTable");
 					let ticketLocal = getVar("selectedTicket", "ifrWaitList");
@@ -100,6 +101,11 @@
 						updateDisplay("ifrWaitList");
 						updateDisplay("ifrServerList");
 						updateDisplay("ifrWaitTimes");
+					}
+
+					if (selectedTableUpdateFlag == "updateSelectedTable") {
+						removeVar("flag", "ifrRestaurantLayout");
+						updateDisplay("ifrSelectedTable");
 					}
 
 					let updateNeeded = false;
