@@ -129,6 +129,7 @@
                 let quantityToCompare = -1;
                 let itemsToCheck = getVar("selectedItem");
                 let updateInput = document.getElementById("numQty")
+                let checkBox = document.getElementById("chkQtyTracked");
                 if(itemsToCheck == null){
                     document.getElementById("chkQtyTracked").checked = false;
                     updateInput.disabled = true;
@@ -149,8 +150,13 @@
                         else if(quantityToCompare != parseInt(theItem.getElementsByClassName("qty")[0].innerText)) {sameQuantity = false;}
                     }
                 }
+                
                 document.getElementById("chkQtyTracked").checked = anyTracked;
+                if(checkBox.checked != anyTracked){
+                    checkbox.change();
+                }
                 updateInput.disabled = !anyTracked;
+
                 if(sameQuantity&&quantityToCompare != -1){
                     updateInput.placeholder = "qty";
                     updateInput.value = quantityToCompare;
@@ -222,14 +228,35 @@
                 with (document.getElementById("chkQtyTracked")) {
                     addEventListener('change', function() {
                         var numQty = document.getElementById("numQty");
+                        var qtyBtn = document.getElementById("btnUpdateQty");
                         if (this.checked) {
                             numQty.classList.remove("disabled");
-                            numQty.removeAttribute("disabled");           
+                            numQty.removeAttribute("disabled");   
+                            if(document.getElementById("numQty").value == ''){
+                                qtyBtn.classList.add("disabled");
+                                qtyBtn.setAttribute("disabled", true);
+                            }        
                         } else {
                             numQty.classList.add("disabled");
-                            numQty.addAttribute("disabled");
+                            numQty.setAttribute("disabled", true);
+                            qtyBtn.classList.remove("disabled");
+                            qtyBtn.removeAttribute("disabled");  
                         }
                     });
+                }
+                with (document.getElementById("numQty")){
+                    addEventListener('input', function(){
+                        var qtyBtn = document.getElementById("btnUpdateQty");
+                        if(this.value == '' &&document.getElementById("chkQtyTracked").checked){
+                            qtyBtn.classList.add("disabled");
+                            qtyBtn.setAttribute("disabled", true);
+                        }
+                        else{
+                            qtyBtn.classList.remove("disabled");
+                            qtyBtn.removeAttribute("disabled");  
+                        }
+                    })
+
                 }
 
                 rememberScrollPosition();
