@@ -46,7 +46,7 @@
             }
         </script>
     
-        <div class="sessionHeader">
+        <div id="sessionHeader">
             <img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
             <div id="sessionDetails">' .$GLOBALS['username']. '</div>');
 

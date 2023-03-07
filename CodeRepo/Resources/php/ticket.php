@@ -261,7 +261,7 @@ Otherwise will reroute to logon page -->
 </script>
 </head>
 <body onload="loaded()">
-<form id="ticketForm" action="ticket.php" method="post" class= "ticketForm">
+<form id="sessionBody" action="ticket.php" method="post" class= "ticketForm">
 
     <?php
         require_once 'connect_disconnect.php';

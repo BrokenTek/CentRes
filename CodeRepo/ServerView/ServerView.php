@@ -202,8 +202,8 @@
                 }
                 if (getVar("tableId","ticketContainer") === undefined) {
                     ignoreFuturePolls = true;
-                    alert("Ticket " + getVar("ticket", "ticketContainer") + " is not longer assigned to this table!\nRedirecting back to Host View.");
-                    location.replace(document.getElementById("mgrNavHostView").getAttribute("value"));
+                    //alert("Ticket " + getVar("ticket", "ticketContainer") + " is not longer assigned to this table!\nRedirecting back to Host View.");
+                    //location.replace(document.getElementById("mgrNavHostView").getAttribute("value"));
                 }        
             }
 
@@ -882,10 +882,10 @@
         <script src="../InDev/sashort.js"></script>
     </head>
     <body>
-        <form id="serverViewSession" class="sessionContainer" action="ServerView.php" method="POST">
+        <form id="sessionContainer" id="" action="ServerView.php" method="POST">
             <!-- session.php must be included after the opening for tag. It adds  -->
             <?php require_once "../Resources/php/sessionHeader.php"; ?>
-            <div id="serverViewContainer" class="sessionBody">
+            <div id="sessionBody">
                 <div id="serverViewHeader">
                     <select name="table" id="cboTable" onchange="tableSelectionChanged()">
                         <option value="selectTable" id="selectTable" value="selectTable">Getting Your Tables</option>

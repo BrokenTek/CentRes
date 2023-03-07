@@ -4,9 +4,15 @@ html {
   background-color: black;
 }
 
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+}
 
 
-  .sessionHeader {
+
+  #sessionHeader {
     display: grid;
     background-image: linear-gradient(black, #333, black);
     
@@ -19,6 +25,11 @@ html {
     top: 0;
     width: 100%;
     */
+  }
+
+  #sessionContainer {
+    max-height: 100vh;
+    overflow: auto;
   }
 
   #lgoSession {
@@ -86,8 +97,8 @@ html {
     background-color: #bf1e2e;
   }
 
-  .sessionBody {
-    background-color: #FFE699;
+  #sessionBody {
+    background-color: black;
     opacity: .9;
    
   
@@ -150,12 +161,13 @@ html {
     100% { filter: blur(0);}
   }
 
-  .sessionContainer {
+  #sessionContainer {
     display: grid;
+    
+    
     grid-template-columns: 1fr;
     grid-template-rows: min-content 1fr;
-    width: calc(100vw - 2rem);
-    height: calc(100vh - 2rem);
+    
     margin: auto;
     animation: blur .4s;
     background-color: #777;
@@ -195,6 +207,7 @@ fieldset {
 table {
     border: 2px solid white;
     border-collapse: collapse;
+    color: white;
 }
 th {
   border-bottom: .0625rem solid white;

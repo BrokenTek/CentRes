@@ -7,18 +7,20 @@
 			iframe {
 				background-color: black;
 			}
-			.sessionBody {
+			#sessionContainer {
+				height: 100%;
+				width: 100%;
+				margin: auto auto auto auto;
+			}
+			#sessionBody {
 				display: grid;
 				grid-template-areas: "ifrServerList ifrRestaurantLayout ifrSelectedTable"
 									 "ifrWaitList   ifrRestaurantLayout ifrSelectedTable"
 									 "ifrWaitTimes  ifrRestaurantLayout ifrSelectedTable";
 				grid-template-columns: max-content 1fr max-content;
-				grid-template-rows: 40% 40% 20%;
+				grid-template-rows: 2fr 2fr 1fr;
 			}
 
-			.sessionContainer {
-				height: 100vh;
-			}
 
 			#ifrServerList {
 				grid-area: ifrServerList;
@@ -107,9 +109,9 @@
 		</script>
 	</head>
 	<body onload="allElementsLoaded()" class="intro">
-		<form id="hostViewSession" class="sessionContainer" action="../ServerView/ServerView.php" method="POST">
+		<form id="sessionContainer" action="../ServerView/ServerView.php" method="POST">
 			<?php require_once "../Resources/php/sessionHeader.php"; ?>
-			<div class="sessionBody">
+			<div id="sessionBody">
 				<iframe id="ifrServerList" src="ServerList.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="ifrWaitList" src="WaitList.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="ifrWaitTimes" src="WaitTimes.php" frameborder='0' width="100%" height="100%"></iframe>

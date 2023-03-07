@@ -5,14 +5,7 @@
 			============================================= */
 		
 
-		#serverViewSession {
-			width: calc(99vw - 3rem);
-			height: calc(99vh - 3rem);
-			padding-block: 1.5rem;
-			padding-inline: 1.5rem;
-			overflow: hidden;
-		}
-		#serverViewContainer {
+		#sessionBody {
 			display: grid;
 			grid-template-areas: "serverViewHeader serverViewHeader serverViewHeader"
 								 "menuTitle        blank ticketHeader"

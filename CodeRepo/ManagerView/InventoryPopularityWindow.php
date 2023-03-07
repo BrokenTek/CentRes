@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
     <link rel="stylesheet" href="../Resources/CSS/ticketStyle.css">
     <style>
+        #sessionContainer {
+            height: 95%;
+            width: 100%;
+		}
         #sessionBody {
             
             display: grid;
@@ -17,6 +21,7 @@
             grid-template-rows: min-content min-content min-content;
             background-color: black;
             color: white;
+            padding-bottom: 1rem;
         }
         #tabHeader {
             grid-area: tabHeader;
@@ -269,7 +274,7 @@
     </head>
     <body onload="allElementsLoaded()">
         <!-- this form submits to itself -->
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+        <form id="sessionContainer" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <?php require_once "../Resources/php/sessionHeader.php"; ?>
             <div id="sessionBody">
             <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
