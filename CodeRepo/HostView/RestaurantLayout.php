@@ -11,9 +11,19 @@
     <link rel="stylesheet" href="../Resources/CSS/tableStyles.css" />
     <style>
         .multiselect {
-            background-color: #666;
-            filter: blur(2px);
+            animation: goDark .25s 0s ease forwards;
         }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111;
+        }
+
+    @keyframes goDark {
+        0% {background-color: initial;}
+        100% { background-color: #333;}
+    }
     </style>
     <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
     <script src="../Resources/JavaScript/SvgManipulation.js"></script>
@@ -41,16 +51,19 @@
 
         function updateTableStatuses() {
             try {
-                var newTableData = getVar("updatedTables", "tableStatusListener").split(",");
-                for (var i = 0; i < newTableData.length; i += 2 ) {
-                    with (document.getElementById(newTableData[i]).classList) {
-                        remove("disabled","unassigned", "open", "seated", "bussing");
-                        add(newTableData[i+1]);
+                var newTableData = getVar("updatedTables", "tableStatusListener");
+                if (newTableData != null) {
+                    newTableData = newTableData.split(",");
+                    for (var i = 0; i < newTableData.length; i += 2 ) {
+                        with (document.getElementById(newTableData[i]).classList) {
+                            remove("disabled","unassigned", "open", "seated", "bussing");
+                            add(newTableData[i+1]);
+                        }
                     }
-                }
-                let selectedTable = getVar("selectedTable");
-                if (selectedTable !== undefined && ("," + newTableData + ",").indexOf("," + selectedTable + ",") > -1) {
-                    setVar("flag", "updateSelectedTable");
+                    let selectedTable = getVar("selectedTable");
+                    if (selectedTable !== undefined && ("," + newTableData + ",").indexOf("," + selectedTable + ",") > -1) {
+                        setVar("flag", "updateSelectedTable");
+                    }
                 }
             }
             catch (err) {
@@ -75,19 +88,21 @@
                 setTimeout(listenerLoop, 250);
                 return;
             }
-            let highlightedTables = getVar("highlightedTables");
-            if (highlightedTables !== undefined) {
-                removeVar("highlightedTables");
+            if (varCpyRen("highlightedTables", null, "oldHighlightedTables")) {
                 let allTables = document.getElementsByClassName("table");
-                let newTables = highlightedTables.split(",");
-                for (let i = 0; i < allTables.length; i++) {
-                    allTables[i].classList.remove("highlighted");
-                }
-                if (highlightedTables != "clear") {
-                    for (let i = 0; i < newTables.length; i+=2) {
-                        document.getElementById(newTables[i]).classList.add("highlighted");
+                let newTables = getVar("highlightedTables");
+                if (newTables !== undefined) {
+                    newTables = newTables.split(",");
+                    for (let i = 0; i < allTables.length; i++) {
+                        allTables[i].classList.remove("highlighted");
+                    }
+                    if (highlightedTables != "clear") {
+                        for (let i = 0; i < newTables.length; i+=2) {
+                            document.getElementById(newTables[i]).classList.add("highlighted");
+                        }
                     }
                 }
+                
             }
             update = true;
             startListenerLoop();

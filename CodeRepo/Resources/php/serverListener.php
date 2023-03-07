@@ -30,10 +30,15 @@
                     
                     $_POST['tableList'] = "";
                     
-                    
-                    $sql = "SELECT Tickets.tableId AS tableId, Tickets.id AS ticketNumber  FROM TableAssignments INNER JOIN Tickets 
+                    if (isset($_POST['showAllTables'])) {
+                        $sql = "SELECT tableId FROM TableAssignments WHERE employeeId = $userStr;";
+                    }
+                    else {
+                        $sql = "SELECT Tickets.tableId AS tableId, Tickets.id AS ticketNumber  FROM TableAssignments INNER JOIN Tickets 
                                                                 ON TableAssignments.tableId = Tickets.tableId
                                                                 WHERE TableAssignments.employeeId = $userStr ORDER BY Tickets.tableId;";
+                        
+                    }
                     $ownedTables = connection()->query($sql);
                     if (mysqli_num_rows($ownedTables) > 0) {
                         $row = $ownedTables->fetch_assoc();
@@ -45,6 +50,7 @@
                     else {
                         unset($_POST['tableList']);
                     }
+                    
                 }
                 else {
                     unset($_POST['tableList']);

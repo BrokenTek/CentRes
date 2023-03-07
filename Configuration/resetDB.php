@@ -10,7 +10,7 @@
             var resetSuccessful = false;
             function allElementsLoaded() {
                 if (resetSuccessful) {
-                    document.getElementById("frmToLogin").submit();
+                    //document.getElementById("frmToLogin").submit();
                 }
             }
         </script>

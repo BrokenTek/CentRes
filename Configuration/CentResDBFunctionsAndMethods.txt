@@ -225,42 +225,49 @@ END;
 CREATE TRIGGER beforeInsertTableLog
 BEFORE INSERT ON TableLog FOR EACH ROW
 BEGIN
-	
-	IF ((SELECT COUNT(*) FROM EmployeeLog WHERE employeeId = NEW.authorizationId AND startTime IS NOT NULL AND endTime IS NULL) = 0) THEN
-		-- authorizer isn't logged in
-	    -- This is going to bog down the system the longer the EmployeeLog gets. Need to set up trigger to add/remove logged in employees from another table.
+	DECLARE onlyEmp INT UNSIGNED;
+	IF ((NEW.tableId IS NOT NULL) AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId) = 0) THEN
+		-- if an authorization employee number is specified, but it's invalid
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'Authorized host must be logged in!';
-		
-		
-		-- authorizer has invalid roles for session to perform action
+		SET MESSAGE_TEXT = 'Specified table does not exist!';
+	ELSEIF ((NEW.authorizationId IS NOT NULL) AND (SELECT COUNT(*) FROM Employees WHERE id = NEW.authorizationId) = 0) THEN
+		-- if an authorization employee number is specified, but it's invalid
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Specifed authorization employee ID does not exist!';
+	ELSEIF ((NEW.employeeId IS NOT NULL) AND ((SELECT COUNT(*) FROM Employees WHERE id = NEW.employeeId) = 0)) THEN
+		-- if an employee number is specified, but it's invalid
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Specifed employee ID does not exist!';
 	ELSEIF ((NEW.ticketId IS NOT NULL) AND (SELECT COUNT(*) FROM Tickets WHERE id = NEW.ticketId) = 0) THEN
 		-- if a ticket number is specified, but it's invalid
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Specifed ticket number does not exist!';
-	
-		-- If you are assigning a server to table, but they aren't logged in or don't have server roles for session
-	ELSEIF (NEW.ticketId IS NOT NULL AND NEW.tableId IS NOT NULL AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status IN ('Occupied', 'disabled')) = 1) THEN
+	ELSEIF (NEW.action = 'Addd' AND NEW.ticketId IS NOT NULL AND NEW.tableId IS NOT NULL AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status IN ('seated', 'disabled')) = 1) THEN
 		-- if you're assigning a ticket to a table, but it's occupied or disabled	
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Cannot assign a Ticket to an Unassigned or Occupied Table!';
+	ELSEIF (NEW.action = 'Remove' AND NEW.employeeId IS NOT NULL AND NEW.ticketId IS NULL) THEN
+		-- if you're removing the only server, but the table is occupied and you're not removing the ticket
+		IF ((SELECT COUNT(*) FROM TableAssignments WHERE tableId = NEW.tableId) = 1) THEN
+			SELECT employeeId INTO onlyEmp FROM TableAssignments WHERE tableId = NEW.tableId;
+			IF (onlyEmp = NEW.employeeId AND (SELECT status FROM Tables WHERE id = NEW.tableId) = 'seated') THEN
+				SIGNAL SQLSTATE '45000'
+				SET MESSAGE_TEXT = 'Cannot remove only server from an Occupied Table!';
+			END IF;
+		END IF;
+	ELSEIF (NEW.action = 'SetDisabled' AND (SELECT status FROM Tables WHERE id = NEW.tableId) <> 'unassigned') THEN
+		-- if you're trying to set the table as disabled but the table status <> unassigned
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Cannot Disable Table! Status Must Be Unassigned!';
 	ELSEIF (NEW.action = 'SetBused' AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status = 'bussing') = 0) THEN	
 		-- if you're setting the bused flag but the table isn't flagged as bussing
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Specified Table is not marked for bussing. Cannot set status to bused.';
-	-- ELSEIF () THEN
-		-- if you're removing the only server, but the table is occupied and you're not removing the ticket
-	
-		-- if you're trying to set the table as disabled but the table status <> unassigned
-
-	END IF;
-	
-	
+	END IF;	
 END;
 
 
 -- add employee to table
-
 CREATE PROCEDURE assignEmployeeToTable(IN employeeId INT UNSIGNED, IN tableId VARCHAR(3), authorizationId INT UNSIGNED)
 BEGIN
 	DECLARE empId INT UNSIGNED;

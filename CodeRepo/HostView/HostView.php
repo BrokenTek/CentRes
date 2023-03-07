@@ -10,10 +10,10 @@
 			.sessionBody {
 				display: grid;
 				grid-template-areas: "ifrServerList ifrRestaurantLayout ifrSelectedTable"
-									 "ifrWaitList   ifrRestaurantLayout ifrTicket"
-									 "ifrWaitTimes  ifrRestaurantLayout ifrTicket";
+									 "ifrWaitList   ifrRestaurantLayout ifrSelectedTable"
+									 "ifrWaitTimes  ifrRestaurantLayout ifrSelectedTable";
 				grid-template-columns: max-content 1fr max-content;
-				grid-template-rows: min-content 1fr min-content;
+				grid-template-rows: 40% 40% 20%;
 			}
 
 			.sessionContainer {
@@ -23,11 +23,13 @@
 			#ifrServerList {
 				grid-area: ifrServerList;
 				background-color: black;
+				overflow: auto;
 			}
 
 			#ifrWaitList {
 				grid-area: ifrWaitList;
 				background-color: black;
+				overflow: auto;
 			}
 
 			#ifrWaitTimes {
@@ -47,12 +49,12 @@
 
 			#ifrRestaurantLayout {
 				grid-area: ifrRestaurantLayout;
-				background-color: #777;
 			}
 		</style>
 		<script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
 		<script>
 			function allElementsLoaded() {
+				setVar("showAllTables", "", "serverListener");
 				setVar("authorizationId", USER_ID, "ifrSelectedTable");
 				if ((ROLE & 8) == 8) {
                 	setVar("authorizationId", USER_ID, "ifrRestaurantLayout");
@@ -63,185 +65,55 @@
 			
 			var verifyAuthProcessed = false;
 			var eventLoopTimer;
-
 			function eventLoop() {
 				try {
 					if (verifyAuthProcessed && getVar("authorizationId", "ifrRestaurantLayout") === undefined) {
 						setTimeout(eventLoop, 250);
 					}
 					verifyAuthProcessed = false;
-					let goToTableId = getVar("goToTable", "ifrRestaurantLayout");
-					if (goToTableId !== undefined) {
-						setVar("staticTableId",goToTableId);
-						document.getElementsByTagName("form")[0].setAttribute("action", "../ServerView/ServerView.php");
-						updateDisplay();
-					}
-
-					let selectionChanged = false;
-
-					let serverExtern = getVar("selectedServer", "ifrServerList");
-					let serverLocal = getVar("selectedServer");
 					
-					let tableExtern = getVar("selectedTable", "ifrRestaurantLayout");
-					let tableLocal = getVar("selectedTable");
-					
-					let selectedTableUpdated = getVar("updated", "ifrSelectedTable");
+					varCpyRen("goToTable", "ifrRestaurantLayout", "staticTableId", null, true);
 
-					let waitListUpdateFlag = getVar("flag", "ifrSelectedTable");
-					let selectedTableUpdateFlag = getVar("flag", "ifrRestaurantLayout");
-					
-					let ticketExtern = getVar("ticketId", "ifrSelectedTable");
-					let ticketLocal = getVar("selectedTicket", "ifrWaitList");
-					if (ticketLocal !== undefined) {
-						ticketLocal = ticketLocal.substring(6);
+					if (varCpyRen("employeeId", "ifrServerList", "addEmployeeId", "ifrSelectedTable", true)) {
+						varCpy("employeeId", "ifrServerList", "serverListener", true);
 					}
 					
-					if (waitListUpdateFlag == "refreshWaitList") {
-						removeVar("flag", "ifrSelectedTable");
+					varCpyRen("ticketId", "ifrWaitList", "addTicketId", "ifrSelectedTable", true);
+					varCpyRen("selectedTable", "ifrRestaurantLayout", "tableId", "ifrSelectedTable", true);
+					varCpyRen("tableList", "serverListener", "highlightedTables", "ifrRestaurantLayout");
+					
+					if (getVarOnce("flag","ifrSelectedTable")) {
+						removeVar("tableList","serverListener");
 						updateDisplay("ifrWaitList");
 						updateDisplay("ifrServerList");
 						updateDisplay("ifrWaitTimes");
+						highlightTables();
 					}
-
-					if (selectedTableUpdateFlag == "updateSelectedTable") {
-						removeVar("flag", "ifrRestaurantLayout");
-						updateDisplay("ifrSelectedTable");
-					}
-
-					let updateNeeded = false;
-					let highlightNeeded = false;
-										
-					if (ticketLocal !== undefined && ticketExtern === undefined) {
-						setVar("ticketId", ticketLocal, "ifrSelectedTable");
-						updateNeeded = true;
-					}
-
-					if (serverLocal != serverExtern) {
-						selectionChanged = true;
-						removeVar("tableList","serverListener");
-						setVar("selectedServer", serverExtern);
-						setVar("employeeId", serverExtern === undefined ? undefined : serverExtern.substring(6), "serverListener");
-						setVar("employeeId", serverExtern === undefined ? undefined : serverExtern.substring(6), "ifrSelectedTable");
-						updateDisplay(serverListener);
-						highlightNeeded = true;
-						updateNeeded = true;
-						
-						
-					}
-
-					if (tableLocal != tableExtern) {
-						removeVar("employeeId", "ifrSelectedTable");
-						removeVar("ticketId", "ifrSelectedTable");
-						setVar("selectedTable", tableExtern);
-						updateNeeded = true;
-					}
-					if (updateNeeded || highlightNeeded) {
-						updateDisplay("serverListener");
-						if (updateNeeded) { updateSelectedTable(); }
-						if (highlightNeeded) { highlightTables(); }
-					}
-						
+		
 				}
 				catch (error) {
-				
+					
 				}
 				startEventLoopTimer();
-			}
-
-			function highlightTables() {
-				try {
-					var selectedServer = getVar("selectedServer");
-					var tableList = getVar("tableList", "serverListener");
-					if (selectedServer !== undefined && tableList == null) {
-						setTimeout(highlightTables, 250);
-						return;
-					}
-					else if (tableList !== undefined && selectedServer === undefined) {
-						setTimeout(highlightTables, 250);
-						return;
-					}
-					setVar("highlightedTables", (selectedServer === undefined ? "clear" : tableList) , "ifrRestaurantLayout");
-				}
-				catch (error) {
-					setTimeout(highlightTables, 250);
-				}
-			}
-
-			function updateSelectedTable() {
-				try {
-					let tableList = getVar("tableList","serverListener");
-
-					let serverLocal = getVar("selectedServer");
-					if (serverLocal !== undefined) {
-						serverLocal = serverLocal.substring(6);
-					}
-					let serverExtern = getVar("selectedServer", "ifrSelectedTable");
-					
-					let tableLocal = getVar("selectedTable");
-					let tableExtern = getVar("selectedTable", "ifrSelectedTable");
-
-					let tableNew = undefined;
-					let serverNew = undefined;
-
-					let selectedTables = getVar("selectedTable", "ifrRestaurantLayout");
-
-					if (tableLocal !== undefined) {
-						tableNew = tableLocal;
-					}
-
-					if (serverLocal !== undefined) {
-						serverNew = serverLocal;
-					}
-
-					let updateRequired = false;
-					if (selectedTables !== undefined && selectedTables.indexOf(",") > -1) {
-						setVar("tableId", undefined, "ifrSelectedTable");
-						removeVar("employeeId", "ifrSelectedTable");
-						updateDisplay("ifrSelectedTable");
-						return;
-					}
-					if (tableExtern != tableNew) {
-						if (tableNew == "clear") {
-							removeVar("tableId", "ifrSelectedTable");
-							updateRequired = true;
-						}
-						else {
-							setVar("tableId", tableNew, "ifrSelectedTable");
-							updateRequired = true;
-						}
-					}
-					if (serverExtern != serverNew) {
-						setVar("employeeId", serverNew, "ifrSelectedTable");
-						updateRequired = true;
-					}
-					if (updateRequired) {
-						updateDisplay("ifrSelectedTable");
-					}
-				}
-				catch (err) {
-					alert("error");
-					setTimeout(updateSelectedTable, 250);
-				}
 			}
 
 			function stopEventLoopTimer() {
 				clearTimeout(eventLoopTimer);
 			}
 			function startEventLoopTimer() {
-				eventLoopTimer = setTimeout(eventLoop, 1000);
+				eventLoopTimer = setTimeout(eventLoop, 100);
 			}
 			<!-- event loop goes here -->
 		</script>
 	</head>
 	<body onload="allElementsLoaded()" class="intro">
-		<form id="hostViewSession" class="sessionContainer" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+		<form id="hostViewSession" class="sessionContainer" action="../ServerView/ServerView.php" method="POST">
 			<?php require_once "../Resources/php/sessionHeader.php"; ?>
 			<div class="sessionBody">
 				<iframe id="ifrServerList" src="ServerList.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="ifrWaitList" src="WaitList.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="ifrWaitTimes" src="WaitTimes.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="ifrSelectedTable" src="SelectedTable.php" frameborder='0' width="100%" height="100%"></iframe>
-				<iframe id="ifrTicket" src="../Resources/php/ticket.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="ifrRestaurantLayout" src="RestaurantLayout.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="serverListener" src="../Resources/php/serverListener.php" style="display: none;"></iframe>
 			</div>

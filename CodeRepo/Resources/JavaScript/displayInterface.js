@@ -1,7 +1,10 @@
+
 function setVar(variableName, value, id = null, update = false) {
     if (value == null || value === undefined) {
-        removeVar(variableName, id, update);
-        return;
+        if (getVar(variableName, id) === undefined) {
+            return false;
+        }
+        return removeVar(variableName, id, update);
     }
     var container = document.getElementById(id);
     var form;
@@ -18,11 +21,14 @@ function setVar(variableName, value, id = null, update = false) {
         // reprocess the request until successful.
         if (form == null) {
             setTimeout(setVar(variableName), 250);
-            return;
+            return undefined;
         }
     }
 
     if (variableElement != null) {
+        if (variableElement.getAttribute('value') == value) {
+            return false;
+        }
         variableElement.setAttribute('value', value);
     }
     else {
@@ -45,6 +51,7 @@ function setVar(variableName, value, id = null, update = false) {
     if (update) {
         updateDisplay(id);
     }
+    return true;
 }
 
 function getVar(variableName, id = null) {
@@ -72,6 +79,17 @@ function getVar(variableName, id = null) {
     }
 }
 
+function getVarOnce(variableName, id = null, update = false) {
+    let val = getVar(variableName, id);
+    if (val !== undefined) {
+        removeVar(variableName, id);
+        if (update) {
+            updateDisplay(id);
+        }
+    }
+    return val;
+}
+
 function removeVar(variableName, id = null, update = false) {
     var container = document.getElementById(id);
     var form;
@@ -86,19 +104,27 @@ function removeVar(variableName, id = null, update = false) {
         try {
             if (form == null) {
                 setTimeout(removeVar(variableName, id), 250);
-                return;
+                return undefined;
             }
         }
         catch (err) {
-            return;
+            return  undefined;
         }
     }
     if (variableElement != null) {
+        variableName;
         variableElement.remove();
     }
+    else {
+        return false;
+    }
+    if (update) {
+        updateDisplay(id);
+    }
+    return true;
 }
 
-function renameVar(oldVarName, newVarName, id = null, update = true) {
+function renameVar(oldVarName, newVarName, id = null, update = false) {
     var container = document.getElementById(id);
     var form;
     var variableElement;
@@ -111,7 +137,7 @@ function renameVar(oldVarName, newVarName, id = null, update = true) {
         variableElement = container.contentWindow.document.getElementById(oldVarName);
         try {
             if (form == null) {
-                setTimeout(renameVar(oldVarName, newVarName, id, update), 250);
+                setTimeout(renameVar(oldVarName, newVarName, id, update, update), 250);
                 return;
             }
         }
@@ -128,6 +154,21 @@ function renameVar(oldVarName, newVarName, id = null, update = true) {
     }
 }
 
+function varCpy(variableName, fromChild = null, toChild = null, updateChild = false, update = false, recordNewValLocally = false) {
+    let val = getVar(variableName, fromChild);
+    if (recordNewValLocally) {
+        setVar(variableName, val, update);
+    }
+    return setVar(variableName, val, toChild, updateChild);
+}
+
+function varCpyRen(fromVariableName, fromChild, toVariableName, toChild, updateChild = false, update = false, localRecordVarname = null) {
+    let val = getVar(fromVariableName, fromChild);
+    if (localRecordVarname != null) {
+        setVar(localRecordVarname, val, update);
+    }
+    return setVar(toVariableName, val, toChild, updateChild);
+}
 
 
 function clearVars(id = null, update = false) {

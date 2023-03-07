@@ -27,6 +27,7 @@ Otherwise will reroute to logon page -->
                     }
                     else {
                         removeVar("selectedTicket");
+                        removeVar("ticketId");
                     }
                 }
                 rememberScrollPosition();
@@ -46,6 +47,7 @@ Otherwise will reroute to logon page -->
                 if (getVar("selectedTicket") == this.id) {
                     this.classList.remove("selected");
                     removeVar("selectedTicket");
+                    removeVar("ticketId");
                     with (document.querySelector("#btnRemoveSelectedTicket")) {
                         setAttribute('disabled', '');
                         classList.add('disabled');
@@ -58,6 +60,7 @@ Otherwise will reroute to logon page -->
                         oldSelection.classList.remove("selected");
                     }
                     setVar("selectedTicket", this.id);
+                    setVar("ticketId", this.id.substring(6));
                     this.classList.add("selected");
 
                     with (document.querySelector("#btnRemoveSelectedTicket")) {

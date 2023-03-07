@@ -15,7 +15,9 @@ you'll be routed to whatever the home page is for your specified role level -->
   $employeeId = @$_POST['employeeId'];
   $ticketId = @$_POST['ticketId'];
   $tableId = @$_POST['tableId'];
-  $removeEmployeeId = false;
+
+  $addEmployeeId = @$_POST['addEmployeeId'];
+  $addTicketId = @$_POST['addTicketId'];
 
   if (isset($_POST['verboseAction'])) {
     $sqlCols = "authorizationId, tableId";
@@ -23,22 +25,24 @@ you'll be routed to whatever the home page is for your specified role level -->
     switch($_POST['verboseAction']) {
       case "addTicket":
         $sqlCols .= ", action, ticketId";
-        $sqlVals .= ", 'Add', '$ticketId'";
-        $flag = "refreshWaitList";
+        $sqlVals .= ", 'Add', '$addTicketId'";
+        $flag = "refresh";
         break;
       case "addServer":
         $sqlCols .= ", action, employeeId";
         $sqlVals .= ", 'Add', '$employeeId'";
+        $flag = "refresh";
         $removeEmployeeId = true;
         break;
       case "removeTicket":
         $sqlCols .= ", action, ticketId";
         $sqlVals .= ", 'Remove', '$ticketId'";
-        $flag = "refreshWaitList";
+        $flag = "refresh";
         break;
       case "removeServer":
         $sqlCols .= ", action, employeeId";
         $sqlVals .= ", 'Remove', '$employeeId'";
+        $flag = "refresh";
         $removeEmployeeId = true;
         break;
       case "setBused":
@@ -59,9 +63,6 @@ you'll be routed to whatever the home page is for your specified role level -->
     //echo("<h1>$sql</h1>");
     connection()->query($sql);
     unset($_POST['verboseAction'], $_POST['ticketId'], $ticket);
-    if ($removeEmployeeId) {
-      unset($_POST['employeeId'], $employeeId);
-    }
   }
 ?>
 <!DOCTYPE html>
@@ -129,9 +130,10 @@ you'll be routed to whatever the home page is for your specified role level -->
           background-color: #F6941D;
         }
 
-        #lblNoTicket {
+        .bannerLabel {
           grid-column: 1 / span 4;
           font-size: 2rem;
+          margin-inline: auto;
         }
       </style>
         <!-- gives you access to setVar, getVar, removeVar, 
@@ -157,22 +159,37 @@ you'll be routed to whatever the home page is for your specified role level -->
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
           <?php
-            if (isset($tableId)) {
+            if (!isset($tableId) || $tableId == "clear") {
+              echo("<div id='lblNoTicket' class='bannerLabel'>No Table Selected</div>");
+            }
+            elseif (strpos($tableId, ",") > 0) {
+              if (isset($_POST['addEmployeeId'])) {
+                echo("<div id='lblSectionAssignments' class='bannerLabel'>Section Assignment</div>");
+                echo("<button type='button' class='button' onPointerDown='executeAction(\"removeTicket\")'>Add To Zone</button>");
+                echo("<button type='button' class='button' onPointerDown='executeAction(\"removeTicket\")'>Remove From Zone</button>");
+                echo("<button type='button' class='button' onPointerDown='executeAction(\"removeTicket\")'>Set Zone</button>");
+              }
+              else {
+                echo("<div id='lblSectionAssignments' class='bannerLabel'>Select Server to Set Their Zone.</div>");
+              }
+            }
+            else {
               //get table status
               $sql = "SELECT status FROM Tables WHERE id='$tableId';";
               $status = connection()->query($sql)->fetch_assoc()['status'];
 
               echo("<div id='lblTableId' class='$status'>$tableId&nbsp;-&nbsp;$status</div>");
               
+              $ignoreEmp = false;
               // Check if the server is already assigned to table. If so, ignore $employeeId var
-              if(isset($employeeId)) {
-                $sql = "SELECT COUNT(*) AS result FROM TableAssignments WHERE employeeId = '$employeeId' && tableId = '$tableId'";
+              if(isset($addEmployeeId)) {
+                $sql = "SELECT COUNT(*) AS result FROM TableAssignments WHERE employeeId = '$addEmployeeId' && tableId = '$tableId'";
                 if (connection()->query($sql)->fetch_assoc()['result'] == 1) {
-                  unset($employeeId);
+                  $ignoreEmp = true;
                   
                 }
               }
-
+              
               $ticketSet = false;
               
               // Get the ticket associated with the table, if there is one
@@ -206,9 +223,9 @@ you'll be routed to whatever the home page is for your specified role level -->
                 }
               }
 
-              if (isset($employeeId)) {
-                $sql = "SELECT usernameFromId($employeeId) as username;";
-                $employeeUsername = connection()->query($sql)->fetch_assoc()['username'];
+              if (isset($addEmployeeId)) {
+                $sql = "SELECT usernameFromId($addEmployeeId) as username;";
+                $addEmployeeUsername = connection()->query($sql)->fetch_assoc()['username'];
               }
 
               switch ($status) {
@@ -216,34 +233,31 @@ you'll be routed to whatever the home page is for your specified role level -->
                   echo("<button type='button' id='btnEnable' onPointerDown='executeAction(\"enableTable\")'>Enable&nbsp;Table</button>");
                   break;
                 case "unassigned":
-                  if (isset($employeeId)) {
-                    echo("<button type='button' id='btnAddServer' onPointerDown='executeAction(\"addServer\", $employeeId)'>Assign&nbsp;$employeeUsername</button>");
+                  if (isset($addEmployeeId) && !$ignoreEmp) {
+                    echo("<button type='button' id='btnAddServer' onPointerDown='executeAction(\"addServer\", $addEmployeeId)'>Assign&nbsp;$addEmployeeUsername</button>");
                   }
                   echo("<button type='button' id='btnDisable' onPointerDown='executeAction(\"disableTable\")'>Disable&nbsp;Table</button>");
                   break;
                 case "open":
-                  if (isset($employeeId)) {
-                    echo("<button type='button' id='btnAddServer' onPointerDown='executeAction(\"addServer\", $employeeId)'>Assign&nbsp;$employeeUsername</button>");
+                  if (isset($addEmployeeId) && !$ignoreEmp) {
+                    echo("<button type='button' id='btnAddServer' onPointerDown='executeAction(\"addServer\", $addEmployeeId)'>Assign&nbsp;$addEmployeeUsername</button>");
                   }
-                  if (isset($ticketId)) {
+                  if (isset($addTicketId)) {
                     echo("<button type='button' id='btnAddTicket' onPointerDown='executeAction(\"addTicket\")'>Assign&nbsp;Ticket</button>");
                   }
                   break;
                 case "seated";
-                  if (isset($employeeId)) {
-                    echo("<button type='button' id='btnAddServer' onPointerDown='executeAction(\"addServer\", $employeeId)'>Assign&nbsp;$employeeUsername</button>");
+                  if (isset($addEmployeeId) && !$ignoreEmp) {
+                    echo("<button type='button' id='btnAddServer' onPointerDown='executeAction(\"addServer\", $addEmployeeId)'>Assign&nbsp;$addEmployeeUsername</button>");
                   }
                   break;
                 case "bussing";
-                  if (isset($employeeId)) {
-                    echo("<button type='button' id='btnAddServer' onPointerDown='executeAction(\"addServer\", $employeeId)'>Assign&nbsp;$employeeUsername</button>");
+                  if (isset($addEmployeeId) && !$ignoreEmp) {
+                    echo("<button type='button' id='btnAddServer' onPointerDown='executeAction(\"addServer\", $addEmployeeId)'>Assign&nbsp;$addEmployeeUsername</button>");
                   }
                   echo("<button type='button' id='btnBussingComplete' onPointerDown='executeAction(\"setBused\")'>Bussing&nbsp;Complete</button>");
                   break;
               }
-            }
-            else {
-              echo("<div id='lblNoTicket'>No Table Selected</div>");
             }
             //retain any POST vars. When updateDisplay() is called or the form is submitted,
             //these variables will be carried over -->

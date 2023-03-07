@@ -32,6 +32,7 @@
                 if (this.classList.contains("selected")) {
                     this.classList.remove("selected");
                     removeVar("selectedServer");
+                    removeVar("employeeId");
                 }
                 else {
                     var selectedServer = document.getElementsByClassName("selected");
@@ -40,6 +41,7 @@
                     } 
                     this.classList.add("selected");
                     setVar("selectedServer", this.id);
+                    setVar("employeeId", this.id.substring(6));
                 }
             }
         </script>
