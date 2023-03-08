@@ -134,7 +134,7 @@ Otherwise will reroute to logon page -->
             for (let i = 0; i < items.length; i++) {
                 if (items[i].classList.contains("selected")) {
                     selItemString += "," + items[i].id;
-                    if (lookAt == null) {
+                    if (lookAt === null) {
                         lookAt = items[i];
                     }
                     else {
@@ -147,7 +147,7 @@ Otherwise will reroute to logon page -->
                 lookAt.classList.remove("multiselect");
             }
             if (selItemString != "") {
-                setVar("selectedTicketItem", selItemString);
+                setVar("selectedTicketItem", selItemString.substring(1));
             }
             else {
                 removeVar("selectedTicketItem");
