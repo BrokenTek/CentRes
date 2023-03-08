@@ -126,10 +126,39 @@ Otherwise will reroute to logon page -->
     var longTouchTimer = null;
 	function pointerDown() {
         if (this === undefined || this.classList.contains('disabled')) { return; }
-        targetTicketItem = this;
-        targetTicketItem.classList.add("selected");
-        if (getVar("selectedTicketItem") != null && getVar("selectedTicketItem") != this.id) {
-            longTouchTimer = setTimeout(longTouch, LONG_TIME_TOUCH_LENGTH);
+        if (this.classList.contains("selected")) {
+            this.classList.remove("selected", "multiselect");
+            let items = document.getElementsByClassName("ticketItem");
+            let lookAt = null;
+            let selItemString = "";
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].classList.contains("selected")) {
+                    selItemString += "," + items[i].id;
+                    if (lookAt == null) {
+                        lookAt = items[i];
+                    }
+                    else {
+                        lookAt = undefined;
+                    }
+                }
+            }
+
+            if (lookAt !== null && lookAt !== undefined) {
+                lookAt.classList.remove("multiselect");
+            }
+            if (selItemString != "") {
+                setVar("selectedTicketItem", selItemString);
+            }
+            else {
+                removeVar("selectedTicketItem");
+            }
+        }
+        else {
+            targetTicketItem = this;
+            targetTicketItem.classList.add("selected");
+            if (getVar("selectedTicketItem") != null && getVar("selectedTicketItem") != this.id) {
+                longTouchTimer = setTimeout(longTouch, LONG_TIME_TOUCH_LENGTH);
+            }
         }
 	}
 
