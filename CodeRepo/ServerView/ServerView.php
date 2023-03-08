@@ -80,8 +80,9 @@
             function updateLoop() {
                 stopUpdateLoopTimer();
 
-                if (getVar("staticTableId") !== undefined && getVar("tableId","ticketContainer") === undefined) {
-                    setTimeout(redirectToHostView, 5000);
+                if (getVar("staticTableId") !== undefined && varCpy("ticketRemoved","ticketContainer", false, true)) {
+                    alert("Ticket " + getVar("ticket", "ticketContainer") + " is not longer assigned to this table!\nRedirecting back to Host View.");
+                    location.replace(document.getElementById("mgrNavHostView").getAttribute("value"));
                 }
             
                
@@ -193,18 +194,6 @@
                     }
                 }
                 startUpdateLoopTimer();
-            }
-
-            var ignoreFuturePolls = false;
-            function redirectToHostView() {
-                if (ignoreFuturePolls) {
-                    return;
-                }
-                if (getVar("tableId","ticketContainer") === undefined) {
-                    ignoreFuturePolls = true;
-                    //alert("Ticket " + getVar("ticket", "ticketContainer") + " is not longer assigned to this table!\nRedirecting back to Host View.");
-                    //location.replace(document.getElementById("mgrNavHostView").getAttribute("value"));
-                }        
             }
 
             function showModWindow() {

@@ -154,20 +154,25 @@ function renameVar(oldVarName, newVarName, id = null, update = false) {
     }
 }
 
-function varCpy(variableName, fromChild = null, toChild = null, updateChild = false, update = false, recordNewValLocally = false) {
-    let val = getVar(variableName, fromChild);
-    if (recordNewValLocally) {
-        setVar(variableName, val, update);
+function varCpy(variableName, source = null, destination = null, updateDestination = false, allowUndefinedVariables = false) {
+    let val = getVar(variableName, source);
+    let val2 = getVar(variableName, destination);
+    if (val === val2 || (val === undefined && !allowUndefinedVariables)) {
+        return false;
     }
-    return setVar(variableName, val, toChild, updateChild);
+    return setVar(variableName, val, destination, updateDestination);
 }
 
-function varCpyRen(fromVariableName, fromChild, toVariableName, toChild, updateChild = false, update = false, localRecordVarname = null) {
-    let val = getVar(fromVariableName, fromChild);
-    if (localRecordVarname != null) {
-        setVar(localRecordVarname, val, update);
+function varCpyRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateDestination, allowUndefinedVariables = false) {
+    let val = getVar(sourceVariableName, source);
+    let val2 = getVar(destinationVariableName, destination);
+    if (sourceVariableName == "tableList" && val === undefined) {
+        //alert(val2);
     }
-    return setVar(toVariableName, val, toChild, updateChild);
+    if (val === val2 || (val === undefined && !allowUndefinedVariables)) {
+        return false;
+    }
+    return setVar(destinationVariableName, val, destination, updateDestination);
 }
 
 

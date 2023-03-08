@@ -26,23 +26,23 @@ you'll be routed to whatever the home page is for your specified role level -->
       case "addTicket":
         $sqlCols .= ", action, ticketId";
         $sqlVals .= ", 'Add', '$addTicketId'";
-        $flag = "refresh";
+        $update = true;
         break;
       case "addServer":
         $sqlCols .= ", action, employeeId";
         $sqlVals .= ", 'Add', '$employeeId'";
-        $flag = "refresh";
+        $update = true;
         $removeEmployeeId = true;
         break;
       case "removeTicket":
         $sqlCols .= ", action, ticketId";
         $sqlVals .= ", 'Remove', '$ticketId'";
-        $flag = "refresh";
+        $update = true;
         break;
       case "removeServer":
         $sqlCols .= ", action, employeeId";
         $sqlVals .= ", 'Remove', '$employeeId'";
-        $flag = "refresh";
+        $update = true;
         $removeEmployeeId = true;
         break;
       case "setBused":
@@ -57,6 +57,19 @@ you'll be routed to whatever the home page is for your specified role level -->
         $sqlCols .= ", action";
         $sqlVals .= ", 'Enable'";
         break;
+      case "setZone":
+        echo("Set Zone Code Here");
+        // any error messages you get, put them in $errorMessages, separated by \n
+        $errorMessage = "only Error Message";
+        break;
+      case "addToZone":
+        echo("Add To Zone Code Here");
+        break;
+      case "removeFromZone":
+        echo("Remove From Zone Code Here");
+        // any error messages you get, put them in $errorMessages, separated by \n
+        $errorMessage = "ErrorMsg1 is really long and should wrap in the container\nErrorMsg2";
+        break;
     }
 
     $sql = "INSERT INTO TableLog ($sqlCols) VALUES ($sqlVals);";
@@ -69,8 +82,8 @@ you'll be routed to whatever the home page is for your specified role level -->
 
 <html>
     <head>
+      <link rel="stylesheet" href="../Resources/CSS/tableStyles.css">
       <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
-      <link rel="stylesheet" href="../Resources/CSS/tableStyles.css" />
       <style>
         *, form{
           background-color: black;
@@ -135,6 +148,18 @@ you'll be routed to whatever the home page is for your specified role level -->
           font-size: 2rem;
           margin-inline: auto;
         }
+        .bannerLabel2 {
+          grid-column: 1 / span 4;
+          font-size: 1.5rem;
+          margin-inline: auto;
+        }
+        .errorMessage {
+          grid-column: 1 / span 4;
+          border: .125rem solid white;
+          margin-bottom: .25rem;
+          padding-left: .5rem;
+          margin-inline: .25rem;
+        }
       </style>
         <!-- gives you access to setVar, getVar, removeVar, 
         clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
@@ -142,7 +167,7 @@ you'll be routed to whatever the home page is for your specified role level -->
         
         <script>
             function allElementsLoaded() {
-              <?php if (isset($flag)) { echo("setVar('flag', '$flag');"); } ?>
+              <?php if (isset($update)) { echo("setVar('update', true);"); } ?>
             }
             
             function executeAction(verboseAction, employeeId = null) {
@@ -163,11 +188,21 @@ you'll be routed to whatever the home page is for your specified role level -->
               echo("<div id='lblNoTicket' class='bannerLabel'>No Table Selected</div>");
             }
             elseif (strpos($tableId, ",") > 0) {
-              if (isset($_POST['addEmployeeId'])) {
+              if (isset($addEmployeeId)) {
+                $sql = "SELECT usernameFromId($addEmployeeId) as username;";
+                $username = connection()->query($sql)->fetch_assoc()['username'];
                 echo("<div id='lblSectionAssignments' class='bannerLabel'>Section Assignment</div>");
-                echo("<button type='button' class='button' onPointerDown='executeAction(\"removeTicket\")'>Add To Zone</button>");
-                echo("<button type='button' class='button' onPointerDown='executeAction(\"removeTicket\")'>Remove From Zone</button>");
-                echo("<button type='button' class='button' onPointerDown='executeAction(\"removeTicket\")'>Set Zone</button>");
+                echo("<div class='bannerLabel2'>$username</div>");
+                echo("<button type='button' class='button' onPointerDown='executeAction(\"addToZone\")'>Add To Zone</button>");
+                echo("<button type='button' class='button' onPointerDown='executeAction(\"removeFromZone\")'>Remove From Zone</button>");
+                echo("<button type='button' class='button' onPointerDown='executeAction(\"setZone\")'>Set Zone</button>");
+
+                if (isset($errorMessage)) {
+                  $errorMessages = explode("\n", $errorMessage);
+                  for ($i = 0; $i < sizeof($errorMessages); $i++) {
+                    echo("<div class='highlighted errorMessage'>$errorMessages[$i]</div>");
+                  }
+                }
               }
               else {
                 echo("<div id='lblSectionAssignments' class='bannerLabel'>Select Server to Set Their Zone.</div>");

@@ -227,7 +227,7 @@ BEFORE INSERT ON TableLog FOR EACH ROW
 BEGIN
 	DECLARE onlyEmp INT UNSIGNED;
 	IF ((NEW.tableId IS NOT NULL) AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId) = 0) THEN
-		-- if an authorization employee number is specified, but it's invalid
+		-- if table id is invalid
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Specified table does not exist!';
 	ELSEIF ((NEW.authorizationId IS NOT NULL) AND (SELECT COUNT(*) FROM Employees WHERE id = NEW.authorizationId) = 0) THEN
@@ -252,7 +252,7 @@ BEGIN
 			SELECT employeeId INTO onlyEmp FROM TableAssignments WHERE tableId = NEW.tableId;
 			IF (onlyEmp = NEW.employeeId AND (SELECT status FROM Tables WHERE id = NEW.tableId) = 'seated') THEN
 				SIGNAL SQLSTATE '45000'
-				SET MESSAGE_TEXT = 'Cannot remove only server from an Occupied Table!';
+				SET MESSAGE_TEXT = 'All seated tables must have at least 1 server assigned to them!';
 			END IF;
 		END IF;
 	ELSEIF (NEW.action = 'SetDisabled' AND (SELECT status FROM Tables WHERE id = NEW.tableId) <> 'unassigned') THEN

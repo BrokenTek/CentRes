@@ -42,9 +42,17 @@
                     $ownedTables = connection()->query($sql);
                     if (mysqli_num_rows($ownedTables) > 0) {
                         $row = $ownedTables->fetch_assoc();
-                        $_POST['tableList'] = $row['tableId'] .",". $row['ticketNumber'];
-                        while($row = $ownedTables->fetch_assoc()) {
-                            $_POST['tableList'] .= "," . $row['tableId'] .",". $row['ticketNumber'];
+                        if (isset($_POST['tableIdOnly'])) {
+                            $_POST['tableList'] = $row['tableId'];
+                            while($row = $ownedTables->fetch_assoc()) {
+                                $_POST['tableList'] .= "," . $row['tableId'];
+                            }
+                        }
+                        else {
+                            $_POST['tableList'] = $row['tableId'] .",". $row['ticketNumber'];
+                            while($row = $ownedTables->fetch_assoc()) {
+                                $_POST['tableList'] .= "," . $row['tableId'] .",". $row['ticketNumber'];
+                            }
                         }
                     }
                     else {

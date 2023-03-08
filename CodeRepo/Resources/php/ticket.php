@@ -19,69 +19,36 @@ Otherwise will reroute to logon page -->
     // ========================= TASKS WHEN TICKET IS LOADED ==============================
     // after the ticket has loaded
     function loaded() {
-        var newTime;
-        var paidStatuses;
-        var tableId;
-        try {
-            newTime = getVar("modificationTime", "ticketListener");
-            paidStatuses = getVar("paidStatuses", "ticketListener");
-            tableId = getVar("tableId", "ticketListener");
-            setVar("tableId",tableId);
-        }
-        catch (err) {
-            setTimeout(loaded, 250);
-            return;
-        }
-        
-        // set the ticket timestamp, so anything listening to it can update.
-        if (getVar("paidStatuses") != paidStatuses) {
-            setVar("paidStatuses", paidStatuses);
-        }
-        if (newTime != getVar("recordedModificationTime")) {
+        varCpyRen("ticket", null, "ticketNumber", "ticketListener", true);
+        varCpy("tableId", "ticketListener");
+        varCpy("paidStatuses", "ticketListener");
+        if (varCpyRen("modificationTime", "ticketListener", "recordedModificationTime")) {
             setVar("lastUpdate", Date.now());
         }
         
-        var tick = getVar("ticket");
-        
         // if the ticket number has been specified
-        if (tick != null) {
-            setVar("ticketNumber", tick, "ticketListener", true);
-            
-            var oldTime = getVar("recordedModificationTime");
-            
-
-            // but you haven't yet retrieved a timestamp
-            if (getVar("recordedModificationTime") == null) { 
-                //  get the timestamp from the listener
-                setVar("recordedModificationTime", newTime);
-            }
-
-
+        if (getVar("ticket") != null) {
             // if you previusly had items selected
             var selItems = getVar("selectedTicketItem");
             if (selItems != null) {
                 selItems = selItems.split(",");
-                // and there were more than 1 selected,
-                if (selItems.length > 1) {
+                let count = 0;
+                let className = "selected";
+                for (let control = 0; control < 2; control++) {
                     for(let i = 0; i < selItems.length; i++){
                         // Some of them might be visible or exist anymore
                         // check if you can still see them (exists and visible), and if so
                         // set them as "multiselect" 
                         var lookAt = document.querySelector("#" + selItems[i]);
                         if (lookAt != null) {
-                            lookAt.classList.add("selected");
-                            lookAt.classList.add("multiselect");
+                            lookAt.classList.add(className);
+                            count++;
                         }
-        	            
-    	            }
-                }
-                // otherwise the selected item mgiht not be visible or exist anymore
-                // check if you can still see it (exists and visible), and if so
-                // set it as "selected"
-                else {
-                    let lookAt = document.querySelector("#" + selItems);
-                    if (lookAt != null) {
-                        lookAt.classList.add("selected");
+                        if (count < 2) {
+                            break;
+                        }
+                        className = "multiselect";
+                        
                     }
                 }
             }
@@ -115,37 +82,9 @@ Otherwise will reroute to logon page -->
     // function that listens for an external change in the ticket timestamp.
     // if a change has been detected, reload with the changes.
     function checkExternalTicketUpdate() {
-        var tableId;
-        var oldTime = getVar("recordedModificationTime");
-        var newTime;
-        var paidStatuses;
-        try {
-            tableId = getVar("tableId", "ticketListener");
-            newTime = getVar("modificationTime", "ticketListener");
-            paidStatuses = getVar("paidStatuses", "ticketListener");
-        }
-        catch (err) {
-            setTimeout(checkExternalTicketUpdate, 250);
-            return;
-        }
-        if (tableId !== getVar("tableId")) {
-            setVar("tableId", tableId);
-        }
-        if (getVar("ignoreUpdate") != null) {
-            removeVar("ignoreUpdate");
-            setVar("recordedModificationTime", newTime);
-            return;
-        }
-        
-        if (paidStatuses != getVar(paidStatuses)) {
-            setVar("paidStatuses", paidStatuses);
-        }
-        if (oldTime != newTime && newTime != null) {
-            setVar("recordedModificationTime", newTime);
-            if (oldTime != null) {
-                document.getElementById("ticketForm").submit(); 
-            }
-        }
+        varCpy("tableId", "ticketListener");
+        varCpy("paidStatuses", "ticketListener");
+        varCpyRen("modificationTime", "ticketListener", "recordedModificationTime", null, getVarOnce("ignoreUpdate") === undefined);
     }
 
     function setState() {
@@ -261,7 +200,7 @@ Otherwise will reroute to logon page -->
 </script>
 </head>
 <body onload="loaded()">
-<form id="sessionBody" action="ticket.php" method="post" class= "ticketForm">
+<form id="ticketForm" action="ticket.php" method="post" class= "ticketForm">
 
     <?php
         require_once 'connect_disconnect.php';

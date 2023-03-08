@@ -88,22 +88,22 @@
                 setTimeout(listenerLoop, 250);
                 return;
             }
-            if (varCpyRen("highlightedTables", null, "oldHighlightedTables")) {
+            
+            if (getVarOnce("highlightedTablesChanged")) {
                 let allTables = document.getElementsByClassName("table");
-                let newTables = getVar("highlightedTables");
-                if (newTables !== undefined) {
-                    newTables = newTables.split(",");
-                    for (let i = 0; i < allTables.length; i++) {
-                        allTables[i].classList.remove("highlighted");
-                    }
-                    if (highlightedTables != "clear") {
-                        for (let i = 0; i < newTables.length; i+=2) {
-                            document.getElementById(newTables[i]).classList.add("highlighted");
-                        }
+                for (let i = 0; i < allTables.length; i++) {
+                    allTables[i].classList.remove("highlighted");
+                }
+
+                let tables = getVar("highlightedTables");
+                if (tables !== undefined) {
+                    tables = tables.split(",");
+                    for (let i = 0; i < tables.length; i++) {
+                        document.getElementById(tables[i]).classList.add("highlighted");
                     }
                 }
-                
             }
+
             update = true;
             startListenerLoop();
            

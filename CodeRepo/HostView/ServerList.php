@@ -64,13 +64,12 @@
                     //it then aggregates the sum of every active ticket's party size and the amount of tables assigned, grouped by the server's name,
                     //afterwards it filters out any employees that aren't currently logged in,
                     //and finally sorts the records first by the amount of customers being served ascending, then by the amount of tables being served ascending.
-                    $sql = "SELECT employees.username as servername, employees.id as serverid, IFNULL(SUM(activetickets.partysize),0) AS pplcount, COUNT(tableassignments.tableID) as tblcount
+                    $sql = "SELECT employees.username as servername, employees.id as serverid, IFNULL(SUM(activetickets.partysize),0) AS pplcount, COUNT(activetickets.partysize) as tblcount
                             FROM ((Employees 
                             LEFT JOIN tableassignments ON employees.id = tableassignments.employeeId) 
                             LEFT JOIN(SELECT * FROM Tickets WHERE timeSeated IS NOT NULL AND timeClosed IS NULL) AS activetickets 
                             ON tableassignments.tableId = activetickets.tableId)
                             WHERE employees.id IN (SELECT employeeId FROM ActiveEmployees WHERE employeeRole & 2 = employeeRole)
-                            AND tableAssignments.tableID in (SELECT tableId FROM Tickets WHERE tableId IS NOT NULL)
                             GROUP BY servername
                             ORDER BY pplcount ASC, tblcount ASC;";
                     $result = connection()->query($sql);

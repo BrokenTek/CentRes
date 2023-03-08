@@ -56,6 +56,7 @@
 		<script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
 		<script>
 			function allElementsLoaded() {
+				setVar("tableIdOnly", "", "serverListener");
 				setVar("showAllTables", "", "serverListener");
 				setVar("authorizationId", USER_ID, "ifrSelectedTable");
 				if ((ROLE & 8) == 8) {
@@ -76,15 +77,17 @@
 					
 					varCpyRen("goToTable", "ifrRestaurantLayout", "staticTableId", null, true);
 
-					if (varCpyRen("employeeId", "ifrServerList", "addEmployeeId", "ifrSelectedTable", true)) {
-						varCpy("employeeId", "ifrServerList", "serverListener", true);
+					varCpy("employeeId", "ifrServerList", "serverListener", true, true);
+					varCpyRen("employeeId", "ifrServerList", "addEmployeeId", "ifrSelectedTable", true, true);
+					
+					varCpyRen("ticketId", "ifrWaitList", "addTicketId", "ifrSelectedTable", true, true);
+					varCpyRen("selectedTable", "ifrRestaurantLayout", "tableId", "ifrSelectedTable", true,true);
+
+					if (varCpyRen("tableList", "serverListener", "highlightedTables", "ifrRestaurantLayout",false, true)) {
+						setVar("highlightedTablesChanged", "yes", "ifrRestaurantLayout");
 					}
-					
-					varCpyRen("ticketId", "ifrWaitList", "addTicketId", "ifrSelectedTable", true);
-					varCpyRen("selectedTable", "ifrRestaurantLayout", "tableId", "ifrSelectedTable", true);
-					varCpyRen("tableList", "serverListener", "highlightedTables", "ifrRestaurantLayout");
-					
-					if (getVarOnce("flag","ifrSelectedTable")) {
+										
+					if (getVarOnce("update","ifrSelectedTable")) {
 						removeVar("tableList","serverListener");
 						updateDisplay("ifrWaitList");
 						updateDisplay("ifrServerList");
@@ -93,9 +96,7 @@
 					}
 		
 				}
-				catch (error) {
-					
-				}
+				catch (error) { }
 				startEventLoopTimer();
 			}
 
