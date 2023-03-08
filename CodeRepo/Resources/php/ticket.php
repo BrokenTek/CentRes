@@ -61,7 +61,7 @@ Otherwise will reroute to logon page -->
             ?>
 
             //begin listening for updates to the ticket.
-            setInterval(checkExternalTicketUpdate, 1000);
+            setInterval(eventLoop, 1000);
             rememberScrollPosition();
             setState();
         }
@@ -81,10 +81,14 @@ Otherwise will reroute to logon page -->
 
     // function that listens for an external change in the ticket timestamp.
     // if a change has been detected, reload with the changes.
-    function checkExternalTicketUpdate() {
-        varCpy("tableId", "ticketListener");
-        varCpy("paidStatuses", "ticketListener");
-        varCpyRen("modificationTime", "ticketListener", "recordedModificationTime", null, getVarOnce("ignoreUpdate") === undefined);
+    function eventLoop() {
+        try {
+            varCpy("tableId", "ticketListener");
+            varCpy("ticketRemoved", "ticketListener");
+            varCpy("paidStatuses", "ticketListener");
+            varCpyRen("modificationTime", "ticketListener", "recordedModificationTime", null, getVarOnce("ignoreUpdate") === undefined);
+        }
+        catch (err) {}
     }
 
     function setState() {

@@ -23,6 +23,7 @@
 		 #ticketHeaderText, #menuTitle {
 			font-size: 2rem;
 			font-weight: bold;
+			color: white;
 		 }
 
 		 #cboTable, #cboSeat, #cboSplit {

@@ -48,8 +48,7 @@
                 setVar('username', USERNAME, 'serverListener', true);
                 let staticTableId = getVar('staticTableId');
                 if (staticTableId !== undefined) {
-                    setVar('staticTableId', staticTableId, 'serverListener');
-                    updateDisplay('serverListener');
+                    setVar('staticTableId', staticTableId, 'serverListener', true);
                 }
                 
                 checkTableAssignments();
@@ -57,13 +56,9 @@
                 setVar("enabledButtons", "");
                 updateButtonStates();
 
-                // initialize the table listener
-                
-
-                
-                
-
                 startUpdateLoopTimer();
+
+                ignoreUpdates = false;
             }
             addEventListener("load", loaded);
             
@@ -80,7 +75,7 @@
             function updateLoop() {
                 stopUpdateLoopTimer();
 
-                if (getVar("staticTableId") !== undefined && varCpy("ticketRemoved","ticketContainer", false, true)) {
+                if (getVar("staticTableId") !== undefined && getVarOnce("ticketRemoved","ticketContainer") !== undefined) {
                     alert("Ticket " + getVar("ticket", "ticketContainer") + " is not longer assigned to this table!\nRedirecting back to Host View.");
                     location.replace(document.getElementById("mgrNavHostView").getAttribute("value"));
                 }
@@ -255,7 +250,6 @@
                 }
                 catch (err) {
                      // due to the async nature of components, some requests might fail
-                    setTimeout(checkTableAssignments, 250);
                     return;
                 }
 

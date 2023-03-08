@@ -220,6 +220,7 @@ function updateDisplay(id = null) {
     form.submit();
 }
 
+
 // =============================== LOCAL WINDOW ONLY FUNCTIONS ============================
 
 window.onscroll = function (e) { 
