@@ -121,15 +121,7 @@
 <?php		
 			
 			if (isset($_POST['uname'])) {		
-				$sql = "SELECT loggedIn('" .$_POST['uname']. "') AS loggedIn";
-				try {
-					if (connection()->query($sql)->fetch_assoc()['loggedIn']) {
-						$errorMessage = "You are already logged in elsewhere!";
-					}
-				}
-				catch (Exception $e) {
-					$errorMessage = $e->getMessage();
-				}
+				
 				
 		
 				if (!isset($errorMessage)) {
