@@ -40,7 +40,7 @@
                 print("<h1>☑ Database Functions Updated</h1>");
 
                 // Recreate/Update the table 'tableshapes' records
-                $query = file_get_contents("CentResPopulate_tableshapes.txt");
+                $query = file_get_contents("CentResPopulateTableshapesAndTables.txt");
                 $dbh->exec($query);
                 print("<h1>☑ Populated Tables</h1>");
 

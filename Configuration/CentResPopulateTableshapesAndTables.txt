@@ -6,6 +6,8 @@ INSERT INTO `tableshapes` (`shapeName`, `svgPathData`, `capacity`) VALUES
 ('square', 'path id="TABLEID" class="table unassigned square" d="M11 3.5H21M1 1H31V31H1V1Z" transform="TRANSFORMDATA"', 4),
 ('twotop', 'path id="TABLEID" class="table unassigned twotop" d="M1 16V1H14.9535V16M1 16V31H14.9535V16M1 16H14.9535" transform="TRANSFORMDATA"', 2);
 
+
+/* will be populating this */
 INSERT INTO `tables` (`id`, `shape`, `gridLocationX`, `gridLocationY`, `gridSpanX`, `gridSpanY`, `transformData`, `status`) VALUES
 ('NX1', 'booth', NULL, NULL, NULL, NULL, 'translate(200, 200) rotate(45, 0, 0)', 'unassigned'), 
 ('NX2', 'round', NULL, NULL, NULL, NULL, 'translate(100, 100)', 'unassigned');
