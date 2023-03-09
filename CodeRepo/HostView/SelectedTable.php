@@ -60,7 +60,24 @@ you'll be routed to whatever the home page is for your specified role level -->
       case "setZone":
         echo("Set Zone Code Here");
         // any error messages you get, put them in $errorMessages, separated by \n
-        $errorMessage = "only Error Message";
+        $tableIds = explode(",", $tableId);
+        try {
+    // remove employee from all their currently assigned tables
+          $sql = "DELETE FROM tableassignments WHERE employeeId = '$addEmployeeId';";
+          connection()->query($sql);
+          foreach ($tableIds as $tableId) {
+            // add employee to the selected table and log the action
+            $sql = "INSERT INTO tableassignments (employeeId, tableId) VALUES ('$addEmployeeId', '$tableId');";
+            $result = connection()->query($sql);
+            $values = "($authorizationId, '$tableId', 'SetZone', $addEmployeeId)";
+            $values = rtrim($values, ",");
+            $sql = "INSERT INTO TableLog (authorizationId, tableId, action, employeeId) VALUES $values;";
+            $result = connection()->query($sql);
+          }
+      } catch (Error $e) {
+          echo $e->getMessage();
+          $errorMessage = "An error occurred while setting the zone.";
+        }
         break;
       case "addToZone":
         echo("Add To Zone Code Here");
