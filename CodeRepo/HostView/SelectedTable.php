@@ -65,11 +65,17 @@ you'll be routed to whatever the home page is for your specified role level -->
     // remove employee from all their currently assigned tables
           $sql = "DELETE FROM tableassignments WHERE employeeId = '$addEmployeeId';";
           connection()->query($sql);
+          
+          $values = "($authorizationId, '$tableId', 'Remove', $addEmployeeId)";
+          $values = rtrim($values, ",");
+          $sql = "INSERT INTO TableLog (authorizationId, tableId, action, employeeId) VALUES $values;";
+          $result = connection()->query($sql);
+
           foreach ($tableIds as $tableId) {
             // add employee to the selected table and log the action
             $sql = "INSERT INTO tableassignments (employeeId, tableId) VALUES ('$addEmployeeId', '$tableId');";
             $result = connection()->query($sql);
-            $values = "($authorizationId, '$tableId', 'SetZone', $addEmployeeId)";
+            $values = "($authorizationId, '$tableId', 'Add', $addEmployeeId)";
             $values = rtrim($values, ",");
             $sql = "INSERT INTO TableLog (authorizationId, tableId, action, employeeId) VALUES $values;";
             $result = connection()->query($sql);
