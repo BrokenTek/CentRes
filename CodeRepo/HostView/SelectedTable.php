@@ -64,9 +64,38 @@ you'll be routed to whatever the home page is for your specified role level -->
         break;
       case "addToZone":
         echo("Add To Zone Code Here");
+        $tableIds = explode(",", $tableId);
+        foreach ($tableIds as $tableId){
+          try {
+            $values = "($authorizationId, '$tableId', 'Add', $addEmployeeId)";
+            $values = rtrim($values, ",");
+            $sql = "INSERT INTO TableLog (authorizationId, tableId, action, employeeId) VALUES $values;";
+            $result = connection()->query($sql);
+
+          } catch (Error $e) {
+            echo $e->getMessage();
+          }
+          
+        }
+       
         break;
       case "removeFromZone":
         echo("Remove From Zone Code Here");
+        $tableIds = explode(",", $tableId);
+        foreach ($tableIds as $tableId){
+          try {
+            $sql = "DELETE FROM tableassignments WHERE tableId = '$tableId' AND employeeId = '$addEmployeeId';";
+            $result = connection()->query($sql);
+      
+            $values = "($authorizationId, '$tableId', 'Remove', $addEmployeeId)";
+            $values = rtrim($values, ",");
+            $sql = "INSERT INTO TableLog (authorizationId, tableId, action, employeeId) VALUES $values;";
+            $result = connection()->query($sql);
+
+        } catch (Error $e) {
+            echo $e->getMessage();
+            }
+        }     
         // any error messages you get, put them in $errorMessages, separated by \n
         $errorMessage = "ErrorMsg1 is really long and should wrap in the container\nErrorMsg2";
         break;
