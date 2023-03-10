@@ -282,7 +282,7 @@
             <?php            
                 if (isset($_POST['command'])) {
                     $inStr = isset($_POST['selectedItem']) ?
-                            "('"  .str_replace(",","','", $_POST['selectedItem']). "')" : "";
+                            "('"  .str_replace(",","','", $_POST['selectedItem']). "')" : "('')";
                     
                     switch ($_POST['command']) {
                         //reset all sort keys
