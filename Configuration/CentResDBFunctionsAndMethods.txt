@@ -647,7 +647,7 @@ BEGIN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'You do not have the authorization to login with the role you specified!';
 		ELSEIF ((SELECT COUNT(*) FROM Employees WHERE accessToken = newAccessToken AND userName <> requestedUsername) = 1 ) THEN
-			ELSEIF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername AND accessToken IS NOT NULL AND accessTokenExpiration > now()) = 1) THEN
+			IF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername AND accessToken IS NOT NULL AND accessTokenExpiration > now()) = 1) THEN
 				CALL logout(requestedUsername);
 			END IF;
 			-- Another user is already logged in using your access key.

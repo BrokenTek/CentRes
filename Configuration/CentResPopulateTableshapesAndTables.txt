@@ -8,6 +8,7 @@ INSERT INTO `tableshapes` (`shapeName`, `svgPathData`, `capacity`) VALUES
 ('twotop', '<g transform="TRANSFORMDATA" id="TABLEID" class="table unassigned twotop"> <rect width="15" height="18"/> <rect width="15" height="18" transform="translate(0,20)"/> <rect width="15" height="38" opacity="0"/> </g>', 2);
 
 
+
 /* will be populating this */
 DELETE FROM Tables;
 INSERT INTO `tables` (`id`, `shape`, `transformData`) VALUES 
@@ -24,6 +25,10 @@ INSERT INTO `tables` (`id`, `shape`, `transformData`) VALUES
 ('L4', 'longtable', 'translate(1160, 330)'),
 ('L5', 'longtable', 'translate(1005, 420)'),
 ('L6', 'longtable', 'translate(1160, 420)'),
+('L7', 'longtable', 'translate(600, 380)'),
+('L8', 'longtable', 'translate(758, 380)'),
+('L9', 'longtable', 'translate(600, 288)'),
+('L10', 'longtable', 'translate(758, 288)'),
 
 ('S1', 'square',    'translate(350, 251)'),
 ('S2', 'square',    'translate(470, 251)'),
