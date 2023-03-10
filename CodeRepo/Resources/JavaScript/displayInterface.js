@@ -79,6 +79,8 @@ function getVar(variableName, id = null) {
     }
 }
 
+// get a var. If its defined, remove the var and return its value.
+// If the variable was retrieved, specify you want to update the target display by setting update = true;
 function getVarOnce(variableName, id = null, update = false) {
     let val = getVar(variableName, id);
     if (val !== undefined) {
@@ -90,6 +92,8 @@ function getVarOnce(variableName, id = null, update = false) {
     return val;
 }
 
+
+// returns false if variable doesn't exist
 function removeVar(variableName, id = null, update = false) {
     var container = document.getElementById(id);
     var form;
@@ -103,12 +107,11 @@ function removeVar(variableName, id = null, update = false) {
         variableElement = container.contentWindow.document.getElementById(variableName);
         try {
             if (form == null) {
-                setTimeout(removeVar(variableName, id), 250);
-                return undefined;
+                return false;
             }
         }
         catch (err) {
-            return  undefined;
+            return  false;
         }
     }
     if (variableElement != null) {
@@ -137,12 +140,11 @@ function renameVar(oldVarName, newVarName, id = null, update = false) {
         variableElement = container.contentWindow.document.getElementById(oldVarName);
         try {
             if (form == null) {
-                setTimeout(renameVar(oldVarName, newVarName, id, update, update), 250);
-                return;
+                return false;
             }
         }
         catch (err) {
-            return;
+            return false;
         }
     }
     if (variableElement != null) {
@@ -154,6 +156,10 @@ function renameVar(oldVarName, newVarName, id = null, update = false) {
     }
 }
 
+// get a variable and copy it. Returns true/false if copied. If you want to allow transfereing an undefined variable
+// aka deleting it at the destination, set allowUndefinedVariables = true
+// If you need to update the destination if a variable is copied, set updateDestination to true.
+// NOTE: variable does not get copied if the value at the source and destination are the same.
 function varCpy(variableName, source = null, destination = null, updateDestination = false, allowUndefinedVariables = false) {
     let val = getVar(variableName, source);
     let val2 = getVar(variableName, destination);
@@ -163,6 +169,7 @@ function varCpy(variableName, source = null, destination = null, updateDestinati
     return setVar(variableName, val, destination, updateDestination);
 }
 
+// see varCpy function commment. Additionally allows to specify a different destination variable name with destinationVariableName
 function varCpyRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateDestination, allowUndefinedVariables = false) {
     let val = getVar(sourceVariableName, source);
     let val2 = getVar(destinationVariableName, destination);
@@ -175,6 +182,15 @@ function varCpyRen(sourceVariableName, source = null, destinationVariableName, d
     return setVar(destinationVariableName, val, destination, updateDestination);
 }
 
+// transfer a variable from source to destination. Specify if oyu want to update the source and or destination
+// allowUndefinedVariables = true will clear the variable at the destination.
+function varXfr(variableName, source = null, destination = null, updateSource = false, updateDestination = false, allowUndefinedVariables = false) {
+    if (varCpy(variableName, source, destination, updateDestination, allowUndefinedVariables)) {
+        return removeVar(variableName, source, updateSource);
+    }
+    return false;
+}
+
 
 function clearVars(id = null, update = false) {
     var container = document.getElementById(id);
@@ -185,8 +201,7 @@ function clearVars(id = null, update = false) {
     else {
         form = container.contentWindow.document.getElementsByTagName('form')[0];
         if (form == null) {
-            setTimeout(clearVars(id), 250);
-            return;
+            return false;
         }
     }
     var vars = ticketForm.getElementsByClassName('variable');
@@ -209,12 +224,11 @@ function updateDisplay(id = null) {
         try {
             form = container.contentWindow.document.getElementsByTagName('form')[0];
             if (form == null) {
-                setTimeout(updateDisplay(id), 250);
-               return;
+               return false;
             }
         }
         catch (err) {
-            return;
+            return false;
         }
     }
     form.submit();

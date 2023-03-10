@@ -98,15 +98,14 @@ you'll be routed to whatever the home page is for your specified role level -->
               $result = connection()->query($sql);
             }
           } catch (mysqli_sql_exception $e) {
-            $errorMessage .= "\n$table Add Error: " . $e->getMessage();
+            //$errorMessage .= "\n$table Add Error: " . $e->getMessage();
           }
         }
             
 
         $errorMessage = ltrim($errorMessage, "\n");
         $update = true;
-      
-        $errorMessage = ltrim($errorMessage, "\n");
+        $_POST['syncHighlightAnimation'] = true;
         break;
       case "addToZone":
         $bypassGeneralSQLExecute = true;
@@ -127,6 +126,7 @@ you'll be routed to whatever the home page is for your specified role level -->
         }
         $errorMessage = ltrim($errorMessage, "\n");
         $update = true;
+        $_POST['syncHighlightAnimation'] = true;
         break;
       case "removeFromZone":
         $bypassGeneralSQLExecute = true;
@@ -145,6 +145,7 @@ you'll be routed to whatever the home page is for your specified role level -->
         // any error messages you get, put them in $errorMessages, separated by \n
         $errorMessage = ltrim($errorMessage, "\n");
         $update = true;
+        $_POST['syncHighlightAnimation'] = true;
         break;
     }
 

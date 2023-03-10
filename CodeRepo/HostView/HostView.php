@@ -77,15 +77,17 @@
 					
 					varCpyRen("goToTable", "ifrRestaurantLayout", "staticTableId", null, true);
 
+					
 					varCpy("employeeId", "ifrServerList", "serverListener", true, true);
 					varCpyRen("employeeId", "ifrServerList", "addEmployeeId", "ifrSelectedTable", true, true);
 					
 					varCpyRen("ticketId", "ifrWaitList", "addTicketId", "ifrSelectedTable", true, true);
-					varCpyRen("selectedTable", "ifrRestaurantLayout", "tableId", "ifrSelectedTable", true,true);
+					
+					let tableList = getVar("selectedTable", "ifrRestaurantLayout");
+					let oldTableList = getVar("tableId", "ifrSelectedTable");
+					let updateSelectedTable = !(tableList !== undefined && oldTableList !== undefined && tableList.indexOf(",") > -1 && oldTableList.indexOf(",") > -1);
 
-					if (varCpyRen("tableList", "serverListener", "highlightedTables", "ifrRestaurantLayout",false, true)) {
-						setVar("highlightedTablesChanged", "yes", "ifrRestaurantLayout");
-					}
+					varCpyRen("selectedTable", "ifrRestaurantLayout", "tableId", "ifrSelectedTable", updateSelectedTable,true);
 										
 					if (getVarOnce("update","ifrSelectedTable")) {
 						removeVar("tableList","serverListener");
@@ -93,6 +95,11 @@
 						updateDisplay("ifrServerList");
 						updateDisplay("ifrWaitTimes");
 						highlightTables();
+					}
+					varXfr("syncHighlightAnimation", "ifrSelectedTable", "ifrRestaurantLayout");
+
+					if (varCpyRen("tableList", "serverListener", "highlightedTables", "ifrRestaurantLayout",false, true)) {
+						setVar("highlightedTablesChanged", "yes", "ifrRestaurantLayout");
 					}
 		
 				}

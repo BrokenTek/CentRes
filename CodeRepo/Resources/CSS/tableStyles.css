@@ -8,7 +8,10 @@
 }
 .selected{
     opacity: 1;
+    stroke-width: 5px;
 }
+
+
 .multiSelect{
     stroke-width: 12px;
 }
@@ -42,6 +45,6 @@
     }
     
     30%, 70% {
-        stroke-width: 15px;
+        stroke-width: 5px;
     }
 }

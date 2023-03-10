@@ -55,6 +55,16 @@
            
         }
 
+        function highlightTables() {
+            let tables = getVar("highlightedTables");
+            if (tables !== undefined) {
+                tables = tables.split(",");
+                for (let i = 0; i < tables.length; i++) {
+                    document.getElementById(tables[i]).classList.add("highlighted");
+                }
+            }
+        }
+        
         function updateTableStatuses() {
             try {
                 var newTableData = getVar("updatedTables", "tableStatusListener");
@@ -101,13 +111,15 @@
                     allTables[i].classList.remove("highlighted");
                 }
 
-                let tables = getVar("highlightedTables");
-                if (tables !== undefined) {
-                    tables = tables.split(",");
-                    for (let i = 0; i < tables.length; i++) {
-                        document.getElementById(tables[i]).classList.add("highlighted");
-                    }
+                highlightTables();
+                
+            }
+            else if (getVarOnce("syncHighlightAnimation")) {
+                let allTables = document.getElementsByClassName("table");
+                for (let i = 0; i < allTables.length; i++) {
+                    allTables[i].classList.remove("highlighted");
                 }
+                setTimeout(highlightTables, 2000);
             }
 
             update = true;
