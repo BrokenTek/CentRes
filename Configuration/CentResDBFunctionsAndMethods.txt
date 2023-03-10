@@ -263,7 +263,12 @@ BEGIN
 		-- if you're setting the bused flag but the table isn't flagged as bussing
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Specified Table is not marked for bussing. Cannot set status to bused.';
-	END IF;	
+	END IF;
+	IF (NEW.employeeId IS NOT NULL AND NEW.action = "Add" AND (SELECT COUNT(*) FROM TableAssignments WHERE employeeId = NEW.employeeId AND tableId = NEW.tableId) = 1) THEN
+		-- if the server is already assigned to the table
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Server is already assigned to this table.';
+	END IF;
 END;
 
 

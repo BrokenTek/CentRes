@@ -301,7 +301,6 @@
 
         <?php
             // Load all of the tables here
-                echo("<svg>");
                 $sql = "SELECT id, transformData, shapeName, svgPathData FROM Tables JOIN TableShapes ON Tables.shape = TableShapes.shapeName;";
                 $tables = connection()->query($sql);
                 while ($row = $tables->fetch_assoc()) {
@@ -319,8 +318,7 @@
                         catch (Exception $e) {
                         echo($e);
                     }
-                }      
-                echo("</svg>");
+                }
                 
         ?>
 

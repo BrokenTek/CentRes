@@ -19,6 +19,8 @@ you'll be routed to whatever the home page is for your specified role level -->
   $addEmployeeId = @$_POST['addEmployeeId'];
   $addTicketId = @$_POST['addTicketId'];
 
+  $bypassGeneralSQLExecute = false;
+
   if (isset($_POST['verboseAction'])) {
     $sqlCols = "authorizationId, tableId";
     $sqlVals = "$authorizationId, '$tableId'";
@@ -58,76 +60,101 @@ you'll be routed to whatever the home page is for your specified role level -->
         $sqlVals .= ", 'Enable'";
         break;
       case "setZone":
-        echo("Set Zone Code Here");
-        // any error messages you get, put them in $errorMessages, separated by \n
-        $tableIds = explode(",", $tableId);
-        try {
-    // remove employee from all their currently assigned tables
-          $sql = "DELETE FROM tableassignments WHERE employeeId = '$addEmployeeId';";
-          connection()->query($sql);
-          
-          $values = "($authorizationId, '$tableId', 'Remove', $addEmployeeId)";
-          $values = rtrim($values, ",");
-          $sql = "INSERT INTO TableLog (authorizationId, tableId, action, employeeId) VALUES $values;";
-          $result = connection()->query($sql);
+        $bypassGeneralSQLExecute = true;
+        $errorMessage = "";
 
-          foreach ($tableIds as $tableId) {
-            // add employee to the selected table and log the action
-            $sql = "INSERT INTO tableassignments (employeeId, tableId) VALUES ('$addEmployeeId', '$tableId');";
-            $result = connection()->query($sql);
-            $values = "($authorizationId, '$tableId', 'Add', $addEmployeeId)";
-            $values = rtrim($values, ",");
-            $sql = "INSERT INTO TableLog (authorizationId, tableId, action, employeeId) VALUES $values;";
-            $result = connection()->query($sql);
+        // attempt to remove server from any of their existing tables.
+        $sql = "SELECT tableId FROM TableAssignments WHERE employeeId = $addEmployeeId;";
+        $assignedTables = connection()->query($sql);
+        $tableStr = "";
+        while($selectedTable = $assignedTables->fetch_assoc()) {
+          if (strpos(",".$tableId.",", ",".$selectedTable['tableId'].",") == "") {
+            $tableStr .= ",". $selectedTable['tableId'];
           }
-      } catch (Error $e) {
-          echo $e->getMessage();
-          $errorMessage = "An error occurred while setting the zone.";
         }
+        $tableStr = ltrim($tableStr, ",");
+
+        if ($tableStr != "") {
+          $tableIds = explode(",", $tableStr);
+          foreach ($tableIds as $table){
+            try {      
+              $values = "($authorizationId, '$table', 'Remove', $addEmployeeId)";
+              $sql = "INSERT INTO TableLog (authorizationId, tableId, action, employeeId) VALUES $values;";
+              $result = connection()->query($sql);
+
+            } catch (mysqli_sql_exception $e) {
+              $errorMessage .= "\n$table Remove Error: " . $e->getMessage();
+            }
+          }
+        }
+        
+        // add tables to selection
+        $tableIds = explode(",", $tableId);
+        foreach ($tableIds as $table){
+          try {
+            if (strpos(",".$tableId.",", ",".$tableStr.",") == "") {
+              $values = "($authorizationId, '$table', 'Add', $addEmployeeId)";
+              $sql = "INSERT INTO TableLog (authorizationId, tableId, action, employeeId) VALUES $values;";
+              $result = connection()->query($sql);
+            }
+          } catch (mysqli_sql_exception $e) {
+            $errorMessage .= "\n$table Add Error: " . $e->getMessage();
+          }
+        }
+            
+
+        $errorMessage = ltrim($errorMessage, "\n");
+        $update = true;
+      
+        $errorMessage = ltrim($errorMessage, "\n");
         break;
       case "addToZone":
-        echo("Add To Zone Code Here");
+        $bypassGeneralSQLExecute = true;
         $tableIds = explode(",", $tableId);
-        foreach ($tableIds as $tableId){
+        if (!isset($errorMessage)) {
+          $errorMessage = "";
+        }
+        foreach ($tableIds as $table){
           try {
-            $values = "($authorizationId, '$tableId', 'Add', $addEmployeeId)";
-            $values = rtrim($values, ",");
+            $values = "($authorizationId, '$table', 'Add', $addEmployeeId)";
             $sql = "INSERT INTO TableLog (authorizationId, tableId, action, employeeId) VALUES $values;";
             $result = connection()->query($sql);
 
-          } catch (Error $e) {
-            echo $e->getMessage();
+          } catch (mysqli_sql_exception $e) {
+            $errorMessage .= "\n$table: " . $e->getMessage();
           }
           
         }
-       
+        $errorMessage = ltrim($errorMessage, "\n");
+        $update = true;
         break;
       case "removeFromZone":
-        echo("Remove From Zone Code Here");
+        $bypassGeneralSQLExecute = true;
         $tableIds = explode(",", $tableId);
-        foreach ($tableIds as $tableId){
-          try {
-            $sql = "DELETE FROM tableassignments WHERE tableId = '$tableId' AND employeeId = '$addEmployeeId';";
-            $result = connection()->query($sql);
-      
-            $values = "($authorizationId, '$tableId', 'Remove', $addEmployeeId)";
-            $values = rtrim($values, ",");
+        $errorMessage = "";
+        foreach ($tableIds as $table){
+          try {      
+            $values = "($authorizationId, '$table', 'Remove', $addEmployeeId)";
             $sql = "INSERT INTO TableLog (authorizationId, tableId, action, employeeId) VALUES $values;";
             $result = connection()->query($sql);
 
-        } catch (Error $e) {
-            echo $e->getMessage();
-            }
+          } catch (mysqli_sql_exception $e) {
+            $errorMessage .= "\n$table: " . $e->getMessage();
+          }
         }     
         // any error messages you get, put them in $errorMessages, separated by \n
-        $errorMessage = "ErrorMsg1 is really long and should wrap in the container\nErrorMsg2";
+        $errorMessage = ltrim($errorMessage, "\n");
+        $update = true;
         break;
     }
 
-    $sql = "INSERT INTO TableLog ($sqlCols) VALUES ($sqlVals);";
-    //echo("<h1>$sql</h1>");
-    connection()->query($sql);
+    if (!$bypassGeneralSQLExecute) {
+      $sql = "INSERT INTO TableLog ($sqlCols) VALUES ($sqlVals);";
+      //echo("<h1>$sql</h1>");
+      connection()->query($sql);
+    }
     unset($_POST['verboseAction'], $_POST['ticketId'], $ticket);
+    
   }
 ?>
 <!DOCTYPE html>
@@ -272,8 +299,7 @@ you'll be routed to whatever the home page is for your specified role level -->
               if(isset($addEmployeeId)) {
                 $sql = "SELECT COUNT(*) AS result FROM TableAssignments WHERE employeeId = '$addEmployeeId' && tableId = '$tableId'";
                 if (connection()->query($sql)->fetch_assoc()['result'] == 1) {
-                  $ignoreEmp = true;
-                  
+                  $ignoreEmp = true; 
                 }
               }
               
