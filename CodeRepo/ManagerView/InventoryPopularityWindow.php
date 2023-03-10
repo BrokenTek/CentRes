@@ -171,6 +171,7 @@
                 }
                 if(anyUntracked){
                     updateInput.placeholder = "Untracked";
+                    updateInput.value=null;
                 }
                 if(anyUntracked && anyTracked){
                     updateInput.classList.add("conflict");
