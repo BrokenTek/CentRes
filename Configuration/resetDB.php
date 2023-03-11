@@ -50,7 +50,9 @@
                 print("<h1>☑ Loaded 3 Stooges as Employees</h1>");
 
                 // Populate Menu
-                include 'menuPop.php';
+                $query = file_get_contents("CentResPopuolateMenuAndModsWithAssociations.txt");
+                $dbh->exec($query);
+                //include 'menuPop.php';
                 print("<h1>☑ Loaded Menu as to Database</h1>");
 
                 // Message to verify the success of all queries in the block

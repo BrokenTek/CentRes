@@ -20,7 +20,7 @@ you'll be routed to whatever the home page is for your specified role level -->
   $addTicketId = @$_POST['addTicketId'];
 
   $bypassGeneralSQLExecute = false;
-
+  
   if (isset($_POST['verboseAction'])) {
     $sqlCols = "authorizationId, tableId";
     $sqlVals = "$authorizationId, '$tableId'";
@@ -228,6 +228,17 @@ you'll be routed to whatever the home page is for your specified role level -->
           font-size: 2rem;
           margin-inline: auto;
         }
+
+        .capacityText {
+          grid-column: 1 / span 4;
+          margin-inline: auto;
+          font-size:1.125rem;
+          margin-top: 1rem;
+          border-top: .125rem solid white;
+          margin-bottom: 1rem;
+          border-bottom: .125rem solid white;
+        }
+        
         .bannerLabel2 {
           grid-column: 1 / span 4;
           font-size: 1.5rem;
@@ -294,7 +305,10 @@ you'll be routed to whatever the home page is for your specified role level -->
               $status = connection()->query($sql)->fetch_assoc()['status'];
 
               echo("<div id='lblTableId' class='$status'>$tableId&nbsp;-&nbsp;$status</div>");
-              
+
+              $sql=  "SELECT TableShapes.capacity AS capacity FROM Tables JOIN TableShapes ON Tables.shape = TableShapes.shapeName WHERE Tables.id = '$tableId';";
+              $capacity = connection()->query($sql)->fetch_assoc()['capacity'];
+                            
               $ignoreEmp = false;
               // Check if the server is already assigned to table. If so, ignore $employeeId var
               if(isset($addEmployeeId)) {
@@ -307,16 +321,23 @@ you'll be routed to whatever the home page is for your specified role level -->
               $ticketSet = false;
               
               // Get the ticket associated with the table, if there is one
-              $sql = "SELECT id FROM Tickets WHERE tableId = '$tableId';";
+              $sql = "SELECT id, partySize FROM Tickets WHERE tableId = '$tableId';";
               $result = connection()->query($sql);
               if (mysqli_num_rows($result) == 1) {
                 $ticketSet = true;
-                $ticketId = $result->fetch_assoc()['id'];
+                $ticket = $result->fetch_assoc();
+                $partySize =  $ticket['partySize'];
+                $ticketId = $ticket['id'];
                 $_POST['ticketId'] = $ticketId;
-                // TODO, ONLY ALLOW THE REMOVE BUTTON WHEN PAYMENT IS PROCESSED OR TICKET IS CLOSED
-                echo("<button type='button' class='removeButton' onPointerDown='executeAction(\"removeTicket\")'>X</button>");
+                echo("<div class='capacityText'>Party&nbsp;Size:&nbsp;$partySize&nbsp;/&nbsp;$capacity</div>");              
                 
+               
+                // TODO, ONLY ALLOW THE REMOVE BUTTON WHEN PAYMENT IS PROCESSED OR TICKET IS CLOSED
+                echo("<button type='button' class='removeButton' onPointerDown='executeAction(\"removeTicket\")'>X</button>");                
                 echo("<div id='lblTicket'>Ticket:&nbsp;$ticketId</div>");
+              }
+              else {
+                echo("<div class='capacityText'>Capacity:&nbsp;$capacity</div>");
               }
 
               // Get any servers that are assigned to the table
