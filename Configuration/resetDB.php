@@ -49,8 +49,13 @@
                 $dbh->exec($query);
                 print("<h1>☑ Loaded 3 Stooges as Employees</h1>");
 
+                // Populate Menu
+                include 'menuPop.php';
+                print("<h1>☑ Loaded Menu as to Database</h1>");
+
                 // Message to verify the success of all queries in the block
                 echo("<script>resetSuccessful = true;</script>");
+
 
             // If one of the queries in the try block fail, the rest are not run. Message below will appear
             } catch(Exception $e) {
