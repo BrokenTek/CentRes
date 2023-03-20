@@ -120,10 +120,10 @@ Otherwise will reroute to logon page -->
         <fieldset>
             <legend>Create a Ticket</legend>
             <label id="lblPartyNickname" for="nickname">Name:</label>
-            <input id="txtNickname" type="text" name="nickname" required>
+            <input id="txtNickname" type="text" name="nickname" pattern="[a-zA-Z0-9]+" required placeholder="Letters and Numbers">
             
             <label id="lblPartySize" for="partySize">Size:</label>
-            <input id="numPartySize" type="number" name="partySize" required>
+            <input id="numPartySize" type="number" name="partySize" min=1 required>
             <label id="lblReservation" for="chkReservation">Reserve:</label>
             <input id="chkReservation" type="checkbox" onclick="setTimeRequestedToNow()">
             <div id="divButtons">

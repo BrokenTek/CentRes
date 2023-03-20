@@ -219,6 +219,7 @@ function updateDisplay(id = null) {
     var form;
     if (id == null) {
         form = document.getElementsByTagName('form')[0];
+        document.getElementById("btnSubmit").click();
     }
     else {
         try {
@@ -226,12 +227,13 @@ function updateDisplay(id = null) {
             if (form == null) {
                return false;
             }
+            container.contentWindow.document.getElementById("btnSubmit").click();
         }
         catch (err) {
             return false;
+           
         }
     }
-    form.submit();
 }
 
 

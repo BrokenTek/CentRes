@@ -57,7 +57,7 @@ you'll be routed to whatever the home page is for your specified role level -->
         <!-- demonstration on how to use getVar, setVar, updateDisplay for just this page -->
         <!-- remove this script tag -->
         <script>
-            
+            let initialLoad = true;
             function allElementsLoaded() {
                 valTimeToRefresh = document.getElementById("valTimeToRefresh");
                 valTimeToRefresh.innerHTML = "1&nbsp;Minute";
@@ -69,6 +69,7 @@ you'll be routed to whatever the home page is for your specified role level -->
                 maxValueChanged(true);
                 timeRangeChanged(true);
                 setInterval(refreshCountdown, 1000);
+                initialLoad = false;
             }
 
              //Place your JavaScript Code here
@@ -79,19 +80,26 @@ you'll be routed to whatever the home page is for your specified role level -->
             var legend;
             var secsToRefresh = 60;
 
-            function refreshWaitTimeCalculation() {
-                document.getElementsByTagName("form")[0].submit();
-            }
-
             function refreshCountdown() {
                 secsToRefresh--;
                 if (secsToRefresh == 0) {
-                    refreshWaitTimeCalculation()
+                    updateDisplay();
+                    secsToRefresh = 60;
+                    valTimeToRefresh.innerHTML = "1&nbsp;Minute";
+                    return;
                 }
                 valTimeToRefresh.innerHTML = secsToRefresh + "&nbsp;Seconds";
             }
 
-            function minValueChanged(initialLoad = false) {
+            function minValueChanged(e) {
+                let maxVal = parseInt(rngMax.getAttribute("max"));
+                if (rngMin.value < 1) {
+                    rngMin.value = 1;
+                }
+                else if (rngMin.value > maxVal) {
+                    rngMin.value = maxVal;
+                   
+                }
                 if (rngMin.value > rngMax.value) {
                     rngMax.value = rngMin.value;
                     rngMax.previousElementSibling.innerHTML = rngMax.value + '&nbsp;Max';
@@ -99,10 +107,17 @@ you'll be routed to whatever the home page is for your specified role level -->
                 rngMin.previousElementSibling.innerHTML = rngMin.value + '&nbsp;Min';
                 if (initialLoad) { return; }
                 legend.innerHTML = "Press&nbsp;to&nbsp;Update&nbsp;Wait&nbsp;Time";
-
             }
 
-            function maxValueChanged(initialLoad = false) {
+            function maxValueChanged(e) {
+                let maxVal = parseInt(rngMax.getAttribute("max"));
+                if (rngMax.value < 1) {
+                    rngmax.value = 1;
+                }
+                else if (rngMax.value > maxVal) {
+                    rngMax.value = maxVal;
+                   
+                }
                 if (rngMax.value < rngMin.value) {
                     rngMin.value = rngMax.value;
                     rngMin.previousElementSibling.innerHTML = rngMin.value + '&nbsp;Min';
@@ -113,11 +128,17 @@ you'll be routed to whatever the home page is for your specified role level -->
             }
 
             function timeRangeChanged(initialLoad = false) {
+                if (rngTimeSpan.value < 1) {
+                    rngTimeSpan.value = 1;
+                }
+                else if (rngTimeSpan.value > 60) {
+                    rngTimeSpan.value = 60;
+                }
                 if (rngTimeSpan.value == 60) {
                     rngTimeSpan.previousElementSibling.innerHTML = "1&nbsp;Hour"; 
                 }
                 else {
-                    rngTimeSpan.previousElementSibling.innerHTML = rngTimeSpan.value + "&nbsp;Minutes";
+                    rngTimeSpan.previousElementSibling.innerHTML = (rngTimeSpan.value + "&nbsp;Minutes").replace("1&nbsp;Minutes", "1&nbsp;Minute");
                 }
                 if (initialLoad) { return; }
                 legend.innerHTML = "Press&nbsp;to&nbsp;Update&nbsp;Wait&nbsp;Time";
@@ -131,12 +152,12 @@ you'll be routed to whatever the home page is for your specified role level -->
             <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
             <fieldset>
            
-                <legend onclick="refreshWaitTimeCalculation()">Wait&nbsp;Time:&nbsp;<?php echo($waitTime); ?></legend>
+                <legend onclick="updateDisplay()">Wait&nbsp;Time:&nbsp;<?php echo($waitTime); ?></legend>
                 <label id="lblLowerPartySize" for="rngLowerPartySize"></label>
-                <input id="rngLowerPartySize" type="number" name="lowerPartySize" min="1" max="<?php echo($_POST['timeSpan']); ?>" required oninput="minValueChanged()" value="<?php echo($_POST['lowerPartySize']); ?>">
+                <input id="rngLowerPartySize" type="number" name="lowerPartySize" min="1" max="<?php echo($_POST['upperPartySize']); ?>" required oninput="minValueChanged()" value="<?php echo($_POST['lowerPartySize']); ?>">
                 
                 <label id="lblUpperPartySize" for="rngUpperPartySize"></label>
-                <input id="rngUpperPartySize" type="number" name="upperPartySize" min="1" max="<?php echo($_POST['timeSpan']); ?>" required oninput="maxValueChanged()" value="<?php echo($_POST['upperPartySize']); ?>">
+                <input id="rngUpperPartySize" type="number" name="upperPartySize" min="1" max="<?php echo($_POST['upperPartySize']); ?>" required oninput="maxValueChanged()" value="<?php echo($_POST['upperPartySize']); ?>">
                 
                 <label id="lblTimeSpan" for="rngTimeSpan"></label>
                 <input id="rngTimeSpan" type="number" name="timeSpan" min="5" max="60" step="5" required oninput="timeRangeChanged()" value="<?php echo($_POST['timeSpan']); ?>">
@@ -145,11 +166,11 @@ you'll be routed to whatever the home page is for your specified role level -->
             </fieldset>
             <!-- If you want to forget/not carry over variables, use PHP unset function
             to remove these variables -->
-            <?php //unset($thisVariableIWantToForget) ?>
+            <?php unset($_POST['lowerPartySize'], $_POST['upperPartySize'], $_POST['timeSpan']); ?>
 
             <!-- retain any POST vars. When updateDisplay() is called or the form is submitted,
             these variables will be carried over -->
-            <?php //require_once '../Resources/php/display.php'; ?>
+            <?php require_once '../Resources/php/display.php'; ?>
            
         </form>
     </body>
