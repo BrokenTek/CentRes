@@ -162,6 +162,8 @@ you'll be routed to whatever the home page is for your specified role level -->
                 <label id="lblTimeSpan" for="rngTimeSpan"></label>
                 <input id="rngTimeSpan" type="number" name="timeSpan" min="5" max="60" step="5" required oninput="timeRangeChanged()" value="<?php echo($_POST['timeSpan']); ?>">
                 
+                <input id="btnSubmit" type="submit" style="display:none">
+                
                 <div id="lblTimeToRefresh">Refresh&nbsp;In&nbsp;</div><div id="valTimeToRefresh"></div>
             </fieldset>
             <!-- If you want to forget/not carry over variables, use PHP unset function

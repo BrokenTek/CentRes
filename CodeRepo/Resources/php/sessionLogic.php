@@ -20,8 +20,13 @@
 			$uname = connection()->query($sql)->fetch_assoc()['sessionUsername'];
 			
 			//$get First and Last Name
-			$sql = "SELECT id, firstName, lastName FROM Employees where userName = '" .$uname. "';";
-			$row = connection()->query($sql)->fetch_assoc();
+			$db = connection();
+			$sql = $db->prepare("SELECT id, firstName, lastName FROM Employees where userName = ?;");
+			$sql->bind_param("s", $uname);
+			$sql->execute();
+			$result = $sql->get_result();
+			$row = $result->fetch_assoc();
+					
 			$fname = $row['firstName'];
 			$lname = $row['lastName'];
 			$uid = $row['id'];

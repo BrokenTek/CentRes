@@ -8,16 +8,25 @@
 	$cookie_name = "804288a34eb7a49b349be68fc6437621cbf25e10d82f4268bb795eca277adedb6a3367add5bfb7cbffb50df150e2e78d26b276f37d32d96cd76746065df58a30cde25c4d9803aa7214dc8f6a985bf8643c341f229b5834964b0f371915d5677e4b579fbab42844cd63ddc3148e4250591277cfc521906bc30cfedd765974c2009ae5fe451ab1890e5ebbfa120ad18934c972618dbe3e";
 	
 	if (isset($_POST['logoutUsername'])) {
-		$sql = "CALL logout('" .$_POST['logoutUsername']. "');";
-		connection()->query($sql);
+		$db = connection();
+		$sql = $db->prepare("CALL logout(?)");
+		$sql->bind_param("s", $_POST['logoutUsername']);
+		$sql->execute();
+		
+
 		$_COOKIE[$cookie_name] = NULL;		
 	}
 
 	//attempt to get allowed roles if unverifed username has been submitted
 	if (isset($_POST['uname'])) {
+		//removes characters that mess with the echo command in sessionHeader.php.
+		$_POST['uname'] = str_replace(array('"', '\\', '&', ';', '{', '}', '(', ')', '[', ']', '<', '>'), '', $_POST['uname']);
 		//if username exists, get the allowed roles value
-		$sql = "SELECT roleLevel FROM Employees WHERE userName = '" .$_POST['uname']. "';";
-		$result = connection()->query($sql);
+		$db = connection();
+		$sql = $db->prepare("SELECT roleLevel from Employees WHERE username = ?;");
+		$sql->bind_param("s", $_POST['uname']);
+		$sql->execute();
+		$result = $sql->get_result();
 		if (mysqli_num_rows ($result) == 1) {
 			$allowedRoles = $result->fetch_assoc()['roleLevel'];
 		}	
@@ -28,9 +37,12 @@
 			// unvalidated username and password entered
 		
 			// confirm valid username & get password hash, otherwise invalid username.
+			$db = connection();
+			$sql = $db->prepare("SELECT userPasswordHash(?) AS userPasswordHash;");
+			$sql->bind_param("s", $_POST['uname']);
+			$sql->execute();
 			
-			$sql = "SELECT userPasswordHash('" .$_POST['uname']. "') AS userPasswordHash;";
-			$passResult = connection()->query($sql)->fetch_assoc()['userPasswordHash'];
+			$passResult = $sql->get_result()->fetch_assoc()['userPasswordHash'];
 
 			// confirm entered password matches stored password, otherwise invalid password entered.
 			if (!password_verify($_POST['pword'], $passResult)) {
@@ -55,8 +67,10 @@
 			$sessionToken = password_hash($_POST['uname'] . $_POST['pword']. time(), PASSWORD_BCRYPT);
 					
 			// login to database and set session token, otherwise sessionToken is already in use or incorrect role selected.
-			$sql = "CALL login('" .$_POST['uname']. "', " .$_POST['role']. ", '" .$sessionToken. "');";
-			connection()->query($sql);	
+			$db = connection();
+			$sql = $db->prepare("CALL login(?, ?, ?);");
+			$sql->bind_param("sis", $_POST['uname'], $_POST['role'], $sessionToken);
+			$sql->execute();
 			
 			// LOGIN SUCCESSFUL..... redirect to the appropriate page.
 			
@@ -117,12 +131,20 @@
 <?php		
 			
 			if (isset($_POST['uname'])) {		
-				
+				$_POST['uname'] = str_replace(array('"', '\\', '&', ';', '{', '}', '(', ')', '[', ']', '<', '>'), '', $_POST['uname']);
 				
 		
 				if (!isset($errorMessage)) {
-					$sql = "SELECT roleLevel from Employees WHERE id = idFromUsername('" .$_POST['uname']. "');";
-					$allowedRoles = connection()->query($sql)->fetch_assoc()['roleLevel'];
+					//when working with user input that might break a SQL statement, the 4 statements below or the appropriate variation prevents characters such as "'"
+					//from interfering with the statement.
+					//further sanitization may be necessary if user input is eventually being used in an echo statement, see above replacement.
+					$db = connection();
+					$sql = $db->prepare("SELECT roleLevel from Employees WHERE id = idFromUsername(?);");
+					$sql->bind_param("s", $_POST['uname']);
+					$sql->execute();
+
+					$result = $sql->get_result();
+					$allowedRoles = $result->fetch_assoc()['roleLevel'];
 
 					$sql = "SELECT * FROM LoginRouteTable;";
 					$definedRoles = connection()->query($sql);

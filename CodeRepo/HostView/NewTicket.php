@@ -90,17 +90,24 @@ Otherwise will reroute to logon page -->
     date_default_timezone_set('America/New_York');
     $message = "";
     if (isset($_POST["createTicket"])) {
-        $nickname = $_POST["nickname"];
+        //filters out certain characters to eliminate the possibility of a XSS attack
+        $nickname = str_replace(array('"', '\\', '&', ';', '{', '}', '(', ')', '[', ']', '<', '>'), '', $_POST["nickname"]);
         $partySize = $_POST["partySize"];
         $timeRequested = isset($_POST['timeRequested']) ? str_replace("T", " ",$_POST["timeRequested"]) : "";
         try {
 			// Call a stored procedure to create a new ticket and store its number in a MySQL user-defined variable
+            //CHANGE THIS to allow for single quotes. 
+
             $sql = 
                 isset($_POST['timeRequested']) ? 
-                "CALL createReservation('$nickname', $partySize, '$timeRequested', @newTicketNumber);" :
-                "CALL createTicket('$nickname', $partySize, @newTicketNumber);";
+                /*"CALL createReservation('$nickname', $partySize, '$timeRequested', @newTicketNumber);" :
+                "CALL createTicket('$nickname', $partySize, @newTicketNumber);";*/
+                "CALL createReservation(?, $partySize, '$timeRequested', @newTicketNumber);":
+                "CALL createTicket(?, $partySize, @newTicketNumber);";
             
-            connection()->query($sql);
+            $sql = connection()->prepare($sql);
+            $sql->bind_param("s", $nickname);
+            $sql->execute();
 			// Retrieve the new ticket number and the time it was requested from the Tickets table
             $sql = "SELECT @newTicketNumber AS newTicketNum, timeRequested FROM Tickets WHERE id = @newTicketNumber;";
             $result = connection()->query($sql);
