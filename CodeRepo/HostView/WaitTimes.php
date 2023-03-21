@@ -112,7 +112,7 @@ you'll be routed to whatever the home page is for your specified role level -->
             function maxValueChanged(e) {
                 let maxVal = parseInt(rngMax.getAttribute("max"));
                 if (rngMax.value < 1) {
-                    rngMax.value = 1;
+                    rngmax.value = 1;
                 }
                 else if (rngMax.value > maxVal) {
                     rngMax.value = maxVal;
