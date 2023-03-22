@@ -617,6 +617,10 @@ BEGIN
 	IF (empId IS NULL) THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Username Not Found!';
+	ELSEIF (endTime IS NULL) THEN
+		RETURN FALSE;
+	ELSEIF (endTime < NOW()) THEN
+		CALL logout( uname );
 	ELSEIF (endTime IS NULL OR endTime < NOW()) THEN
 		RETURN FALSE;
 	ELSE

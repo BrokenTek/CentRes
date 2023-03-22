@@ -15,6 +15,7 @@
 
 
     echo('
+        <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
         <script>
             const USERNAME = "' .$GLOBALS['username']. '";
@@ -23,18 +24,14 @@
             const LAST_NAME = "' .$GLOBALS['lastName']. '";
             const ROLE = ' .$GLOBALS['role']. ';'
             .$roleStr.
-        ' function navigateAway() {
-            var value = document.getElementById("managementNavigationSelector").value;
-            if (value != "") {
-                location.replace(value);
+        '   function navigateAway() {
+                var value = document.getElementById("managementNavigationSelector").value;
+                if (value != "") {
+                    location.replace(value);
+                }
+                document.getElementById("managementNavigationSelector").selectedIndex = 0;    
             }
-            document.getElementById("managementNavigationSelector").selectedIndex = 0;    
-          }
-        </script>
-    ');
-
-    echo('<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
-        <script>
+            
             function logout() {
                 let div = document.createElement("input");
                 div.setAttribute("type","hidden");
@@ -66,4 +63,5 @@
 
     echo('<button type="button" id="btnLogout" onclick="logout()">Logout</button>
         </div>');
+    echo("<iframe id='ifrSessionInfo' src='../Resources/php/sessionInfo.php' style='display: none;'></iframe>");
 ?>

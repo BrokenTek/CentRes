@@ -70,6 +70,7 @@
                             LEFT JOIN(SELECT * FROM Tickets WHERE timeSeated IS NOT NULL AND timeClosed IS NULL) AS activetickets 
                             ON tableassignments.tableId = activetickets.tableId)
                             WHERE employees.id IN (SELECT employeeId FROM ActiveEmployees WHERE employeeRole & 2 = employeeRole)
+                            AND loggedIn(employees.username)
                             GROUP BY servername
                             ORDER BY pplcount ASC, tblcount ASC;";
                     $result = connection()->query($sql);

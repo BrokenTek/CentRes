@@ -5,7 +5,7 @@
 	$allowedRoles = NULL;
 	$errorMessage = NULL;
 	
-	$cookie_name = "804288a34eb7a49b349be68fc6437621cbf25e10d82f4268bb795eca277adedb6a3367add5bfb7cbffb50df150e2e78d26b276f37d32d96cd76746065df58a30cde25c4d9803aa7214dc8f6a985bf8643c341f229b5834964b0f371915d5677e4b579fbab42844cd63ddc3148e4250591277cfc521906bc30cfedd765974c2009ae5fe451ab1890e5ebbfa120ad18934c972618dbe3e";;
+	$cookie_name = "804288a34eb7a49b349be68fc6437621cbf25e10d82f4268bb795eca277adedb6a3367add5bfb7cbffb50df150e2e78d26b276f37d32d96cd76746065df58a30cde25c4d9803aa7214dc8f6a985bf8643c341f229b5834964b0f371915d5677e4b579fbab42844cd63ddc3148e4250591277cfc521906bc30cfedd765974c2009ae5fe451ab1890e5ebbfa120ad18934c972618dbe3e";
 	
 	if (isset($_POST['logoutUsername'])) {
 		$db = connection();
@@ -54,18 +54,15 @@
 
 			// check if somebody is already logged in on this machine, if so, log them out.
 			// Only 1 person is allowed to be logged in at a time on a device.
-			if (isset($_COOKIE[$cookie_name])) {
-				$sql = "SELECT * FROM Employees WHERE accessToken = '" .$_COOKIE[$cookie_name].
-				       "' AND accessTokenExpiration > NOW()";
-				$existingLocalSession = connection()->query($sql);
-				if (mysqli_num_rows($existingLocalSession) == 1) {
-					echo("<h1>Error</h1>");
-					$username = $existingLocalSession->fetch_assoc()['userName'];
-					$sql = "CALL logout('$username');";
-					connection()->query($sql);
-				}
-				
+			$sql = "SELECT * FROM Employees WHERE accessToken = '" .$_COOKIE[$cookie_name]. "'
+				    AND accessTokenExpiration > NOW()";
+			$existingLocalSession = connection()->query($sql);
+			if (mysqli_num_rows($existingLocalSession) == 1) {
+				$username = $existingLocalSession->fetch_assoc()['userName'];
+				$sql = "CALL logout('$username');";
+				connection()->query($sql);
 			}
+				
 		
 			// generate session token
 			$sessionToken = password_hash($_POST['uname'] . $_POST['pword']. time(), PASSWORD_BCRYPT);
@@ -126,10 +123,10 @@
 		<form action="login.php" method="POST" id="loginForm">
 			<?php $readonlyStr = isset($errorMessage) ? "" : " readonly"; ?>
 			<label for="uname" id="lblLoginUsername">Enter Your Username</label>
-			<input type=text id='txtLoginUsername' name='uname' <?php if (isset($_POST['uname'])) { echo('value="' .$_POST['uname']. '"' .$readonlyStr. '>');} ?>
+			<input type=text id='txtLoginUsername' name='uname' <?php if (isset($_POST['uname'])) { echo('value="' .$_POST['uname']. '"' .$readonlyStr);} ?> required>
 			<br><br>
 			<label for="pword" id="lblLoginPassword">Enter Your Password</label>
-			<input type=password id='pwdLoginPassword' name='pword' <?php if (isset($_POST['pword'])) { echo('value="' .$_POST['pword']. '"' .$readonlyStr. '>');} ?>
+			<input type=password id='pwdLoginPassword' name='pword' <?php if (isset($_POST['pword'])) { echo('value="' .$_POST['pword']. '"' .$readonlyStr);} ?> required>
 			<br><br>
 
 <?php		
