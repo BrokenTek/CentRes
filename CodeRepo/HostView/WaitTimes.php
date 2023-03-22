@@ -154,10 +154,10 @@ you'll be routed to whatever the home page is for your specified role level -->
            
                 <legend onclick="updateDisplay()">Wait&nbsp;Time:&nbsp;<?php echo($waitTime); ?></legend>
                 <label id="lblLowerPartySize" for="rngLowerPartySize"></label>
-                <input id="rngLowerPartySize" type="number" name="lowerPartySize" min="1" max="<?php echo($_POST['upperPartySize']); ?>" required oninput="minValueChanged()" value="<?php echo($_POST['lowerPartySize']); ?>">
+                <input id="rngLowerPartySize" type="number" name="lowerPartySize" min="1" max="<?php echo($maxPartySize); ?>" required oninput="minValueChanged()" value="<?php echo($_POST['lowerPartySize']); ?>">
                 
                 <label id="lblUpperPartySize" for="rngUpperPartySize"></label>
-                <input id="rngUpperPartySize" type="number" name="upperPartySize" min="1" max="<?php echo($_POST['upperPartySize']); ?>" required oninput="maxValueChanged()" value="<?php echo($_POST['upperPartySize']); ?>">
+                <input id="rngUpperPartySize" type="number" name="upperPartySize" min="1" max="<?php echo($maxPartySize); ?>" required oninput="maxValueChanged()" value="<?php echo($_POST['upperPartySize']); ?>">
                 
                 <label id="lblTimeSpan" for="rngTimeSpan"></label>
                 <input id="rngTimeSpan" type="number" name="timeSpan" min="5" max="60" step="5" required oninput="timeRangeChanged()" value="<?php echo($_POST['timeSpan']); ?>">

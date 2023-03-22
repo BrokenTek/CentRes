@@ -5,7 +5,7 @@ foreach($_POST as $key => $value)
 {
     echo("<input type='hidden' class='variable' id=" .$key. " name='" .$key. "' value='" .$value. "' style:'display: none;'>");
 }
-echo("<input type='submit' style='display: none;' id='btnSubmit' />");
+echo("<input type='submit' style='display: none;' id='btnSubmit'>");
 
 
 

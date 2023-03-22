@@ -28,27 +28,28 @@ Otherwise will reroute to logon page -->
         
         // if the ticket number has been specified
         if (getVar("ticket") != null) {
-            // if you previusly had items selected
+            // if you previously had items selected
             var selItems = getVar("selectedTicketItem");
             if (selItems != null) {
                 selItems = selItems.split(",");
                 let count = 0;
-                let className = "selected";
-                for (let control = 0; control < 2; control++) {
+                for(let i = 0; i < selItems.length; i++){
+                    // Some of them might be visible or exist anymore
+                    // check if you can still see them (exists and visible), and if so
+                    // set them as "multiselect" 
+                    var lookAt = document.querySelector("#" + selItems[i]);
+                    if (lookAt != null) {
+                        lookAt.classList.add("selected");
+                        count++;
+                    }   
+                }
+                if (count > 1) {
                     for(let i = 0; i < selItems.length; i++){
-                        // Some of them might be visible or exist anymore
-                        // check if you can still see them (exists and visible), and if so
-                        // set them as "multiselect" 
                         var lookAt = document.querySelector("#" + selItems[i]);
                         if (lookAt != null) {
-                            lookAt.classList.add(className);
+                            lookAt.classList.add("multiselect");
                             count++;
-                        }
-                        if (count < 2) {
-                            break;
-                        }
-                        className = "multiselect";
-                        
+                        }   
                     }
                 }
             }

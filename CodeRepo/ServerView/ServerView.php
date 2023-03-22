@@ -386,37 +386,13 @@
             
             // listen for menu item selection
             function checkMenuItemSelected() {
-                var selectedMenuItem;
-                try {
-                    selectedMenuItem = getVar("selectedMenuItem", "menuContainer");
-                }
-                catch (err) {
-                    setTimeout(checkMenuItemSelected, 250);
-                    return;
-                }
-                // if a menu item was selected
-                if (selectedMenuItem !== undefined) {
-                    // menu item selection acknowledged.
-                    removeVar("selectedMenuItem", "menuContainer");
-                    // signal the ticketContainer that a menu item was selected and needs to be added to the ticket
-    			    setVar('command', 'add', 'ticketContainer');
-    			    setVar('menuItem', selectedMenuItem, 'ticketContainer');
-
-                    // scroll down to bottom
+                if (varXfrRen("selectedMenuItem", "menuContainer", "menuItem", "ticketContainer")) {
+                    setVar('command', 'add', 'ticketContainer');
                     setVar('scrollY', Number.MAX_SAFE_INTEGER , 'ticketContainer');
-                    setVar("ignoreUpdate", "Yes please" ,"ticketContainer", true);
-
-                    // make the ticketContaner commit the added item to the database
-                    //mitigateMenuFlicker();
-                    //setVar("ignoreUpdate", "ticketContainer");
-                    //ticketContainer.classList.remove("clear");
-
+                    setVar("ignoreUpdate", "Yes please" ,"ticketContainer");
                     showTicketContainer();
-                    
-                    
-                    
-                }	
-                
+                    updateDisplay("ticketContainer");
+                }                
             }
 
             function showTicketContainer() {
@@ -530,10 +506,9 @@
 
                     ticketHeader.innerHTML = "Ticket:&nbsp;n/a";
 
-                    removeVar("ticket", "ticketContainer", true);
+                    updateDisplay("ticketContainer");
+
                     //setVar("ignoreUpdate", "ticketContainer");
-                    
-                    removeVar("ticket","serverListener", true);
                    
                                        
                 }

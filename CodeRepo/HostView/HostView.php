@@ -76,7 +76,6 @@
 					verifyAuthProcessed = false;
 					
 					varCpyRen("goToTable", "ifrRestaurantLayout", "staticTableId", null, true);
-
 					
 					varCpy("employeeId", "ifrServerList", "serverListener", true, true);
 					varCpyRen("employeeId", "ifrServerList", "addEmployeeId", "ifrSelectedTable", true, true);

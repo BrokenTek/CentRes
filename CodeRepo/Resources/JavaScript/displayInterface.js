@@ -115,7 +115,6 @@ function removeVar(variableName, id = null, update = false) {
         }
     }
     if (variableElement != null) {
-        variableName;
         variableElement.remove();
     }
     else {
@@ -173,20 +172,26 @@ function varCpy(variableName, source = null, destination = null, updateDestinati
 function varCpyRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateDestination, allowUndefinedVariables = false) {
     let val = getVar(sourceVariableName, source);
     let val2 = getVar(destinationVariableName, destination);
-    if (sourceVariableName == "tableList" && val === undefined) {
-        //alert(val2);
-    }
     if (val === val2 || (val === undefined && !allowUndefinedVariables)) {
         return false;
     }
     return setVar(destinationVariableName, val, destination, updateDestination);
 }
 
-// transfer a variable from source to destination. Specify if oyu want to update the source and or destination
+// transfer a variable from source to destination. Specify if you want to update the source and or destination
 // allowUndefinedVariables = true will clear the variable at the destination.
 function varXfr(variableName, source = null, destination = null, updateSource = false, updateDestination = false, allowUndefinedVariables = false) {
     if (varCpy(variableName, source, destination, updateDestination, allowUndefinedVariables)) {
         return removeVar(variableName, source, updateSource);
+    }
+    return false;
+}
+
+// transfer a variable from source to destination. Specify if you want to update the source and or destination
+// allowUndefinedVariables = true will clear the variable at the destination.
+function varXfrRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateSource = false, updateDestination = false, allowUndefinedVariables = false) {
+    if (varCpyRen(sourceVariableName, source, destinationVariableName, destination, updateDestination, allowUndefinedVariables)) {
+        return removeVar(sourceVariableName, source, updateSource);
     }
     return false;
 }
@@ -217,17 +222,30 @@ function clearVars(id = null, update = false) {
 function updateDisplay(id = null) {
     var container = document.getElementById(id);
     var form;
+    var btnSubmit;
     if (id == null) {
         form = document.getElementsByTagName('form')[0];
-        document.getElementById("btnSubmit").click();
+        btnSubmit = document.getElementById("btnSubmit");
+        if (btnSubmit !== null) {
+          btnSubmit.click();  
+        }
+        else {
+            form.submit();
+        }
     }
     else {
         try {
             form = container.contentWindow.document.getElementsByTagName('form')[0];
-            if (form == null) {
+            btnSubmit = container.contentWindow.document.getElementById("btnSubmit");
+            if (form == null && btnSubmit === null) {
                return false;
             }
-            container.contentWindow.document.getElementById("btnSubmit").click();
+            else if (btnSubmit !== null) {
+                btnSubmit.click();
+            }
+            else {
+                form.submit();
+            }
         }
         catch (err) {
             return false;

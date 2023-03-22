@@ -136,7 +136,7 @@
         }
 
          // ========================= TABLE SELECT FUNCTIONS ==============================
-         const DOUBLE_TOUCH_LENGTH = 500;
+        const DOUBLE_TOUCH_LENGTH = 500;
         var targetTable = null;
         var doubleTouchTimer = null;
         var multiselectEnabled = false;

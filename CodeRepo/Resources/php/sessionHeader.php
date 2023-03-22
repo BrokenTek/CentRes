@@ -15,6 +15,7 @@
 
 
     echo('
+        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
         <script>
             const USERNAME = "' .$GLOBALS['username']. '";
             const USER_ID = "' .$GLOBALS['userId']. '";
