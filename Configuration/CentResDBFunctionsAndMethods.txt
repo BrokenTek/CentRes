@@ -565,7 +565,7 @@ END;
 
 -- function needs to be recoded to require_once appropriate price calculation
 
-CREATE FUNCTION ticketItemPrice(ticketItemId INT UNSIGNED, split TINYINT UNSIGNED) RETURNS DECIMAL(6, 2)
+CREATE FUNCTION ticketItemPrice(ticketItemId INT UNSIGNED, split SMALLINT UNSIGNED) RETURNS DECIMAL(6, 2)
 BEGIN
 	DECLARE miQuickCode VARCHAR(10);
 	DECLARE prc DECIMAL(6, 2);
@@ -631,7 +631,7 @@ END;
 
 
 
-CREATE PROCEDURE createUser(IN lName VARCHAR(50), fName VARCHAR(60), IN uName VARCHAR(25), IN pHash VARCHAR(60), IN roles TINYINT UNSIGNED)
+CREATE PROCEDURE createUser(IN lName VARCHAR(50), fName VARCHAR(60), IN uName VARCHAR(25), IN pHash VARCHAR(60), IN roles SMALLINT UNSIGNED)
 BEGIN
 	INSERT INTO Employees (lastName, firstName, userName, passwordBCrypt, roleLevel) VALUES (lName, fName, uname, pHash, roles);
 END;
@@ -639,9 +639,9 @@ END;
 
 
 
-CREATE PROCEDURE login(IN requestedUsername VARCHAR(25), IN requestedRoles TINYINT UNSIGNED, IN newAccessToken varchar(60))
+CREATE PROCEDURE login(IN requestedUsername VARCHAR(25), IN requestedRoles SMALLINT UNSIGNED, IN newAccessToken varchar(60))
 BEGIN
-	DECLARE allowedRoles TINYINT UNSIGNED;
+	DECLARE allowedRoles SMALLINT UNSIGNED;
 	DECLARE empId INT UNSIGNED;
 	DECLARE timeoutMins INT UNSIGNED;
 	IF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername) = 0) THEN
@@ -755,7 +755,7 @@ END;
 
 -- todo switch to using menuItemPrice
 
-CREATE PROCEDURE createTicketItem(IN ticketNumber INT UNSIGNED, IN seatNumber TINYINT UNSIGNED, IN split TINYINT UNSIGNED, IN menuItemQC VARCHAR(10))
+CREATE PROCEDURE createTicketItem(IN ticketNumber INT UNSIGNED, IN seatNumber SMALLINT UNSIGNED, IN split SMALLINT UNSIGNED, IN menuItemQC VARCHAR(10))
 BEGIN
 	DECLARE tbl VARCHAR(3);
 	DECLARE newItemIndex SMALLINT UNSIGNED;
@@ -911,7 +911,7 @@ END;
 
 
 
-CREATE PROCEDURE moveTicketItemToSeat(IN ticketItemNumber INT UNSIGNED, IN toSeat TINYINT UNSIGNED)
+CREATE PROCEDURE moveTicketItemToSeat(IN ticketItemNumber INT UNSIGNED, IN toSeat SMALLINT UNSIGNED)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
 	DECLARE splitFlg SMALLINT UNSIGNED;
@@ -1104,7 +1104,7 @@ END;
 CREATE FUNCTION ticketItemPayStatus(tickItemNum INT UNSIGNED) RETURNS VARCHAR(7)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
-	DECLARE splitFlg TINYINT UNSIGNED;
+	DECLARE splitFlg SMALLINT UNSIGNED;
 	DECLARE countSplits INT UNSIGNED;
 	DECLARE paidSplits INT UNSIGNED;
 
@@ -1148,7 +1148,7 @@ CREATE FUNCTION splitString(ticketItemId INT UNSIGNED) RETURNS VARCHAR(25)
 BEGIN
 	DECLARE myStr VARCHAR(10);
 	DECLARE splitFlg SMALLINT UNSIGNED;
-	DECLARE len TINYINT UNSIGNED;
+	DECLARE len SMALLINT UNSIGNED;
 	SET myStr = "";
 	SELECT splitFlag INTO splitFlg FROM TicketItems WHERE id = ticketItemId;
 	
