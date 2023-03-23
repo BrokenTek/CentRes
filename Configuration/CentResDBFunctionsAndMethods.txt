@@ -24,6 +24,7 @@ DROP PROCEDURE IF EXISTS bussingComplete; -- TODO
 
 DROP FUNCTION IF EXISTS menuItemPrice; -- TODO
 DROP FUNCTION IF EXISTS ticketItemPrice; -- TODO
+DROP FUNCTION IF EXISTS splitTotal;
 DROP FUNCTION IF EXISTS splitSubtotal; -- TODO
 DROP FUNCTION IF EXISTS menuItemModifications;
 DROP FUNCTION IF EXISTS mipHelperFunction;
@@ -565,7 +566,7 @@ END;
 
 -- function needs to be recoded to require_once appropriate price calculation
 
-CREATE FUNCTION ticketItemPrice(ticketItemId INT UNSIGNED, split SMALLINT UNSIGNED) RETURNS DECIMAL(6, 2)
+CREATE FUNCTION ticketItemPrice(ticketItemId INT UNSIGNED, splitFlg SMALLINT UNSIGNED) RETURNS DECIMAL(6, 2)
 BEGIN
 	DECLARE miQuickCode VARCHAR(10);
 	DECLARE prc DECIMAL(6, 2);
@@ -574,7 +575,13 @@ BEGIN
 	RETURN prc;	
 END;
 
-
+-- calculate a sub  total for split
+CREATE FUNCTION splitTotal(ticketNumber INT UNSIGNED, splitFlg SMALLINT UNSIGNED) RETURNS DECIMAL(6,2)
+BEGIN
+	DECLARE splitTotal DECIMAL(6,2);
+	SELECT SUM(ticketItemPrice(id, splitFlag)) INTO splitTotal FROM TicketItems WHERE ticketId = ticketNumber AND splitFlg & splitFlag != 0;
+	RETURN splitTotal;
+END;
 
 CREATE FUNCTION sessionRole(token VARCHAR(60)) RETURNS INT UNSIGNED
 BEGIN
