@@ -248,6 +248,7 @@ Otherwise will reroute to logon page -->
                                                      .$_POST['split']. ", '"
                                                    .$_POST['menuItem']. "');";
                     connection()->query($sql);
+
 				}
                 elseif ($_POST['command'] == 'cancelPending') {
                     $sql = "CALL cancelPendingTicketItems(" .$_POST['ticket']. ", ". (isset($_POST['split']) ? $_POST['split'] : "10") . ");";
@@ -535,7 +536,7 @@ Otherwise will reroute to logon page -->
             unset($_POST['recordedModificationTime'], $_POST['recordedModificationTime'], $_POST['seat'], $_POST['split'], $_POST['selectedTicketItem']);
             $_POST['enabledButtons'] = "";
         }
-        unset($_POST['command'], $_POST['modificationNotes'], $_POST['overrideValue'], $_POST['overrideNote'], $_POST['authorizationUsername'], $_POST['toSeat'], $_POST['toSplit']);
+        unset($_POST['command'], $_POST['modificationNotes'],$_POST['menuItem'], $_POST['overrideValue'], $_POST['overrideNote'], $_POST['authorizationUsername'], $_POST['toSeat'], $_POST['toSplit']);
         require_once 'display.php';
     ?>
     </form>
