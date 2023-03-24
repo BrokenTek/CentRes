@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <base href="http://localhost/CentRes/CodeRepo/">
         <script>
             function reload() {
                 document.getElementById("tableSelectorForm").submit();

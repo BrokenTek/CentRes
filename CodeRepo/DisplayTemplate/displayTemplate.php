@@ -14,9 +14,10 @@ you'll be routed to whatever the home page is for your specified role level -->
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <html>
     <head>
+        <base href="http://localhost/CentRes/CodeRepo/">
         <!-- gives you access to setVar, getVar, removeVar, 
         clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
-        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+        <script src="Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         
         <!-- demonstration on how to use getVar, setVar, updateDisplay for just this page -->
         <!-- remove this script tag -->

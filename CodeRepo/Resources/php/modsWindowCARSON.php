@@ -4,8 +4,9 @@ Otherwise will reroute to logon page -->
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="../CSS/baseStyle.css">
-        <script src="../JavaScript/displayInterface.js"></script>
+        <base href="http://localhost/CentRes/CodeRepo/">
+        <link rel="stylesheet" href="Resources/CSS/baseStyle.css">
+        <script src="Resources/JavaScript/displayInterface.js"></script>
         <script>
             function signalStatus(status) {
                 setVar("status", status);

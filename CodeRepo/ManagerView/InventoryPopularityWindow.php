@@ -4,8 +4,9 @@
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <html>
     <head>
-    <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
-    <link rel="stylesheet" href="../Resources/CSS/ticketStyle.css">
+    <base href="http://localhost/CentRes/CodeRepo/">
+    <link rel="stylesheet" href="Resources/CSS/baseStyle.css">
+    <link rel="stylesheet" href="Resources/CSS/ticketStyle.css">
     <style>
         #sessionContainer {
             height: 95%;
@@ -58,7 +59,7 @@
     </style>
         <!-- gives you access to setVar, getVar, removeVar, 
         clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
-        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+        <script src="Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         
 
         <script>

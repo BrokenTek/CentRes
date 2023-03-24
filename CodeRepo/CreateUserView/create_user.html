@@ -5,17 +5,19 @@
 <head>
 	<title> CentRes Create Profile </title>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
+    <base href="http://localhost/CentRes/CodeRepo/">
+    <link rel="stylesheet" href="Resources/CSS/baseStyle.css">
     <script>
 		function redirectToLoginPage() {
-			window.location.href = "../LoginView/login.php";
+			window.location.href = "LoginView/login.php";
 		}
+        alert(window.location.href);
 	</script>
 </head>
 <body id="loginBody">
 	<div id="loginContainer">
         <div id="loginHeader">
-            <img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
+            <img src="Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
             <div id="loginTitle">CentRes Employee Setup</div>
                 <button type="button" id="backToLogin" onclick="redirectToLoginPage()">Back to Login</button>
             </div>

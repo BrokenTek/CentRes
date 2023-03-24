@@ -4,8 +4,9 @@ Otherwise will reroute to logon page -->
 <!DOCTYPE html>
 <html>
 <head>
+    <base href="http://localhost/CentRes/CodeRepo/">
     <title>Create a Ticket</title>
-    <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
+    <link rel="stylesheet" href="Resources/CSS/baseStyle.css">
     <style>
         body > * {
             background-color: black;

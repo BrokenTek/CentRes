@@ -2,7 +2,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
+		<base href="http://localhost/CentRes/CodeRepo/">
+		<link rel="stylesheet" href="Resources/CSS/baseStyle.css">
 		<style>
 			iframe {
 				background-color: black;
@@ -56,7 +57,7 @@
 
 			}
 		</style>
-		<script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+		<script src="Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
 		<script>
 			function allElementsLoaded() {
 				setVar("tableIdOnly", "", "serverListener");
@@ -119,15 +120,15 @@
 		</script>
 	</head>
 	<body onload="allElementsLoaded()" class="intro">
-		<form id="sessionContainer" action="../ServerView/ServerView.php" method="POST">
+		<form id="sessionContainer" action="ServerView/ServerView.php" method="POST">
 			<?php require_once "../Resources/php/sessionHeader.php"; ?>
 			<div id="sessionBody">
-				<iframe id="ifrServerList" src="ServerList.php" frameborder='0' width="100%" height="100%"></iframe>
-				<iframe id="ifrWaitList" src="WaitList.php" frameborder='0' width="100%" height="100%"></iframe>
-				<iframe id="ifrWaitTimes" src="WaitTimes.php" frameborder='0' width="100%" height="100%"></iframe>
-				<iframe id="ifrSelectedTable" src="SelectedTable.php" frameborder='0' width="100%" height="100%"></iframe>
-				<iframe id="ifrRestaurantLayout" src="RestaurantLayout.php" frameborder='0' width="100%" height="100%"></iframe>
-				<iframe id="serverListener" src="../Resources/php/serverListener.php" style="display: none;"></iframe>
+				<iframe id="ifrServerList" src="HostView/ServerList.php" frameborder='0' width="100%" height="100%"></iframe>
+				<iframe id="ifrWaitList" src="HostView/WaitList.php" frameborder='0' width="100%" height="100%"></iframe>
+				<iframe id="ifrWaitTimes" src="HostView/WaitTimes.php" frameborder='0' width="100%" height="100%"></iframe>
+				<iframe id="ifrSelectedTable" src="HostView/SelectedTable.php" frameborder='0' width="100%" height="100%"></iframe>
+				<iframe id="ifrRestaurantLayout" src="HostView/RestaurantLayout.php" frameborder='0' width="100%" height="100%"></iframe>
+				<iframe id="serverListener" src="Resources/php/serverListener.php" style="display: none;"></iframe>
 			</div>
 		</form>
 	</body>

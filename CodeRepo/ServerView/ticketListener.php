@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <base href="http://localhost/CentRes/CodeRepo/">
         <script>
             function reload() {
                 document.getElementById("ticketSelectorForm").submit();
             }
             // if the ticket number has been injected into the frame, reload
-            // and to enable timestamp retrieval... Otherwise start listening for changes to ticket.
+            // and to enable timestamp retrieval… Otherwise start listening for changes to ticket.
             <?php
                 if (isset($_POST['ticketNumber']) && !isset($_POST['modificationTime'])) {
                     echo("addEventListener('load',reload);");
@@ -18,7 +19,7 @@
         </script>
     </head>
     <body>
-        <form id="ticketSelectorForm"  action="ticketListener.php" method="POST">
+        <form id="ticketSelectorForm"  action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <?php
                 require_once '../Resources/php/connect_disconnect.php';
 

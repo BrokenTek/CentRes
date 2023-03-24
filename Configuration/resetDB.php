@@ -6,6 +6,7 @@
     **use this on CentRes folder to search all**  -->
 <html>
     <head>
+        <base href="http://localhost/CentRes/CodeRepo/">
         <script>
             var resetSuccessful = false;
             function allElementsLoaded() {
@@ -16,7 +17,7 @@
         </script>
     </head>
     <body onload="allElementsLoaded()">
-        <form action="../CodeRepo/LoginView/login.php" method="POST" id="frmToLogin">
+        <form action="LoginView/login.php" method="POST" id="frmToLogin">
             <input type="hidden" name="message" value="Database Successfully Reset.">
         </form>
         <?php
@@ -50,10 +51,10 @@
                 print("<h1>☑ Loaded 3 Stooges as Employees</h1>");
 
                 // Populate Menu
-                $query = file_get_contents("CentResPopuolateMenuAndModsWithAssociations.txt");
+                $query = file_get_contents("CentResPopulateMenuAndModsWithAssociations.txt");
                 $dbh->exec($query);
                 //include 'menuPop.php';
-                print("<h1>☑ Loaded Menu as to Database</h1>");
+                print("<h1>☑ Loaded Menu into Database</h1>");
 
                 // Message to verify the success of all queries in the block
                 echo("<script>resetSuccessful = true;</script>");

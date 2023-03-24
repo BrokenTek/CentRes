@@ -763,7 +763,7 @@ BEGIN
 		ELSE
 			-- record a menu item was requested.
 			UPDATE MenuItems SET requests = req + 1 WHERE quickCode = menuItemQC;
-			-- null qty is unchecked.... Thinks like drinks and stuff not routed to the
+			-- null qty is unchecked… Thinks like drinks and stuff not routed to the
 			-- kitchen or bar should not keep track of quantity.
 			IF (IFNULL(qty, 1) = 0) THEN
 				SIGNAL SQLSTATE '45000'

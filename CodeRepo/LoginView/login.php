@@ -73,7 +73,7 @@
 			$sql->bind_param("sis", $_POST['uname'], $_POST['role'], $sessionToken);
 			$sql->execute();
 			
-			// LOGIN SUCCESSFUL..... redirect to the appropriate page.
+			// LOGIN SUCCESSFUL… redirect to the appropriate page.
 			
 			header("Location: " .$_POST['route']);
 			
@@ -82,7 +82,7 @@
 			
 			
 			
-			setcookie($cookie_name, $sessionToken, time() + ($timeoutLength * 60), "/"); // value is in seconds... 86,400 per day, 60 per minute, 3600 per hour
+			setcookie($cookie_name, $sessionToken, time() + ($timeoutLength * 60), "/"); // value is in seconds… 86,400 per day, 60 per minute, 3600 per hour
 		}
 	}
 	catch (Exception $e) {
@@ -92,14 +92,15 @@
 
 <html>
 <head>
+	<base href="http://localhost/CentRes/CodeRepo/">
 	<title> CentRes Employee Portal </title>
 	<meta charset="utf-8">
 	<!-- <link rel="stylesheet" href="style.css"> -->
-	<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
-	<script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
+	<link rel="stylesheet" href="Resources/CSS/baseStyle.css">
+	<script src="Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
 	<script>
 		function redirectToCreateAccount() {
-			window.location.href = "../CreateUserView/create_user.html";
+			window.location.href = "CreateUserView/create_user.html";
 		}
 
 		function allElementsLoaded() {
@@ -115,12 +116,12 @@
 
 	<div id="loginContainer">
 	<div id="loginHeader">
-		<img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
+		<img src="Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
 		<div id="loginTitle">CentRes Employee Portal</div>
 			<button type="button" id="btnCreateAccount" onclick="redirectToCreateAccount()">I'm New</button>
 		</div>
 	<div>
-		<form action="login.php" method="POST" id="loginForm">
+		<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="loginForm">
 			<?php $readonlyStr = isset($errorMessage) ? "" : " readonly"; ?>
 			<label for="uname" id="lblLoginUsername">Enter Your Username</label>
 			<input type=text id='txtLoginUsername' name='uname' <?php if (isset($_POST['uname'])) { echo('value="' .$_POST['uname']. '"' .$readonlyStr);} ?> required>
@@ -219,7 +220,7 @@
 ?>	
 
 		</form>	
-		<form action="login.php" method="POST" id="frmClearLogin">
+		<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="frmClearLogin">
 		</form>
 
 	</div>	

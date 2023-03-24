@@ -4,9 +4,10 @@ Otherwise will reroute to logon page -->
 <!DOCTYPE html>
 <html>
     <head>
-		<script src="../Resources/JavaScript/displayInterface.js"></script>
-        <link rel="stylesheet" href="../Resources/CSS/menuStyle.css">
-		<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
+		<base href="http://localhost/CentRes/CodeRepo/">
+		<script src="Resources/JavaScript/displayInterface.js"></script>
+        <link rel="stylesheet" href="Resources/CSS/menuStyle.css">
+		<link rel="stylesheet" href="Resources/CSS/baseStyle.css">
 		<script>
 			function createMenuSelectEventHandlers() {
 	    		var menuItemSelected = function() {
@@ -26,13 +27,6 @@ Otherwise will reroute to logon page -->
 			
 
 		</script>
-        <script src="../InDev/cwpribble.js"></script>
-        <script src="../InDev/dbutshudiema.js"></script>
-        <script src="../InDev/dlmahan.js"></script>
-        <script src="../InDev/kcdine.js"></script>
-        <script src="../InDev/sashort.js"></script>
-        <script src="../InDev/OVERRIDEEXAMPLE.js"></script>
-        <script>templateFunction("Hello World");</script>
 	</head>
 	<body>
 		<form>

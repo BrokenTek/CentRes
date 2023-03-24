@@ -5,15 +5,16 @@ Otherwise will reroute to logon page -->
 <!DOCTYPE html>
 <html>
 <head>
+    <base href="http://localhost/CentRes/CodeRepo/">
     <style>
         body {
             background-color: transparent;
         }
     </style>
-<link rel="stylesheet" href="../CSS/baseStyle.css">
-<link rel="stylesheet" href="../CSS/ticketStructure.css">
-<link rel="stylesheet" href="../CSS/ticketStyle.css">
-<script src="../JavaScript/displayInterface.js"></script>
+<link rel="stylesheet" href="Resources/CSS/baseStyle.css">
+<link rel="stylesheet" href="Resources/CSS/ticketStructure.css">
+<link rel="stylesheet" href="Resources/CSS/ticketStyle.css">
+<script src="Resources/JavaScript/displayInterface.js"></script>
 <script>
     var addError = false;
     // ========================= TASKS WHEN TICKET IS LOADED ==============================
@@ -234,7 +235,7 @@ Otherwise will reroute to logon page -->
 </script>
 </head>
 <body onload="loaded()">
-<form id="ticketForm" action="ticket.php" method="post" class= "ticketForm">
+<form id="ticketForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class= "ticketForm">
 
     <?php
         require_once 'connect_disconnect.php';
@@ -540,6 +541,6 @@ Otherwise will reroute to logon page -->
         require_once 'display.php';
     ?>
     </form>
-    <iframe id="ticketListener" frameborder='0' width=100% height=100% src="../../ServerView/ticketListener.php" style="display: none;"></iframe>
+    <iframe id="ticketListener" frameborder='0' width=100% height=100% src="ServerView/ticketListener.php" style="display: none;"></iframe>
     </body>
     </html>

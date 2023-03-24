@@ -3,7 +3,7 @@
 //  that they could be the prefix for the eventListeners at the bottom. This
 //  is just for testing at this point. For memory optimization, eventListeners 
 //  will not be reference from variables, they will be referenced from DOM 
-//  element grabs (document.getElementBy...)
+//  element grabs (document.getElementBy…)
 
 var ticketContainerBtn = document.getElementById('getTicketContainer');
 var modsContainerBtn = document.getElementById('getModsContainer');

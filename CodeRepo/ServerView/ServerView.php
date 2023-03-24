@@ -2,11 +2,12 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <base href="http://localhost/CentRes/CodeRepo/">
         <title>CentRes: Host View</title>
-        <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
-        <link rel="stylesheet" href="../Resources/CSS/serverStyle.css">
-        <link rel="stylesheet" href="../Resources/CSS/serverStructure.css">
-        <script src="../Resources/JavaScript/displayInterface.js"></script>
+        <link rel="stylesheet" href="Resources/CSS/baseStyle.css">
+        <link rel="stylesheet" href="Resources/CSS/serverStyle.css">
+        <link rel="stylesheet" href="Resources/CSS/serverStructure.css">
+        <script src="Resources/JavaScript/displayInterface.js"></script>
         <script type="text/javascript">
             var cboTable;
             var cboSeat;
@@ -143,7 +144,7 @@
 
                 //update check
                 var ticketRefresh = false;
-                // verify ticket, seats, and splits have loaded... If not, attempt to reload
+                // verify ticket, seats, and splits have loaded… If not, attempt to reload
                 try {
                     if (cboTable.selectedIndex > 0 && (getVar("ticket", "ticketContainer") == null )) { 
                         setVar("ticket", cboTable.value, "ticketContainer" );
@@ -228,7 +229,7 @@
                         //setVar("recordedModificationTime", Date.now() + 6000, "ticketContainer");
                         setTimeout(() => { ticketContainer.classList.remove("clear")} ,750);
                         setVar("ignoreUpdate", "yes please", "ticketContainer", true);
-                        modEditorContainer.setAttribute("src", "../Resources/php/modsWindowCARSON.php");
+                        modEditorContainer.setAttribute("src", "Resources/php/modsWindowCARSON.php");
                         cboTable.removeAttribute("disabled");
                         cboSeat.removeAttribute("disabled");
                         cboSplit.removeAttribute("disabled");
@@ -314,7 +315,7 @@
                         document.querySelector("#" + tablesRemoved[i]).remove();
                     }
 
-                    //items may no longer be sorted in alphabetical order....
+                    //items may no longer be sorted in alphabetical order…
                     //reposition all items to make them sorted
                     cboTable.appendChild(document.querySelector("#selectTable"));
                     for (var i = 0; i < checkAgainst.length; i+=2) {
@@ -833,14 +834,9 @@
                 cboSeat.disabled = (document.getElementsByClassName("toggled").length == 1);
             }
         </script>
-        <script src="../InDev/cwpribble.js"></script>
-        <script src="../InDev/dbutshudiema.js"></script>
-        <script src="../InDev/dlmahan.js"></script>
-        <script src="../InDev/kcdine.js"></script>
-        <script src="../InDev/sashort.js"></script>
     </head>
     <body>
-        <form id="sessionContainer" id="" action="ServerView.php" method="POST">
+        <form id="sessionContainer" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <!-- session.php must be included after the opening for tag. It adds  -->
             <?php require_once "../Resources/php/sessionHeader.php"; ?>
             <div id="sessionBody">
@@ -858,7 +854,7 @@
             
                 <div id="menuTitle">Menu</div>
             
-                <iframe id="menuContainer" frameborder='0' src="menu.php">
+                <iframe id="menuContainer" frameborder='0' src="ServerView/menu.php">
                 </iframe>
                 
                 
@@ -873,9 +869,9 @@
                         <!-- options are dynamically added and removed here with JavaScript -->
                     </select>
                 </div>
-                <iframe id="ticketContainer" frameborder='0' src="../Resources/php/ticket.php">
+                <iframe id="ticketContainer" frameborder='0' src="Resources/php/ticket.php">
                 </iframe>
-                <iframe id="modEditorContainer" frameborder='0' width="100%" height="100%" src="../Resources/php/modsWindowCARSON.php">
+                <iframe id="modEditorContainer" frameborder='0' width="100%" height="100%" src="Resources/php/modsWindowCARSON.php">
                 </iframe>
                 <div id="ticketFlickerBackdrop"></div>
                 <div id="ticketFooter">
@@ -889,7 +885,7 @@
             </div>
             <?php require_once '../Resources/php/display.php'; ?>
         </form>
-        <iframe id="serverListener" src="../Resources/php/serverListener.php" style="display: none;">
+        <iframe id="serverListener" src="Resources/php/serverListener.php" style="display: none;">
         </div>
     </body>
 </html>

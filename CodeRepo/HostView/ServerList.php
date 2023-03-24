@@ -2,10 +2,11 @@
 <?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(4, $GLOBALS['role'])?>
 <html>
     <head>
+        <base href="http://localhost/CentRes/CodeRepo/">
         <title>Active Servers</title>
-        <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
-        <link rel="stylesheet" href="../Resources/CSS/waitListStructure.css">
-        <script src= '../Resources/JavaScript/displayInterface.js'></script>
+        <link rel="stylesheet" href="Resources/CSS/baseStyle.css">
+        <link rel="stylesheet" href="Resources/CSS/waitListStructure.css">
+        <script src= 'Resources/JavaScript/displayInterface.js'></script>
         <script>
             function allElementsLoaded() {
                 let selectedServer = getVar("selectedServer");

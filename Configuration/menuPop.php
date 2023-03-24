@@ -1,5 +1,6 @@
 <html>
     <head>
+        <base href="http://localhost/CentRes/CodeRepo/">
         <script>
             var resetSuccessful = false;
             function allElementsLoaded() {
@@ -10,7 +11,7 @@
         </script>
     </head>
     <body onload="allElementsLoaded()">
-        <form action="../CodeRepo/LoginView/login.php" method="POST" id="frmToLogin">
+        <form action="LoginView/login.php" method="POST" id="frmToLogin">
                 <input type="hidden" name="message" value="Database Successfully Reset.">
         </form>
     <?php

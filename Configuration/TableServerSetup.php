@@ -29,7 +29,7 @@ echo("<li>Reset Tables</li>");
 	connection()->query($sql);
 	
 	
-	// Create tables with that shape... In our later sprints SVG path data will have to be included
+	// Create tables with that shape… In our later sprints SVG path data will have to be included
 	// so we know how to draw the table on the Host View.
 	$sql="INSERT INTO tables (id, shape) VALUES 
 	('T01', 'square'), 
@@ -64,7 +64,7 @@ connection()->query($sql);
 // ============================== STATEMNTS BELOW SHOULD BE INCLUDED FOR THROW-AWAY INTERACTIVE MANAGER PAGE =============================================
 
 // Manager/Host is required to be logged in to perform add/remove from the TableLog
-// you should just actually log in as Larry on the LoginView... That will allow you to pass this step.
+// you should just actually log in as Larry on the LoginView… That will allow you to pass this step.
 echo("<h1>Host Curly: Login and assign Servers to tables</h1><ol>");
 $sql= "CALL LOGIN('curly', 4, 'ANYTHING GOES HERE');";
 echo($sql);
@@ -118,8 +118,8 @@ connection()->query($sql);
 
 // Pretending to be the host/hostess, create new tickets when a group enters the restaurant and assign them to a table
 echo("<h1>Assigning new tickets to tables</h1><ol>");
-	// Create a few tickets for us to test with... the arguments are...
-	// 1.	ticket nickname (last name of group or lastname/last 4 on credit card (if bar tab).... NICKNAMES MUST BE UNIQUE
+	// Create a few tickets for us to test with… the arguments are…
+	// 1.	ticket nickname (last name of group or lastname/last 4 on credit card (if bar tab)… NICKNAMES MUST BE UNIQUE
 	// 2.	the party size
 	// 3.	the SQL OUT variable to get the new ticket number.
 

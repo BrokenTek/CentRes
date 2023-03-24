@@ -17,7 +17,7 @@ function setVar(variableName, value, id = null, update = false) {
         form = container.contentWindow.document.getElementsByTagName('form')[0];
         variableElement = container.contentWindow.document.getElementById(variableName);
 
-        // the page was unavailable when attempting to set the variable...
+        // the page was unavailable when attempting to set the variable…
         // reprocess the request until successful.
         if (form == null) {
             setTimeout(setVar(variableName), 250);
