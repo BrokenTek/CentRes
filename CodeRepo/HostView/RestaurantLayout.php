@@ -18,8 +18,6 @@
             margin: 0;
             padding: 0;
             background-color: #111;
-            width: 1300px;
-            height:200px;
         }
 
         .tabletest {

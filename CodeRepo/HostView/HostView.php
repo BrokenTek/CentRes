@@ -51,11 +51,9 @@
 
 			#ifrRestaurantLayout {
 				grid-area: ifrRestaurantLayout;
-				/*max-width: 1300px;
-				max-height: 800px; */
-				/*set max-height to include the entire iframe
-				set max-width to include the entire iframe, both by pixel */
-				overflow: auto;
+				min-width: 1300px;
+				min-height: 754px;
+
 			}
 		</style>
 		<script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
