@@ -15,7 +15,7 @@
 			$sql = "SELECT sessionRole('" .$_COOKIE[$cookie_name].  "') AS sessionRole;";
 			$GLOBALS['role'] = connection()->query($sql)->fetch_assoc()['sessionRole'];
 			
-			// session validated and session role determined… get the session username
+			// session validated and session role determined.... get the session username
 			$sql = "SELECT sessionUsername('" .$_COOKIE[$cookie_name].  "') AS sessionUsername;";
 			$uname = connection()->query($sql)->fetch_assoc()['sessionUsername'];
 			

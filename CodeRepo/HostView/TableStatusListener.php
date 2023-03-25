@@ -6,8 +6,7 @@
 
 <html>
     <head>
-        <base href="http://localhost/CentRes/CodeRepo/">
-        <script src="Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         <script>
             function allElementsLoaded() {
                 <?php

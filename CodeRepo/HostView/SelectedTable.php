@@ -162,9 +162,8 @@ you'll be routed to whatever the home page is for your specified role level -->
 
 <html>
     <head>
-      <base href="http://localhost/CentRes/CodeRepo/">
-      <link rel="stylesheet" href="Resources/CSS/tableStyles.css">
-      <link rel="stylesheet" href="Resources/CSS/baseStyle.css">
+      <link rel="stylesheet" href="../Resources/CSS/tableStyles.css">
+      <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
       <style>
         *, form{
           background-color: black;
@@ -255,7 +254,7 @@ you'll be routed to whatever the home page is for your specified role level -->
       </style>
         <!-- gives you access to setVar, getVar, removeVar, 
         clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
-        <script src="Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         
         <script>
             function allElementsLoaded() {

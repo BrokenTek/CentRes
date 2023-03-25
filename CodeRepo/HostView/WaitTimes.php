@@ -42,7 +42,6 @@ you'll be routed to whatever the home page is for your specified role level -->
 ?>
 <html>
     <head>
-        <base href="http://localhost/CentRes/CodeRepo/">
         <style>
             fieldset {
                 display: grid;
@@ -51,9 +50,9 @@ you'll be routed to whatever the home page is for your specified role level -->
         </style>
         <!-- gives you access to setVar, getVar, removeVar, 
         clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
-        <script src="Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
-        <link rel="stylesheet" href="Resources/CSS/baseStyle.css">
-        <link rel="stylesheet" href="Resources/CSS/waitListStructure.css">
+        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+        <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
+        <link rel="stylesheet" href="../Resources/CSS/waitListStructure.css">
         
         <!-- demonstration on how to use getVar, setVar, updateDisplay for just this page -->
         <!-- remove this script tag -->
@@ -149,7 +148,7 @@ you'll be routed to whatever the home page is for your specified role level -->
     </head>
     <body onload="allElementsLoaded()"  class="intro">
         <!-- this form submits to itself -->
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+        <form action="WaitTimes.php" method="POST">
             <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
             <fieldset>
            

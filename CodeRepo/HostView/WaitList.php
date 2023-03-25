@@ -12,12 +12,11 @@ Otherwise will reroute to logon page -->
 ?>
 <html>
     <head>
-        <base href="http://localhost/CentRes/CodeRepo/">
-        <link rel="stylesheet" href="Resources/CSS/baseStyle.css">
-        <link rel="stylesheet" href="Resources/CSS/waitListStructure.css">
+        <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
+        <link rel="stylesheet" href="../Resources/CSS/waitListStructure.css">
         <!-- gives you access to setVar, getVar, removeVar, 
         clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
-        <script src="Resources/JavaScript/displayInterface.js" type="text/javascript"></script>  
+        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>  
         <script>
             function createEventHandlers() {
                 let selectedTicket = getVar("selectedTicket");
@@ -79,7 +78,7 @@ Otherwise will reroute to logon page -->
             <button class="disabled" type="button" onclick="removeSelectedTicket()" disabled id="btnRemoveSelectedTicket" onclick="removeSelectedTicket()">Remove</button>
         </legend>
         <!-- change the action to you filename -->
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="frmWaitList">
+        <form action="WaitList.php" method="POST" id="frmWaitList">
             <!-- retain any POST vars. When updateDisplay() is called, these variables
             will be carried over -->
             <?php require_once '../Resources/PHP/display.php'; ?>

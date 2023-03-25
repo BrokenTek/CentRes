@@ -2,13 +2,13 @@
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <html lang='en'>
 <head>
-<base href="http://localhost/CentRes/CodeRepo/">
+
 <!-- <IfModule mod_mime.c>
     AddType application/manifest+json   webmanifest
 </IfModule> -->
     <meta charset='utf-8' />
     <meta name="viewport" content="width=device-width" />
-    <link rel="stylesheet" href="Resources/CSS/tableStyles.css" />
+    <link rel="stylesheet" href="../Resources/CSS/tableStyles.css" />
     <style>
         .multiselect {
             animation: goDark .25s 0s ease forwards;
@@ -29,8 +29,8 @@
         100% { background-color: #333;}
     }
     </style>
-    <script src="Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
-    <script src="Resources/JavaScript/SvgManipulation.js"></script>
+    <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
+    <script src="../Resources/JavaScript/SvgManipulation.js"></script>
     <!-- Will Need To Change CSS File Path Later -->
 
     <script>
@@ -339,7 +339,7 @@
         // window.addEventListener('DOMContentLoaded', setDimensions);
     </script>
     </form>
-    <iframe id="tableStatusListener" src="HostView/TableStatusListener.php" style="display: none;"></iframe>
+    <iframe id="tableStatusListener" src="TableStatusListener.php" style="display: none;"></iframe>
 </body>
 </html>
 

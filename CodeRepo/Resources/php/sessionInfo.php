@@ -6,7 +6,6 @@ you to use display.php and displayInterface.js -->
 <?php require_once 'connect_disconnect.php'; ?>
 <html>
     <head>
-        <base href="http://localhost/CentRes/CodeRepo/">
     </head>
     <body>
         <!-- this form submits to itself -->
