@@ -269,20 +269,18 @@
                 
 
                 // code that allows retention of scrollbar location between refreshes
+                let frm = document.getElementsByTagName("form")[0]; 
                 with (document.getElementsByTagName("form")[0]) {
-                    let x = getVar("scrollLeft");
-                    let y = getVar("scrollTop");
+                    let x = getVar(id + "_scrollLeft");
+                    let y = getVar(id + "_scrollTop");
                     if (x !== undefined) {
                         scrollLeft = x;
                         scrollTop = y;
                     }
 
                     window.addEventListener('scroll', function(event) {
-                        event.stopPropagation();
-                        if (getVar("scrollLeft") != null) {
-                            setVar("scrollLeft", scrollLeft);
-                            setVar("scrollTop", scrollTop);
-                        }
+                        setVar(id + "_scrollLeft", scrollLeft);
+                        setVar(id + "_scrollTop", scrollTop);
                     }, true);   
                 }
 
