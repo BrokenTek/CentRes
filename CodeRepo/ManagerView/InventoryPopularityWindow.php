@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
     <link rel="stylesheet" href="../Resources/CSS/ticketStyle.css">
     <style>
-        #sessionContainer {
+        #sessionForm {
             height: 95%;
             width: 100%;
 		}
@@ -269,8 +269,7 @@
                 
 
                 // code that allows retention of scrollbar location between refreshes
-                let frm = document.getElementsByTagName("form")[0]; 
-                with (document.getElementsByTagName("form")[0]) {
+                with (document.getElementsById("sessionForm")) {
                     let x = getVar(id + "_scrollLeft");
                     let y = getVar(id + "_scrollTop");
                     if (x !== undefined) {
@@ -293,7 +292,7 @@
     </head>
     <body onload="allElementsLoaded()">
         <!-- this form submits to itself -->
-        <form id="sessionContainer" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+        <form id="sessionForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <?php require_once "../Resources/php/sessionHeader.php"; ?>
             <div id="sessionBody">
             <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->

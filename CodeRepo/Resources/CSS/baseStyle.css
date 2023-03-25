@@ -27,7 +27,7 @@ body {
     */
   }
 
-  #sessionContainer {
+  #sessionForm {
     max-height: 100vh;
     overflow: auto;
   }
@@ -161,7 +161,7 @@ body {
     100% { filter: blur(0);}
   }
 
-  #sessionContainer {
+  #sessionForm {
     display: grid;
     
     

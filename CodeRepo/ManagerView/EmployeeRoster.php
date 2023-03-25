@@ -107,7 +107,7 @@ you'll be routed to whatever the home page is for your specified role level -->
     </head>
     <body onload="allElementsLoaded()">
         <!-- this form submits to itself -->
-        <form  id="sessionContainer" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+        <form  id="sessionForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <?php require_once "../Resources/php/sessionHeader.php"; ?>
             <div id="sessionBody">
                 <!-- PLACE YOUR PHP STRUCTURE LAYOUT CODE HERE -->

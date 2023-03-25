@@ -7,7 +7,7 @@
 			iframe {
 				background-color: black;
 			}
-			#sessionContainer {
+			#sessionForm {
 				height: 100%;
 				width: 100%;
 				margin: auto auto auto auto;
@@ -119,7 +119,7 @@
 		</script>
 	</head>
 	<body onload="allElementsLoaded()" class="intro">
-		<form id="sessionContainer" action="../ServerView/ServerView.php" method="POST">
+		<form id="sessionForm" action="../ServerView/ServerView.php" method="POST">
 			<?php require_once "../Resources/php/sessionHeader.php"; ?>
 			<div id="sessionBody">
 				<iframe id="ifrServerList" src="ServerList.php" frameborder='0' width="100%" height="100%"></iframe>
