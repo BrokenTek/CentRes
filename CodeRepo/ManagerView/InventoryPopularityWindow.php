@@ -4,6 +4,7 @@
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <html>
     <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
     <link rel="stylesheet" href="../Resources/CSS/ticketStyle.css">
     <style>
@@ -266,8 +267,26 @@
 
                 }
                 
-                rememberScrollPosition();
-                //setTimeout(updateDisplay, 30000);
+
+                // code that allows retention of scrollbar location between refreshes
+                with (document.getElementsByTagName("form")[0]) {
+                    let x = getVar("scrollLeft");
+                    let y = getVar("scrollTop");
+                    if (x !== undefined) {
+                        scrollLeft = x;
+                        scrollTop = y;
+                    }
+
+                    window.addEventListener('scroll', function(event) {
+                        event.stopPropagation();
+                        if (getVar("scrollLeft") != null) {
+                            setVar("scrollLeft", scrollLeft);
+                            setVar("scrollTop", scrollTop);
+                        }
+                    }, true);   
+                }
+
+                setTimeout(updateDisplay, 30000);
             }
 
             

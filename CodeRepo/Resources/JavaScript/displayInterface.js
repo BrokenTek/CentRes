@@ -257,17 +257,25 @@ function updateDisplay(id = null) {
 
 // =============================== LOCAL WINDOW ONLY FUNCTIONS ============================
 
-
-window.onscroll = function (e) { 
+window.addEventListener('scroll', function(event) {
+    event.stopPropagation();
     if (getVar("scrollX") != null) {
-        setVar("scrollX", window.scrollX);
-        setVar("scrollY", window.scrollY);
-    }   
-}
+        //setVar("scrollX", window.scrollX);
+        //setVar("scrollY", window.scrollY);
+        /*
+        if (setVar("scrollX", window.scrollX) || setVar("scrollY", window.scrollY)) {
+            alert("changed");
+        }
+        else {
+            alert(window.scrollY);
+        }
+        */
+    }
+}, true);
 
-function rememberScrollPosition() {
-    setVar("scrollX", window.scrollX);
-    setVar("scrollY", window.scrollY); 
+function rememberScrollPosition(id = null) {
+    setVar("scrollX", window.scrollX, id);
+    setVar("scrollY", window.scrollY, id); 
 }
 
 function forgetScrollPosition() {
