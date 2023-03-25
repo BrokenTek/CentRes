@@ -58,7 +58,7 @@
     </style>
         <!-- gives you access to setVar, getVar, removeVar, 
         clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
-        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
         
 
         <script>
@@ -202,6 +202,7 @@
                         }
                         keyIndex++;
                     }
+
                 }
                               
                 
@@ -264,9 +265,9 @@
                     })
 
                 }
-
+                
                 rememberScrollPosition();
-                setTimeout(updateDisplay, 30000);
+                //setTimeout(updateDisplay, 30000);
             }
 
             

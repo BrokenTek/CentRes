@@ -30,16 +30,14 @@
             }
             document.getElementById("managementNavigationSelector").selectedIndex = 0;    
           }
+
           function logout() {
-            let div = document.createElement("input");
-            div.setAttribute("type","hidden");
-            div.setAttribute("name","logoutUsername");
-            div.setAttribute("value",USERNAME);
+            setVar("logoutUsername", USERNAME);
             let frm = document.getElementsByTagName("form")[0];
-            frm.append(div);
             frm.setAttribute("action","../LoginView/login.php");
-            frm.submit();
-        }
+            updateDisplay();
+          }
+          
         const COOKIE_NAME = "804288a34eb7a49b349be68fc6437621cbf25e10d82f4268bb795eca277adedb6a3367add5bfb7cbffb50df150e2e78d26b276f37d32d96cd76746065df58a30cde25c4d9803aa7214dc8f6a985bf8643c341f229b5834964b0f371915d5677e4b579fbab42844cd63ddc3148e4250591277cfc521906bc30cfedd765974c2009ae5fe451ab1890e5ebbfa120ad18934c972618dbe3e";
         const SESSION_VALUE = decodeURIComponent(getCookieValue(COOKIE_NAME));
         function validateSession() {
@@ -62,6 +60,7 @@
                 return undefined;
             }
         }
+       
         
         </script>
     ');
@@ -85,7 +84,7 @@
         ");
     }
 
-    echo('<button type="button" id="btnLogout" onclick="logout()">Logout</button>
+    echo('<input type="button" class="button" id="btnLogout" onclick="logout()" value="Logout">
         </div>');
     echo("<iframe id='ifrSessionInfo' src='../Resources/php/sessionInfo.php' style='display: none;'></iframe>");
 ?>

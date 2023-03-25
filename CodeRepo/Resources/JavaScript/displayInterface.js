@@ -257,6 +257,7 @@ function updateDisplay(id = null) {
 
 // =============================== LOCAL WINDOW ONLY FUNCTIONS ============================
 
+
 window.onscroll = function (e) { 
     if (getVar("scrollX") != null) {
         setVar("scrollX", window.scrollX);
