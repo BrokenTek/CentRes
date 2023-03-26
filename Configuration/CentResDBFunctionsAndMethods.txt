@@ -450,6 +450,7 @@ CREATE FUNCTION ticketItemPrice(ticketItemId INT UNSIGNED, splitFlg SMALLINT UNS
 BEGIN
 	DECLARE miQuickCode VARCHAR(10);
 	DECLARE prc DECIMAL(6, 2);
+	DECLARE splitCount INT UNSIGNED;
 	SELECT menuItemQuickCode INTO miQuickCode FROM TicketItems WHERE id = ticketItemId;
 	SELECT price INTO prc FROM MenuItems WHERE quickCode = miQuickCode;
 	SET splitCount = (SELECT COUNT(*) FROM TicketItems WHERE ticketId = (SELECT ticketId FROM TicketItems WHERE id = ticketItemId) AND splitFlg & splitFlag <> 0);
