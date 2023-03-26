@@ -452,6 +452,11 @@ BEGIN
 	DECLARE prc DECIMAL(6, 2);
 	SELECT menuItemQuickCode INTO miQuickCode FROM TicketItems WHERE id = ticketItemId;
 	SELECT price INTO prc FROM MenuItems WHERE quickCode = miQuickCode;
+	SET splitCount = (SELECT COUNT(*) FROM TicketItems WHERE ticketId = (SELECT ticketId FROM TicketItems WHERE id = ticketItemId) AND splitFlg & splitFlag <> 0);
+	IF splitCount > 1 THEN
+		SET prc = prc / splitCount;
+	END IF;
+	SET prc = ROUND(prc, 2);
 	RETURN prc;	
 END;
 
