@@ -14,6 +14,7 @@
             var ticketContainer;
             var menuContainer;
             var modEditorContainer;
+            var btnDeliver;
             var btnSubmit;
             var btnCancel;
             var btnEdit;
@@ -30,6 +31,7 @@
                 ticketContainer = document.getElementById("ticketContainer");
                 modEditorContainer = document.getElementById("modEditorContainer");
                 menuContainer = document.getElementById("menuContainer");
+                btnDeliver = document.getElementById("btnDeliver"); 
                 btnSubmit = document.getElementById("btnSubmit");
                 btnCancel = document.getElementById("btnCancel");
                 btnEdit = document.getElementById("btnEdit");
@@ -38,6 +40,7 @@
                 btnSplit = document.getElementById("btnSplit");
                 ticketHeader = document.getElementById("ticketHeaderText");
 
+                btnDeliver.addEventListener('pointerup', (event) => {deliverButtonPressed(event)});
                 btnSubmit.addEventListener('pointerup', (event) => {submitButtonPressed(event)});
                 btnCancel.addEventListener('pointerup', (event) => {cancelButtonPressed(event)});
                 btnEdit.addEventListener('pointerup', (event) => {editButtonPressed(event)});
@@ -415,6 +418,7 @@
                 try {
                     var updatedButtons = getVar("enabledButtons", "ticketContainer");
                     setVar("enabledButtons", updatedButtons);
+                    btnDeliver.disabled = updatedButtons.indexOf("Deliver") == -1; 
                     btnSubmit.disabled = updatedButtons.indexOf("Submit") == -1;
                     btnCancel.disabled = updatedButtons.indexOf("Cancel") == -1;
                     btnEdit.disabled = updatedButtons.indexOf("Edit") == -1;
@@ -776,6 +780,19 @@
 
             // =========================== BUTTON PRESS EVENTS =====================================
 
+            function deliverButtonPressed(e) {
+                if (e.target.getAttribute("disabled") == '') { return; }
+                let deliverString = "";
+                with (document.getElementById("ticketContainer").contentWindow.document.querySelectorAll(".selected.ready")) {
+                    for (let i = 0; i < length; i++) {
+                        deliverString += "," + item(i).id;
+                    }
+                    setVar("ignoreUpdate", "yes please", "ticketContainer");
+                    setVar("command", "deliver", "ticketContainer");
+                    setVar("ticketItem",deliverString.substring(1).replaceAll("ticketItem",""),"ticketContainer", true);
+                }
+            }
+
             function submitButtonPressed(e) {
                 if (e.target.getAttribute("disabled") == '') { return; }
                 setVar("ignoreUpdate", "yes please", "ticketContainer");
@@ -833,11 +850,6 @@
                 cboSeat.disabled = (document.getElementsByClassName("toggled").length == 1);
             }
         </script>
-        <script src="../InDev/cwpribble.js"></script>
-        <script src="../InDev/dbutshudiema.js"></script>
-        <script src="../InDev/dlmahan.js"></script>
-        <script src="../InDev/kcdine.js"></script>
-        <script src="../InDev/sashort.js"></script>
     </head>
     <body>
         <form id="sessionForm" action="ServerView.php" method="POST">
@@ -850,6 +862,7 @@
                         <!-- options are dynamically added and removed here with JavaScript -->
                     </select>
                     <div id="headerButtonGroup">
+                        <button type="button" id="btnDeliver">DELIVER</button>
                         <button type="button" id="btnSubmit">SUBMIT</button>
                         <button type="button" id="btnCancel">CANCEL</button>
                         <button type="button" id="btnPrintReceipt" style="display: none;">PRINT RECIEPT</button>

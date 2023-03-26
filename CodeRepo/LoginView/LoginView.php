@@ -214,14 +214,29 @@ you to use display.php and displayInterface.js -->
                                         $errorMessage = "Confirmation Password Does Not Match";
                                     }
                                     else {
-                                        // change the password hash to the new value.
-                                        $newPasswordHash = password_hash($_POST['newPassword'], PASSWORD_BCRYPT);
+                                         // before password change, check that $_POST['validatedPassword'] matches what is stored in db.
+                                        // Otherwise hackers could supply a bogus value for validated password, and if not checked, allows
+                                        // anybody to arbitrarily change any password.
                                         $db = connection();
-                                        $sql = $db->prepare("UPDATE Employees SET passwordBCrypt = ? WHERE userName = ?;");
-                                        $sql->bind_param("ss", $newPasswordHash, $_POST['username']);
+                                        $sql = $db->prepare("SELECT userPasswordHash(?) AS userPasswordHash;");
+                                        $sql->bind_param("s", $_POST['username']);
                                         $sql->execute();
-                                        $message = "Password Succesfully Updated";
-                                        echo("<script>setVar('validatedPassword','$newPasswordHash');</script>");
+                                        
+                                        $passResult = $sql->get_result()->fetch_assoc()['userPasswordHash'];
+
+                                        if ($passResult ==  $_POST['validatedPassword']) {
+                                            // change the password hash to the new value.
+                                            $newPasswordHash = password_hash($_POST['newPassword'], PASSWORD_BCRYPT);
+                                            $db = connection();
+                                            $sql = $db->prepare("UPDATE Employees SET passwordBCrypt = ? WHERE userName = ?;");
+                                            $sql->bind_param("ss", $newPasswordHash, $_POST['username']);
+                                            $sql->execute();
+                                            $message = "Password Succesfully Updated";
+                                            echo("<script>setVar('validatedPassword','$newPasswordHash');</script>");
+                                        }
+                                        else {
+                                            $errorMessage = "Invalid Password Insertion Detected!"; 
+                                        }
                                     }
                                 ?>
                                 <?php if (isset($errorMessage)): ?>

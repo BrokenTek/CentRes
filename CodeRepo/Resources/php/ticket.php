@@ -114,6 +114,9 @@ Otherwise will reroute to logon page -->
             if (document.querySelectorAll(".selected.splittable").length == document.querySelectorAll(".selected").length) {
                 enabledButtons += "Split";
             }
+            if (document.querySelectorAll(".selected.ready").length > 0) {
+                enabledButtons += "Deliver";
+            }
         }
         setVar("enabledButtons", enabledButtons)
         
@@ -178,7 +181,13 @@ Otherwise will reroute to logon page -->
 
     // when you've made your current selection
     function pointerUp() {
-        if (targetTicketItem == null) { return; }
+
+        if (targetTicketItem == null) {
+            setVar("lastUpdate", Date.now()); 
+            longTouchEnabled = false;
+            setState();
+            return; 
+        }
         
         if (longTouchTimer != null) {
             clearTimeout(longTouchTimer);
@@ -261,7 +270,10 @@ Otherwise will reroute to logon page -->
 				elseif (isset($_POST['ticketItem'])) {
                     $ticketItems = explode(",", $_POST['ticketItem']);
                     foreach ($ticketItems as $ticketItem) {
-                        if ($_POST['command'] == 'modify') {
+                        if ($_POST['command'] == 'deliver') {
+                            $sql = "CALL markTicketItemAsDelivered($ticketItem);";
+                        }
+                        elseif ($_POST['command'] == 'modify') {
                             $sql = "CALL modifyTicketItem("                 .$ticketItem. ", '" 
                                                             .$_POST['modificationNotes']. "');";
                         }
@@ -319,7 +331,8 @@ Otherwise will reroute to logon page -->
                 $_POST['split'] = 1;
             }
 
-            $sql = "SELECT *, ticketItemStatus(TicketItems.id) as status, ticketItemPayStatus(TicketItems.id) as splitPayStatus
+            $sql = "SELECT *, ticketItemStatus(TicketItems.id) as status, ticketItemPayStatus(TicketItems.id) as splitPayStatus,
+                    ticketItemPrice(TicketItems.id, specificSplitFlag) as calcTicketItemPrice 
                     FROM ticketItems WHERE TicketItems.ticketId = " .$_POST['ticket'];
 
             if (isset($_POST['seat'])) {
@@ -331,12 +344,16 @@ Otherwise will reroute to logon page -->
             if (isset($_POST['split'])) {
                 $bitMask = POW(2,$_POST['split']);
                 $sql .= " AND (splitFlag & " .$bitMask. ") = "  .$bitMask;
-            }
-            elseif ($header == "") {
-                $header = "<u>Split</u>";
+                $sql = str_replace("specificSplitFlag", $bitMask, $sql);
             }
             else {
-                $header .= " and <u>Split</u>";
+                $sql = str_replace("specificSplitFlag", "0", $sql);
+                if ($header == "") {
+                    $header = "<u>Split</u>";
+                }
+                else {
+                    $header .= " and <u>Split</u>";
+                }
             }
             $sql .= ";";
             $ticketItems = connection()->query($sql);
@@ -364,18 +381,8 @@ Otherwise will reroute to logon page -->
 
                 $sql = "SELECT splitString(" .$ticketItem['id']. ") AS splitString;";
                 $splitString = substr(connection()->query($sql)->fetch_assoc()['splitString'],1);
-                if (!isset($_POST['seat'])) {
-                    $splitString = "<b>" .$ticketItem['seat'] . "</b>·" . $splitString;
-                }
-                try {
-                    
-                }
-                catch (Exception $e) {
-                    echo("<h1>" .$e->getMessage(). "</h1>");
-                    echo("<h1>" .$sql. "</h1>");
-                }
-                
-                
+                $splitString = "Seat&nbsp;" .$ticketItem['seat'] . "<br/>" . $splitString;
+                         
                 $selectedFlag = "";
                 if (isset($_POST['selectedTicketItem']) && strpos($_POST['selectedTicketItem'], "ticketItem".$ticketItem['id']) ) {
                     $selectedFlag .= " selected";
@@ -455,29 +462,30 @@ Otherwise will reroute to logon page -->
 
                 echo('<div class="ticketItemNumber">' .$splitString. '</div>
                     <div class="ticketItemText">' .$menuItem['title']. "</div>");
-                
                 if (is_null($ticketItem['overridePrice'])) {
-                    echo('<div class="ticketItemPrice">' .$ticketItem['calculatedPrice']. '</div>');
+                    echo('<div class="ticketItemPrice">' .$ticketItem['calcTicketItemPrice']. '</div>');
                 }
                 else {
-                    echo('<div class="ticketItemPrice old-info">' .$ticketItem['calculatedPrice']. '</div>');
+                    echo('<div class="ticketItemPrice">' .$ticketItem['calcTicketItemPrice']. '</div>');
                     echo('<div class="ticketItemOverrideNote">' .$ticketItem['overrideNote']. '</div>');
                     echo('<div class="ticketItemOverridePrice">');
                     if ($ticketItem['overridePrice'] < 0) {
                         // discount applied
-                        echo($ticketItem['overridePrice']);
+                        //echo("$ticketItem['overridePrice']");
+                        echo("Discount");
                     }
                     elseif ( $ticketItem['overridePrice'] >= 1 ) {
                          // price set to a value
-                         echo($ticketItem['overridePrice']);
+                         //echo($ticketItem['overridePrice']);
+                         echo("Price Change");
                     }
                     elseif ( $ticketItem['overridePrice'] == 0 ) {
                         // free
-                        echo('FREE');
+                        echo('Free');
                     }
                     else {
                         // percent discount applied
-                       echo(((1 - $ticketItem['overridePrice']) * 100) ."% off");
+                       echo(($ticketItem['overridePrice'] * 100) ."% off");
                     }
                     echo('</div>');
                 }

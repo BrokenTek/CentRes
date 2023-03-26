@@ -15,8 +15,10 @@ DROP FUNCTION IF EXISTS usernameFromId;
 DROP FUNCTION IF EXISTS idFromUsername;
 
 DROP FUNCTION IF EXISTS menuItemPrice; -- TODO
-DROP FUNCTION IF EXISTS ticketItemPrice; -- TODO
-DROP FUNCTION IF EXISTS splitSubtotal;
+DROP FUNCTION IF EXISTS ticketItemPrice;
+DROP FUNCTION IF EXISTS splitCount;
+DROP FUNCTION IF EXISTS lowestSplitFlag;
+DROP FUNCTION IF EXISTS ticketSubtotal;
 DROP FUNCTION IF EXISTS menuItemModifications;
 DROP FUNCTION IF EXISTS mipHelperFunction;
 DROP FUNCTION IF EXISTS ticketItemStatus;
@@ -51,6 +53,7 @@ DROP PROCEDURE IF EXISTS moveTicketItemToSeat;
 DROP PROCEDURE IF EXISTS removeTicketItemFromSplit;
 DROP PROCEDURE IF EXISTS addTicketItemToSplit;
 DROP PROCEDURE IF EXISTS markTicketItemAsReady;
+DROP PROCEDURE IF EXISTS markTicketItemAsDelivered;
 DROP PROCEDURE IF EXISTS hideTicketItem;
 DROP PROCEDURE IF EXISTS updateTicketSplitTimeStamp;
 DROP PROCEDURE IF EXISTS updateTicketSplitsTimeStamp;
@@ -445,27 +448,97 @@ BEGIN
 
 END;
 
--- function needs to be recoded to include appropriate price calculation
+-- calculates the ticket item price, taking into account it's split.
+-- If a split flag of 0 or 1023 is supplied, the associated menu item price is returned as-is. 
 CREATE FUNCTION ticketItemPrice(ticketItemId INT UNSIGNED, splitFlg SMALLINT UNSIGNED) RETURNS DECIMAL(6, 2)
 BEGIN
-	DECLARE miQuickCode VARCHAR(10);
-	DECLARE prc DECIMAL(6, 2);
-	DECLARE splitCount INT UNSIGNED;
-	SELECT menuItemQuickCode INTO miQuickCode FROM TicketItems WHERE id = ticketItemId;
-	SELECT price INTO prc FROM MenuItems WHERE quickCode = miQuickCode;
-	SET splitCount = (SELECT COUNT(*) FROM TicketItems WHERE ticketId = (SELECT ticketId FROM TicketItems WHERE id = ticketItemId) AND splitFlg & splitFlag <> 0);
-	IF splitCount > 1 THEN
-		SET prc = prc / splitCount;
+	DECLARE spltCount TINYINT UNSIGNED;
+	DECLARE spltLow TINYINT UNSIGNED;
+	DECLARE prcTot DECIMAL(6, 2);
+	DECLARE prcAdj DECIMAL(6, 2);
+	DECLARE prcRem DECIMAL(6, 2);
+	DECLARE prcDiv DECIMAL(6, 2);
+
+	SELECT calculatedPrice, overridePrice, splitCount(splitFlag), lowestSplitFlag(splitflag) INTO prcTot, prcAdj, spltCount, spltLow FROM TicketItems WHERE id = ticketItemId;
+	IF (prcAdj IS NOT NULL) THEN
+		IF (prcAdj < 0) THEN
+			SET prcTot = prcTot + prcAdj;
+		ELSEIF (prcAdj = 0) THEN
+			SET prcTot = 0;
+		ELSEIF (prcAdj >= 1) THEN
+			SET prcTot = prcAdj;
+		ELSE
+			SET prcTot = prcTot * (1 - prcAdj);
+		END IF;
 	END IF;
-	SET prc = ROUND(prc, 2);
-	RETURN prc;	
+
+	
+	SELECT TRUNCATE(prcTot / spltCount, 2) INTO prcDiv;
+	SELECT (prcTot - prcDiv * spltCount) INTO prcRem; 
+
+	IF (splitFlg IN (0, 1023) OR spltCount = 1) THEN
+		-- if you want to get the price irrespective of split, or there isn't a split
+		RETURN prcTot;
+	ELSEIF (splitFlg & spltLow <> 0) THEN
+		-- if there is a split and you specified the lowest split.
+		RETURN prcDiv + prcRem;
+	ELSE
+		-- if there is a split and the split you specifed is not the lowest split.
+		RETURN prcDiv;
+	END IF;
+
 END;
 
--- calculate a subtotal for split
-CREATE FUNCTION splitSubtotal(ticketNumber INT UNSIGNED, splitFlg SMALLINT UNSIGNED) RETURNS DECIMAL(6,2)
+-- provided a split flag, return the lowest digit turned on. Returns 0 if the lowest 10 digits are 0
+CREATE FUNCTION lowestSplitFlag(splitFlg SMALLINT UNSIGNED) RETURNS SMALLINT UNSIGNED
+BEGIN
+	DECLARE bitMask SMALLINT UNSIGNED;
+	SET bitMask = 1;
+	bitMaskLoop: LOOP
+
+		IF (bitMask & splitFlg <> 0) THEN
+			LEAVE bitMaskLoop;
+		END IF;
+
+		SET bitMask = bitMask * 2;
+		IF (bitMask = 1024) THEN
+			SET bitMask = 0;
+			LEAVE bitMaskLoop;
+		END IF;
+
+ 	END LOOP bitMaskLoop;
+	RETURN bitMask;
+END;
+
+-- provided a split flag, return the count of digits turned on in the lowest 10 bits
+CREATE FUNCTION splitCount(splitFlg SMALLINT UNSIGNED) RETURNS TINYINT UNSIGNED
+BEGIN
+	DECLARE bitMask SMALLINT UNSIGNED;
+	DECLARE cnt TINYINT UNSIGNED DEFAULT 0; 
+	SET bitMask = 1;
+	bitMaskLoop: LOOP
+
+		IF (bitMask & splitFlg <> 0) THEN
+			SET cnt = cnt + 1;
+		END IF;
+		
+		SET bitMask = bitMask * 2;
+		IF (bitMask = 1024) THEN
+			LEAVE bitMaskLoop;
+		END IF;
+		
+ 	END LOOP bitMaskLoop;
+	RETURN cnt;
+END;
+
+-- calculate a subtotal for split. If splitFlg is 0 OR 1023 (bin 1111111111) the subtotal for the entire ticket is returned.
+CREATE FUNCTION ticketSubtotal(ticketNumber INT UNSIGNED, splitFlg SMALLINT UNSIGNED) RETURNS DECIMAL(6,2)
 BEGIN
 	DECLARE splitSubtotal DECIMAL(6,2);
-	SELECT SUM(ticketItemPrice(id, splitFlag)) INTO splitSubtotal FROM TicketItems WHERE ticketId = ticketNumber AND splitFlg & splitFlag <> 0;
+	IF (splitFlg = 0) THEN
+		SET splitFlg = 1023;
+	END IF;
+	SELECT SUM(ticketItemPrice(id, splitFlg)) INTO splitSubtotal FROM TicketItems WHERE ticketId = ticketNumber AND splitFlg & splitFlag <> 0;
 	RETURN splitSubtotal;
 END;
 
@@ -697,7 +770,8 @@ BEGIN
 			SET MESSAGE_TEXT = 'Removed/Ready/Delivered Ticket Items Cannot Be Modified!';
 		ELSE
 			UPDATE TicketItems SET modificationNotes = modNotes WHERE id = ticketItemNumber;
-			UPDATE TicketItems SET calculatedPriceWithMods = ticketItemPrice(ticketItemNumber) WHERE id = ticketItemNumber;
+			-- DEPRECATED needs to be recoded
+			-- UPDATE TicketItems SET calculatedPriceWithMods = ticketItemPrice(ticketItemNumber) WHERE id = ticketItemNumber;
 			IF (stat = 'Preparing') THEN
 				UPDATE TicketItems SET flag = 'Updated' WHERE id = ticketItemNumber;
 			END IF; 
@@ -866,6 +940,18 @@ BEGIN
 	UPDATE TicketItems SET readyTime = NOW() WHERE id = ticketItemNumber;
 	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 END;
+
+CREATE PROCEDURE markTicketItemAsDelivered(IN ticketItemNumber INT UNSIGNED)
+BEGIN
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE splitFlg SMALLINT UNSIGNED;
+	
+	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
+
+	UPDATE TicketItems SET deliveredTime = NOW() WHERE id = ticketItemNumber;
+	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
+END;
+
 
 CREATE PROCEDURE hideTicketItem(IN ticketItemNumber INT UNSIGNED)
 BEGIN
