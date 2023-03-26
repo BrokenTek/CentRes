@@ -840,7 +840,7 @@
         <script src="../InDev/sashort.js"></script>
     </head>
     <body>
-        <form id="sessionForm" id="" action="ServerView.php" method="POST">
+        <form id="sessionForm" action="ServerView.php" method="POST">
             <!-- session.php must be included after the opening for tag. It adds  -->
             <?php require_once "../Resources/php/sessionHeader.php"; ?>
             <div id="sessionBody">

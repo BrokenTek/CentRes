@@ -16,10 +16,10 @@ window.removeTicketItem = function(){
 	event.stopPropagation();
 	
 	//remove the function event listner for selecting this ticket item.
-    this.parentElement.removeEventListener("onclick", selectTicketItem);
+    this.parentElement.removeEventListener("onpointerdown", selectTicketItem);
     
 	//remove the event listener that called this function
-    this.removeEventListener("onclick", removeTicketItem);
+    this.removeEventListener("onpointerdown", removeTicketItem);
 	
     //remove the selected item
     this.parentElement.remove();

@@ -34,7 +34,7 @@
           function logout() {
             setVar("logoutUsername", USERNAME);
             let frm = document.getElementsByTagName("form")[0];
-            frm.setAttribute("action","../LoginView/login.php");
+            frm.setAttribute("action","../LoginView/LoginView.php");
             frm.submit();
           }
           
@@ -44,7 +44,7 @@
             if (!setVar("username", "' .$GLOBALS['username']. '", "ifrSessionInfo", true)) {
                 updateDisplay("ifrSessionInfo");
                 if (getVar("sessionValue", "ifrSessionInfo") != SESSION_VALUE) {
-                    location.replace("../LoginView/login.php");
+                    location.replace("../LoginView/loginView.php");
                 }
             }
             setTimeout(validateSession, 1000);
@@ -84,7 +84,7 @@
         ");
     }
 
-    echo('<input type="button" class="button" id="btnLogout" onclick="logout()" value="Logout">
+    echo('<input type="button" class="button" id="btnLogout" onpointerdown="logout()" value="Logout">
         </div>');
     echo("<iframe id='ifrSessionInfo' src='../Resources/php/sessionInfo.php' style='display: none;'></iframe>");
 ?>

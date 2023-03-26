@@ -152,7 +152,7 @@ you'll be routed to whatever the home page is for your specified role level -->
             <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
             <fieldset>
            
-                <legend onclick="updateDisplay()">Wait&nbsp;Time:&nbsp;<?php echo($waitTime); ?></legend>
+                <legend onpointerdown="updateDisplay()">Wait&nbsp;Time:&nbsp;<?php echo($waitTime); ?></legend>
                 <label id="lblLowerPartySize" for="rngLowerPartySize"></label>
                 <input id="rngLowerPartySize" type="number" name="lowerPartySize" min="1" max="<?php echo($maxPartySize); ?>" required oninput="minValueChanged()" value="<?php echo($_POST['lowerPartySize']); ?>">
                 

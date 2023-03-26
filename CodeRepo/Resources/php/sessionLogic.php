@@ -49,7 +49,7 @@
 	}
 	else {
 		$_COOKIE[$cookie_name] = NULL;
-		header("Location: ../LoginView/Login.php");
+		header("Location: ../LoginView/LoginView.php");
 		$GLOBALS['loggedIn'] = false;
 	}	
 

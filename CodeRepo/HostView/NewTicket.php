@@ -132,9 +132,9 @@ Otherwise will reroute to logon page -->
             <label id="lblPartySize" for="partySize">Size:</label>
             <input id="numPartySize" type="number" name="partySize" min=1 required>
             <label id="lblReservation" for="chkReservation">Reserve:</label>
-            <input id="chkReservation" type="checkbox" onclick="setTimeRequestedToNow()">
+            <input id="chkReservation" type="checkbox" onpointerdown="setTimeRequestedToNow()">
             <div id="divButtons">
-                <button id="btnBack" type="button" onclick="location.href='WaitList.php'">Back</button>
+                <button id="btnBack" type="button" onpointerdown="location.href='WaitList.php'">Back</button>
                 <button id="btnCreate" type="submit" name="createTicket">Create Ticket</button>
             </div>
         </fieldset>

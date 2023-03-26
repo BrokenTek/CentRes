@@ -74,8 +74,8 @@ Otherwise will reroute to logon page -->
     <body onload="createEventHandlers()" class="intro">
         <legend>
             <div onpointerdown="updateDisplay()">Wait List</div>
-            <button type="button" onclick="location.href='NewTicket.php'" id="btnAddTicket">Add</button>
-            <button class="disabled" type="button" onclick="removeSelectedTicket()" disabled id="btnRemoveSelectedTicket" onclick="removeSelectedTicket()">Remove</button>
+            <button type="button" onpointerdown="location.href='NewTicket.php'" id="btnAddTicket">Add</button>
+            <button class="disabled" type="button" onpointerdown="removeSelectedTicket()" disabled id="btnRemoveSelectedTicket" onpointerdown="removeSelectedTicket()">Remove</button>
         </legend>
         <!-- change the action to you filename -->
         <form action="WaitList.php" method="POST" id="frmWaitList">

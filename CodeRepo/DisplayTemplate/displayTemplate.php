@@ -49,7 +49,7 @@ you'll be routed to whatever the home page is for your specified role level -->
             //Place your JavaScript Code here
         </script>
     </head>
-    <body onload="allElementsLoaded()">
+    <body id="sessionForm" onload="allElementsLoaded()">
         <!-- this form submits to itself -->
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->

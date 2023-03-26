@@ -97,7 +97,7 @@ Otherwise will reroute to logon page -->
                         echo("<label for='txtModString'>Mod String w/ commas</label>
                         <input type='text' id='txtModString' name='newModValue'>
                         <input type='submit' value='Update Mods'>
-                        <button type='button' onclick='signalStatus(" .'"await"'. ")'>Cancel Update</button>");
+                        <button type='button' onpointerdown='signalStatus(" .'"await"'. ")'>Cancel Update</button>");
                         //===================================================================================================
                     }
                                  
