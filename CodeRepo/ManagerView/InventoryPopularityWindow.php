@@ -269,7 +269,7 @@
                 
 
                 // code that allows retention of scrollbar location between refreshes
-                with (document.getElementsById("sessionForm")) {
+                with (document.getElementById("sessionForm")) {
                     let x = getVar(id + "_scrollLeft");
                     let y = getVar(id + "_scrollTop");
                     if (x !== undefined) {
