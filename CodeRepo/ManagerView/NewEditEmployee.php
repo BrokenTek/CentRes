@@ -150,7 +150,7 @@ you'll be routed to whatever the home page is for your specified role level -->
                     if($_POST['mode'] == "Edit"){
                         $firstClause = "UPDATE employees ";
                         $actionClause = "SET lastname = ?, firstname = ?, username = ?, rolelevel = ?";
-                        if(isset($_POST['SMALLINTphraseField'])){
+                        if(isset($_POST['passphraseField'])){
                             $passphraseHash = strrev(password_hash($_POST['passphraseField'], PASSWORD_BCRYPT));
                             $actionClause = $actionClause.", passwordbcrypt = ?";
                         }
