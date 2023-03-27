@@ -9,6 +9,20 @@ Otherwise will reroute to logon page -->
         body {
             background-color: transparent;
         }
+
+        .ticketItemStatus {
+            margin-inline: auto;
+        }
+        .ready > .ticketItemStatus {
+            font-weight: bold;
+            animation: readyAnimation 2s ease-in-out infinite;
+        }
+
+        @keyframes readyAnimation {
+            0%   { font-size: 1rem;}
+            50%  { font-size: 2rem;}
+            100% { font-size: 1rem;}
+        }
     </style>
 <link rel="stylesheet" href="../CSS/baseStyle.css">
 <link rel="stylesheet" href="../CSS/ticketStructure.css">
