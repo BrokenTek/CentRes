@@ -452,8 +452,8 @@ END;
 -- If a split flag of 0 or 1023 is supplied, the associated menu item price is returned as-is. 
 CREATE FUNCTION ticketItemPrice(ticketItemId INT UNSIGNED, splitFlg SMALLINT UNSIGNED) RETURNS DECIMAL(6, 2)
 BEGIN
-	DECLARE spltCount TINYINT UNSIGNED;
-	DECLARE spltLow TINYINT UNSIGNED;
+	DECLARE spltCount SMALLINT UNSIGNED;
+	DECLARE spltLow SMALLINT UNSIGNED;
 	DECLARE prcTot DECIMAL(6, 2);
 	DECLARE prcAdj DECIMAL(6, 2);
 	DECLARE prcRem DECIMAL(6, 2);
@@ -511,10 +511,10 @@ BEGIN
 END;
 
 -- provided a split flag, return the count of digits turned on in the lowest 10 bits
-CREATE FUNCTION splitCount(splitFlg SMALLINT UNSIGNED) RETURNS TINYINT UNSIGNED
+CREATE FUNCTION splitCount(splitFlg SMALLINT UNSIGNED) RETURNS SMALLINT UNSIGNED
 BEGIN
 	DECLARE bitMask SMALLINT UNSIGNED;
-	DECLARE cnt TINYINT UNSIGNED DEFAULT 0; 
+	DECLARE cnt SMALLINT UNSIGNED DEFAULT 0; 
 	SET bitMask = 1;
 	bitMaskLoop: LOOP
 

@@ -27,7 +27,7 @@ CREATE TABLE Config (
 INSERT INTO Config (sessionTimeoutInMins) VALUES (3600);
 
 CREATE TABLE LoginRouteTable (
-		id TINYINT UNSIGNED PRIMARY KEY,
+		id SMALLINT UNSIGNED PRIMARY KEY,
 		title VARCHAR(25),
 		route VARCHAR(200)
 );
@@ -38,10 +38,11 @@ INSERT INTO LoginRouteTable VALUES
 	(6, 'Host', '../HostView/HostView.php'),
 	(9, 'Back of House Manager', NULL),
 	(14, 'Front of House Manager', '../HostView/HostView.php'),
-	(15, 'General Manager', '../HostView/HostView.php');
+	(15, 'General Manager', '../HostView/HostView.php'),
+	(16777215, 'Admin', '../ManagerView/EmployeeRoster.php');
 
 CREATE TABLE EmployeeRoles (
-	id TINYINT UNSIGNED PRIMARY KEY,
+	id SMALLINT UNSIGNED PRIMARY KEY,
 	title VARCHAR(25)
 );
 
@@ -51,7 +52,8 @@ INSERT INTO EmployeeRoles VALUES
 	(6, 'Host'),
 	(9, 'Back of House Manager'),
 	(14, 'Front of House Manager'),
-	(15, 'General Manager');
+	(15, 'General Manager'),
+	(16777215, 'Admin');
 	
 CREATE TABLE Employees(
 	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -66,7 +68,7 @@ CREATE TABLE Employees(
 
 CREATE TABLE EmployeeLog (
 	employeeId INT UNSIGNED NOT NULL,
-	employeeRole TINYINT UNSIGNED NOT NULL,
+	employeeRole SMALLINT UNSIGNED NOT NULL,
 	startTime DATETIME NOT NULL DEFAULT NOW(),
 	endTime DATETIME,
 	FOREIGN KEY (employeeId) REFERENCES Employees(id)
@@ -75,7 +77,7 @@ CREATE TABLE EmployeeLog (
 
 CREATE TABLE ActiveEmployees (
 	employeeId INT UNSIGNED NOT NULL,
-	employeeRole TINYINT UNSIGNED
+	employeeRole SMALLINT UNSIGNED
 );
 
 CREATE TABLE QuickCodes (
@@ -133,7 +135,7 @@ CREATE TABLE MenuModificationItems (
 CREATE TABLE MenuAssociations (
 	parentQuickCode VARCHAR(40),
 	childQuickCode VARCHAR(40),
-	displayIndex TINYINT UNSIGNED,
+	displayIndex SMALLINT UNSIGNED,
 	UNIQUE(parentQuickCode, childQuickCode),
 	FOREIGN KEY (parentQuickCode) REFERENCES QuickCodes(id)
 	ON DELETE CASCADE
@@ -150,7 +152,7 @@ CREATE TABLE StructureShapes (
 CREATE TABLE TableShapes (
 	shapeName VARCHAR(50) PRIMARY KEY,
 	svgPathData VARCHAR(5000),
-	capacity TINYINT UNSIGNED NOT NULL DEFAULT 0
+	capacity SMALLINT UNSIGNED NOT NULL DEFAULT 0
 );
 
 CREATE TABLE TableStatuses (
@@ -167,10 +169,10 @@ INSERT INTO TableStatuses VALUES
 CREATE TABLE Tables (
 	id VARCHAR(3) PRIMARY KEY,
 	shape VARCHAR(50),
-	gridLocationX TINYINT UNSIGNED,
-	gridLocationY TINYINT UNSIGNED,
-	gridSpanX TINYINT UNSIGNED,
-	gridSpanY TINYINT UNSIGNED,
+	gridLocationX SMALLINT UNSIGNED,
+	gridLocationY SMALLINT UNSIGNED,
+	gridSpanX SMALLINT UNSIGNED,
+	gridSpanY SMALLINT UNSIGNED,
 	transformData VARCHAR(5000),
 	status VARCHAR(30) NOT NULL DEFAULT 'unassigned',
 	FOREIGN KEY (shape) REFERENCES TableShapes(shapeName)
@@ -214,7 +216,7 @@ CREATE TABLE Tickets (
 
 CREATE TABLE Splits (
 	ticketId INT UNSIGNED NOT NULL,
-	splitId TINYINT UNSIGNED NOT NULL,
+	splitId SMALLINT UNSIGNED NOT NULL,
 	id INT UNSIGNED GENERATED ALWAYS AS (ticketId * 10000 + splitId * 1000),
 	overrideValue DECIMAL(6, 2) UNSIGNED,
 	overrideNote VARCHAR(500),
@@ -238,7 +240,7 @@ CREATE TABLE TicketItems (
 	menuItemQuickCode VARCHAR(10),
 	changePointer INT UNSIGNED,
 	modificationNotes VARCHAR(500),
-	seat TINYINT UNSIGNED,
+	seat SMALLINT UNSIGNED,
 	flag ENUM('Updated','Removed', 'Hidden'),
 	calculatedPrice DECIMAL(6, 2),
 	calculatedPriceWithMods DECIMAL(6, 2),
@@ -246,7 +248,7 @@ CREATE TABLE TicketItems (
 	overrideNote VARCHAR(500),
 	overrideAuthorization INT UNSIGNED,
 	overrideTimeStamp DATETIME,
-	prepPriority TINYINT UNSIGNED NOT NULL DEFAULT 1,
+	prepPriority SMALLINT UNSIGNED NOT NULL DEFAULT 1,
 	submitTime DATETIME,
 	readyTime DATETIME,
 	deliveredTime DATETIME,

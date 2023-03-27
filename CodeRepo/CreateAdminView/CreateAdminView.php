@@ -135,7 +135,7 @@ you to use display.php and displayInterface.js -->
                                             setAttribute('action', '../LoginView/LoginView.php');
                                             submit();
                                         }
-                                    }, 3000);
+                                    }, 1000);
                                   </script>"
                                 );
                         }
