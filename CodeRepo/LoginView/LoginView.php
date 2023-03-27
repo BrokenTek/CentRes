@@ -188,11 +188,18 @@ you to use display.php and displayInterface.js -->
                             else {
                                 // on the client side, set the password hash and reset a new password hash.
                                 $_POST['validatedPassword'] = $passResult;
-                                $newPasswordHash = password_hash($_POST['password'], PASSWORD_BCRYPT);
-                                echo("<script>
+                                if (isset($_POST['password'])) {
+                                    $newPasswordHash = password_hash($_POST['password'], PASSWORD_BCRYPT);
+                                    echo("<script>
                                         setVar('validatedPassword', '$passResult');
                                         setVar('nph', '$newPasswordHash');
                                       </script>");
+                                }
+                                else {
+                                    echo("<script>
+                                            setVar('validatedPassword', '$passResult');
+                                        </script>");
+                                    }
                             }
                         }
                         catch (Exception $e) {

@@ -131,7 +131,19 @@ you to use display.php and displayInterface.js -->
                             connection()->query($sql);
                             $message = "1st Manager Profile Created";
 
-                            echo("<script>setTimeout(function() { location.replace('../LoginView/LoginView.php'); }, 3000);</script>");
+                            echo("<script>
+                                    setTimeout(function() { 
+                                        with (document.getElementById('pwdNewPassword')) {
+                                            setAttribute('name', 'validatedPassword');
+                                            setAttribute('value', '$hash');
+                                        }
+                                        with (document.getElementsByTagName('form')[0]) {
+                                            setAttribute('action', '../LoginView/LoginView.php');
+                                            submit();
+                                        }
+                                    }, 3000);
+                                  </script>"
+                                );
                         }
                         catch (Exception $e) {
                             $errorMessage = $e->getMessage();
