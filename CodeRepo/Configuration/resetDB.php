@@ -71,7 +71,7 @@
                 // Message to verify the success of all queries in the block
                 echo("<script>resetSuccessful = true;</script>");
 
-                echo("<script>location.replace('../CreateUserView/CreateUserView.php');</script>");
+                echo("<script>location.replace('../CreateAdminView/CreateAdminView.php');</script>");
 
             // If one of the queries in the try block fail, the rest are not run. Message below will appear
             } catch(Exception $e) {

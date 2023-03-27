@@ -64,7 +64,7 @@ you to use display.php and displayInterface.js -->
         <div id="loginContainer">
         <div id="loginHeader">
             <img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
-            <div id="loginTitle">CentRes&nbsp;Employee&nbsp;Portal</div>
+            <div id="loginTitle">CentRes&nbsp;Admin&nbsp;Setup</div>
         </div>
         <div>
             <!-- this form submits to itself -->
@@ -109,12 +109,6 @@ you to use display.php and displayInterface.js -->
                         }
                     } 
                 ?>
-                <label id='lblNewPassword' for='newPassword'>Password</label>
-                <input id='pwdNewPassword' name='newPassword' type=password required>
-                <label id='lblNewPasswordConfirm' for='newPasswordConfirm'>Confirm&nbsp;Password</label>
-                <input id='pwdNewPasswordConfirm' name='newPasswordConfirm' type=password required>
-                <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
-                <input id='btnCreate' type='submit' class='button' value='Create'> 
                 <?php
                     if (isset($errorMessage)) { $processCreateUser = false; }
 
@@ -129,14 +123,14 @@ you to use display.php and displayInterface.js -->
                                 "'" .$hash. "', ".
                                 $allowedRoles.");";
                             connection()->query($sql);
-                            $message = "1st Manager Profile Created";
+                            $message = "Admin&nbsp;Profile&nbsp;Created";
 
                             echo("<script>
+                                    document.getElementById('txtFirstName').setAttribute('readonly','');
+                                    document.getElementById('txtLastName').setAttribute('readonly','');
+                                    document.getElementById('txtUsername').setAttribute('readonly','');
                                     setTimeout(function() { 
-                                        with (document.getElementById('pwdNewPassword')) {
-                                            setAttribute('name', 'validatedPassword');
-                                            setAttribute('value', '$hash');
-                                        }
+                                        
                                         with (document.getElementsByTagName('form')[0]) {
                                             setAttribute('action', '../LoginView/LoginView.php');
                                             submit();
@@ -149,15 +143,24 @@ you to use display.php and displayInterface.js -->
                             $errorMessage = $e->getMessage();
                         }
                     }
-
-
-                    if (isset($errorMessage)) {
-                        echo("<div id='errorMessage' class='highlighted'>$errorMessage</div>");
-                    } elseif (isset($message)) {
-                        echo("<div id='message'>$message</div>");
-                    }
-                ?>  
-                
+                ?> 
+                <?php if(!isset($errorMessage) && $processCreateUser): ?>
+                    <label id='lblNewPassword' for='pwdNewPassword'>Password</label>
+                    <input id='pwdNewPassword' name='newPwd' type=password readonly required placeholder='Validated'>
+                    <input type='hidden' name='validatedPassword' value='<?php echo $hash; ?>'>
+                <?php else: ?>
+                    <label id='lblNewPassword' for='pwdNewPassword'>Password</label>
+                    <input id='pwdNewPassword' name='newPassword' type=password required>
+                    <label id='lblNewPasswordConfirm' for='pwdNewPasswordConfirm'>Confirm&nbsp;Password</label>
+                    <input id='pwdNewPasswordConfirm' name='newPasswordConfirm' type=password required>
+                    <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
+                    <input id='btnCreate' type='submit' class='button' value='Create'> 
+                <?php endif; ?>
+                <?php if(isset($errorMessage)): ?>
+                    <div id='errorMessage' class='highlighted'><?php echo $errorMessage; ?></div>
+                <?php elseif(isset($message)): ?>
+                    <div id='message'><?php echo $message; ?></div>
+                <?php endif; ?>                
                 
             </form>
         </div>

@@ -7,7 +7,7 @@ you to use display.php and displayInterface.js -->
     $sql = "SELECT * FROM Employees WHERE (roleLevel & 8) <> 0";
     $result = connection()->query($sql);
     if (mysqli_num_rows($result) == 0) {
-        header("Location: ../CreateUserView/CreateUserView.php");
+        header("Location: ../CreateAdminView/CreateAdminView.php");
     }
 
     $cookie_name = "804288a34eb7a49b349be68fc6437621cbf25e10d82f4268bb795eca277adedb6a3367add5bfb7cbffb50df150e2e78d26b276f37d32d96cd76746065df58a30cde25c4d9803aa7214dc8f6a985bf8643c341f229b5834964b0f371915d5677e4b579fbab42844cd63ddc3148e4250591277cfc521906bc30cfedd765974c2009ae5fe451ab1890e5ebbfa120ad18934c972618dbe3e";
@@ -148,7 +148,7 @@ you to use display.php and displayInterface.js -->
         <div id="loginContainer">
         <div id="loginHeader">
             <img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
-            <div id="loginTitle">CentRes&nbsp;Employee&nbsp;Portal</div>
+            <div id="loginTitle">CentRes&nbsp;Employee&nbsp;Login</div>
         </div>
         <div>
             <!-- this form submits to itself -->

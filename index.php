@@ -5,7 +5,6 @@
 		$uri = 'http://';
 	}
 	$uri .= $_SERVER['HTTP_HOST'];
-	header('Location: ' .$uri. '/centres/CodeRepo/LoginView/login.php');
+	header('Location: ' .$uri. '/centres/CodeRepo/LoginView/LoginView.php');
 	exit;
 ?>
-Something is wrong with the XAMPP installation :-(
