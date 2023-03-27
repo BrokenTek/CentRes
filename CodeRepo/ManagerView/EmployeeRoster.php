@@ -92,13 +92,24 @@ you'll be routed to whatever the home page is for your specified role level -->
             }
             //=========================FUNCTIONS INVOLVING SELECTION============================
             const LONG_TIME_TOUCH_LENGTH = 250;
-            var targetMenuItem = null;
+            var targetEmployee = null;
             var longTouchEnabled = false;
             var longTouchTimer = null;
 	        function pointerDown() {
                 if (this === undefined || this.classList.contains('disabled')) { return; }
-                targetMenuItem = this;
-                targetMenuItem.classList.add("selected");
+                this.classList.toggle("selected");
+                if (!this.classList.contains("selected")) {
+                    // deselect action performed.
+                    this.classList.remove("multiselect");
+                    let sel = document.getElementsByClassName("selected");
+                    if (sel.length == 1) {
+                        sel[0].classList.remove("multiselect");
+                    }
+                    setVar("selectedEmp", getVar("selectedEmp").replace(this.id,"").replace(",,",",").replace(/^,+|,+$/g, ''));
+                    setNewEditBtnState();
+                    return;
+                }
+                targetEmployee = this;
                 if (getVar("selectedEmp") != null && getVar("selectedEmp") != this.id) {
                     longTouchTimer = setTimeout(longTouch, LONG_TIME_TOUCH_LENGTH);
                 }
@@ -108,7 +119,7 @@ you'll be routed to whatever the home page is for your specified role level -->
             // for multiselect has elapsed, change the selected item to "multiselect" 
             function longTouch() {
                 longTouchEnabled = true;
-                targetMenuItem.classList.add("multiselect");
+                targetEmployee.classList.add("multiselect");
 
                 // if there is exactly 1 other item selected, make it multi-select as well.
                 var alreadySelected = getVar("selectedEmp");
@@ -118,11 +129,11 @@ you'll be routed to whatever the home page is for your specified role level -->
             }
 
             function pointerUp() {
-                if (targetMenuItem == null) { return; }
+                if (targetEmployee == null) { return; }
                 
-                    if (longTouchTimer != null) {
-                        clearTimeout(longTouchTimer);
-                    }
+                if (longTouchTimer != null) {
+                    clearTimeout(longTouchTimer);
+                }
 
                 let oldselectedEmps = document.getElementsByClassName("employee");
                 // if you only have 1 item selected, adjust the state of applicable menu items to reflect that.
@@ -133,16 +144,16 @@ you'll be routed to whatever the home page is for your specified role level -->
     	                oldselectedEmps[i].classList.remove("selected");
                         oldselectedEmps[i].classList.remove("multiselect");
     	            }
-    	            targetMenuItem.classList.add("selected");
-                    targetMenuItem.classList.remove("multiselect");
-                    setVar("selectedEmp", targetMenuItem.id);
+    	            targetEmployee.classList.add("selected");
+                    targetEmployee.classList.remove("multiselect");
+                    setVar("selectedEmp", targetEmployee.id);
                 }
                 // or you have multiple items selected
                 else {
-                    setVar("selectedEmp", getVar("selectedEmp") + "," + targetMenuItem.id); 
+                    setVar("selectedEmp", getVar("selectedEmp") + "," + targetEmployee.id); 
                 }
 
-                targetMenuItem = null;
+                targetEmployee = null;
                 longTouchEnabled = false;
                 setNewEditBtnState();
             }

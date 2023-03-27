@@ -1,6 +1,6 @@
 
 function setVar(variableName, value, id = null, update = false) {
-    if (value == null || value === undefined) {
+    if (value == null || value === undefined || value === '') {
         if (getVar(variableName, id) === undefined) {
             return false;
         }

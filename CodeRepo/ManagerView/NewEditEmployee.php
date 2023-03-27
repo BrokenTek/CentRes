@@ -240,10 +240,10 @@ you'll be routed to whatever the home page is for your specified role level -->
             </div>
             <input id="btnSubmit" type="submit" style="display:none">
             <?php
-            if(isset($_POST['errorState'])){
-                echo('<div class="highlighted">'.$_POST['errorState']."</div>");
-                unset($_POST['errorState']);
-            }
+                if(isset($_POST['errorState'])){
+                    echo('<div class="highlighted">'.$_POST['errorState']."</div>");
+                    unset($_POST['errorState']);
+                }
             ?>
             </div>
 
