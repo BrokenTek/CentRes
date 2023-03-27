@@ -146,212 +146,213 @@ you to use display.php and displayInterface.js -->
     <body id="loginBody" onload="allElementsLoaded()">
 
         <div id="loginContainer">
-        <div id="loginHeader">
-            <img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
-            <div id="loginTitle">CentRes&nbsp;Employee&nbsp;Login</div>
-        </div>
-        <div>
-            <!-- this form submits to itself -->
-            <form id="loginForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
-                <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
-                <?php if (isset($_POST['username']) && (isset($_POST['password']) || isset($_POST['validatedPassword']))): ?>    
-                    <?php 
-                        //removes characters that mess with the echo command in sessionHeader.php.
-                        $_POST['username'] = str_replace(array('"', '\\', '&', ';', '{', '}', '(', ')', '[', ']', '<', '>'), '', $_POST['username']);
+            <div id="loginHeader">
+                <img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
+                <div id="loginTitle">CentRes&nbsp;Employee&nbsp;Login</div>
+            </div>
+            <div>
+                <!-- this form submits to itself -->
+                <form id="loginForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+                    <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
+                    <?php if (isset($_POST['username']) && (isset($_POST['password']) || isset($_POST['validatedPassword']))): ?>    
+                        <?php 
+                            //removes characters that mess with the echo command in sessionHeader.php.
+                            $_POST['username'] = str_replace(array('"', '\\', '&', ';', '{', '}', '(', ')', '[', ']', '<', '>'), '', $_POST['username']);
 
-                        // Validate credentials
-                        try {
-                            // confirm valid username & get password hash, otherwise invalid username.
-                            $db = connection();
-                            $sql = $db->prepare("SELECT userPasswordHash(?) AS userPasswordHash;");
-                            $sql->bind_param("s", $_POST['username']);
-                            $sql->execute();
-                            
-                            $passResult = $sql->get_result()->fetch_assoc()['userPasswordHash'];
+                            // Validate credentials
+                            try {
+                                // confirm valid username & get password hash, otherwise invalid username.
+                                $db = connection();
+                                $sql = $db->prepare("SELECT userPasswordHash(?) AS userPasswordHash;");
+                                $sql->bind_param("s", $_POST['username']);
+                                $sql->execute();
+                                
+                                $passResult = $sql->get_result()->fetch_assoc()['userPasswordHash'];
 
-                            $isPassphrase = substr($passResult,0,1) != '$';
-                            if ($isPassphrase) {
-                                $passResult = strrev($passResult);
-                            }
-
-                            // confirm entered password matches stored password, otherwise invalid password entered.
-                            if (!(isset($_POST['validatedPassword']) || password_verify($_POST['password'], $passResult))) {
-                                $errorMessage = "Invalid Password Entered";
-                            }
-                            elseif ($isPassphrase) {
-                                // on the client side, set the password hash and reset a new password hash.
-                                $_POST['validatedPassword'] = $passResult;
-                                echo("<script>
-                                        setVar('validatedPassword', '$passResult');
-                                      </script>");
-                            }
-                            else {
-                                // on the client side, set the password hash and reset a new password hash.
-                                $_POST['validatedPassword'] = $passResult;
-                                if (isset($_POST['password'])) {
-                                    $newPasswordHash = password_hash($_POST['password'], PASSWORD_BCRYPT);
-                                    echo("<script>
-                                        setVar('validatedPassword', '$passResult');
-                                        setVar('nph', '$newPasswordHash');
-                                      </script>");
+                                $isPassphrase = substr($passResult,0,1) != '$';
+                                if ($isPassphrase) {
+                                    $passResult = strrev($passResult);
                                 }
-                                else {
+
+                                // confirm entered password matches stored password, otherwise invalid password entered.
+                                if (!(isset($_POST['validatedPassword']) || password_verify($_POST['password'], $passResult))) {
+                                    $errorMessage = "Invalid Password Entered";
+                                }
+                                elseif ($isPassphrase) {
+                                    // on the client side, set the password hash and reset a new password hash.
+                                    $_POST['validatedPassword'] = $passResult;
                                     echo("<script>
                                             setVar('validatedPassword', '$passResult');
                                         </script>");
-                                    }
-                            }
-                        }
-                        catch (Exception $e) {
-                            $errorMessage = $e->getMessage();
-                        }
-                    ?>
-                    <?php if (isset($errorMessage)): ?>
-                        <label id='lblUsername' for='txtUsername'>Username</label>
-                        <input id='txtUsername' name='username' type='text' value='<?php echo $_POST['username']; ?>' required>
-                        <label id='lblPassword' for='password'>Password</label>
-                        <input id='pwdPassword' name='password' type=password value='<?php echo $_POST['password']; ?>' required>
-                        <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
-                        <input id='btnLogin' type='submit' class='button' value='Login'>
-                    <?php else: ?>
-                        <label id='lblUsername' for='txtUsername'>Username</label>
-                        <input id='txtUsername' name='username' type='text' value='<?php echo $_POST['username']; ?>' readonly required>
-                        <label id='lblPassword' for='password'>Password</label>
-                        <input id='pwdPassword' name='password' type=password placeholder='Validated' readonly>
-
-                        <?php if($isPassphrase): ?>
-                            <?php if(isset($_POST['newPassword']) && isset($_POST['newPasswordConfirm'])): ?>
-
-                                <?php
-                                    if ($_POST['newPassword'] != $_POST['newPasswordConfirm']) {
-                                        $errorMessage = "Confirmation Password Does Not Match";
+                                }
+                                else {
+                                    // on the client side, set the password hash and reset a new password hash.
+                                    $_POST['validatedPassword'] = $passResult;
+                                    if (isset($_POST['password'])) {
+                                        $newPasswordHash = password_hash($_POST['password'], PASSWORD_BCRYPT);
+                                        echo("<script>
+                                            setVar('validatedPassword', '$passResult');
+                                            setVar('nph', '$newPasswordHash');
+                                        </script>");
                                     }
                                     else {
-                                         // before password change, check that $_POST['validatedPassword'] matches what is stored in db.
-                                        // Otherwise hackers could supply a bogus value for validated password, and if not checked, allows
-                                        // anybody to arbitrarily change any password.
-                                        $db = connection();
-                                        $sql = $db->prepare("SELECT userPasswordHash(?) AS userPasswordHash;");
-                                        $sql->bind_param("s", $_POST['username']);
-                                        $sql->execute();
-                                        
-                                        $passResult = $sql->get_result()->fetch_assoc()['userPasswordHash'];
+                                        echo("<script>
+                                                setVar('validatedPassword', '$passResult');
+                                            </script>");
+                                        }
+                                }
+                            }
+                            catch (Exception $e) {
+                                $errorMessage = $e->getMessage();
+                            }
+                        ?>
+                        <?php if (isset($errorMessage)): ?>
+                            <label id='lblUsername' for='txtUsername'>Username</label>
+                            <input id='txtUsername' name='username' type='text' value='<?php echo $_POST['username']; ?>' required>
+                            <label id='lblPassword' for='password'>Password</label>
+                            <input id='pwdPassword' name='password' type=password value='<?php echo $_POST['password']; ?>' required>
+                            <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
+                            <input id='btnLogin' type='submit' class='button' value='Login'>
+                        <?php else: ?>
+                            <label id='lblUsername' for='txtUsername'>Username</label>
+                            <input id='txtUsername' name='username' type='text' value='<?php echo $_POST['username']; ?>' readonly required>
+                            <label id='lblPassword' for='password'>Password</label>
+                            <input id='pwdPassword' name='password' type=password placeholder='Validated' readonly>
 
-                                        if (strrev($passResult) ==  $_POST['validatedPassword']) {
-                                            // change the password hash to the new value.
-                                            $newPasswordHash = password_hash($_POST['newPassword'], PASSWORD_BCRYPT);
-                                            $db = connection();
-                                            $sql = $db->prepare("UPDATE Employees SET passwordBCrypt = ? WHERE userName = ?;");
-                                            $sql->bind_param("ss", $newPasswordHash, $_POST['username']);
-                                            $sql->execute();
-                                            $message = "Password Succesfully Updated";
-                                            echo("<script>setVar('validatedPassword','$newPasswordHash');</script>");
+                            <?php if($isPassphrase): ?>
+                                <?php if(isset($_POST['newPassword']) && isset($_POST['newPasswordConfirm'])): ?>
+
+                                    <?php
+                                        if ($_POST['newPassword'] != $_POST['newPasswordConfirm']) {
+                                            $errorMessage = "Confirmation Password Does Not Match";
                                         }
                                         else {
-                                            $errorMessage = "Invalid Password Insertion Detected!"; 
+                                            // before password change, check that $_POST['validatedPassword'] matches what is stored in db.
+                                            // Otherwise hackers could supply a bogus value for validated password, and if not checked, allows
+                                            // anybody to arbitrarily change any password.
+                                            $db = connection();
+                                            $sql = $db->prepare("SELECT userPasswordHash(?) AS userPasswordHash;");
+                                            $sql->bind_param("s", $_POST['username']);
+                                            $sql->execute();
+                                            
+                                            $passResult = $sql->get_result()->fetch_assoc()['userPasswordHash'];
+
+                                            if (strrev($passResult) ==  $_POST['validatedPassword']) {
+                                                // change the password hash to the new value.
+                                                $newPasswordHash = password_hash($_POST['newPassword'], PASSWORD_BCRYPT);
+                                                $db = connection();
+                                                $sql = $db->prepare("UPDATE Employees SET passwordBCrypt = ? WHERE userName = ?;");
+                                                $sql->bind_param("ss", $newPasswordHash, $_POST['username']);
+                                                $sql->execute();
+                                                $message = "Password&nbsp;Updated";
+                                                echo("<script>setVar('validatedPassword','$newPasswordHash');</script>");
+                                            }
+                                            else {
+                                                $errorMessage = "Invalid Password Insertion Detected!"; 
+                                            }
                                         }
-                                    }
-                                ?>
-                                <?php if (isset($errorMessage)): ?>
+                                    ?>
+                                    <?php if (isset($errorMessage)): ?>
+                                        <label id='lblNewPassword' for='newPassword'>New&nbsp;Password</label>
+                                        <input id='pwdNewPassword' name='newPassword' type=password required>
+                                        <label id='lblNewPasswordConfirm' for='newPasswordConfirm'>Confirm&nbsp;New&nbsp;Password</label>
+                                        <input id='pwdNewPasswordConfirm' name='newPasswordConfirm' type=password required>
+                                        <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
+                                        <input id='btnSetPassword' type='submit' class='button' value='Set Password'>
+                                    <?php else: ?>
+                                        <label id='lblRole' for='cboLoginRole'>Role</label>
+                                        <select id='cboLoginRole' name='role' onchange='autoLogin()'>
+                                            <option>Select Your Role</option>
+                                            <?php
+                                                //get user roles and populate the window
+                                                $db = connection();
+                                                $sql = $db->prepare("SELECT roleLevel from Employees WHERE username = ?;");
+                                                $sql->bind_param("s", $_POST['username']);
+                                                $sql->execute();
+                                                $result = $sql->get_result();
+                                                $allowedRoles = $result->fetch_assoc()['roleLevel'];
+
+                                                $sql = "SELECT * FROM LoginRouteTable;";
+                                                $definedRoles = connection()->query($sql);
+                                
+                                                $allowedRoleCount = 0;
+                                                $allowedRoute = "";
+                                                while($row = $definedRoles->fetch_assoc()) {
+                                                    if((intval($row['id']) & intval($allowedRoles)) == intval($row['id'])) {
+                                                        echo ('<option route="' .$row['route']. '" value=' .$row['id']. '>' .$row['title']. '</option>');
+                                                        $allowedRoleCount += 1;
+                                                        $allowedRoute = $row['route'];
+                                                    }
+                                                }
+                                            ?>
+                                        </select>
+                                        <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
+                                        <?php
+                                            if ($allowedRoleCount == 1) {
+                                                echo("<script>setTimeout(function() { autoLogin(1); }, 1500);</script>");
+                                            }
+                                        ?>
+                                    <?php endif; ?> 
+                                <?php else: ?>
                                     <label id='lblNewPassword' for='newPassword'>New&nbsp;Password</label>
                                     <input id='pwdNewPassword' name='newPassword' type=password required>
                                     <label id='lblNewPasswordConfirm' for='newPasswordConfirm'>Confirm&nbsp;New&nbsp;Password</label>
                                     <input id='pwdNewPasswordConfirm' name='newPasswordConfirm' type=password required>
                                     <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
                                     <input id='btnSetPassword' type='submit' class='button' value='Set Password'>
-                                <?php else: ?>
-                                    <label id='lblRole' for='cboLoginRole'>Role</label>
-                                    <select id='cboLoginRole' name='role' onchange='autoLogin()'>
-                                        <option>Select Your Role</option>
-                                        <?php
-                                            //get user roles and populate the window
-                                            $db = connection();
-                                            $sql = $db->prepare("SELECT roleLevel from Employees WHERE username = ?;");
-                                            $sql->bind_param("s", $_POST['username']);
-                                            $sql->execute();
-                                            $result = $sql->get_result();
-                                            $allowedRoles = $result->fetch_assoc()['roleLevel'];
-
-                                            $sql = "SELECT * FROM LoginRouteTable;";
-                                            $definedRoles = connection()->query($sql);
-                            
-                                            $allowedRoleCount = 0;
-                                            $allowedRoute = "";
-                                            while($row = $definedRoles->fetch_assoc()) {
-                                                if((intval($row['id']) & intval($allowedRoles)) == intval($row['id'])) {
-                                                    echo ('<option route="' .$row['route']. '" value=' .$row['id']. '>' .$row['title']. '</option>');
-                                                    $allowedRoleCount += 1;
-                                                    $allowedRoute = $row['route'];
-                                                }
-                                            }
-                                        ?>
-                                    </select>
-                                    <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <label id='lblRole' for='cboLoginRole'>Role</label>
+                                <select id='cboLoginRole' name='role' onchange='autoLogin()'>
+                                    <option>Select Your Role</option>
                                     <?php
-                                        if ($allowedRoleCount == 1) {
-                                            echo("<script>setTimeout(function() { autoLogin(1); }, 1500);</script>");
+                                        //get user roles and populate the window
+                                        $db = connection();
+                                        $sql = $db->prepare("SELECT roleLevel from Employees WHERE username = ?;");
+                                        $sql->bind_param("s", $_POST['username']);
+                                        $sql->execute();
+                                        $result = $sql->get_result();
+                                        $allowedRoles = $result->fetch_assoc()['roleLevel'];
+
+                                        $sql = "SELECT * FROM LoginRouteTable;";
+                                        $definedRoles = connection()->query($sql);
+                        
+                                        $allowedRoleCount = 0;
+                                        $allowedRoute = "";
+                                        while($row = $definedRoles->fetch_assoc()) {
+                                            if((intval($row['id']) & intval($allowedRoles)) == intval($row['id'])) {
+                                                echo ('<option route="' .$row['route']. '" value=' .$row['id']. '>' .$row['title']. '</option>');
+                                                $allowedRoleCount += 1;
+                                                $allowedRoute = $row['route'];
+                                            }
                                         }
                                     ?>
-                                <?php endif; ?> 
-                            <?php else: ?>
-                                <label id='lblNewPassword' for='newPassword'>New&nbsp;Password</label>
-                                <input id='pwdNewPassword' name='newPassword' type=password required>
-                                <label id='lblNewPasswordConfirm' for='newPasswordConfirm'>Confirm&nbsp;New&nbsp;Password</label>
-                                <input id='pwdNewPasswordConfirm' name='newPasswordConfirm' type=password required>
+                                </select>
                                 <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
-                                <input id='btnSetPassword' type='submit' class='button' value='Set Password'>
-                            <?php endif; ?>
-                        <?php else: ?>
-                            <label id='lblRole' for='cboLoginRole'>Role</label>
-                            <select id='cboLoginRole' name='role' onchange='autoLogin()'>
-                                <option>Select Your Role</option>
                                 <?php
-                                    //get user roles and populate the window
-                                    $db = connection();
-                                    $sql = $db->prepare("SELECT roleLevel from Employees WHERE username = ?;");
-                                    $sql->bind_param("s", $_POST['username']);
-                                    $sql->execute();
-                                    $result = $sql->get_result();
-                                    $allowedRoles = $result->fetch_assoc()['roleLevel'];
-
-                                    $sql = "SELECT * FROM LoginRouteTable;";
-                                    $definedRoles = connection()->query($sql);
-                    
-                                    $allowedRoleCount = 0;
-                                    $allowedRoute = "";
-                                    while($row = $definedRoles->fetch_assoc()) {
-                                        if((intval($row['id']) & intval($allowedRoles)) == intval($row['id'])) {
-                                            echo ('<option route="' .$row['route']. '" value=' .$row['id']. '>' .$row['title']. '</option>');
-                                            $allowedRoleCount += 1;
-                                            $allowedRoute = $row['route'];
-                                        }
+                                    if ($allowedRoleCount == 1 && !$isPassphrase) {
+                                        echo("<script>autoLogin(1);</script>");
                                     }
                                 ?>
-                            </select>
-                            <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
-                            <?php
-                                if ($allowedRoleCount == 1 && !$isPassphrase) {
-                                    echo("<script>autoLogin(1);</script>");
-                                }
-                            ?>
-                        <?php endif; ?>
-                    <?php endif; ?>    
-                <?php else: ?>
-                    <label id='lblUsername' for='txtUsername'>Username</label>
-                    <input id='txtUsername' name='username' type='text' required>
-                    <label id='lblPassword' for='password'>Password</label>
-                    <input id='pwdPassword' name='password' type=password required>
-                    <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
-                    <input id='btnLogin' type='submit' class='button' value='Login'>
-                <?php endif; ?>
-                <?php 
-                    if (isset($errorMessage)) {
-                        echo("<div id='errorMessage' class='highlighted'>$errorMessage</div>");
-                    } elseif (isset($message)) {
-                        echo("<div id='message'>$message</div>");
-                    }
-                ?>
-            </form>
+                            <?php endif; ?>
+                        <?php endif; ?>    
+                    <?php else: ?>
+                        <label id='lblUsername' for='txtUsername'>Username</label>
+                        <input id='txtUsername' name='username' type='text' required>
+                        <label id='lblPassword' for='password'>Password</label>
+                        <input id='pwdPassword' name='password' type=password required>
+                        <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
+                        <input id='btnLogin' type='submit' class='button' value='Login'>
+                    <?php endif; ?>
+                    <?php 
+                        if (isset($errorMessage)) {
+                            echo("<div id='errorMessage' class='highlighted'>$errorMessage</div>");
+                        } elseif (isset($message)) {
+                            echo("<div id='message'>$message</div>");
+                        }
+                    ?>
+                </form>
+            </div>
         </div>
     </body>
 </html>

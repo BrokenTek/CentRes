@@ -45,10 +45,11 @@ you'll be routed to whatever the home page is for your specified role level -->
             }
             #buttonSet{
                 display:grid;
-                grid-auto-rows:max-content;
+                grid-template-columns: min-content min-content min-content;
                 
                 grid-area:buttons;
                 border:none;
+                margin-inline: auto;
             }
             .hidden {
                 display: none;
@@ -60,6 +61,21 @@ you'll be routed to whatever the home page is for your specified role level -->
             fieldset{
                 grid-area:fields;
                 align-content:end;
+                display: grid;
+                grid-template-columns: min-content min-content;
+                grid-auto-rows: min-content;
+                grid-gap: .25rem;
+            }
+
+            #roleField {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            button, .button {
+                max-width: 6rem;
+                margin: auto auto auto auto;
             }
 
 
@@ -111,6 +127,14 @@ you'll be routed to whatever the home page is for your specified role level -->
             <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
             <div id="sessionBody">
             <?php
+                if($_POST['mode'] == "Edit"){
+                    $revertButtonText = 'Reset';
+                    $commitButtonText = 'Update';
+                    }
+                else {
+                    $revertButtonText = 'Clear';
+                    $commitButtonText = 'Create';
+                }
             //the string checked for using strpbrk, lists off all prohibited characters for certain fields
             $prohibitedChars = '"\\&;{}()[]<>)';
             if(isset($_POST['finished'])){
@@ -126,7 +150,7 @@ you'll be routed to whatever the home page is for your specified role level -->
                     if($_POST['mode'] == "Edit"){
                         $firstClause = "UPDATE employees ";
                         $actionClause = "SET lastname = ?, firstname = ?, username = ?, rolelevel = ?";
-                        if(isset($_POST['passphraseField'])){
+                        if(isset($_POST['SMALLINTphraseField'])){
                             $passphraseHash = strrev(password_hash($_POST['passphraseField'], PASSWORD_BCRYPT));
                             $actionClause = $actionClause.", passwordbcrypt = ?";
                         }
@@ -173,8 +197,8 @@ you'll be routed to whatever the home page is for your specified role level -->
                 $_POST['defaultRole'] = $theEmployee['rolelevel'];
                 echo("<div id='tabHeader'>Edit Employee</div>
                     <fieldset>
-                    <label for='lastNameField'>Last&nbsp;Name</label><input name='lastNameField' id='lastNameField' value='".$theEmployee['lastname']."' required></input>
                     <label for='firstNameField'>First&nbsp;Name</label><input name='firstNameField' id='firstNameField' value='".$theEmployee['firstname']."' required></input>
+                    <label for='lastNameField'>Last&nbsp;Name</label><input name='lastNameField' id='lastNameField' value='".$theEmployee['lastname']."' required></input>
                     <label for='usernameField'>Username</label><input name='usernameField' id='usernameField' value='".$theEmployee['username']."' required></input>
                     <label for='roleField'>Role</label><select name='roleField' id='roleField' value='".$theEmployee['rolelevel']."' required>");
                 //generalize the list to an arbitrary number of role options
@@ -184,15 +208,15 @@ you'll be routed to whatever the home page is for your specified role level -->
                     echo("<option value='".$roleOption['id']."'>".$roleOption['title']."</option>");
                 }
                 echo("</select>
-                <label for='passphraseField'>Passphrase</label><input name='passphraseField' id='passphraseField'></input>
+                <label for='passphraseField'>Passphrase</label><input name='passphraseField' id='passphraseField' placeholder='Temporary Password' type='password'></input>
                 </fieldset>"
                 );
             }
             else{
                 echo("<div id='tabHeader'>New Employee</div>
                     <fieldset>
-                    <label for='lastNameField'>Last&nbsp;Name</label><input name='lastNameField' id='lastNameField' required></input>
                     <label for='firstNameField'>First&nbsp;Name</label><input name='firstNameField' id='firstNameField' required></input>
+                    <label for='lastNameField'>Last&nbsp;Name</label><input name='lastNameField' id='lastNameField' required></input>
                     <label for='usernameField'>Username</label><input name='usernameField' id='usernameField' required></input>
                     <label for='roleField'>Role</label><select name='roleField' id='roleField' required>
                     <option value='' selected disabled hidden>Select a Role</option>");
@@ -211,8 +235,8 @@ you'll be routed to whatever the home page is for your specified role level -->
             ?>
             <div id="buttonSet">
                 <button type="button" id= btnBack value="Back">Back</button>
-                <input type="reset" id= "btnReset" class="button" value="Reset"></input>
-                <button type="button" id= "btnFinish" value="Finish">Finish</button>
+                <input type="reset" id= "btnReset" class="button" value="<?php echo $revertButtonText; ?>"></input>
+                <button type="button" id= "btnFinish" value="Finish"><?php echo $commitButtonText; ?></button>
             </div>
             <input id="btnSubmit" type="submit" style="display:none">
             <?php

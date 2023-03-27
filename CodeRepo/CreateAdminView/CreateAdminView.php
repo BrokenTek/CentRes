@@ -25,7 +25,7 @@ you to use display.php and displayInterface.js -->
             //Place your JavaScript Code here
 
             function clearFields() {
-                location.replace("LoginView.php");
+                location.replace("CreateAdminView.php");
             }
 
         </script>
@@ -62,107 +62,108 @@ you to use display.php and displayInterface.js -->
     <body id="loginBody" onload="allElementsLoaded()">
 
         <div id="loginContainer">
-        <div id="loginHeader">
-            <img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
-            <div id="loginTitle">CentRes&nbsp;Admin&nbsp;Setup</div>
-        </div>
-        <div>
-            <!-- this form submits to itself -->
-            <form id="loginForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
-                <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
-                <?php $processCreateUser = true; ?>
-                <?php if (isset($_POST['firstName']) && isset($_POST['lastName'])): ?>
-                    <label id='lblFirstName' for='txtFirstName'>First&nbsp;Name</label>
-                    <input id='txtFirstName' name='firstName' type='text' value='<?php echo $_POST['firstName']; ?>' required>
-                    <label id='lblLastName' for='txtLastName'>Last&nbsp;Name</label>
-                    <input id='txtLastName' name='lastName' type='text' value='<?php echo $_POST['lastName']; ?>' required>   
-                <?php else: ?>
-                    <?php $processCreateUser = false; ?>
-                    <label id='lblFirstName' for='txtFirstName'>First&nbsp;Name</label>
-                    <input id='txtFirstName' name='firstName' type='text' required>
-                    <label id='lblLastName' for='txtLastName'>Last&nbsp;Name</label>
-                    <input id='txtLastName' name='lastName' type='text' required>
-                <?php endif; ?>
-                <?php if(isset($_POST['username'])): ?>
-                    <?php
-                        $_POST['username'] = str_replace(array('"', '\\', '&', ';', '{', '}', '(', ')', '[', ']', '<', '>'), '', $_POST['username']);
-                        $db = connection();
-                        $sql = $db->prepare("SELECT * from Employees WHERE userName = ?;");
-                        $sql->bind_param("s", $_POST['username']);
-                        $sql->execute();
-                        $result = $sql->get_result();
-                        if (mysqli_num_rows($result) > 0) {
-                            $errorMessage = "Username already in use.";
-                        }
+            <div id="loginHeader">
+                <img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
+                <div id="loginTitle">CentRes&nbsp;Admin&nbsp;Setup</div>
+            </div>
+            <div>
+                <!-- this form submits to itself -->
+                <form id="loginForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+                    <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
+                    <?php $processCreateUser = true; ?>
+                    <?php if (isset($_POST['firstName']) && isset($_POST['lastName'])): ?>
+                        <label id='lblFirstName' for='txtFirstName'>First&nbsp;Name</label>
+                        <input id='txtFirstName' name='firstName' type='text' value='<?php echo $_POST['firstName']; ?>' required>
+                        <label id='lblLastName' for='txtLastName'>Last&nbsp;Name</label>
+                        <input id='txtLastName' name='lastName' type='text' value='<?php echo $_POST['lastName']; ?>' required>   
+                    <?php else: ?>
+                        <?php $processCreateUser = false; ?>
+                        <label id='lblFirstName' for='txtFirstName'>First&nbsp;Name</label>
+                        <input id='txtFirstName' name='firstName' type='text' required>
+                        <label id='lblLastName' for='txtLastName'>Last&nbsp;Name</label>
+                        <input id='txtLastName' name='lastName' type='text' required>
+                    <?php endif; ?>
+                    <?php if(isset($_POST['username'])): ?>
+                        <?php
+                            $_POST['username'] = str_replace(array('"', '\\', '&', ';', '{', '}', '(', ')', '[', ']', '<', '>'), '', $_POST['username']);
+                            $db = connection();
+                            $sql = $db->prepare("SELECT * from Employees WHERE userName = ?;");
+                            $sql->bind_param("s", $_POST['username']);
+                            $sql->execute();
+                            $result = $sql->get_result();
+                            if (mysqli_num_rows($result) > 0) {
+                                $errorMessage = "Username already in use.";
+                            }
+                        ?>
+                        <label id='lblUsername' for='txtUsername'>Username</label>
+                        <input id='txtUsername' name='username' type='text' value='<?php echo $_POST['username']; ?>' required>
+                    <?php else: ?>
+                        <?php $processCreateUser = false; ?>
+                        <label id='lblUsername' for='txtUsername'>Username</label>
+                        <input id='txtUsername' name='username' type='text' required>
+                    <?php endif; ?>
+                    <?php 
+                        if(isset($_POST['newPassword']) && isset($_POST['newPasswordConfirm'])) {
+                            if ($_POST['newPassword'] != $_POST['newPasswordConfirm']) {
+                                $errorMessage = "Confirmation Password Does Not Match";
+                            }
+                        } 
                     ?>
-                    <label id='lblUsername' for='txtUsername'>Username</label>
-                    <input id='txtUsername' name='username' type='text' value='<?php echo $_POST['username']; ?>' required>
-                <?php else: ?>
-                    <?php $processCreateUser = false; ?>
-                    <label id='lblUsername' for='txtUsername'>Username</label>
-                    <input id='txtUsername' name='username' type='text' required>
-                <?php endif; ?>
-                <?php 
-                    if(isset($_POST['newPassword']) && isset($_POST['newPasswordConfirm'])) {
-                        if ($_POST['newPassword'] != $_POST['newPasswordConfirm']) {
-                            $errorMessage = "Confirmation Password Does Not Match";
-                        }
-                    } 
-                ?>
-                <?php
-                    if (isset($errorMessage)) { $processCreateUser = false; }
+                    <?php
+                        if (isset($errorMessage)) { $processCreateUser = false; }
 
-                    if ($processCreateUser) {
-                        try {
-                            $hash = password_hash($_POST['newPassword'], PASSWORD_BCRYPT);
-                            $allowedRoles = 16777215;
-                            $sql = "INSERT INTO Employees (userName, lastName, firstName, passwordBCrypt, roleLevel) VALUES (".
-                                "'" .$_POST['username']. "', ".
-                                "'" .$_POST['lastName']. "', ".
-                                "'" .$_POST['firstName']. "', ".
-                                "'" .$hash. "', ".
-                                $allowedRoles.");";
-                            connection()->query($sql);
-                            $message = "Admin&nbsp;Profile&nbsp;Created";
+                        if ($processCreateUser) {
+                            try {
+                                $hash = password_hash($_POST['newPassword'], PASSWORD_BCRYPT);
+                                $allowedRoles = 16777215;
+                                $sql = "INSERT INTO Employees (userName, lastName, firstName, passwordBCrypt, roleLevel) VALUES (".
+                                    "'" .$_POST['username']. "', ".
+                                    "'" .$_POST['lastName']. "', ".
+                                    "'" .$_POST['firstName']. "', ".
+                                    "'" .$hash. "', ".
+                                    $allowedRoles.");";
+                                connection()->query($sql);
+                                $message = "Admin&nbsp;Profile&nbsp;Created";
 
-                            echo("<script>
-                                    document.getElementById('txtFirstName').setAttribute('readonly','');
-                                    document.getElementById('txtLastName').setAttribute('readonly','');
-                                    document.getElementById('txtUsername').setAttribute('readonly','');
-                                    setTimeout(function() { 
-                                        
-                                        with (document.getElementsByTagName('form')[0]) {
-                                            setAttribute('action', '../LoginView/LoginView.php');
-                                            submit();
-                                        }
-                                    }, 1000);
-                                  </script>"
-                                );
+                                echo("<script>
+                                        document.getElementById('txtFirstName').setAttribute('readonly','');
+                                        document.getElementById('txtLastName').setAttribute('readonly','');
+                                        document.getElementById('txtUsername').setAttribute('readonly','');
+                                        setTimeout(function() { 
+                                            
+                                            with (document.getElementsByTagName('form')[0]) {
+                                                setAttribute('action', '../LoginView/LoginView.php');
+                                                submit();
+                                            }
+                                        }, 1000);
+                                    </script>"
+                                    );
+                            }
+                            catch (Exception $e) {
+                                $errorMessage = $e->getMessage();
+                            }
                         }
-                        catch (Exception $e) {
-                            $errorMessage = $e->getMessage();
-                        }
-                    }
-                ?> 
-                <?php if(!isset($errorMessage) && $processCreateUser): ?>
-                    <label id='lblNewPassword' for='pwdNewPassword'>Password</label>
-                    <input id='pwdNewPassword' name='newPwd' type=password readonly required placeholder='Validated'>
-                    <input type='hidden' name='validatedPassword' value='<?php echo $hash; ?>'>
-                <?php else: ?>
-                    <label id='lblNewPassword' for='pwdNewPassword'>Password</label>
-                    <input id='pwdNewPassword' name='newPassword' type=password required>
-                    <label id='lblNewPasswordConfirm' for='pwdNewPasswordConfirm'>Confirm&nbsp;Password</label>
-                    <input id='pwdNewPasswordConfirm' name='newPasswordConfirm' type=password required>
-                    <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
-                    <input id='btnCreate' type='submit' class='button' value='Create'> 
-                <?php endif; ?>
-                <?php if(isset($errorMessage)): ?>
-                    <div id='errorMessage' class='highlighted'><?php echo $errorMessage; ?></div>
-                <?php elseif(isset($message)): ?>
-                    <div id='message'><?php echo $message; ?></div>
-                <?php endif; ?>                
-                
-            </form>
+                    ?> 
+                    <?php if(!isset($errorMessage) && $processCreateUser): ?>
+                        <label id='lblNewPassword' for='pwdNewPassword'>Password</label>
+                        <input id='pwdNewPassword' name='newPwd' type=password readonly required placeholder='Validated'>
+                        <input type='hidden' name='validatedPassword' value='<?php echo $hash; ?>'>
+                    <?php else: ?>
+                        <label id='lblNewPassword' for='pwdNewPassword'>Password</label>
+                        <input id='pwdNewPassword' name='newPassword' type=password required>
+                        <label id='lblNewPasswordConfirm' for='pwdNewPasswordConfirm'>Confirm&nbsp;Password</label>
+                        <input id='pwdNewPasswordConfirm' name='newPasswordConfirm' type=password required>
+                        <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
+                        <input id='btnCreate' type='submit' class='button' value='Create'> 
+                    <?php endif; ?>
+                    <?php if(isset($errorMessage)): ?>
+                        <div id='errorMessage' class='highlighted'><?php echo $errorMessage; ?></div>
+                    <?php elseif(isset($message)): ?>
+                        <div id='message'><?php echo $message; ?></div>
+                    <?php endif; ?>                
+                    
+                </form>
+            </div>
         </div>
     </body>
 </html>
