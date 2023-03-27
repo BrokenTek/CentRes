@@ -1,10 +1,44 @@
-DROP DATABASE IF EXISTS Centres;
-CREATE DATABASE Centres;
-USE Centres;
+DROP TABLE IF EXISTS TicketItems;
+DROP TABLE IF EXISTS Splits;
+DROP TABLE IF EXISTS Tickets;
+DROP TABLE IF EXISTS TableLog;
+DROP TABLE IF EXISTS TableAssignments;
+DROP TABLE IF EXISTS Tables;
+DROP TABLE IF EXISTS TableStatuses;
+DROP TABLE IF EXISTS TableShapes;
+DROP TABLE IF EXISTS StructureShapes;
+DROP TABLE IF EXISTS MenuAssociations;
+DROP TABLE IF EXISTS MenuModificationItems;
+DROP TABLE IF EXISTS MenuModificationCategories;
+DROP TABLE IF EXISTS MenuItems;
+DROP TABLE IF EXISTS MenuCategories;
+DROP TABLE IF EXISTS QuickCodes;
+DROP TABLE IF EXISTS ActiveEmployees;
+DROP TABLE IF EXISTS EmployeeLog;
+DROP TABLE IF EXISTS Employees;
+DROP TABLE IF EXISTS EmployeeRoles;
+DROP TABLE IF EXISTS LoginRouteTable;
+DROP TABLE IF EXISTS Config;
 
-DROP USER IF EXISTS 'scott'@'localhost';
-CREATE USER 'scott'@'localhost' IdENTIFIED BY 'tiger';
-GRANT ALL PRIVILEGES ON * . * TO 'scott'@'localhost';
+CREATE TABLE Config (
+	sessionTimeoutInMins INT UNSIGNED NOT NULL DEFAULT 5
+);
+
+INSERT INTO Config (sessionTimeoutInMins) VALUES (3600);
+
+CREATE TABLE LoginRouteTable (
+		id TINYINT UNSIGNED PRIMARY KEY,
+		title VARCHAR(25),
+		route VARCHAR(200)
+);
+
+INSERT INTO LoginRouteTable VALUES
+	(1, 'Back-of-House Anon', NULL),
+	(2, 'Server', '../ServerView/ServerView.php'),
+	(6, 'Host', '../HostView/HostView.php'),
+	(9, 'Back of House Manager', NULL),
+	(14, 'Front of House Manager', '../HostView/HostView.php'),
+	(15, 'General Manager', '../HostView/HostView.php');
 
 CREATE TABLE EmployeeRoles (
 	id TINYINT UNSIGNED PRIMARY KEY,
@@ -12,10 +46,12 @@ CREATE TABLE EmployeeRoles (
 );
 
 INSERT INTO EmployeeRoles VALUES
-	(8,'Manager'),
-	(4,'Host'),
+	(1, 'Back-of-House Anon'),
 	(2, 'Server'),
-	(1, 'Back-of-House Anon');
+	(6, 'Host'),
+	(9, 'Back of House Manager'),
+	(14, 'Front of House Manager'),
+	(15, 'General Manager');
 	
 CREATE TABLE Employees(
 	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -34,6 +70,7 @@ CREATE TABLE EmployeeLog (
 	startTime DATETIME NOT NULL DEFAULT NOW(),
 	endTime DATETIME,
 	FOREIGN KEY (employeeId) REFERENCES Employees(id)
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE ActiveEmployees (
@@ -105,9 +142,15 @@ CREATE TABLE MenuAssociations (
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE TableShapes (
+CREATE TABLE StructureShapes (
 	shapeName VARCHAR(50) PRIMARY KEY,
 	svgPathData VARCHAR(5000)
+);
+
+CREATE TABLE TableShapes (
+	shapeName VARCHAR(50) PRIMARY KEY,
+	svgPathData VARCHAR(5000),
+	capacity TINYINT UNSIGNED NOT NULL DEFAULT 0
 );
 
 CREATE TABLE TableStatuses (
@@ -121,7 +164,6 @@ INSERT INTO TableStatuses VALUES
 	('seated'),
 	('bussing');
 
-
 CREATE TABLE Tables (
 	id VARCHAR(3) PRIMARY KEY,
 	shape VARCHAR(50),
@@ -130,7 +172,7 @@ CREATE TABLE Tables (
 	gridSpanX TINYINT UNSIGNED,
 	gridSpanY TINYINT UNSIGNED,
 	transformData VARCHAR(5000),
-	status VARCHAR(30),
+	status VARCHAR(30) NOT NULL DEFAULT 'unassigned',
 	FOREIGN KEY (shape) REFERENCES TableShapes(shapeName)
 	ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (status) REFERENCES TableStatuses(id)
@@ -145,7 +187,7 @@ CREATE TABLE TableAssignments (
 CREATE TABLE TableLog (
 	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	tableId VARCHAR(3) NOT NULL,
-	action ENUM('Add', 'Remove', 'Bused', 'Disable', 'Enable') NOT NULL,
+	action ENUM('Add', 'Remove', 'SetBused', 'Disable', 'Enable') NOT NULL,
 	timeStamp TIMESTAMP DEFAULT NOW(),
 	authorizationId INT UNSIGNED,
 	employeeId INT UNSIGNED,
@@ -164,6 +206,7 @@ CREATE TABLE Tickets (
 	partySize INTEGER UNSIGNED NOT NULL,
 	tableId VARCHAR(3),
 	timeRequested DATETIME NOT NULL DEFAULT NOW(),
+	timeReserved DATETIME NOT NULL DEFAULT NOW(),
 	timeSeated DATETIME,
 	timeClosed DATETIME,
 	timeModified DATETIME NOT NULL DEFAULT NOW()
@@ -214,7 +257,3 @@ CREATE TABLE TicketItems (
 	FOREIGN KEY (menuItemQuickCode) REFERENCES QuickCodes(id) 
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
-
-CREATE TABLE Config (
-	sessionTimeoutInMins INT UNSIGNED NOT NULL DEFAULT 5
-)

@@ -4,6 +4,12 @@ you to use display.php and displayInterface.js -->
 
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <?php
+    $sql = "SELECT * FROM Employees WHERE (roleLevel & 8) <> 0";
+    $result = connection()->query($sql);
+    if (mysqli_num_rows($result) == 0) {
+        header("Location: ../CreateUserView/CreateUserView.php");
+    }
+
     $cookie_name = "804288a34eb7a49b349be68fc6437621cbf25e10d82f4268bb795eca277adedb6a3367add5bfb7cbffb50df150e2e78d26b276f37d32d96cd76746065df58a30cde25c4d9803aa7214dc8f6a985bf8643c341f229b5834964b0f371915d5677e4b579fbab42844cd63ddc3148e4250591277cfc521906bc30cfedd765974c2009ae5fe451ab1890e5ebbfa120ad18934c972618dbe3e";
     
     if (isset($_POST['logoutUsername'])) {
@@ -241,9 +247,9 @@ you to use display.php and displayInterface.js -->
                                 ?>
                                 <?php if (isset($errorMessage)): ?>
                                     <label id='lblNewPassword' for='newPassword'>New&nbsp;Password</label>
-                                    <input id='pwdNewPassword' name='newPassword' type=password value='<?php echo $_POST['newPassword']; ?>' required>
+                                    <input id='pwdNewPassword' name='newPassword' type=password required>
                                     <label id='lblNewPasswordConfirm' for='newPasswordConfirm'>Confirm&nbsp;New&nbsp;Password</label>
-                                    <input id='pwdNewPasswordConfirm' name='newPasswordConfirm' type=password value='<?php echo $_POST['newPasswordConfirm']; ?>' required>
+                                    <input id='pwdNewPasswordConfirm' name='newPasswordConfirm' type=password required>
                                     <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
                                     <input id='btnSetPassword' type='submit' class='button' value='Set Password'>
                                 <?php else: ?>

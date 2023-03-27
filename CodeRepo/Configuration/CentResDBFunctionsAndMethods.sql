@@ -1,6 +1,3 @@
-DELETE FROM Config;
-INSERT INTO Config (sessionTimeoutInMins) VALUES (30);
-
 -- todo switch to using menuItemPrice
 -- todo switch to using ticketItemPrice
 DROP TRIGGER IF EXISTS beforeInsertTableLog;
@@ -17,17 +14,11 @@ DROP FUNCTION IF EXISTS userPasswordHash;
 DROP FUNCTION IF EXISTS usernameFromId;
 DROP FUNCTION IF EXISTS idFromUsername;
 
-DROP PROCEDURE IF EXISTS assignEmployeeToTable; -- TODO
-DROP PROCEDURE IF EXISTS removeEmployeeFromTable; -- TODO
-DROP PROCEDURE IF EXISTS assignTicketToTable; -- TODO
-DROP PROCEDURE IF EXISTS removeTicketFromTable; -- TODO
-DROP PROCEDURE IF EXISTS enableTable; -- TODO
-DROP PROCEDURE IF EXISTS disableTable; -- TODO
-DROP PROCEDURE IF EXISTS bussingComplete; -- TODO
-
 DROP FUNCTION IF EXISTS menuItemPrice; -- TODO
-DROP FUNCTION IF EXISTS ticketItemPrice; -- TODO
-DROP FUNCTION IF EXISTS splitSubtotal; -- TODO
+DROP FUNCTION IF EXISTS ticketItemPrice;
+DROP FUNCTION IF EXISTS splitCount;
+DROP FUNCTION IF EXISTS lowestSplitFlag;
+DROP FUNCTION IF EXISTS ticketSubtotal;
 DROP FUNCTION IF EXISTS menuItemModifications;
 DROP FUNCTION IF EXISTS mipHelperFunction;
 DROP FUNCTION IF EXISTS ticketItemStatus;
@@ -49,6 +40,7 @@ DROP TRIGGER IF EXISTS afterDeleteMenuModificationCategory;
 DROP TRIGGER IF EXISTS afterDeleteMenuModificationItem;
 
 DROP PROCEDURE IF EXISTS createTicket;
+DROP PROCEDURE IF EXISTS createReservation;
 DROP PROCEDURE IF EXISTS removeTicket;
 DROP PROCEDURE IF EXISTS addSplit;
 DROP PROCEDURE IF EXISTS removeSplit;
@@ -61,78 +53,61 @@ DROP PROCEDURE IF EXISTS moveTicketItemToSeat;
 DROP PROCEDURE IF EXISTS removeTicketItemFromSplit;
 DROP PROCEDURE IF EXISTS addTicketItemToSplit;
 DROP PROCEDURE IF EXISTS markTicketItemAsReady;
+DROP PROCEDURE IF EXISTS markTicketItemAsDelivered;
 DROP PROCEDURE IF EXISTS hideTicketItem;
 DROP PROCEDURE IF EXISTS updateTicketSplitTimeStamp;
 DROP PROCEDURE IF EXISTS updateTicketSplitsTimeStamp;
 DROP PROCEDURE IF EXISTS submitPendingTicketItems;
 DROP PROCEDURE IF EXISTS cancelPendingTicketItems;
 
-
-DELIMITER $$
 CREATE TRIGGER beforeAddMenuCategory
 BEFORE INSERT ON MenuCategories FOR EACH ROW
 BEGIN
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE TRIGGER beforeAddMenuItem
 BEFORE INSERT ON MenuItems FOR EACH ROW
 BEGIN
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE TRIGGER beforeAddMenuModificationCategory
 BEFORE INSERT ON MenuModificationCategories FOR EACH ROW
 BEGIN
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE TRIGGER beforeAddMenuModificationItem
 BEFORE INSERT ON MenuModificationItems FOR EACH ROW
 BEGIN
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE TRIGGER afterDeleteMenuCategory
 AFTER DELETE ON MenuCategories FOR EACH ROW
 BEGIN
 	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE TRIGGER afterDeleteMenuItem
 AFTER DELETE ON MenuItems FOR EACH ROW
 BEGIN
 	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE TRIGGER afterDeleteMenuModificationCategory
 AFTER DELETE ON MenuModificationCategories FOR EACH ROW
 BEGIN
 	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE TRIGGER afterDeleteMenuModificationItem
 AFTER DELETE ON MenuModificationItems FOR EACH ROW
 BEGIN
 	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE TRIGGER beforeUpdateMenuCategory
 BEFORE UPDATE ON MenuCategories FOR EACH ROW
 BEGIN
@@ -151,10 +126,8 @@ BEGIN
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		END IF; 
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE TRIGGER beforeUpdateMenuItem
 BEFORE UPDATE ON MenuItems FOR EACH ROW
 BEGIN
@@ -173,10 +146,8 @@ BEGIN
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		END IF; 
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE TRIGGER beforeUpdateMenuModificationCategory
 BEFORE UPDATE ON MenuModificationCategories FOR EACH ROW
 BEGIN
@@ -195,10 +166,8 @@ BEGIN
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		END IF; 
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE TRIGGER beforeUpdateMenuModificationItem
 BEFORE UPDATE ON MenuModificationItems FOR EACH ROW
 BEGIN
@@ -217,111 +186,57 @@ BEGIN
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		END IF; 
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-
-
-
-
-
-DELIMITER $$
 CREATE TRIGGER beforeInsertTableLog
 BEFORE INSERT ON TableLog FOR EACH ROW
 BEGIN
-	
-	IF ((SELECT COUNT(*) FROM EmployeeLog WHERE employeeId = NEW.authorizationId AND startTime IS NOT NULL AND endTime IS NULL) = 0) THEN
-		-- authorizer isn't logged in
-	    -- This is going to bog down the system the longer the EmployeeLog gets. Need to set up trigger to add/remove logged in employees from another table.
+	DECLARE onlyEmp INT UNSIGNED;
+	IF ((NEW.tableId IS NOT NULL) AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId) = 0) THEN
+		-- if table id is invalid
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'Authorized host must be logged in!';
-		
-		
-		-- authorizer has invalid roles for session to perform action
+		SET MESSAGE_TEXT = 'Specified table does not exist!';
+	ELSEIF ((NEW.authorizationId IS NOT NULL) AND (SELECT COUNT(*) FROM Employees WHERE id = NEW.authorizationId) = 0) THEN
+		-- if an authorization employee number is specified, but it's invalid
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Specifed authorization employee ID does not exist!';
+	ELSEIF ((NEW.employeeId IS NOT NULL) AND ((SELECT COUNT(*) FROM Employees WHERE id = NEW.employeeId) = 0)) THEN
+		-- if an employee number is specified, but it's invalid
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Specifed employee ID does not exist!';
 	ELSEIF ((NEW.ticketId IS NOT NULL) AND (SELECT COUNT(*) FROM Tickets WHERE id = NEW.ticketId) = 0) THEN
 		-- if a ticket number is specified, but it's invalid
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Specifed ticket number does not exist!';
-	
-		-- If you are assigning a server to table, but they aren't logged in or don't have server roles for session
-	ELSEIF (NEW.tableId IS NOT NULL AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status IN ('Occupied', 'Unavailable')) = 1) THEN
-		-- if you're assigning a ticket to a table, but it's occupied or unavailable	
+	ELSEIF (NEW.action = 'Add' AND NEW.ticketId IS NOT NULL AND NEW.tableId IS NOT NULL AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status IN ('seated', 'disabled')) = 1) THEN
+		-- if you're assigning a ticket to a table, but it's occupied or disabled	
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Cannot assign a Ticket to an Unassigned or Occupied Table!';
-	ELSEIF (NEW.action = 'Bused' AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status = 'bussing') = 0) THEN	
+	ELSEIF (NEW.action = 'Remove' AND NEW.employeeId IS NOT NULL AND NEW.ticketId IS NULL) THEN
+		-- if you're removing the only server, but the table is occupied and you're not removing the ticket
+		IF ((SELECT COUNT(*) FROM TableAssignments WHERE tableId = NEW.tableId) = 1) THEN
+			SELECT employeeId INTO onlyEmp FROM TableAssignments WHERE tableId = NEW.tableId;
+			IF (onlyEmp = NEW.employeeId AND (SELECT status FROM Tables WHERE id = NEW.tableId) = 'seated') THEN
+				SIGNAL SQLSTATE '45000'
+				SET MESSAGE_TEXT = 'All seated tables must have at least 1 server assigned to them!';
+			END IF;
+		END IF;
+	ELSEIF (NEW.action = 'SetDisabled' AND (SELECT status FROM Tables WHERE id = NEW.tableId) <> 'unassigned') THEN
+		-- if you're trying to set the table as disabled but the table status <> unassigned
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Cannot Disable Table! Status Must Be Unassigned!';
+	ELSEIF (NEW.action = 'SetBused' AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status = 'bussing') = 0) THEN	
 		-- if you're setting the bused flag but the table isn't flagged as bussing
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Specified Table is not marked for bussing. Cannot set status to bused.';
-	-- ELSEIF () THEN
-		-- if you're removing the only server, but the table is occupied and you're not removing the ticket
-	
-		-- if you're trying to set the table as disabled but the table is occupied
 	END IF;
-	
-	
-END$$
-DELIMITER ;
+	IF (NEW.employeeId IS NOT NULL AND NEW.action = "Add" AND (SELECT COUNT(*) FROM TableAssignments WHERE employeeId = NEW.employeeId AND tableId = NEW.tableId) = 1) THEN
+		-- if the server is already assigned to the table
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Server is already assigned to this table.';
+	END IF;
+END;
 
--- add employee to table
-DELIMITER $$
-CREATE PROCEDURE assignEmployeeToTable(IN employeeId INT UNSIGNED, IN tableId VARCHAR(3), authorizationId INT UNSIGNED)
-BEGIN
-	DECLARE empId INT UNSIGNED;
-	DECLARE hashReturn CHAR(60);
-	
-END$$
-DELIMITER ;
-
--- add remove employee from table
-DELIMITER $$
-CREATE PROCEDURE removeEmployeeFromTable(IN employeeId INT UNSIGNED, IN tableId VARCHAR(3), authorizationId INT UNSIGNED)
-BEGIN
-		
-END$$
-DELIMITER ;
-
--- add ticket to table
-DELIMITER $$
-CREATE PROCEDURE assignTicketToTable(IN ticketId VARCHAR(3), IN tableId VARCHAR(3), authorizationId INT UNSIGNED)
-BEGIN
-		
-END$$
-DELIMITER ;
-
--- remove ticket from table
-DELIMITER $$
-CREATE PROCEDURE removeTicketFromTable(IN ticketId VARCHAR(3), IN tableId VARCHAR(3), authorizationId INT UNSIGNED)
-BEGIN
-		
-END$$
-DELIMITER ;
-
--- disable table
-DELIMITER $$
-CREATE PROCEDURE disableTable(IN tableId VARCHAR(3))
-BEGIN
-		
-END$$
-DELIMITER ;
-
--- enable table
-DELIMITER $$
-CREATE PROCEDURE enableTable(IN tableId VARCHAR(3))
-BEGIN
-		
-END$$
-DELIMITER ;
-
--- set table status to bussed
-DELIMITER $$
-CREATE PROCEDURE bussingComplete(IN tableId VARCHAR(3))
-BEGIN
-		
-END$$
-DELIMITER ;
-
-
-DELIMITER $$
 CREATE TRIGGER afterInsertTableLog
 AFTER INSERT ON TableLog FOR EACH ROW
 BEGIN
@@ -338,14 +253,16 @@ BEGIN
 		IF (SELECT COUNT(*) FROM Tickets WHERE tableId = NEW.TableId > 0) THEN
 			UPDATE Tables SET status = 'seated' WHERE id = NEW.tableId;
 		ELSE
-			UPDATE Tables SET status = 'open' WHERE id = NEW.tableId;
+			IF ((SELECT COUNT(status) FROM Tables WHERE id = NEW.TableId AND status = 'bussing') = 0) THEN
+				UPDATE Tables SET status = 'open' WHERE id = NEW.tableId;
+			END IF;
 		END IF;
 	ELSEIF (NEW.action = 'Remove' AND NEW.ticketId IS NOT NULL AND NEW.employeeId IS NOT NULL) THEN
 		DELETE FROM TableAssignments WHERE employeeId = NEW.employeeId AND tableId = NEW.tableId;
-		UPDATE Tickets SET tableId = NULL WHERE id = NEW.ticketId;
+		UPDATE Tickets SET tableId = NULL, timeSeated = NULL WHERE id = NEW.ticketId;
 		UPDATE Tables SET status = 'bussing' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Remove' AND NEW.ticketId IS NOT NULL) THEN
-		UPDATE Tickets SET tableId = NULL WHERE id = NEW.ticketId;
+		UPDATE Tickets SET tableId = NULL, timeSeated = NULL WHERE id = NEW.ticketId;
 		UPDATE Tables SET status = 'bussing' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Remove' AND NEW.employeeId IS NOT NULL) THEN
 		DELETE FROM TableAssignments WHERE employeeId = NEW.employeeId and tableId = NEW.tableId;
@@ -353,14 +270,14 @@ BEGIN
 		((SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId and status = 'bussing')) = 0) THEN
 			UPDATE Tables SET status = 'unassigned' WHERE id = NEW.tableId;
 		END IF;
-	ELSEIF (NEW.action = 'Bused') THEN
+	ELSEIF (NEW.action = 'SetBused') THEN
 		IF ((SELECT COUNT(*) FROM TableAssignments WHERE tableId = NEW.TableId) = 0) THEN
 			UPDATE Tables SET status = 'unassigned' WHERE id = NEW.tableId;
 		ELSE
 			UPDATE Tables SET status = 'open' WHERE id = NEW.tableId;
 		END IF;
 	ELSEIF (NEW.action = 'Disable') THEN
-		UPDATE Tables SET status = 'Unavailable' WHERE id = NEW.tableId;
+		UPDATE Tables SET status = 'disabled' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Enable') THEN
 		IF ((SELECT COUNT(*) FROM TableAssignments WHERE tableId = NEW.TableId) = 0) THEN
 			UPDATE Tables SET status = 'unassigned' WHERE id = NEW.tableId;
@@ -368,10 +285,8 @@ BEGIN
 			UPDATE Tables SET status = 'open' WHERE id = NEW.tableId;
 		END IF;
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE FUNCTION userPasswordHash(uname VARCHAR(25)) RETURNS CHAR(60)
 BEGIN
 	DECLARE empId INT UNSIGNED;
@@ -383,12 +298,8 @@ BEGIN
 	ELSE
 		SELECT passwordBCrypt INTO hashReturn FROM Employees WHERE userName = uname;
 		RETURN hashReturn;
-	END IF;
-	
-END$$
-DELIMITER ;
-
-DELIMITER $$
+	END IF;	
+END;
 
 CREATE FUNCTION usernameFromId(empId INT UNSIGNED) RETURNS VARCHAR(25)
 BEGIN
@@ -400,12 +311,9 @@ BEGIN
 	ELSE
 		SELECT userName INTO uname FROM Employees WHERE id = empId;
 		RETURN uname;
-	END IF;
-	
-END$$
-DELIMITER ;
+	END IF;	
+END;
 
-DELIMITER $$
 CREATE FUNCTION idFromUsername(uname VARCHAR(25)) RETURNS INT UNSIGNED
 BEGIN
 	DECLARE empId INT UNSIGNED;
@@ -417,21 +325,17 @@ BEGIN
 		SELECT id INTO empId FROM Employees WHERE userName = uname;
 		RETURN empId;
 	END IF;
-END$$
-DELIMITER ;
+END;
 
 -- parent Quick code is required because Menu Items can belong to more than 1 Menu Item Category.
 -- specifying the parent uniquely identifies a specific instance of the menu item.
-DELIMITER $$
 CREATE FUNCTION menuItemPrice(qc VARCHAR(10), parentQuickCode VARCHAR(10)) RETURNS DECIMAL(6, 2)
 BEGIN
 	DECLARE prc DECIMAL(6, 2);
 	SELECT price INTO prc FROM MenuItems WHERE id = qc; 
 	RETURN mipHelperFunction(parentQuickCode, prc, NULL, NULL, NULL);
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE FUNCTION mipHelperFunction(qc VARCHAR(10), basePrice DECIMAL(6, 2), minPercentage DECIMAL(6, 2), minDiscount DECIMAL(6, 2), minPriceOverride DECIMAL(6,2)) RETURNS DECIMAL(6, 2)
 BEGIN
 	DECLARE selectedValue DECIMAL(6, 2);
@@ -465,7 +369,7 @@ BEGIN
 
 	IF (basePrice IS NULL) Then
 		SELECT defaultPrice INTO basePrice FROM MenuCategories WHERE quickCode = qc;
-	End If;
+	END IF;
 
 	SELECT parentQuickCode INTO parentQC FROM TableAssociations WHERE childQuickCode = qc;
 	IF (basePrice - minDiscount < 0) THEN
@@ -490,12 +394,9 @@ BEGIN
 		END IF;
 	ELSE
 		RETURN mipHelperFunction(parentQC, basePrice, minPercentage, minDiscount, minPriceOverride);
-	END IF;
-	
-END$$
-DELIMITER ;
+	END IF;	
+END;
 
-DELIMITER $$
 CREATE FUNCTION menuItemModifications(qc VARCHAR(10), parentQC VARCHAR(10)) RETURNS VARCHAR(500)
 BEGIN
 	DECLARE inString VARCHAR(10);
@@ -522,9 +423,7 @@ BEGIN
 		--	UPDATE myString SET myString = inString;
 		-- ELSE
 			UPDATE myString SET myString = myString + ',' + inString;
-		-- END IF;
-		
-		
+		-- END IF;	
 	END LOOP modItemsLoop;
 	CLOSE myCursor;
 	SET done = FALSE;
@@ -547,24 +446,102 @@ BEGIN
 
 	RETURN myString;
 
-END$$
-DELIMITER ;
+END;
 
-
-
--- function needs to be recoded to require_once appropriate price calculation
-DELIMITER $$
-CREATE FUNCTION ticketItemPrice(ticketItemId INT UNSIGNED) RETURNS DECIMAL(6, 2)
+-- calculates the ticket item price, taking into account it's split.
+-- If a split flag of 0 or 1023 is supplied, the associated menu item price is returned as-is. 
+CREATE FUNCTION ticketItemPrice(ticketItemId INT UNSIGNED, splitFlg SMALLINT UNSIGNED) RETURNS DECIMAL(6, 2)
 BEGIN
-	DECLARE miQuickCode VARCHAR(10);
-	DECLARE prc DECIMAL(6, 2);
-	SELECT menuItemQuickCode INTO miQuickCode FROM TicketItems WHERE id = ticketItemId;
-	SELECT price INTO prc FROM MenuItems WHERE quickCode = miQuickCode;
-	RETURN prc;	
-END$$
-DELIMITER ;
+	DECLARE spltCount TINYINT UNSIGNED;
+	DECLARE spltLow TINYINT UNSIGNED;
+	DECLARE prcTot DECIMAL(6, 2);
+	DECLARE prcAdj DECIMAL(6, 2);
+	DECLARE prcRem DECIMAL(6, 2);
+	DECLARE prcDiv DECIMAL(6, 2);
 
-DELIMITER $$
+	SELECT calculatedPrice, overridePrice, splitCount(splitFlag), lowestSplitFlag(splitflag) INTO prcTot, prcAdj, spltCount, spltLow FROM TicketItems WHERE id = ticketItemId;
+	IF (prcAdj IS NOT NULL) THEN
+		IF (prcAdj < 0) THEN
+			SET prcTot = prcTot + prcAdj;
+		ELSEIF (prcAdj = 0) THEN
+			SET prcTot = 0;
+		ELSEIF (prcAdj >= 1) THEN
+			SET prcTot = prcAdj;
+		ELSE
+			SET prcTot = prcTot * (1 - prcAdj);
+		END IF;
+	END IF;
+
+	
+	SELECT TRUNCATE(prcTot / spltCount, 2) INTO prcDiv;
+	SELECT (prcTot - prcDiv * spltCount) INTO prcRem; 
+
+	IF (splitFlg IN (0, 1023) OR spltCount = 1) THEN
+		-- if you want to get the price irrespective of split, or there isn't a split
+		RETURN prcTot;
+	ELSEIF (splitFlg & spltLow <> 0) THEN
+		-- if there is a split and you specified the lowest split.
+		RETURN prcDiv + prcRem;
+	ELSE
+		-- if there is a split and the split you specifed is not the lowest split.
+		RETURN prcDiv;
+	END IF;
+
+END;
+
+-- provided a split flag, return the lowest digit turned on. Returns 0 if the lowest 10 digits are 0
+CREATE FUNCTION lowestSplitFlag(splitFlg SMALLINT UNSIGNED) RETURNS SMALLINT UNSIGNED
+BEGIN
+	DECLARE bitMask SMALLINT UNSIGNED;
+	SET bitMask = 1;
+	bitMaskLoop: LOOP
+
+		IF (bitMask & splitFlg <> 0) THEN
+			LEAVE bitMaskLoop;
+		END IF;
+
+		SET bitMask = bitMask * 2;
+		IF (bitMask = 1024) THEN
+			SET bitMask = 0;
+			LEAVE bitMaskLoop;
+		END IF;
+
+ 	END LOOP bitMaskLoop;
+	RETURN bitMask;
+END;
+
+-- provided a split flag, return the count of digits turned on in the lowest 10 bits
+CREATE FUNCTION splitCount(splitFlg SMALLINT UNSIGNED) RETURNS TINYINT UNSIGNED
+BEGIN
+	DECLARE bitMask SMALLINT UNSIGNED;
+	DECLARE cnt TINYINT UNSIGNED DEFAULT 0; 
+	SET bitMask = 1;
+	bitMaskLoop: LOOP
+
+		IF (bitMask & splitFlg <> 0) THEN
+			SET cnt = cnt + 1;
+		END IF;
+		
+		SET bitMask = bitMask * 2;
+		IF (bitMask = 1024) THEN
+			LEAVE bitMaskLoop;
+		END IF;
+		
+ 	END LOOP bitMaskLoop;
+	RETURN cnt;
+END;
+
+-- calculate a subtotal for split. If splitFlg is 0 OR 1023 (bin 1111111111) the subtotal for the entire ticket is returned.
+CREATE FUNCTION ticketSubtotal(ticketNumber INT UNSIGNED, splitFlg SMALLINT UNSIGNED) RETURNS DECIMAL(6,2)
+BEGIN
+	DECLARE splitSubtotal DECIMAL(6,2);
+	IF (splitFlg = 0) THEN
+		SET splitFlg = 1023;
+	END IF;
+	SELECT SUM(ticketItemPrice(id, splitFlg)) INTO splitSubtotal FROM TicketItems WHERE ticketId = ticketNumber AND splitFlg & splitFlag <> 0;
+	RETURN splitSubtotal;
+END;
+
 CREATE FUNCTION sessionRole(token VARCHAR(60)) RETURNS INT UNSIGNED
 BEGIN
 	DECLARE empId INT UNSIGNED;
@@ -577,11 +554,8 @@ BEGIN
 		SELECT employeeRole INTO role FROM ActiveEmployees WHERE employeeId = empId;
 		RETURN role;
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-
-DELIMITER $$
 CREATE FUNCTION sessionUsername(token VARCHAR(60)) RETURNS VARCHAR(25)
 BEGIN
 	 DECLARE uname VARCHAR(25);
@@ -592,11 +566,8 @@ BEGIN
 	ELSE
 		RETURN uname;
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-
-DELIMITER $$
 CREATE FUNCTION loggedIn(uname VARCHAR(25)) RETURNS BOOLEAN
 BEGIN
 	DECLARE endTime DATETIME;
@@ -606,27 +577,25 @@ BEGIN
 	IF (empId IS NULL) THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Username Not Found!';
+	ELSEIF (endTime IS NULL) THEN
+		RETURN FALSE;
+	ELSEIF (endTime < NOW()) THEN
+		CALL logout( uname );
 	ELSEIF (endTime IS NULL OR endTime < NOW()) THEN
 		RETURN FALSE;
 	ELSE
 		RETURN TRUE;
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-
-DELIMITER $$
-CREATE PROCEDURE createUser(IN lName VARCHAR(50), fName VARCHAR(60), IN uName VARCHAR(25), IN pHash VARCHAR(60), IN roles TINYINT UNSIGNED)
+CREATE PROCEDURE createUser(IN lName VARCHAR(50), fName VARCHAR(60), IN uName VARCHAR(25), IN pHash VARCHAR(60), IN roles SMALLINT UNSIGNED)
 BEGIN
 	INSERT INTO Employees (lastName, firstName, userName, passwordBCrypt, roleLevel) VALUES (lName, fName, uname, pHash, roles);
-END$$
-DELIMITER ;
+END;
 
-
-DELIMITER $$
-CREATE PROCEDURE login(IN requestedUsername VARCHAR(25), IN requestedRoles TINYINT UNSIGNED, IN newAccessToken varchar(60))
+CREATE PROCEDURE login(IN requestedUsername VARCHAR(25), IN requestedRoles SMALLINT UNSIGNED, IN newAccessToken varchar(60))
 BEGIN
-	DECLARE allowedRoles TINYINT UNSIGNED;
+	DECLARE allowedRoles SMALLINT UNSIGNED;
 	DECLARE empId INT UNSIGNED;
 	DECLARE timeoutMins INT UNSIGNED;
 	IF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername) = 0) THEN
@@ -640,10 +609,10 @@ BEGIN
 			-- Invalid Requested Roles
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'You do not have the authorization to login with the role you specified!';
-		ELSEIF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername AND accessToken IS NOT NULL AND accessTokenExpiration > now()) = 1) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'You are already logged in elsewhere!';
 		ELSEIF ((SELECT COUNT(*) FROM Employees WHERE accessToken = newAccessToken AND userName <> requestedUsername) = 1 ) THEN
+			IF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername AND accessToken IS NOT NULL AND accessTokenExpiration > now()) = 1) THEN
+				CALL logout(requestedUsername);
+			END IF;
 			-- Another user is already logged in using your access key.
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Access Token Not Unique! Retry Login.';
@@ -657,12 +626,9 @@ BEGIN
 			SELECT (sessionTimeoutInMins * 100) INTO timeoutMins FROM Config;	
 			UPDATE employees SET accessToken = newAccessToken, accessTokenExpiration = ADDTIME(NOW(), timeoutMins) WHERE userName = requestedUsername;
 		END IF;
-	END IF;
-	
-END$$
-DELIMITER ;
+	END IF;	
+END;
 
-DELIMITER $$
 CREATE PROCEDURE logout(IN uname VARCHAR(25))
 BEGIN
 	DECLARE empId INT UNSIGNED;
@@ -675,13 +641,9 @@ BEGIN
 		UPDATE EmployeeLog SET endTime = NOW() WHERE employeeId = empId and endTime IS NULL;
 		UPDATE Employees SET accessToken = NULL, accessTokenExpiration = NULL WHERE userName = uname;
 		DELETE FROM ActiveEmployees WHERE employeeId = empId;
-	END IF;
-	
-END$$
-DELIMITER ;
+	END IF;	
+END;
 
-
-DELIMITER $$
 CREATE FUNCTION ticketItemStatus(ticketNum INT UNSIGNED) RETURNS VARCHAR(20)
 BEGIN
 	DECLARE flg VARCHAR(20);
@@ -710,29 +672,30 @@ BEGIN
 			RETURN flg;
 		END IF;
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE PROCEDURE createTicket(IN ticketNickname VARCHAR(25), IN peopleCount INT UNSIGNED, OUT newTicketNumber INT UNSIGNED)
 BEGIN
 	INSERT INTO Tickets (nickname, partySize) VALUES (ticketNickname, peopleCount);
 	SELECT MAX(id) INTO newTicketNumber FROM Tickets; 
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
+CREATE PROCEDURE createReservation(IN ticketNickname VARCHAR(25), IN peopleCount INT UNSIGNED, IN requestedTime DATETIME, OUT newTicketNumber INT UNSIGNED)
+BEGIN
+	INSERT INTO Tickets (nickname, partySize, timeRequested) VALUES (ticketNickname, peopleCount, requestedTime);
+	SELECT MAX(id) INTO newTicketNumber FROM Tickets; 
+END;
+
 CREATE PROCEDURE removeTicket(IN ticketNumber INT UNSIGNED)
 BEGIN
 	DELETE FROM TicketItems WHERE ticketId = ticketNumber;
 	DELETE FROM Splits WHERE ticketId = ticketNumber;
 	DELETE FROM Tickets WHERE id = ticketNumber;
-END$$
-DELIMITER ;
+END;
 
 -- todo switch to using menuItemPrice
-DELIMITER $$
-CREATE PROCEDURE createTicketItem(IN ticketNumber INT UNSIGNED, IN seatNumber TINYINT UNSIGNED, IN split TINYINT UNSIGNED, IN menuItemQC VARCHAR(10))
+-- need to use real price calculation
+CREATE PROCEDURE createTicketItem(IN ticketNumber INT UNSIGNED, IN seatNumber SMALLINT UNSIGNED, IN split SMALLINT UNSIGNED, IN menuItemQC VARCHAR(10))
 BEGIN
 	DECLARE tbl VARCHAR(3);
 	DECLARE newItemIndex SMALLINT UNSIGNED;
@@ -786,15 +749,11 @@ BEGIN
 				END IF; 
 				CALL updateTicketSplitTimeStamp(ticketNumber, split);
 			END IF;
-			
 		END IF; 
 	END IF;
-END$$
-DELIMITER ;
+END;
 
 
--- need to use real price calcualtion
-DELIMITER $$
 CREATE PROCEDURE modifyTicketItem(IN ticketItemNumber INT UNSIGNED, IN modNotes VARCHAR(500))
 BEGIN
 	DECLARE stat VARCHAR(20);
@@ -811,17 +770,16 @@ BEGIN
 			SET MESSAGE_TEXT = 'Removed/Ready/Delivered Ticket Items Cannot Be Modified!';
 		ELSE
 			UPDATE TicketItems SET modificationNotes = modNotes WHERE id = ticketItemNumber;
-			UPDATE TicketItems SET calculatedPriceWithMods = ticketItemPrice(ticketItemNumber) WHERE id = ticketItemNumber;
+			-- DEPRECATED needs to be recoded
+			-- UPDATE TicketItems SET calculatedPriceWithMods = ticketItemPrice(ticketItemNumber) WHERE id = ticketItemNumber;
 			IF (stat = 'Preparing') THEN
 				UPDATE TicketItems SET flag = 'Updated' WHERE id = ticketItemNumber;
 			END IF; 
 			CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 		END IF;
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE PROCEDURE overrideTicketItemPrice(IN ticketItemNumber INT UNSIGNED, IN adjustemnt DECIMAL(6, 2), note VARCHAR(500), authorizationUsername VARCHAR(25))
 BEGIN
 	DECLARE empId INT UNSIGNED;
@@ -835,7 +793,7 @@ BEGIN
 		SET MESSAGE_TEXT = 'Ticket Item Number Doesn''t Exist!';
 	ELSEIF (authorizationUsername IS NULL) THEN
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'Price Overrides require_once Employee# to Log Event!';
+		SET MESSAGE_TEXT = 'Price Overrides must include Employee# to Log Event!';
 	ELSEIF (stat NOT IN ('Delivered', 'Hidden')) THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Price Overrides Can Only Be Applied to Delivered Ticket Items!';
@@ -848,10 +806,8 @@ BEGIN
 						   WHERE id = ticketItemNumber;
 		CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE PROCEDURE removeTicketItem(IN ticketItemNumber INT UNSIGNED)
 BEGIN
 	DECLARE stat VARCHAR(20);
@@ -884,21 +840,17 @@ BEGIN
 		END IF;
 		CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
-CREATE PROCEDURE moveTicketItemToSeat(IN ticketItemNumber INT UNSIGNED, IN toSeat TINYINT UNSIGNED)
+CREATE PROCEDURE moveTicketItemToSeat(IN ticketItemNumber INT UNSIGNED, IN toSeat SMALLINT UNSIGNED)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
 	DECLARE splitFlg SMALLINT UNSIGNED;
 	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
 	UPDATE TicketItems SET seat = toSeat WHERE id = ticketItemNumber;
 	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE PROCEDURE moveTicketItemToSplit(IN ticketItemNumber INT UNSIGNED, IN fromSplit SMALLINT UNSIGNED, IN toSplit SMALLINT UNSIGNED)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
@@ -927,10 +879,8 @@ BEGIN
 	CALL addSplit(tickNum, toSplit);
 
 	CALL updateTicketSplitsTimeStamp(tickNum, fromFlg | toFlg);
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE PROCEDURE removeTicketItemFromSplit(IN ticketItemNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
@@ -958,10 +908,8 @@ BEGIN
 	CALL removeSplit(tickNum, split);
 	
 	CALL updateTicketSplitsTimeStamp(tickNum, changeFlg);
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE PROCEDURE addTicketItemToSplit(IN ticketItemNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
@@ -980,10 +928,8 @@ BEGIN
 	CALL addSplit(tickNum DIV 10000, split);
 
 	CALL updateTicketSplitsTimeStamp(tickNum, changeFlg);
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE PROCEDURE markTicketItemAsReady(IN ticketItemNumber INT UNSIGNED)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
@@ -993,10 +939,20 @@ BEGIN
 
 	UPDATE TicketItems SET readyTime = NOW() WHERE id = ticketItemNumber;
 	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
+CREATE PROCEDURE markTicketItemAsDelivered(IN ticketItemNumber INT UNSIGNED)
+BEGIN
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE splitFlg SMALLINT UNSIGNED;
+	
+	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
+
+	UPDATE TicketItems SET deliveredTime = NOW() WHERE id = ticketItemNumber;
+	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
+END;
+
+
 CREATE PROCEDURE hideTicketItem(IN ticketItemNumber INT UNSIGNED)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
@@ -1013,10 +969,8 @@ BEGIN
 		UPDATE TicketItems SET flag = 'Hidden' WHERE id = ticketItemNumber;
 		CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE PROCEDURE updateTicketSplitTimeStamp(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
 BEGIN
 	DECLARE sf SMALLINT UNSIGNED;
@@ -1028,12 +982,10 @@ BEGIN
 	ELSE
 		UPDATE Splits SET timeModified = NOW() WHERE ticketId = ticketNumber AND splitId = split;
 	END IF;
-END$$
-DELIMITER ;
+END;
 
 -- passing in a split value of 10 indicates submit all ticket items for specified ticket
 -- otherwise submits a single split 0 - 9.
-DELIMITER $$
 CREATE PROCEDURE submitPendingTicketItems(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
 BEGIN
 	DECLARE sf SMALLINT UNSIGNED;
@@ -1044,12 +996,10 @@ BEGIN
 		UPDATE TicketItems SET submitTime = NOW() WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
 	END IF;
 	CALL updateTicketSplitsTimeStamp(ticketNumber, 1023);
-END$$
-DELIMITER ;
+END;
 
 -- passing in a split value of 10 indicates submit all ticket items for specified ticket
 -- otherwise submits a single split 0 - 9.
-DELIMITER $$
 CREATE PROCEDURE cancelPendingTicketItems(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
 BEGIN
 	DECLARE sf SMALLINT UNSIGNED;
@@ -1060,10 +1010,8 @@ BEGIN
 		DELETE FROM TicketItems WHERE submitTime IS NULL AND ticketId = ticketNumber AND (splitFlag & sf) = sf AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
 	END IF;
 	CALL updateTicketSplitsTimeStamp(ticketNumber, sf);
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE PROCEDURE updateTicketSplitsTimeStamp(IN ticketNumber INT UNSIGNED, IN sf SMALLINT UNSIGNED)
 BEGIN
 	UPDATE Tickets SET timeModified = NOW() WHERE id = ticketNumber;
@@ -1073,15 +1021,12 @@ BEGIN
 	ELSE
 		UPDATE Splits SET timeModified = NOW() WHERE ticketId = ticketNumber AND (POWER(2, splitId) & sf) = sf;
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-
-DELIMITER $$
 CREATE FUNCTION ticketItemPayStatus(tickItemNum INT UNSIGNED) RETURNS VARCHAR(7)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
-	DECLARE splitFlg TINYINT UNSIGNED;
+	DECLARE splitFlg SMALLINT UNSIGNED;
 	DECLARE countSplits INT UNSIGNED;
 	DECLARE paidSplits INT UNSIGNED;
 
@@ -1095,79 +1040,45 @@ BEGIN
 		RETURN 'Paid';
 	ELSE
 		RETURN 'Partial';
-	END IF;
-	
-END$$
-DELIMITER ;
+	END IF;	
+END;
 
-DELIMITER $$
 CREATE PROCEDURE addSplit(IN ticketNumber INT UNSIGNED, IN splitNumber SMALLINT UNSIGNED)
 BEGIN
 	-- new split. Add Split record.
 	IF ((SELECT COUNT(*) FROM Splits WHERE ticketId = ticketNumber AND splitId = splitNumber) = 0) THEN
 		INSERT INTO Splits (ticketId, splitId) VALUES (ticketNumber, splitNumber);
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE PROCEDURE removeSplit(IN ticketNumber INT UNSIGNED, IN splitNumber SMALLINT UNSIGNED)
 BEGIN
 	-- new split. Add Split record.
 	IF ((SELECT COUNT(*) FROM Splits WHERE ticketId = ticketNumber AND splitId = splitNumber) = 0) THEN
 		DELETE FROM Splits WHERE ticketId = ticketNumber AND splitId = splitNumber;
 	END IF;
-END$$
-DELIMITER ;
+END;
 
-DELIMITER $$
 CREATE FUNCTION splitString(ticketItemId INT UNSIGNED) RETURNS VARCHAR(25)
 BEGIN
-	DECLARE myStr VARCHAR(10);
+	DECLARE splitStr VARCHAR(20) DEFAULT '';
+	DECLARE splitNum SMALLINT UNSIGNED DEFAULT 1;
 	DECLARE splitFlg SMALLINT UNSIGNED;
-	DECLARE len TINYINT UNSIGNED;
-	SET myStr = "";
 	SELECT splitFlag INTO splitFlg FROM TicketItems WHERE id = ticketItemId;
-	
-	IF (splitFlg > 511) THEN
-		SET myStr = CONCAT(myStr, '/', '9');
-		SET splitFlg = splitFlg & 511; 
-	END IF; 
-	IF (splitFlg > 255) THEN
-		SET myStr = CONCAT(myStr, '/', '8');
-		SET splitFlg = splitFlg & 255;
-	END IF; 
-	IF (splitFlg > 127) THEN
-		SET myStr = CONCAT(myStr, '/', '7');
-		SET splitFlg = splitFlg & 127;
-	END IF; 
-	IF (splitFlg > 63) THEN
-		SET myStr = CONCAT(myStr, '/', '6');
-		SET splitFlg = splitFlg & 63;
-	END IF; 
-	IF (splitFlg > 31) THEN
-		SET myStr = CONCAT(myStr, '/', '5');
-		SET splitFlg = splitFlg & 31;
-	END IF; 
-	IF (splitFlg > 15) THEN
-		SET myStr = CONCAT(myStr, '/', '4');
-		SET splitFlg = splitFlg & 15;
-	END IF; 
-	IF (splitFlg > 7) THEN
-		SET myStr = CONCAT(myStr, '/', '3');
-		SET splitFlg = splitFlg & 7;
-	END IF; 
-	IF (splitFlg > 3) THEN
-		SET myStr = CONCAT(myStr, '/', '2');
-		SET splitFlg = splitFlg & 3;
-	END IF; 
-	IF (splitFlg > 1) THEN
-		SET myStr = CONCAT(myStr, '/', '1');
-		SET splitFlg = splitFlg & 1;
-	END IF; 
-	IF (splitFlg = 1) THEN
-		SET myStr = CONCAT(myStr, '/', '0');
-	END IF; 
-	RETURN myStr;	
-END$$
-DELIMITER ;
+
+	splitLoop: LOOP
+  		
+		IF (POWER(2, MOD(splitNum, 10)) & splitFlg <> 0) THEN
+			SET splitStr = CONCAT(splitStr, '/', CONVERT(splitNum, CHAR));
+		END IF;
+
+		IF splitNum = 10 THEN
+			SET splitNum = 0;
+    		LEAVE splitLoop;
+  		END IF;
+		
+		SET splitNum = splitNum + 1;
+
+ 	END LOOP splitLoop;
+	RETURN SUBSTRING(splitStr,2);	
+END;

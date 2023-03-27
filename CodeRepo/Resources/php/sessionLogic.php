@@ -43,7 +43,7 @@
 			// cookie exists, but sessionID doesn't exist in the DB or it's expired.
 			// remove the cookie
 			$_COOKIE[$cookie_name] = NULL;
-			header("Location: ../LoginView/Login.php");
+			header("Location: ../LoginView/LoginView.php");
 			$GLOBALS['loggedIn'] = false;
 		}					
 	}

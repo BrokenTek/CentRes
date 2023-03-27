@@ -3,13 +3,13 @@ DELETE FROM MenuItems;
 DELETE FROM MenuCategories;
 DELETE FROM MenuModificationItems;
 DELETE FROM MenuModificationCategories;
-/* 1) INSERT CATEGORIES */
+/* 1 INSERT CATEGORIES */
 
 INSERT INTO menucategories (quickCode, title)
 VALUES ('ROOT','root'),('DRK','Drinks'),('APP','Appetizers'),('ENT','Entrees'),('DES','Desserts'),('DNA','Non-Alcoholic'),('DAA','Alcoholic'),('FAP','Fried'),('SAP','Salads'),('SEN','Sandwiches'),('GRL','Grilled'),('SEA','Seafood'),('ICC','Ice Cream'),('BAK','Baked');
 
 
-/* 2) INSERT MENU ITEMS */
+/* 2 INSERT MENU ITEMS */
 
 INSERT INTO menuitems (quickCode, title, price)
 VALUES
