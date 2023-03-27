@@ -172,8 +172,10 @@ you'll be routed to whatever the home page is for your specified role level -->
             //the button value determines the mode in which the button functions
             function setNewEditBtnState(){
                 let newEditBtn = document.getElementById("btnEditRoster")
+                let deleteBtn = document.getElementById("btnDelete")
                 let selectedEmps = getVar("selectedEmp");
                 if(selectedEmps){
+                    deleteBtn.removeAttribute("disabled");
                     if(selectedEmps.indexOf(",")!=-1){
                         newEditBtn.setAttribute("disabled", true);
                         newEditBtn.classList.add("disabled")
@@ -184,8 +186,10 @@ you'll be routed to whatever the home page is for your specified role level -->
                         newEditBtn.removeAttribute("disabled");
                         newEditBtn.classList.remove("disabled")
                     }
+
                 }
                 else{
+                    deleteBtn.setAttribute("disabled", true);
                     newEditBtn.value = "New"
                     newEditBtn.innerText = "New"
                     newEditBtn.removeAttribute("disabled");
@@ -320,7 +324,7 @@ you'll be routed to whatever the home page is for your specified role level -->
                     </table>
                 </div>
                 <div id="modifyButtons">
-                <button id="btnDelete" type="button" value="Delete">Delete</button>
+                <button id="btnDelete" type="button" value="Delete" disabled>Delete</button>
                 <button id="btnEditRoster" type="button" value="New">New</button>
                 <input id="btnSubmit" type="submit" style="display:none">
                 </div>
