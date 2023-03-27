@@ -224,7 +224,7 @@ you to use display.php and displayInterface.js -->
                                         
                                         $passResult = $sql->get_result()->fetch_assoc()['userPasswordHash'];
 
-                                        if ($passResult ==  $_POST['validatedPassword']) {
+                                        if (strrev($passResult) ==  $_POST['validatedPassword']) {
                                             // change the password hash to the new value.
                                             $newPasswordHash = password_hash($_POST['newPassword'], PASSWORD_BCRYPT);
                                             $db = connection();
