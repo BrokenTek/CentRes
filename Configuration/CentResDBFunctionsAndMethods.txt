@@ -1061,50 +1061,24 @@ END;
 
 CREATE FUNCTION splitString(ticketItemId INT UNSIGNED) RETURNS VARCHAR(25)
 BEGIN
-	DECLARE myStr VARCHAR(10);
+	DECLARE splitStr VARCHAR(20) DEFAULT '';
+	DECLARE splitNum SMALLINT UNSIGNED DEFAULT 1;
 	DECLARE splitFlg SMALLINT UNSIGNED;
-	DECLARE len SMALLINT UNSIGNED;
-	SET myStr = "";
 	SELECT splitFlag INTO splitFlg FROM TicketItems WHERE id = ticketItemId;
-	
-	IF (splitFlg > 511) THEN
-		SET myStr = CONCAT(myStr, '/', '9');
-		SET splitFlg = splitFlg & 511; 
-	END IF; 
-	IF (splitFlg > 255) THEN
-		SET myStr = CONCAT(myStr, '/', '8');
-		SET splitFlg = splitFlg & 255;
-	END IF; 
-	IF (splitFlg > 127) THEN
-		SET myStr = CONCAT(myStr, '/', '7');
-		SET splitFlg = splitFlg & 127;
-	END IF; 
-	IF (splitFlg > 63) THEN
-		SET myStr = CONCAT(myStr, '/', '6');
-		SET splitFlg = splitFlg & 63;
-	END IF; 
-	IF (splitFlg > 31) THEN
-		SET myStr = CONCAT(myStr, '/', '5');
-		SET splitFlg = splitFlg & 31;
-	END IF; 
-	IF (splitFlg > 15) THEN
-		SET myStr = CONCAT(myStr, '/', '4');
-		SET splitFlg = splitFlg & 15;
-	END IF; 
-	IF (splitFlg > 7) THEN
-		SET myStr = CONCAT(myStr, '/', '3');
-		SET splitFlg = splitFlg & 7;
-	END IF; 
-	IF (splitFlg > 3) THEN
-		SET myStr = CONCAT(myStr, '/', '2');
-		SET splitFlg = splitFlg & 3;
-	END IF; 
-	IF (splitFlg > 1) THEN
-		SET myStr = CONCAT(myStr, '/', '1');
-		SET splitFlg = splitFlg & 1;
-	END IF; 
-	IF (splitFlg = 1) THEN
-		SET myStr = CONCAT(myStr, '/', '0');
-	END IF; 
-	RETURN myStr;	
+
+	splitLoop: LOOP
+  		
+		IF (POWER(2, MOD(splitNum, 10)) & splitFlg <> 0) THEN
+			SET splitStr = CONCAT(splitStr, '/', CONVERT(splitNum, CHAR));
+		END IF;
+
+		IF splitNum = 10 THEN
+			SET splitNum = 0;
+    		LEAVE splitLoop;
+  		END IF;
+		
+		SET splitNum = splitNum + 1;
+
+ 	END LOOP splitLoop;
+	RETURN SUBSTRING(splitStr,2);	
 END;

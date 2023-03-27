@@ -783,7 +783,7 @@
             function deliverButtonPressed(e) {
                 if (e.target.getAttribute("disabled") == '') { return; }
                 let deliverString = "";
-                with (document.getElementById("ticketContainer").contentWindow.document.querySelectorAll(".selected.ready")) {
+                with (document.getElementById("ticketContainer").contentWindow.document.querySelectorAll(".ready")) {
                     for (let i = 0; i < length; i++) {
                         deliverString += "," + item(i).id;
                     }

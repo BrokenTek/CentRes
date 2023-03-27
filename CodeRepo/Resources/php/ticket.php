@@ -98,6 +98,9 @@ Otherwise will reroute to logon page -->
         if (document.querySelectorAll(".pending").length > 0) {
             enabledButtons += "CancelSubmit";
         }
+        if (document.querySelectorAll(".ready").length > 0) {
+            enabledButtons += "Deliver";
+        }
         if (document.querySelectorAll(".selected").length  > 0) {
             // can edit
             if (document.querySelectorAll(".selected.editable").length > 0 && document.querySelectorAll(".multiselect.editable").length == 0) {
@@ -113,9 +116,6 @@ Otherwise will reroute to logon page -->
             }
             if (document.querySelectorAll(".selected.splittable").length == document.querySelectorAll(".selected").length) {
                 enabledButtons += "Split";
-            }
-            if (document.querySelectorAll(".selected.ready").length > 0) {
-                enabledButtons += "Deliver";
             }
         }
         setVar("enabledButtons", enabledButtons)
@@ -380,7 +380,7 @@ Otherwise will reroute to logon page -->
                 }
 
                 $sql = "SELECT splitString(" .$ticketItem['id']. ") AS splitString;";
-                $splitString = substr(connection()->query($sql)->fetch_assoc()['splitString'],1);
+                $splitString = connection()->query($sql)->fetch_assoc()['splitString'];
                 $splitString = "Seat&nbsp;" .$ticketItem['seat'] . "<br/>" . $splitString;
                          
                 $selectedFlag = "";
@@ -544,7 +544,7 @@ Otherwise will reroute to logon page -->
             unset($_POST['recordedModificationTime'], $_POST['recordedModificationTime'], $_POST['seat'], $_POST['split'], $_POST['selectedTicketItem']);
             $_POST['enabledButtons'] = "";
         }
-        unset($_POST['command'], $_POST['modificationNotes'],$_POST['menuItem'], $_POST['overrideValue'], $_POST['overrideNote'], $_POST['authorizationUsername'], $_POST['toSeat'], $_POST['toSplit']);
+        unset($_POST['command'], $_POST['modificationNotes'],$_POST['menuItem'], $_POST['ticketItem'], $_POST['overrideValue'], $_POST['overrideNote'], $_POST['authorizationUsername'], $_POST['toSeat'], $_POST['toSplit']);
         require_once 'display.php';
     ?>
     </form>

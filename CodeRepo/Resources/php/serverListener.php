@@ -66,20 +66,15 @@
                 }
 
                 if (isset($_POST['ticket'])) {
-                    $_POST['maxSeat'] = 2;
-                    $sql = "SELECT DISTINCT seat FROM TicketItems WHERE ticketId = " .$_POST['ticket']. " ORDER BY seat;";
-                    $seats = connection()->query($sql);
-                    
-                    if (mysqli_num_rows($seats) > 0) {
-                        while ($seatCurr = $seats->fetch_assoc()) {
-                            $_POST['maxSeat'] = intval($seatCurr['seat']) + 2;
-                        }
-                    }
+                    $sql = "SELECT partySize, tableId FROM Tickets WHERE id = " .$_POST['ticket']. ";";
+                    $result = connection()->query($sql)->fetch_assoc();
 
-                    $_POST['maxSplit'] = 2;
+                    $_POST['maxSeat'] = $result['partySize'];
+                    
                     $sql = "SELECT DISTINCT splitFlag FROM TicketItems WHERE ticketId = " .$_POST['ticket']. " ORDER BY splitFlag;";
                     $splits = connection()->query($sql);
                     
+                    $_POST['maxSplit'] = 1;
                     while ($splitCurr = $splits->fetch_assoc()) {
                         $val = intval(log($splitCurr['splitFlag'],2));
                         if ($val == 0) {
