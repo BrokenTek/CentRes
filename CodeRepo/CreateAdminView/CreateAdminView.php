@@ -153,7 +153,7 @@ you to use display.php and displayInterface.js -->
                         <input id='pwdNewPassword' name='newPassword' type=password required>
                         <label id='lblNewPasswordConfirm' for='pwdNewPasswordConfirm'>Confirm&nbsp;Password</label>
                         <input id='pwdNewPasswordConfirm' name='newPasswordConfirm' type=password required>
-                        <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
+                        <button id='btnClear' class='button' onpointerdown='clearFields()'>Clear</button>
                         <input id='btnCreate' type='submit' class='button' value='Create'> 
                     <?php endif; ?>
                     <?php if(isset($errorMessage)): ?>

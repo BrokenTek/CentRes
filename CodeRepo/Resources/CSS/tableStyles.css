@@ -4,7 +4,7 @@
 
 .highlighted{
     stroke:#bf1e2e;
-    animation: highlighted 3s linear infinite;
+    animation: highlighted_animation 3s linear infinite;
 }
 .selected{
     opacity: 1;
@@ -39,7 +39,7 @@
 
 
 
-@keyframes highlighted {
+@keyframes highlighted_animation {
     0%, 100% {
         stroke-width: 0px; 
     }
