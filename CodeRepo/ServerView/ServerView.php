@@ -62,6 +62,7 @@
                 startUpdateLoopTimer();
 
                 ignoreUpdates = false;
+
             }
             addEventListener("load", loaded);
             
@@ -191,6 +192,8 @@
                     catch(err) {
                     }
                 }
+
+                updateButtonStates();
                 startUpdateLoopTimer();
             }
 
@@ -414,24 +417,29 @@
             }
             
 
-            function updateButtonStates() {
+            function updateButtonStates(forceUpdate = false) {
                 try {
-                    var updatedButtons = getVar("enabledButtons", "ticketContainer");
-                    setVar("enabledButtons", updatedButtons);
-                    btnDeliver.disabled = updatedButtons.indexOf("Deliver") == -1; 
-                    btnSubmit.disabled = updatedButtons.indexOf("Submit") == -1;
-                    btnCancel.disabled = updatedButtons.indexOf("Cancel") == -1;
-                    btnEdit.disabled = updatedButtons.indexOf("Edit") == -1;
-                    btnSubmit.disabled = updatedButtons.indexOf("Submit") == -1;
-                    btnRemove.disabled = updatedButtons.indexOf("Remove") == -1;
-                    btnMove.disabled = updatedButtons.indexOf("Move") == -1;
-                    btnSplit.disabled = updatedButtons.indexOf("Split") == -1;
-
-                    if (btnMove.disabled) {
-                        btnMove.classList.remove("toggled");
+                    if (forceUpdate) {
+                        removeVar("enabledButtons");
                     }
-                    if (btnSPlit.disabled) {
-                        btnSplit.classList.remove("toggled");
+                    if (varXfr("enabledButtons", "ticketContainer", null, false, true) || forceUpdate) {
+                        var updatedButtons = getVar("enabledButtons");
+                        if (updatedButtons === undefined) {updatedButtons = '';}
+                        btnDeliver.disabled = updatedButtons.indexOf("Deliver") == -1; 
+                        btnSubmit.disabled = updatedButtons.indexOf("Submit") == -1;
+                        btnCancel.disabled = updatedButtons.indexOf("Cancel") == -1;
+                        btnEdit.disabled = updatedButtons.indexOf("Edit") == -1;
+                        btnSubmit.disabled = updatedButtons.indexOf("Submit") == -1;
+                        btnRemove.disabled = updatedButtons.indexOf("Remove") == -1;
+                        btnMove.disabled = updatedButtons.indexOf("Move") == -1;
+                        btnSplit.disabled = updatedButtons.indexOf("Split") == -1;
+
+                        if (btnMove.disabled) {
+                            btnMove.classList.remove("toggled");
+                        }
+                        if (btnSplit.disabled) {
+                            btnSplit.classList.remove("toggled");
+                        }
                     }
                 }
                 catch (err) {
@@ -830,7 +838,7 @@
 
                 cboSeat.disabled = false;
                 cboSplit.disabled = false;
-
+                updateButtonStates(true);
             }
 
             function moveButtonPressed(e) {
@@ -862,10 +870,10 @@
                         <!-- options are dynamically added and removed here with JavaScript -->
                     </select>
                     <div id="headerButtonGroup">
-                        <button type="button" id="btnDeliver">DELIVER</button>
-                        <button type="button" id="btnSubmit">SUBMIT</button>
-                        <button type="button" id="btnCancel">CANCEL</button>
-                        <button type="button" id="btnPrintReceipt" style="display: none;">PRINT RECIEPT</button>
+                        <button type="button" id="btnDeliver" disabled>DELIVER</button>
+                        <button type="button" id="btnSubmit" disabled>SUBMIT</button>
+                        <button type="button" id="btnCancel" disabled>CANCEL</button>
+                        <button type="button" id="btnPrintReceipt" style="display: none;" disabled>PRINT RECIEPT</button>
                     </div>
                 </div>
             

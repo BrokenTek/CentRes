@@ -162,11 +162,12 @@ function renameVar(oldVarName, newVarName, id = null, update = false) {
 function varCpy(variableName, source = null, destination = null, updateDestination = false, allowUndefinedVariables = false) {
     let val = getVar(variableName, source);
     let val2 = getVar(variableName, destination);
-    if (val === val2 || (val === undefined && !allowUndefinedVariables)) {
+    if (val === val2 || (val === undefined && !allowUndefinedVariables)) {        
         return false;
     }
     return setVar(variableName, val, destination, updateDestination);
 }
+
 
 // see varCpy function commment. Additionally allows to specify a different destination variable name with destinationVariableName
 function varCpyRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateDestination, allowUndefinedVariables = false) {

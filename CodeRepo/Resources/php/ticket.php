@@ -14,8 +14,13 @@ Otherwise will reroute to logon page -->
             margin-inline: auto;
         }
         .ready > .ticketItemStatus {
+            background-color: #bf1e2e;
+            color: white;
             font-weight: bold;
             animation: readyAnimation 2s ease-in-out infinite;
+            margin-block: auto;
+            padding: .125rem;
+            border-radius: .25rem;
         }
 
         @keyframes readyAnimation {
@@ -76,9 +81,9 @@ Otherwise will reroute to logon page -->
             ?>
 
             //begin listening for updates to the ticket.
-            setInterval(eventLoop, 1000);
             rememberScrollPosition();
             setState();
+            setInterval(eventLoop, 1000);
         }
         
 
@@ -132,7 +137,7 @@ Otherwise will reroute to logon page -->
                 enabledButtons += "Split";
             }
         }
-        setVar("enabledButtons", enabledButtons)
+        setVar("enabledButtons", enabledButtons);
         
     }
     
@@ -283,6 +288,9 @@ Otherwise will reroute to logon page -->
 				}
 				elseif (isset($_POST['ticketItem'])) {
                     $ticketItems = explode(",", $_POST['ticketItem']);
+                    if ($_POST['command'] == 'remove') {
+                        unset($_POST['selectedTicketItem']);
+                    }
                     foreach ($ticketItems as $ticketItem) {
                         if ($_POST['command'] == 'deliver') {
                             $sql = "CALL markTicketItemAsDelivered($ticketItem);";
