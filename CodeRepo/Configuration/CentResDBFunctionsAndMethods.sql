@@ -971,19 +971,6 @@ BEGIN
 	END IF;
 END;
 
-CREATE PROCEDURE updateTicketSplitTimeStamp(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
-BEGIN
-	DECLARE sf SMALLINT UNSIGNED;
-	SELECT POWER(2, split) INTO sf;
-	UPDATE Tickets SET timeModified = NOW() WHERE id = ticketNumber;
-	
-	IF ((SELECT COUNT(*) FROM TicketItems WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf) = 0) THEN
-		DELETE FROM Splits WHERE ticketId = ticketNumber AND splitId = split;
-	ELSE
-		UPDATE Splits SET timeModified = NOW() WHERE ticketId = ticketNumber AND splitId = split;
-	END IF;
-END;
-
 -- passing in a split value of 10 indicates submit all ticket items for specified ticket
 -- otherwise submits a single split 0 - 9.
 CREATE PROCEDURE submitPendingTicketItems(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
@@ -1012,10 +999,29 @@ BEGIN
 	CALL updateTicketSplitsTimeStamp(ticketNumber, sf);
 END;
 
+CREATE PROCEDURE updateTicketSplitTimeStamp(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
+BEGIN
+	DECLARE sf SMALLINT UNSIGNED;
+	
+	SELECT POWER(2, split) INTO sf;
+	UPDATE Tickets SET timeModified = NOW() WHERE id = ticketNumber;
+	
+	IF ((SELECT COUNT(*) FROM TicketItems WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf) = 0) THEN
+		DELETE FROM Splits WHERE ticketId = ticketNumber AND splitId = split;
+	ELSE
+		UPDATE Splits SET timeModified = NOW() WHERE ticketId = ticketNumber AND splitId = split;
+	END IF;
+END;
+
 CREATE PROCEDURE updateTicketSplitsTimeStamp(IN ticketNumber INT UNSIGNED, IN sf SMALLINT UNSIGNED)
 BEGIN
 	UPDATE Tickets SET timeModified = NOW() WHERE id = ticketNumber;
 	
+	-- if sf/split flag is 0, set it to apply to all splits.
+	IF (sf = 0) THEN
+		SET sf = 1023;
+	END IF;
+
 	IF ((SELECT COUNT(*) FROM TicketItems WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf) = 0) THEN
 		DELETE FROM Splits WHERE ticketId = ticketNumber AND (POWER(2, splitId) & sf) = sf;
 	ELSE
