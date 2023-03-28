@@ -39,7 +39,7 @@ INSERT INTO LoginRouteTable VALUES
 	(9, 'Back of House Manager', NULL),
 	(14, 'Front of House Manager', '../HostView/HostView.php'),
 	(15, 'General Manager', '../HostView/HostView.php'),
-	(16777215, 'Admin', '../ManagerView/EmployeeRoster.php');
+	(65535, 'Admin', '../ManagerView/EmployeeRoster.php');
 
 CREATE TABLE EmployeeRoles (
 	id SMALLINT UNSIGNED PRIMARY KEY,
@@ -53,7 +53,7 @@ INSERT INTO EmployeeRoles VALUES
 	(9, 'Back of House Manager'),
 	(14, 'Front of House Manager'),
 	(15, 'General Manager'),
-	(16777215, 'Admin');
+	(65535, 'Admin');
 	
 CREATE TABLE Employees(
 	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

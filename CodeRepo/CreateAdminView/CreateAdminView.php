@@ -115,7 +115,7 @@ you to use display.php and displayInterface.js -->
                         if ($processCreateUser) {
                             try {
                                 $hash = password_hash($_POST['newPassword'], PASSWORD_BCRYPT);
-                                $allowedRoles = 16777215;
+                                $allowedRoles = 65535;
                                 $sql = "INSERT INTO Employees (userName, lastName, firstName, passwordBCrypt, roleLevel) VALUES (".
                                     "'" .$_POST['username']. "', ".
                                     "'" .$_POST['lastName']. "', ".
