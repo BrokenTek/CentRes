@@ -37,7 +37,7 @@ if (isset($_POST['scrollX']) OR isset($_POST['scrollY'])) {
 
 function getSqlOrderByClause($tableId) {
     $sql = "";
-    $sortKeyPrefix = tableId + "_SortKey";
+    $sortKeyPrefix = $tableId + "_SortKey";
     $keyIndex = 1;
     while (true) {
         $key = $sortKeyPrefix + $keyIndex;
@@ -56,7 +56,7 @@ function getSqlOrderByClause($tableId) {
 }
 
 function sortKeyIndex($tableId, $columnId) {
-    $sortKeyPrefix = tableId + "_SortKey";
+    $sortKeyPrefix = $tableId + "_SortKey";
     $keyIndex = 1;
     while (true) {
         $key = $sortKeyPrefix + $keyIndex;
