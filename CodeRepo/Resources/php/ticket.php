@@ -85,7 +85,6 @@ Otherwise will reroute to logon page -->
             ?>
 
             //begin listening for updates to the ticket.
-            rememberScrollPosition();
             setInterval(eventLoop, 1000);
         }
         setState();
@@ -100,7 +99,21 @@ Otherwise will reroute to logon page -->
             }
         }
 
-       
+        // code that allows retention of scrollbar location between refreshes
+        let x = varGet("scrollX");
+        let y = varGet("scrollY");
+        if (x !== undefined) {
+            window.scroll({
+                top: y,
+                left: x,
+                behavior: "smooth",
+                });
+        }
+
+        window.addEventListener('scroll', function(event) {
+            varSet("scrollX", window.scrollX);
+            varSet("scrollY", window.scrollY);
+        }, true);
     }
 
     // function that listens for an external change in the ticket timestamp.

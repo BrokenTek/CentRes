@@ -57,8 +57,8 @@
 
         
     </style>
-        <!-- gives you access to setVar, getVar, removeVar, 
-        clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
+        <!-- gives you access to varSet, varGet, varRem, 
+        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
         
 
@@ -68,7 +68,7 @@
                 toggleSortKey(tableId, this.getAttribute("sqlColumnId"));
             }
             function buttonClicked(){
-                setVar("command", this.getAttribute("command"));
+                varSet("command", this.getAttribute("command"));
                 updateDisplay();
             }
 
@@ -81,7 +81,7 @@
                 if (this === undefined || this.classList.contains('disabled')) { return; }
                 targetMenuItem = this;
                 targetMenuItem.classList.add("selected");
-                if (getVar("selectedItem") != null && getVar("selectedItem") != this.id) {
+                if (varGet("selectedItem") != null && varGet("selectedItem") != this.id) {
                     longTouchTimer = setTimeout(longTouch, LONG_TIME_TOUCH_LENGTH);
                 }
 	        }
@@ -93,7 +93,7 @@
                 targetMenuItem.classList.add("multiselect");
 
                 // if there is exactly 1 other item selected, make it multi-select as well.
-                var alreadySelected = getVar("selectedItem");
+                var alreadySelected = varGet("selectedItem");
                 if (alreadySelected != null && alreadySelected.indexOf(",") == -1) {
                     document.getElementById(alreadySelected).classList.add("multiselect");
                 }
@@ -117,11 +117,11 @@
     	            }
     	            targetMenuItem.classList.add("selected");
                     targetMenuItem.classList.remove("multiselect");
-                    setVar("selectedItem", targetMenuItem.id);
+                    varSet("selectedItem", targetMenuItem.id);
                 }
                 // or you have multiple items selected
                 else {
-                    setVar("selectedItem", getVar("selectedItem") + "," + targetMenuItem.id); 
+                    varSet("selectedItem", varGet("selectedItem") + "," + targetMenuItem.id); 
                 }
 
                 targetMenuItem = null;
@@ -133,7 +133,7 @@
                 let anyUntracked = false;
                 let anyTracked = false;
                 let quantityToCompare = -1;
-                let itemsToCheck = getVar("selectedItem");
+                let itemsToCheck = varGet("selectedItem");
                 let updateInput = document.getElementById("numQty")
                 let checkBox = document.getElementById("chkQtyTracked");
                 if(itemsToCheck == null){
@@ -184,16 +184,16 @@
             function allElementsLoaded(){
                 //add the unicode characters to table headers with sort keys.
                 let tableHeaders = document.getElementsByTagName("th");
-                if(getVar('tblInventory_SortKey1')!=null){
+                if(varGet('tblInventory_SortKey1')!=null){
                     let keyIndex = 1;
                     let unicodeBase = 9311;
                     let keyPrefix = 'tblInventory_SortKey';
-                    while(getVar(keyPrefix + keyIndex)!= null){
-                        let keyToScan = getVar(keyPrefix + keyIndex);
+                    while(varGet(keyPrefix + keyIndex)!= null){
+                        let keyToScan = varGet(keyPrefix + keyIndex);
                         for(let i = 0; i < tableHeaders.length; i++){
                             if(keyToScan.indexOf(tableHeaders[i].getAttribute("sqlColumnId"))!= -1){
                                 tableHeaders[i].innerText = String.fromCharCode(unicodeBase + keyIndex) +tableHeaders[i].innerText;
-                                if(getVar(keyPrefix + keyIndex).indexOf("ASC")!=-1){
+                                if(varGet(keyPrefix + keyIndex).indexOf("ASC")!=-1){
                                     tableHeaders[i].innerText = tableHeaders[i].innerText +"\u25B2";
                                 }
                                 else{
@@ -208,8 +208,8 @@
                               
                 
                 //select any items that were selected before refresh
-                let selItems = getVar("selectedItem");
-                if (getVar("selectedItem") !== undefined) {
+                let selItems = varGet("selectedItem");
+                if (varGet("selectedItem") !== undefined) {
                     selItems = selItems.split(",");
                     for( let i = 0; i < selItems.length; i++) {
                         document.getElementById(selItems[i]).classList.add("selected");
@@ -270,16 +270,16 @@
 
                 // code that allows retention of scrollbar location between refreshes
                 with (document.getElementById("sessionForm")) {
-                    let x = getVar(id + "_scrollLeft");
-                    let y = getVar(id + "_scrollTop");
+                    let x = varGet(id + "_scrollLeft");
+                    let y = varGet(id + "_scrollTop");
                     if (x !== undefined) {
                         scrollLeft = x;
                         scrollTop = y;
                     }
 
                     window.addEventListener('scroll', function(event) {
-                        setVar(id + "_scrollLeft", scrollLeft);
-                        setVar(id + "_scrollTop", scrollTop);
+                        varSet(id + "_scrollLeft", scrollLeft);
+                        varSet(id + "_scrollTop", scrollTop);
                     }, true);   
                 }
 
