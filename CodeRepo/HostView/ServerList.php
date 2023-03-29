@@ -8,14 +8,14 @@
         <script src= '../Resources/JavaScript/displayInterface.js'></script>
         <script>
             function allElementsLoaded() {
-                let selectedServer = getVar("selectedServer");
+                let selectedServer = varGet("selectedServer");
                 if (selectedServer !== undefined) {
                     let server = document.getElementById(selectedServer);
                     if (server != null) {
                         server.classList.add("selected");
                     }
                     else {
-                        removeVar("selectedServer");
+                        varRem("selectedServer");
                     }
                 }
                 var activeServers = document.getElementsByClassName("activeServer");
@@ -31,8 +31,8 @@
             function serverClicked() {
                 if (this.classList.contains("selected")) {
                     this.classList.remove("selected");
-                    removeVar("selectedServer");
-                    removeVar("employeeId");
+                    varRem("selectedServer");
+                    varRem("employeeId");
                 }
                 else {
                     var selectedServer = document.getElementsByClassName("selected");
@@ -40,8 +40,8 @@
                         selectedServer[0].classList.remove("selected");
                     } 
                     this.classList.add("selected");
-                    setVar("selectedServer", this.id);
-                    setVar("employeeId", this.id.substring(6));
+                    varSet("selectedServer", this.id);
+                    varSet("employeeId", this.id.substring(6));
                 }
             }
         </script>

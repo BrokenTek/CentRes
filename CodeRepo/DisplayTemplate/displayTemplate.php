@@ -14,34 +14,34 @@ you'll be routed to whatever the home page is for your specified role level -->
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <html>
     <head>
-        <!-- gives you access to setVar, getVar, removeVar, 
-        clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
+        <!-- gives you access to varSet, varGet, varRem, 
+        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         
-        <!-- demonstration on how to use getVar, setVar, updateDisplay for just this page -->
+        <!-- demonstration on how to use varGet, varSet, updateDisplay for just this page -->
         <!-- remove this script tag -->
         <script>
             function allElementsLoaded() {
-                if (getVar("greeting") != null) {
+                if (varGet("greeting") != null) {
                     // variable carried over after updateDisplay() is called
-                    alert('After Refresh/Submit:\ngetVar("greeting")  >>>> ' + getVar("greeting"));
+                    alert('After Refresh/Submit:\nvarGet("greeting")  >>>> ' + varGet("greeting"));
                 }
                 else {
-                    // show getVar returns undefined for anything that hasn't been set yet
-                    alert('getVar("greeting") >>>> ' + getVar("greeting"));
+                    // show varGet returns undefined for anything that hasn't been set yet
+                    alert('varGet("greeting") >>>> ' + varGet("greeting"));
 
-                    // use setVar and show that getVar returns the value
-                    setVar("greeting", "Hello World");
-                    alert('setVar("greeting", "Hello World");\ngetVar("greeting") >>>> ' + getVar("greeting"));
+                    // use varSet and show that varGet returns the value
+                    varSet("greeting", "Hello World");
+                    alert('varSet("greeting", "Hello World");\nvarGet("greeting") >>>> ' + varGet("greeting"));
                     
-                    // use removeVar and show that getVar once again returns undefined
-                    removeVar("greeting");
-                    alert('removeVar("greeting");\ngetVar("greeting") >>>> ' + getVar("greeting"));
+                    // use varRem and show that varGet once again returns undefined
+                    varRem("greeting");
+                    alert('varRem("greeting");\nvarGet("greeting") >>>> ' + varGet("greeting"));
 
                     // set greeting to "Hello Again" and updateDisplay(). Alert user page is about to submit/refresh
                     // using updateDisplay()
-                    setVar("greeting", "Hello Again. Im still here");
-                    alert('setVar("greeting, "Hello Again". Im still here");\nupdateDisplay();\n\nvar will be retained after refresh/submit');
+                    varSet("greeting", "Hello Again. Im still here");
+                    alert('varSet("greeting, "Hello Again". Im still here");\nupdateDisplay();\n\nvar will be retained after refresh/submit');
                     updateDisplay();
                 }
             }

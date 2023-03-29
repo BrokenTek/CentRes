@@ -28,10 +28,10 @@
                                 $updateString .= ",". $table['tableId'] .",". $table['status'];
                             }
                             
-                            echo("setVar('updatedTables', '$updateString');");
+                            echo("varSet('updatedTables', '$updateString');");
                         }
 
-                        echo("setVar('tableLogIndex', '$newIndex');");
+                        echo("varSet('tableLogIndex', '$newIndex');");
                     }
 
                     

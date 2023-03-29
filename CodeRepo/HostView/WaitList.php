@@ -14,20 +14,20 @@ Otherwise will reroute to logon page -->
     <head>
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/waitListStructure.css">
-        <!-- gives you access to setVar, getVar, removeVar, 
-        clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
+        <!-- gives you access to varSet, varGet, varRem, 
+        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>  
         <script>
             function createEventHandlers() {
-                let selectedTicket = getVar("selectedTicket");
+                let selectedTicket = varGet("selectedTicket");
                 if (selectedTicket !== undefined) {
                     let ticket = document.getElementById(selectedTicket);
                     if (ticket != null) {
                         ticket.classList.add("selected");
                     }
                     else {
-                        removeVar("selectedTicket");
-                        removeVar("ticketId");
+                        varRem("selectedTicket");
+                        varRem("ticketId");
                     }
                 }
                 rememberScrollPosition();
@@ -39,15 +39,15 @@ Otherwise will reroute to logon page -->
             }
 
             function removeSelectedTicket() {
-                setVar('removeTicket', getVar('selectedTicket'));
+                varSet('removeTicket', varGet('selectedTicket'));
                 updateDisplay();
             }
 
             function pressTicket() {
-                if (getVar("selectedTicket") == this.id) {
+                if (varGet("selectedTicket") == this.id) {
                     this.classList.remove("selected");
-                    removeVar("selectedTicket");
-                    removeVar("ticketId");
+                    varRem("selectedTicket");
+                    varRem("ticketId");
                     with (document.querySelector("#btnRemoveSelectedTicket")) {
                         setAttribute('disabled', '');
                         classList.add('disabled');
@@ -59,8 +59,8 @@ Otherwise will reroute to logon page -->
                     if (oldSelection != null) {
                         oldSelection.classList.remove("selected");
                     }
-                    setVar("selectedTicket", this.id);
-                    setVar("ticketId", this.id.substring(6));
+                    varSet("selectedTicket", this.id);
+                    varSet("ticketId", this.id.substring(6));
                     this.classList.add("selected");
 
                     with (document.querySelector("#btnRemoveSelectedTicket")) {

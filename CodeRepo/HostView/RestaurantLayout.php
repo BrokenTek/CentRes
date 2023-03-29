@@ -54,7 +54,7 @@
         }
 
         function highlightTables() {
-            let tables = getVar("highlightedTables");
+            let tables = varGet("highlightedTables");
             if (tables !== undefined) {
                 tables = tables.split(",");
                 for (let i = 0; i < tables.length; i++) {
@@ -65,7 +65,7 @@
         
         function updateTableStatuses() {
             try {
-                var newTableData = getVar("updatedTables", "tableStatusListener");
+                var newTableData = varGet("updatedTables", "tableStatusListener");
                 if (newTableData != null) {
                     newTableData = newTableData.split(",");
                     for (var i = 0; i < newTableData.length; i += 2 ) {
@@ -74,9 +74,9 @@
                             add(newTableData[i+1]);
                         }
                     }
-                    let selectedTable = getVar("selectedTable");
+                    let selectedTable = varGet("selectedTable");
                     if (selectedTable !== undefined && ("," + newTableData + ",").indexOf("," + selectedTable + ",") > -1) {
-                        setVar("flag", "updateSelectedTable");
+                        varSet("flag", "updateSelectedTable");
                     }
                 }
             }
@@ -92,7 +92,7 @@
                 updateDisplay("tableStatusListener");
             }
             try {
-                if (getVar("updatedTables", "tableStatusListener") !== undefined) {
+                if (varGet("updatedTables", "tableStatusListener") !== undefined) {
                     updateTableStatuses();
                 }
             }
@@ -103,7 +103,7 @@
                 return;
             }
             
-            if (getVarOnce("highlightedTablesChanged")) {
+            if (varGetOnce("highlightedTablesChanged")) {
                 let allTables = document.getElementsByClassName("table");
                 for (let i = 0; i < allTables.length; i++) {
                     allTables[i].classList.remove("highlighted");
@@ -112,7 +112,7 @@
                 highlightTables();
                 
             }
-            else if (getVarOnce("syncHighlightAnimation")) {
+            else if (varGetOnce("syncHighlightAnimation")) {
                 let allTables = document.getElementsByClassName("table");
                 for (let i = 0; i < allTables.length; i++) {
                     allTables[i].classList.remove("highlighted");
@@ -143,19 +143,19 @@
             if (this === undefined) { return; } else { event.stopPropagation(); }
             pointerIsDown = true;
             if (targetTable != null && this == targetTable) {
-                setVar("goToTable", targetTable.id);
+                varSet("goToTable", targetTable.id);
                 clearInterval(doubleTouchTimer);
                 clearSelectedTables(this.id);
                 return;
             }
-            else if (getVar("authorizationId") !== undefined && this.classList.contains("seated")) {
+            else if (varGet("authorizationId") !== undefined && this.classList.contains("seated")) {
                 targetTable = this;
                 doubleTouchTimer = setTimeout(() => {
                     targetTable = null;
                 }, DOUBLE_TOUCH_LENGTH);
             }
             if (!multiselectEnabled) {
-                let selTables = getVar("selectedTable");
+                let selTables = varGet("selectedTable");
                 if (selTables !== undefined && selTables.indexOf(",") > -1 && selTables.indexOf(this.id) > -1) {
                     clearSelectedTables(this.id);
                 }
@@ -177,7 +177,7 @@
                     updateSelectedTables();
                 }
                 else {
-                    let lookAt = getVar("selectedTable");
+                    let lookAt = varGet("selectedTable");
                     if (lookAt != null && lookAt.indexOf(",") == -1) {
                         multiselectEnabled = true;
                         document.getElementsByTagName("form")[0].classList.add("multiselect");
@@ -202,7 +202,7 @@
                 for(let i = 0; i < oldSelectedItems.length; i++){
                     oldSelectedItems[i].classList.remove("selected");
                 }
-                setVar("selectedTable", "clear");
+                varSet("selectedTable", "clear");
             }
             
         }
@@ -223,19 +223,19 @@
         function updateSelectedTables() {
             let selectedTables = document.getElementsByClassName("selected");
             if (selectedTables.length == 0) {
-                removeVar("selectedTable");
+                varRem("selectedTable");
             }
             else {
                 let selTableStr = selectedTables[0].id;
                 for(let i = 1; i < selectedTables.length; i++) {
                     selTableStr += "," + selectedTables[i].id;
                 }
-                setVar("selectedTable", selTableStr);
+                varSet("selectedTable", selTableStr);
             }
         }
 
         function clearSelectedTables(id) {
-            setVar("selectedTable", id == null ? "clear" : id);
+            varSet("selectedTable", id == null ? "clear" : id);
             var selTables = document.getElementsByClassName("table") 
             for (let i = 0; i < selTables.length; i++) {
                 selTables[i].classList.remove("selected");

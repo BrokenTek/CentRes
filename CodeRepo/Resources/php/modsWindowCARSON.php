@@ -8,7 +8,7 @@ Otherwise will reroute to logon page -->
         <script src="../JavaScript/displayInterface.js"></script>
         <script>
             function signalStatus(status) {
-                setVar("status", status);
+                varSet("status", status);
             }
         </script>
     </head>

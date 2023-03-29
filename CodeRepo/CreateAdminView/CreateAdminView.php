@@ -14,8 +14,8 @@ you to use display.php and displayInterface.js -->
 <html>
     <head>
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
-        <!-- gives you access to setVar, getVar, removeVar, 
-        clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
+        <!-- gives you access to varSet, varGet, varRem, 
+        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         <script>
             function allElementsLoaded() {

@@ -252,19 +252,19 @@ you'll be routed to whatever the home page is for your specified role level -->
           margin-inline: .25rem;
         }
       </style>
-        <!-- gives you access to setVar, getVar, removeVar, 
-        clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
+        <!-- gives you access to varSet, varGet, varRem, 
+        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         
         <script>
             function allElementsLoaded() {
-              <?php if (isset($update)) { echo("setVar('update', true);"); } ?>
+              <?php if (isset($update)) { echo("varSet('update', true);"); } ?>
             }
             
             function executeAction(verboseAction, employeeId = null) {
-              setVar("verboseAction",verboseAction);
+              varSet("verboseAction",verboseAction);
               if (employeeId != null) {
-                setVar("employeeId", employeeId);
+                varSet("employeeId", employeeId);
               }
               updateDisplay();
             }

@@ -48,15 +48,15 @@
                 btnMove.addEventListener('pointerup', (event) => {moveButtonPressed(event)});
                 btnSplit.addEventListener('pointerup', (event) => {splitButtonPressed(event)});
                 
-                setVar('username', USERNAME, 'serverListener', true);
-                let staticTableId = getVar('staticTableId');
+                varSet('username', USERNAME, 'serverListener', true);
+                let staticTableId = varGet('staticTableId');
                 if (staticTableId !== undefined) {
-                    setVar('staticTableId', staticTableId, 'serverListener', true);
+                    varSet('staticTableId', staticTableId, 'serverListener', true);
                 }
                 
                 checkTableAssignments();
 
-                setVar("enabledButtons", "");
+                varSet("enabledButtons", "");
                 updateButtonStates();
 
                 startUpdateLoopTimer();
@@ -79,8 +79,8 @@
             function updateLoop() {
                 stopUpdateLoopTimer();
 
-                if (getVar("staticTableId") !== undefined && getVarOnce("ticketRemoved","ticketContainer") !== undefined) {
-                    alert("Ticket " + getVar("ticket", "ticketContainer") + " is not longer assigned to this table!\nRedirecting back to Host View.");
+                if (varGet("staticTableId") !== undefined && varGetOnce("ticketRemoved","ticketContainer") !== undefined) {
+                    alert("Ticket " + varGet("ticket", "ticketContainer") + " is not longer assigned to this table!\nRedirecting back to Host View.");
                     location.replace(document.getElementById("mgrNavHostView").getAttribute("value"));
                 }
             
@@ -95,13 +95,13 @@
                     // if a seat and split are selected and the mod window is not open,
                     // check if a menu item was selected. otherwise ignore if you clicked a menu item.
                     try {
-                            if (!(getVar("selectedMenuItem", "menuContainer") === undefined)) {
+                            if (!(varGet("selectedMenuItem", "menuContainer") === undefined)) {
                                 if (cboSeat.selectedIndex == 0 || cboSplit.selectedIndex == 0) {
                                     ticketContainer.contentWindow.document.getElementById("ticketHeader").classList.add("highlighted");
                                     setTimeout(() => {
                                     ticketContainer.contentWindow.document.getElementById("ticketHeader").classList.remove("highlighted");
                                 }, 1100);
-                                removeVar("selectedMenuItem", "menuContainer");
+                                varRem("selectedMenuItem", "menuContainer");
                                 }
                             }
                         }
@@ -110,9 +110,9 @@
                     var seat;
                     var split;
                     try {
-                        tick = getVar("ticket", "ticketContainer");
-                        seat = getVar("seat", "ticketContainer");
-                        split = getVar("split", "ticketContainer");
+                        tick = varGet("ticket", "ticketContainer");
+                        seat = varGet("seat", "ticketContainer");
+                        split = varGet("split", "ticketContainer");
                         populateSeats((cboTable.selectedIndex > 0 || tick != null) && cboSeat.options.length == 1);
                         populateSplits((cboTable.selectedIndex > 0 || tick != null) && cboSplit.options.length == 1);
                         if (cboTable.selectedIndex > 0 && cboSeat.selectedIndex > 0 && cboSplit.selectedIndex > 0) {
@@ -131,7 +131,7 @@
                 }
                 else { 
                     try {
-                        removeVar("selectedMenuItem", "menuContainer");
+                        varRem("selectedMenuItem", "menuContainer");
                     } 
                     catch (err) { }
                     hideModWindow();
@@ -149,15 +149,15 @@
                 var ticketRefresh = false;
                 // verify ticket, seats, and splits have loaded... If not, attempt to reload
                 try {
-                    if (cboTable.selectedIndex > 0 && (getVar("ticket", "ticketContainer") == null )) { 
-                        setVar("ticket", cboTable.value, "ticketContainer" );
+                    if (cboTable.selectedIndex > 0 && (varGet("ticket", "ticketContainer") == null )) { 
+                        varSet("ticket", cboTable.value, "ticketContainer" );
                         ticketRefresh = true;                    
                     }
                     if (cboTable.selectedIndex > 0 &&
                         ticketContainer.contentWindow.document.getElementById("ticketHeader") != null &&
                         ticketContainer.contentWindow.document.getElementById("ticketHeader").innerText == "No Ticket/Table Selected") {
                             ticketContainer.contentWindow.document.getElementById("ticketHeader").innerText = "Well this is embarrasing!<br>Sit Tight!<br>Fetching Ticket.".
-                            setVar("ticket", cboTable.value, "ticketContainer" );
+                            varSet("ticket", cboTable.value, "ticketContainer" );
                             ticketRefresh = true;
                     }
                 }
@@ -200,8 +200,8 @@
                 try {
                     stopUpdateLoopTimer();
                     ticketContainer.classList.add("clear");
-                    selTicket = getVar("selectedTicketItem", "ticketContainer");
-                    setVar("selectedItem",selTicket.replace("ticketItem",""), "modEditorContainer", true);
+                    selTicket = varGet("selectedTicketItem", "ticketContainer");
+                    varSet("selectedItem",selTicket.replace("ticketItem",""), "modEditorContainer", true);
                     modEditorContainer.classList.add("active");
                     ticketContainer.classList.add("hidden");
                     cboTable.disabled = true;
@@ -227,12 +227,12 @@
 
             function hideModWindow() {
                 try {
-                    var status = getVar("status", "modEditorContainer");
+                    var status = varGet("status", "modEditorContainer");
                     if (status == 'await' && modEditorContainer.classList.contains("active")) {
                         modEditorContainer.classList.remove("active"); 
-                        //setVar("recordedModificationTime", Date.now() + 6000, "ticketContainer");
+                        //varSet("recordedModificationTime", Date.now() + 6000, "ticketContainer");
                         setTimeout(() => { ticketContainer.classList.remove("clear")} ,750);
-                        setVar("ignoreUpdate", "yes please", "ticketContainer", true);
+                        varSet("ignoreUpdate", "yes please", "ticketContainer", true);
                         modEditorContainer.setAttribute("src", "../Resources/php/modsWindowCARSON.php");
                         cboTable.removeAttribute("disabled");
                         cboSeat.removeAttribute("disabled");
@@ -251,7 +251,7 @@
             function checkTableAssignments() {
                 var checkStr;
                 try {
-                    checkStr = getVar("tableList", "serverListener");
+                    checkStr = varGet("tableList", "serverListener");
                 }
                 catch (err) {
                      // due to the async nature of components, some requests might fail
@@ -310,9 +310,9 @@
 
                         if (tablesRemoved[i] == selectedTable) {
                             cboTable.selectedIndex = 0;
-                            removeVar("ticket", "ticketContainer");
-                            removeVar("seat", "ticketContainer");
-                            removeVar("split", "ticketContainer");
+                            varRem("ticket", "ticketContainer");
+                            varRem("seat", "ticketContainer");
+                            varRem("split", "ticketContainer");
                             tableSelectionChanged();
                             updateDisplay("ticketContainer");
                         }
@@ -328,10 +328,10 @@
 
                     if (cboTable.options.length == 1) {
                         document.querySelector("#selectTable").text="No Tables";
-                        if (getVar("seat", "ticketContainer") != null) {
-                            removeVar("ticket", "ticketContainer");
-                            removeVar("seat", "ticketContainer");
-                            removeVar("split", "ticketContainer");
+                        if (varGet("seat", "ticketContainer") != null) {
+                            varRem("ticket", "ticketContainer");
+                            varRem("seat", "ticketContainer");
+                            varRem("split", "ticketContainer");
                             tableSelectionChanged();
                             updateDisplay("ticketContainer");
                         }
@@ -346,10 +346,10 @@
                 if (cboTable.options.length == 1) {
                     document.querySelector("#selectTable").text = "No Tables"; 
                     
-                    if (getVar("seat", "ticketContainer") != null) {
-                        removeVar("ticket", "ticketContainer");
-                        removeVar("seat", "ticketContainer");
-                        removeVar("split", "ticketContainer");
+                    if (varGet("seat", "ticketContainer") != null) {
+                        varRem("ticket", "ticketContainer");
+                        varRem("seat", "ticketContainer");
+                        varRem("split", "ticketContainer");
                         tableSelectionChanged();
                         updateDisplay("ticketContainer");
                     }
@@ -392,9 +392,9 @@
             // listen for menu item selection
             function checkMenuItemSelected() {
                 if (varXfrRen("selectedMenuItem", "menuContainer", "menuItem", "ticketContainer")) {
-                    setVar('command', 'add', 'ticketContainer');
-                    setVar('scrollY', Number.MAX_SAFE_INTEGER , 'ticketContainer');
-                    setVar("ignoreUpdate", "Yes please" ,"ticketContainer");
+                    varSet('command', 'add', 'ticketContainer');
+                    varSet('scrollY', Number.MAX_SAFE_INTEGER , 'ticketContainer');
+                    varSet("ignoreUpdate", "Yes please" ,"ticketContainer");
                     showTicketContainer();
                     updateDisplay("ticketContainer");
                 }                
@@ -402,7 +402,7 @@
 
             function showTicketContainer() {
                 try {
-                    getVar("ticket", "ticketContainer");
+                    varGet("ticket", "ticketContainer");
                     ticketContainer.classList.remove("clear");
                 }
                 catch (err) {
@@ -416,10 +416,10 @@
             }
             
 
-            function updateButtonStates(buttonPressed = false) {
+            function updateButtonStates() {
                 try {                   
                     if (varCpy("enabledButtons", "ticketContainer", null, false, true)) {
-                        var updatedButtons = getVar("enabledButtons");
+                        var updatedButtons = varGet("enabledButtons");
                         if (updatedButtons === undefined) {updatedButtons = '';}
                         btnDeliver.disabled = updatedButtons.indexOf("Deliver") == -1; 
                         btnSubmit.disabled = updatedButtons.indexOf("Submit") == -1;
@@ -451,8 +451,8 @@
                 var lookAtTimeStamp;
                 var selectedItems;
                 try {
-                    lookAtTimeStamp = parseInt(getVar("lastUpdate", "ticketContainer"));
-                    selectedItems = getVar("selectedTicketItem", "ticketContainer");
+                    lookAtTimeStamp = parseInt(varGet("lastUpdate", "ticketContainer"));
+                    selectedItems = varGet("selectedTicketItem", "ticketContainer");
                 }
                 catch (err) {
                     setTimeout(getSelectedTicketItem, 250);
@@ -482,13 +482,13 @@
 
             function tableSelectionChanged() {
                 //no table selected
-                removeVar("selectedTicketItem", "ticketContainer");
-                removeVar("ticket", "ticketContainer");
-                removeVar("seat","ticketContainer");
-                removeVar("split","ticketContainer");
+                varRem("selectedTicketItem", "ticketContainer");
+                varRem("ticket", "ticketContainer");
+                varRem("seat","ticketContainer");
+                varRem("split","ticketContainer");
                 updateButtonStates();
             
-                setVar("enabledButtons", "");
+                varSet("enabledButtons", "");
                 if (cboTable.selectedIndex == 0) {
                     
                     cboSeat.disabled = true;
@@ -516,16 +516,16 @@
 
                     updateDisplay("ticketContainer");
 
-                    //setVar("ignoreUpdate", "ticketContainer");
+                    //varSet("ignoreUpdate", "ticketContainer");
                    
                                        
                 }
                 else {
                     
                     try {
-                        setVar("ticket",cboTable.value,"serverListener", true);
-                        setVar("ticket",cboTable.value,"ticketContainer");
-                        setVar("ignoreUpdate", "yes please", "ticketContainer", true);
+                        varSet("ticket",cboTable.value,"serverListener", true);
+                        varSet("ticket",cboTable.value,"ticketContainer");
+                        varSet("ignoreUpdate", "yes please", "ticketContainer", true);
                     }
                     catch (err) {
                         
@@ -534,8 +534,8 @@
                     updateButtonStates();
                     ticketHeader.innerHTML = "-&nbsp;-&nbsp;-";
                     
-                    var seat = getVar("seat", "ticketContainer");
-                    var split = getVar("split", "ticketContainer");
+                    var seat = varGet("seat", "ticketContainer");
+                    var split = varGet("split", "ticketContainer");
 
                     cboSeat.disabled = false;
                     cboSplit.disabled = false;
@@ -555,7 +555,7 @@
             function populateSeats(forceReset = false) {
                 var maxSeat;
                 try {
-                    maxSeat = getVar("maxSeat", "serverListener");
+                    maxSeat = varGet("maxSeat", "serverListener");
                 }
                 catch (err) {
                     setTimeout(populateSeats, 250);
@@ -607,7 +607,7 @@
                     }
                     if (cboSeat.selectedIndex >= cboSeat.options.length - 2) {
                         //seat is no longer valid
-                        removeVar("seat", "ticketContainer", true);
+                        varRem("seat", "ticketContainer", true);
                     }
                 }            
             }
@@ -615,7 +615,7 @@
             function populateSplits(forceReset = false) {
                 var maxSplit;
                 try {
-                    maxSplit = getVar("maxSplit", "serverListener");
+                    maxSplit = varGet("maxSplit", "serverListener");
                     if (maxSplit == 0) {
                         maxSplit = 10;
                     }
@@ -678,8 +678,8 @@
             function selectedSeatChanged() {
                 try {
                     var toggledControl = document.getElementsByClassName("toggled");
-                    var prevSel = getVar("seat", "ticketContainer");
-                    var selSplit = getVar("split", "ticketContainer");
+                    var prevSel = varGet("seat", "ticketContainer");
+                    var selSplit = varGet("split", "ticketContainer");
                     var command = "";
                     if (toggledControl.length == 1 && cboSeat.selectedIndex > 0) {
                         let selItems = ticketContainer.contentWindow.document.getElementsByClassName("selected");
@@ -689,20 +689,20 @@
                         }
                         str = str.replaceAll("ticketItem","").substring(1);
                         command = "moveToSeat";
-                        setVar("ignoreUpdate", "yes please", "ticketContainer");
-                        setVar("command", command, "ticketContainer");
-                        setVar("ticketItem", str, "ticketContainer");
-                        setVar("toSeat", cboSeat.selectedIndex, "ticketContainer");   
+                        varSet("ignoreUpdate", "yes please", "ticketContainer");
+                        varSet("command", command, "ticketContainer");
+                        varSet("ticketItem", str, "ticketContainer");
+                        varSet("toSeat", cboSeat.selectedIndex, "ticketContainer");   
                     }
                     if (prevSel == null && selSplit == null && command != "") {
                         cboSeat.selectedIndex = 0;
                     }
                     else {
                         if (cboSeat.selectedIndex == 0) {
-                            removeVar("seat", "ticketContainer", true);
+                            varRem("seat", "ticketContainer", true);
                         }
                         else {
-                            setVar("seat",cboSeat.selectedIndex, "ticketContainer", true);
+                            varSet("seat",cboSeat.selectedIndex, "ticketContainer", true);
                         }
                         
                     }
@@ -722,8 +722,8 @@
             function selectedSplitChanged() {
                 try {
                     var toggledControl = document.getElementsByClassName("toggled");
-                    var prevSel = getVar("split", "ticketContainer");
-                    var selSeat = getVar("seat", "ticketContainer");
+                    var prevSel = varGet("split", "ticketContainer");
+                    var selSeat = varGet("seat", "ticketContainer");
                     var command = "";
                     if (toggledControl.length == 1 && cboSplit.selectedIndex > 0) {
                         let selItems = ticketContainer.contentWindow.document.getElementsByClassName("selected");
@@ -735,23 +735,23 @@
                         
                         if (toggledControl[0].id == "btnMove") {
                             command = "moveToSplit";
-                            setVar("command", command, "ticketContainer");
-                            let fromSplit = getVar("split", "ticketContainer");
+                            varSet("command", command, "ticketContainer");
+                            let fromSplit = varGet("split", "ticketContainer");
                             if (fromSplit == null) {
-                                setVar("fromSplit", 10, "ticketContainer");
+                                varSet("fromSplit", 10, "ticketContainer");
                             }
                             else {
-                                setVar("fromSplit", prevSel, "ticketContainer");
+                                varSet("fromSplit", prevSel, "ticketContainer");
                             }
                             
                         }
                         else {
                             command = "addToSplit";
-                            setVar("command", command, "ticketContainer");
+                            varSet("command", command, "ticketContainer");
                         }
-                        setVar("toSplit", (cboSplit.selectedIndex < 10 ? cboSplit.selectedIndex : 0), "ticketContainer");
-                        setVar("ticketItem", str, "ticketContainer");
-                        setVar("ignoreUpdate", "yes please", "ticketContainer");
+                        varSet("toSplit", (cboSplit.selectedIndex < 10 ? cboSplit.selectedIndex : 0), "ticketContainer");
+                        varSet("ticketItem", str, "ticketContainer");
+                        varSet("ignoreUpdate", "yes please", "ticketContainer");
 
                         btnMove.classList.remove("toggled");
                         btnSplit.classList.remove("toggled");
@@ -762,13 +762,13 @@
                     }
                     else {
                         if (cboSplit.selectedIndex == 0) {
-                            removeVar("split", "ticketContainer", true);
+                            varRem("split", "ticketContainer", true);
                         }
                         else if (cboSplit.selectedIndex < 10)  {
-                            setVar("split",cboSplit.selectedIndex, "ticketContainer", true);
+                            varSet("split",cboSplit.selectedIndex, "ticketContainer", true);
                         }
                         else {
-                            setVar("split",0, "ticketContainer", true);
+                            varSet("split",0, "ticketContainer", true);
                         }
                     }
                     updateDisplay("ticketContainer");
@@ -791,25 +791,25 @@
                     for (let i = 0; i < length; i++) {
                         deliverString += "," + item(i).id;
                     }
-                    setVar("ignoreUpdate", "yes please", "ticketContainer");
-                    setVar("command", "deliver", "ticketContainer");
-                    setVar("ticketItem",deliverString.substring(1).replaceAll("ticketItem",""),"ticketContainer", true);
+                    varSet("ignoreUpdate", "yes please", "ticketContainer");
+                    varSet("command", "deliver", "ticketContainer");
+                    varSet("ticketItem",deliverString.substring(1).replaceAll("ticketItem",""),"ticketContainer", true);
                 }
-                updateButtonStates(true);
+                updateButtonStates();
             }
 
             function submitButtonPressed(e) {
                 if (e.target.getAttribute("disabled") == '') { return; }
-                setVar("ignoreUpdate", "yes please", "ticketContainer");
-                setVar("command", "submitPending" ,"ticketContainer", true);
-                updateButtonStates(true);
+                varSet("ignoreUpdate", "yes please", "ticketContainer");
+                varSet("command", "submitPending" ,"ticketContainer", true);
+                updateButtonStates();
             }
 
             function cancelButtonPressed(e) {
                 if (e.target.getAttribute("disabled") == '') { return; }
-                setVar("ignoreUpdate", "yes please", "ticketContainer");
-                setVar("command", "cancelPending" ,"ticketContainer", true);
-                updateButtonStates(true);
+                varSet("ignoreUpdate", "yes please", "ticketContainer");
+                varSet("command", "cancelPending" ,"ticketContainer", true);
+                updateButtonStates();
             }
 
             function editButtonPressed(e) {
@@ -819,7 +819,7 @@
                 cboSplit.disabled = true;
                 btnMove.classList.remove("toggled");
                 btnSplit.classList.remove("toggled");
-                updateButtonStates(true);
+                updateButtonStates();
             }
 
             function removeButtonPressed(e) {
@@ -830,16 +830,16 @@
                     str += "," + selItems[i].id;
                 }
                 str = str.replaceAll("ticketItem","").substring(1);
-                //setVar("ignoreUpdate", "yes please", "ticketContainer");
+                //varSet("ignoreUpdate", "yes please", "ticketContainer");
 
                
-                setVar("command", "remove", "ticketContainer");
-                setVar("ticketItem", str, "ticketContainer");
-                setVar("ignoreUpdate", "yes please", "ticketContainer", true);
+                varSet("command", "remove", "ticketContainer");
+                varSet("ticketItem", str, "ticketContainer");
+                varSet("ignoreUpdate", "yes please", "ticketContainer", true);
 
                 cboSeat.disabled = false;
                 cboSplit.disabled = false;
-                updateButtonStates(true);
+                updateButtonStates();
             }
 
             function moveButtonPressed(e) {
@@ -848,7 +848,7 @@
                 btnMove.classList.toggle("toggled");
 
                 cboSeat.disabled = false;
-                updateButtonStates(true);        
+                updateButtonStates();        
             }
 
             function splitButtonPressed(e) {
@@ -858,7 +858,7 @@
 
                 cboSeat.disabled = (document.getElementsByClassName("toggled").length == 1);
 
-                updateButtonStates(true);
+                updateButtonStates();
             }
         </script>
     </head>

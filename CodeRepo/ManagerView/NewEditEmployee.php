@@ -83,24 +83,24 @@ you'll be routed to whatever the home page is for your specified role level -->
 
             
         </style>
-        <!-- gives you access to setVar, getVar, removeVar, 
-        clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
+        <!-- gives you access to varSet, varGet, varRem, 
+        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         
 
         <script>
             function finalize(){
-                setVar("finished", "yes");
-                if(getVar('roleField')!=''){
+                varSet("finished", "yes");
+                if(varGet('roleField')!=''){
                     document.getElementById("btnSubmit").click();
                 }
                 //unreachable unless the form submission fails for any reason, such as missing a required value.
-                setVar("errorState", "Please fill out all required fields");
-                removeVar("finished");
+                varSet("errorState", "Please fill out all required fields");
+                varRem("finished");
             }
             function allElementsLoaded() {
-                if(getVar("defaultRole")){
-                    let valueTarget = getVar("defaultRole");
+                if(varGet("defaultRole")){
+                    let valueTarget = varGet("defaultRole");
                     let optionList = document.getElementsByTagName("option");
                     for(let i = 0; i < optionList.length; i++){
                         if(optionList[i].value==valueTarget){

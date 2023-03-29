@@ -2,6 +2,7 @@
 <!-- ensures you are logged in before rendering page.
 Otherwise will reroute to logon page -->
 <?php require_once 'sessionLogic.php'; restrictAccess(7, $GLOBALS['role']); ?>
+<?php require_once 'currencyPrinter.php'; ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -42,13 +43,13 @@ Otherwise will reroute to logon page -->
         varCpy("tableId", "ticketListener");
         varCpy("paidStatuses", "ticketListener");
         if (varCpyRen("modificationTime", "ticketListener", "recordedModificationTime")) {
-            setVar("lastUpdate", Date.now());
+            varSet("lastUpdate", Date.now());
         }
         
         // if the ticket number has been specified
-        if (getVar("ticket") != null) {
+        if (varGet("ticket") != null) {
             // if you previously had items selected
-            var selItems = getVar("selectedTicketItem");
+            var selItems = varGet("selectedTicketItem");
             var newList = ""
             if (selItems != null) {
                 selItems = selItems.split(",");
@@ -73,7 +74,7 @@ Otherwise will reroute to logon page -->
                         }   
                     }
                 }
-                setVar("selectedTicketItem", newList.length == 0 ? undefined : newList.substring(1));
+                varSet("selectedTicketItem", newList.length == 0 ? undefined : newList.substring(1));
             }
 
             // if we just added a ticket item, we need to ensure we scroll to the bottom and select it.
@@ -109,7 +110,7 @@ Otherwise will reroute to logon page -->
             varCpy("tableId", "ticketListener");
             varCpy("ticketRemoved", "ticketListener");
             varCpy("paidStatuses", "ticketListener");
-            varCpyRen("modificationTime", "ticketListener", "recordedModificationTime", null, getVarOnce("ignoreUpdate") === undefined);
+            varCpyRen("modificationTime", "ticketListener", "recordedModificationTime", null, varGetOnce("ignoreUpdate") === undefined);
         }
         catch (err) {}
     }
@@ -139,7 +140,7 @@ Otherwise will reroute to logon page -->
                 enabledButtons += ",Split";
             }
         }
-        setVar("enabledButtons", enabledButtons.length > 0 ? enabledButtons.substring(1) : undefined);
+        varSet("enabledButtons", enabledButtons.length > 0 ? enabledButtons.substring(1) : undefined);
         
     }
     
@@ -172,16 +173,16 @@ Otherwise will reroute to logon page -->
                 lookAt.classList.remove("multiselect");
             }
             if (selItemString != "") {
-                setVar("selectedTicketItem", selItemString.substring(1));
+                varSet("selectedTicketItem", selItemString.substring(1));
             }
             else {
-                removeVar("selectedTicketItem");
+                varRem("selectedTicketItem");
             }
         }
         else {
             targetTicketItem = this;
             targetTicketItem.classList.add("selected");
-            if (getVar("selectedTicketItem") != null && getVar("selectedTicketItem") != this.id) {
+            if (varGet("selectedTicketItem") != null && varGet("selectedTicketItem") != this.id) {
                 longTouchTimer = setTimeout(longTouch, LONG_TIME_TOUCH_LENGTH);
             }
         }
@@ -194,7 +195,7 @@ Otherwise will reroute to logon page -->
          targetTicketItem.classList.add("multiselect");
 
         // if there is exactly 1 other item selected, make it multi-select as well.
-         var alreadySelected = getVar("selectedTicketItem");
+         var alreadySelected = varGet("selectedTicketItem");
          if (alreadySelected != null && alreadySelected.indexOf(",") == -1) {
             document.getElementById(alreadySelected).classList.add("multiselect");
          }
@@ -204,7 +205,7 @@ Otherwise will reroute to logon page -->
     function pointerUp() {
 
         if (targetTicketItem == null) {
-            setVar("lastUpdate", Date.now()); 
+            varSet("lastUpdate", Date.now()); 
             longTouchEnabled = false;
             setState();
             return; 
@@ -225,15 +226,15 @@ Otherwise will reroute to logon page -->
     	    }
     	    targetTicketItem.classList.add("selected");
             targetTicketItem.classList.remove("multiselect");
-            setVar("selectedTicketItem", targetTicketItem.id);
+            varSet("selectedTicketItem", targetTicketItem.id);
         }
         // or you have multiple items selected
         else {
-            setVar("selectedTicketItem", getVar("selectedTicketItem") + "," + targetTicketItem.id); 
+            varSet("selectedTicketItem", varGet("selectedTicketItem") + "," + targetTicketItem.id); 
         }
 
         // set the ticket timestamp so anything listening to it can update.
-        setVar("lastUpdate", Date.now()); 
+        varSet("lastUpdate", Date.now()); 
         targetTicketItem = null;
         longTouchEnabled = false;
         setState();
@@ -252,7 +253,7 @@ Otherwise will reroute to logon page -->
             else {
                 ticks[ticks.length - 1].classList.add("selected");
                 ticks[ticks.length - 1].classList.remove("multiselect");
-                setVar("selectedTicketItem", ticks[ticks.length - 1].id);
+                varSet("selectedTicketItem", ticks[ticks.length - 1].id);
             }
         }
     }
@@ -489,10 +490,10 @@ Otherwise will reroute to logon page -->
                 echo('<div class="ticketItemNumber">' .$splitString. '</div>
                     <div class="ticketItemText">' .$menuItem['title']. "</div>");
                 if (is_null($ticketItem['overridePrice'])) {
-                    echo('<div class="ticketItemPrice">' .$ticketItem['calcTicketItemPrice']. '</div>');
+                    echo('<div class="ticketItemPrice">' .currencyPrint($ticketItem['calcTicketItemPrice']). '</div>');
                 }
                 else {
-                    echo('<div class="ticketItemPrice">' .$ticketItem['calcTicketItemPrice']. '</div>');
+                    echo('<div class="ticketItemPrice">' .currencyPrint($ticketItem['calcTicketItemPrice']). '</div>');
                     echo('<div class="ticketItemOverrideNote">' .$ticketItem['overrideNote']. '</div>');
                     echo('<div class="ticketItemOverridePrice">');
                     if ($ticketItem['overridePrice'] < 0) {
@@ -561,7 +562,9 @@ Otherwise will reroute to logon page -->
             }
 
             // display the subtotal of all splits or a particular split
-            echo("<h2 class='message' id='ticketSubtotal'>Ticket Subtotal: $" .$ticketSubtotal. "</h2>");
+            if ($existingTicketItems > 0) {
+                echo("<h2 class='message' id='ticketSubtotal'>Ticket Subtotal: " . currencyPrint($ticketSubtotal) . "</h2>");    
+            }
 
             
             if ($footer != "") {

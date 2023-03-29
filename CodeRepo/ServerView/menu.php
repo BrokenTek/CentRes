@@ -1,6 +1,7 @@
 <!-- ensures you are logged in before rendering page.
 Otherwise will reroute to logon page -->
 <?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(255, $GLOBALS['role']); ?>
+<?php require_once '../Resources/php/currencyPrinter.php'; ?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -10,7 +11,7 @@ Otherwise will reroute to logon page -->
 		<script>
 			function createMenuSelectEventHandlers() {
 	    		var menuItemSelected = function() {
-					setVar("selectedMenuItem", this.id);
+					varSet("selectedMenuItem", this.id);
 				};
 
 				var elements = document.getElementsByClassName("menuItem");
@@ -93,7 +94,7 @@ if ($result->num_rows > 0) {
 
 		// ** NEEDS TO HAVE THE DATA ATTRIBUTE PASSED INTO 'PRICE' BE THE CALCULATED PRICE^ AND CALCULATED MODS STR (COMMA DELIMINATED) **
 		// GOING TO NEED TO REVISIT FOR THE DATA-MODS ATTR (X)
-		echo "<span id='".$qc."' class='menuItem menuItemTitle' data-text='".$title."' data-price='".$price."' data-mods='X'><span class='menuItemPrice'> $". $price ."</span><span class='menuItemTitle'>".$title."</span>";
+		echo "<span id='".$qc."' class='menuItem menuItemTitle' data-text='".$title."' data-price='".$price."' data-mods='X'><span class='menuItemPrice'>". currencyPrint($price) ."</span><span class='menuItemTitle'>".$title."</span>";
 		echo "</span>";
 
 	}

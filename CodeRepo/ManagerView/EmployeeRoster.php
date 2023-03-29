@@ -63,24 +63,24 @@ you'll be routed to whatever the home page is for your specified role level -->
             
         </style>
 
-        <!-- gives you access to setVar, getVar, removeVar, 
-        clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
+        <!-- gives you access to varSet, varGet, varRem, 
+        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         
         <script>
             function buttonClicked(){
                 if(this.value == "Delete"){
                     //TODO: prompt if the user is sure they want to delete that employee. Important UX considering the button's proximity to the edit button
-                    setVar("command", "Delete");
+                    varSet("command", "Delete");
                     updateDisplay();
                 }
                 else{
-                    setVar("mode", this.value);
+                    varSet("mode", this.value);
                     //clears some extraneous $_POST variables
-                    removeVar('rosterTable_SortKey1');
-                    removeVar('rosterTable_SortKey2');
-                    removeVar('rosterTable_SortKey3');
-                    removeVar('rosterTable_SortKey4');
+                    varRem('rosterTable_SortKey1');
+                    varRem('rosterTable_SortKey2');
+                    varRem('rosterTable_SortKey3');
+                    varRem('rosterTable_SortKey4');
                     //submit selected items and submission mode to NewEditEmployee.php instead of back to this site.
                     document.getElementById("sessionForm").setAttribute("action", "NewEditEmployee.php");
                     document.getElementById("btnSubmit").click();
@@ -105,12 +105,12 @@ you'll be routed to whatever the home page is for your specified role level -->
                     if (sel.length == 1) {
                         sel[0].classList.remove("multiselect");
                     }
-                    setVar("selectedEmp", getVar("selectedEmp").replace(this.id,"").replace(",,",",").replace(/^,+|,+$/g, ''));
+                    varSet("selectedEmp", varGet("selectedEmp").replace(this.id,"").replace(",,",",").replace(/^,+|,+$/g, ''));
                     setNewEditBtnState();
                     return;
                 }
                 targetEmployee = this;
-                if (getVar("selectedEmp") != null && getVar("selectedEmp") != this.id) {
+                if (varGet("selectedEmp") != null && varGet("selectedEmp") != this.id) {
                     longTouchTimer = setTimeout(longTouch, LONG_TIME_TOUCH_LENGTH);
                 }
 	        }
@@ -122,7 +122,7 @@ you'll be routed to whatever the home page is for your specified role level -->
                 targetEmployee.classList.add("multiselect");
 
                 // if there is exactly 1 other item selected, make it multi-select as well.
-                var alreadySelected = getVar("selectedEmp");
+                var alreadySelected = varGet("selectedEmp");
                 if (alreadySelected != null && alreadySelected.indexOf(",") == -1) {
                     document.getElementById(alreadySelected).classList.add("multiselect");
                 }
@@ -146,11 +146,11 @@ you'll be routed to whatever the home page is for your specified role level -->
     	            }
     	            targetEmployee.classList.add("selected");
                     targetEmployee.classList.remove("multiselect");
-                    setVar("selectedEmp", targetEmployee.id);
+                    varSet("selectedEmp", targetEmployee.id);
                 }
                 // or you have multiple items selected
                 else {
-                    setVar("selectedEmp", getVar("selectedEmp") + "," + targetEmployee.id); 
+                    varSet("selectedEmp", varGet("selectedEmp") + "," + targetEmployee.id); 
                 }
 
                 targetEmployee = null;
@@ -165,7 +165,7 @@ you'll be routed to whatever the home page is for your specified role level -->
                 for(let i = 0; i < selectedEmps.length; i++){
     	                selectedEmps[i].classList.remove("selected");
                         selectedEmps[i].classList.remove("multiselect");
-                removeVar("selectedEmp");
+                varRem("selectedEmp");
                 setNewEditBtnState();
                 }
             }
@@ -173,7 +173,7 @@ you'll be routed to whatever the home page is for your specified role level -->
             function setNewEditBtnState(){
                 let newEditBtn = document.getElementById("btnEditRoster")
                 let deleteBtn = document.getElementById("btnDelete")
-                let selectedEmps = getVar("selectedEmp");
+                let selectedEmps = varGet("selectedEmp");
                 if(selectedEmps){
                     deleteBtn.removeAttribute("disabled");
                     if(selectedEmps.indexOf(",")!=-1){
@@ -200,16 +200,16 @@ you'll be routed to whatever the home page is for your specified role level -->
                 // ADD EVENT LISTENERS HERE
                 //add the unicode characters to table headers with sort keys.
                 let tableHeaders = document.getElementsByTagName("th");
-                if(getVar('rosterTable_SortKey1')!=null){
+                if(varGet('rosterTable_SortKey1')!=null){
                     let keyIndex = 1;
                     let unicodeBase = 9311;
                     let keyPrefix = 'rosterTable_SortKey';
-                    while(getVar(keyPrefix + keyIndex)!= null){
-                        let keyToScan = getVar(keyPrefix + keyIndex);
+                    while(varGet(keyPrefix + keyIndex)!= null){
+                        let keyToScan = varGet(keyPrefix + keyIndex);
                         for(let i = 0; i < tableHeaders.length; i++){
                             if(keyToScan.indexOf(tableHeaders[i].getAttribute("sqlColumnId"))!= -1){
                                 tableHeaders[i].innerText = keyIndex + "\xa0" +tableHeaders[i].innerText;
-                                if(getVar(keyPrefix + keyIndex).indexOf("ASC")!=-1){
+                                if(varGet(keyPrefix + keyIndex).indexOf("ASC")!=-1){
                                     tableHeaders[i].innerText = tableHeaders[i].innerText +"\u25B2";
                                 }
                                 else{
@@ -222,8 +222,8 @@ you'll be routed to whatever the home page is for your specified role level -->
                 }
                 //select any items that were selected before refresh
                 
-                let selItems = getVar("selectedEmp");
-                if (getVar("selectedEmp") !== undefined) {
+                let selItems = varGet("selectedEmp");
+                if (varGet("selectedEmp") !== undefined) {
                     selItems = selItems.split(",");
                     for( let i = 0; i < selItems.length; i++) {
                         document.getElementById(selItems[i]).classList.add("selected");

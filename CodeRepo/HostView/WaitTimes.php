@@ -48,13 +48,13 @@ you'll be routed to whatever the home page is for your specified role level -->
                 grid-template-columns: min-content 1fr;
             }
         </style>
-        <!-- gives you access to setVar, getVar, removeVar, 
-        clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
+        <!-- gives you access to varSet, varGet, varRem, 
+        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/waitListStructure.css">
         
-        <!-- demonstration on how to use getVar, setVar, updateDisplay for just this page -->
+        <!-- demonstration on how to use varGet, varSet, updateDisplay for just this page -->
         <!-- remove this script tag -->
         <script>
             let initialLoad = true;

@@ -1,11 +1,11 @@
 
-function setVar(variableName, value, id = null, update = false) {
+function varSet(variableName, value, id = null, update = false) {
     value = nvl(value);
     if (value === undefined) {
-        if (nvl(getVar(variableName, id)) === undefined) {
+        if (nvl(varGet(variableName, id)) === undefined) {
             return false;
         }
-        return removeVar(variableName, id, update);
+        return varRem(variableName, id, update);
     }
     var container = document.getElementById(id);
     var form;
@@ -21,7 +21,7 @@ function setVar(variableName, value, id = null, update = false) {
         // the page was unavailable when attempting to set the variable...
         // reprocess the request until successful.
         if (form == null) {
-            setTimeout(setVar(variableName), 250);
+            setTimeout(varSet(variableName), 250);
             return undefined;
         }
     }
@@ -55,7 +55,7 @@ function setVar(variableName, value, id = null, update = false) {
     return true;
 }
 
-function getVar(variableName, id = null) {
+function varGet(variableName, id = null) {
     var container = document.getElementById(id);
     var form;
     var variableElement;
@@ -68,7 +68,7 @@ function getVar(variableName, id = null) {
         form = container.contentWindow.document.getElementsByTagName('form')[0]; 
         variableElement = container.contentWindow.document.getElementById(variableName);
         if (form == null) {
-            throw "getVar error! Variable unavailable";
+            throw "varGet error! Variable unavailable";
         }
     }
     
@@ -82,10 +82,10 @@ function getVar(variableName, id = null) {
 
 // get a var. If its defined, remove the var and return its value.
 // If the variable was retrieved, specify you want to update the target display by setting update = true;
-function getVarOnce(variableName, id = null, update = false) {
-    let val = getVar(variableName, id);
+function varGetOnce(variableName, id = null, update = false) {
+    let val = varGet(variableName, id);
     if (val !== undefined) {
-        removeVar(variableName, id);
+        varRem(variableName, id);
         if (update) {
             updateDisplay(id);
         }
@@ -95,7 +95,7 @@ function getVarOnce(variableName, id = null, update = false) {
 
 
 // returns false if variable doesn't exist
-function removeVar(variableName, id = null, update = false) {
+function varRem(variableName, id = null, update = false) {
     var container = document.getElementById(id);
     var form;
     var variableElement;
@@ -127,7 +127,7 @@ function removeVar(variableName, id = null, update = false) {
     return true;
 }
 
-function renameVar(oldVarName, newVarName, id = null, update = false) {
+function varRen(oldVarName, newVarName, id = null, update = false) {
     var container = document.getElementById(id);
     var form;
     var variableElement;
@@ -161,36 +161,36 @@ function renameVar(oldVarName, newVarName, id = null, update = false) {
 // If you need to update the destination if a variable is copied, set updateDestination to true.
 // NOTE: variable does not get copied if the value at the source and destination are the same.
 function varCpy(variableName, source = null, destination = null, updateDestination = false, allowUndefinedVariables = false) {
-    let val = nvl(getVar(variableName, source));
-    let val2 = nvl(getVar(variableName, destination));
+    let val = nvl(varGet(variableName, source));
+    let val2 = nvl(varGet(variableName, destination));
     if (val === val2 || (val === undefined && !allowUndefinedVariables)) {    
         return false;
     }
     if (val !== undefined) {
-        return setVar(variableName, val, destination, updateDestination);
+        return varSet(variableName, val, destination, updateDestination);
     }
-    return removeVar(variableName, destination, updateDestination);
+    return varRem(variableName, destination, updateDestination);
 }
 
 
 // see varCpy function commment. Additionally allows to specify a different destination variable name with destinationVariableName
 function varCpyRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateDestination, allowUndefinedVariables = false) {
-    let val = nvl(getVar(sourceVariableName, source));
-    let val2 = nvl(getVar(destinationVariableName, destination));
+    let val = nvl(varGet(sourceVariableName, source));
+    let val2 = nvl(varGet(destinationVariableName, destination));
     if (val === val2 || (val === undefined && !allowUndefinedVariables)) {
         return false;
     }
     if (val !== undefined) {
-        return setVar(destinationVariableName, val, destination, updateDestination);
+        return varSet(destinationVariableName, val, destination, updateDestination);
     }
-    return removeVar(destinationVariableName, destination, updateDestination);
+    return varRem(destinationVariableName, destination, updateDestination);
 }
 
 // transfer a variable from source to destination. Specify if you want to update the source and or destination
 // allowUndefinedVariables = true will clear the variable at the destination.
 function varXfr(variableName, source = null, destination = null, updateSource = false, updateDestination = false, allowUndefinedVariables = false) {
     if (varCpy(variableName, source, destination, updateDestination, allowUndefinedVariables)) {
-        return removeVar(variableName, source, updateSource);
+        return varRem(variableName, source, updateSource);
     }
     return false;
 }
@@ -199,13 +199,13 @@ function varXfr(variableName, source = null, destination = null, updateSource = 
 // allowUndefinedVariables = true will clear the variable at the destination.
 function varXfrRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateSource = false, updateDestination = false, allowUndefinedVariables = false) {
     if (varCpyRen(sourceVariableName, source, destinationVariableName, destination, updateDestination, allowUndefinedVariables)) {
-        return removeVar(sourceVariableName, source, updateSource);
+        return varRem(sourceVariableName, source, updateSource);
     }
     return false;
 }
 
 
-function clearVars(id = null, update = false) {
+function varClr(id = null, update = false) {
     var container = document.getElementById(id);
     var form;
     if (id == null) {
@@ -267,11 +267,11 @@ function updateDisplay(id = null) {
 
 window.addEventListener('scroll', function(event) {
     event.stopPropagation();
-    if (getVar("scrollX") != null) {
-        //setVar("scrollX", window.scrollX);
-        //setVar("scrollY", window.scrollY);
+    if (varGet("scrollX") != null) {
+        //varSet("scrollX", window.scrollX);
+        //varSet("scrollY", window.scrollY);
         /*
-        if (setVar("scrollX", window.scrollX) || setVar("scrollY", window.scrollY)) {
+        if (varSet("scrollX", window.scrollX) || varSet("scrollY", window.scrollY)) {
             alert("changed");
         }
         else {
@@ -282,13 +282,13 @@ window.addEventListener('scroll', function(event) {
 }, true);
 
 function rememberScrollPosition(id = null) {
-    setVar("scrollX", window.scrollX, id);
-    setVar("scrollY", window.scrollY, id); 
+    varSet("scrollX", window.scrollX, id);
+    varSet("scrollY", window.scrollY, id); 
 }
 
 function forgetScrollPosition() {
-    removeVar("scrollX", id);
-    removeVar("ScrollY", id);
+    varRem("scrollX", id);
+    varRem("ScrollY", id);
 }
 
 function toggleSortKey(tableId, columnName, refresh = true) {
@@ -300,7 +300,7 @@ function toggleSortKey(tableId, columnName, refresh = true) {
     let offsetBy1 = false;
     let sortKeyPrefix = tableId + "_SortKey";
     while (true) {
-        let value = getVar(sortKeyPrefix + keyIndex);
+        let value = varGet(sortKeyPrefix + keyIndex);
 
         // end of key list
         if (value === undefined) {
@@ -309,7 +309,7 @@ function toggleSortKey(tableId, columnName, refresh = true) {
 
         // key was removed. All keys to right need to be left-shifted by 1
         if (offsetBy1) {
-            renameVar(sortKeyPrefix + keyIndex, sortKeyPrefix + (keyIndex - 1));
+            varRen(sortKeyPrefix + keyIndex, sortKeyPrefix + (keyIndex - 1));
             keyIndex++;
             continue;
         }
@@ -323,11 +323,11 @@ function toggleSortKey(tableId, columnName, refresh = true) {
 
             // toggle to DESC if it's ASC
             if (value == columnName + " ASC") {
-                setVar(sortKeyPrefix + keyIndex, columnName + " DESC");
+                varSet(sortKeyPrefix + keyIndex, columnName + " DESC");
             }
             // remove the key if it's DESC
             else {
-                removeVar(sortKeyPrefix + keyIndex);
+                varRem(sortKeyPrefix + keyIndex);
                 // if there are any other keys to the right of this, left shift them by 1
                 offsetBy1 = true;
             }
@@ -337,7 +337,7 @@ function toggleSortKey(tableId, columnName, refresh = true) {
    
     // if the key wasn't found, append to the end of key list.
     if (!keyFound) {
-        setVar(sortKeyPrefix + keyIndex, columnName + " ASC");
+        varSet(sortKeyPrefix + keyIndex, columnName + " ASC");
     }
     if (refresh) { 
         updateDisplay();
@@ -348,13 +348,13 @@ function clearSortKeys(tableId) {
     let sortKeyPrefix = tableId + "_SortKey";
     let keyIndex = 1;
     while (true) {
-        let value = getVar(sortKeyPrefix + keyIndex);
+        let value = varGet(sortKeyPrefix + keyIndex);
 
         // end of key list
         if (value === undefined) {
             break;
         }
-        removeVar(sortKeyPrefix + keyIndex);
+        varRem(sortKeyPrefix + keyIndex);
         keyIndex ++;
     }
 }

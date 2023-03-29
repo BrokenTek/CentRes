@@ -59,11 +59,11 @@
 		<script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
 		<script>
 			function allElementsLoaded() {
-				setVar("tableIdOnly", "", "serverListener");
-				setVar("showAllTables", "", "serverListener");
-				setVar("authorizationId", USER_ID, "ifrSelectedTable");
+				varSet("tableIdOnly", "", "serverListener");
+				varSet("showAllTables", "", "serverListener");
+				varSet("authorizationId", USER_ID, "ifrSelectedTable");
 				if ((ROLE & 8) == 8) {
-                	setVar("authorizationId", USER_ID, "ifrRestaurantLayout");
+                	varSet("authorizationId", USER_ID, "ifrRestaurantLayout");
 					verifyAuthProcessed = true;
             	}
 				startEventLoopTimer();
@@ -73,7 +73,7 @@
 			var eventLoopTimer;
 			function eventLoop() {
 				try {
-					if (verifyAuthProcessed && getVar("authorizationId", "ifrRestaurantLayout") === undefined) {
+					if (verifyAuthProcessed && varGet("authorizationId", "ifrRestaurantLayout") === undefined) {
 						setTimeout(eventLoop, 250);
 					}
 					verifyAuthProcessed = false;
@@ -85,14 +85,14 @@
 					
 					varCpyRen("ticketId", "ifrWaitList", "addTicketId", "ifrSelectedTable", true, true);
 					
-					let tableList = getVar("selectedTable", "ifrRestaurantLayout");
-					let oldTableList = getVar("tableId", "ifrSelectedTable");
+					let tableList = varGet("selectedTable", "ifrRestaurantLayout");
+					let oldTableList = varGet("tableId", "ifrSelectedTable");
 					let updateSelectedTable = !(tableList !== undefined && oldTableList !== undefined && tableList.indexOf(",") > -1 && oldTableList.indexOf(",") > -1);
 
 					varCpyRen("selectedTable", "ifrRestaurantLayout", "tableId", "ifrSelectedTable", updateSelectedTable,true);
 										
-					if (getVarOnce("update","ifrSelectedTable")) {
-						removeVar("tableList","serverListener");
+					if (varGetOnce("update","ifrSelectedTable")) {
+						varRem("tableList","serverListener");
 						updateDisplay("ifrWaitList");
 						updateDisplay("ifrServerList");
 						updateDisplay("ifrWaitTimes");
@@ -101,7 +101,7 @@
 					varXfr("syncHighlightAnimation", "ifrSelectedTable", "ifrRestaurantLayout");
 
 					if (varCpyRen("tableList", "serverListener", "highlightedTables", "ifrRestaurantLayout",false, true)) {
-						setVar("highlightedTablesChanged", "yes", "ifrRestaurantLayout");
+						varSet("highlightedTablesChanged", "yes", "ifrRestaurantLayout");
 					}
 		
 				}

@@ -32,7 +32,7 @@
           }
 
           function logout() {
-            setVar("logoutUsername", USERNAME);
+            varSet("logoutUsername", USERNAME);
             let frm = document.getElementsByTagName("form")[0];
             frm.setAttribute("action","../LoginView/LoginView.php");
             frm.submit();
@@ -41,12 +41,15 @@
         const COOKIE_NAME = "804288a34eb7a49b349be68fc6437621cbf25e10d82f4268bb795eca277adedb6a3367add5bfb7cbffb50df150e2e78d26b276f37d32d96cd76746065df58a30cde25c4d9803aa7214dc8f6a985bf8643c341f229b5834964b0f371915d5677e4b579fbab42844cd63ddc3148e4250591277cfc521906bc30cfedd765974c2009ae5fe451ab1890e5ebbfa120ad18934c972618dbe3e";
         const SESSION_VALUE = decodeURIComponent(getCookieValue(COOKIE_NAME));
         function validateSession() {
-            if (!setVar("username", "' .$GLOBALS['username']. '", "ifrSessionInfo", true)) {
-                updateDisplay("ifrSessionInfo");
-                if (getVar("sessionValue", "ifrSessionInfo") != SESSION_VALUE) {
-                    location.replace("../LoginView/loginView.php");
+            try {
+                if (!varSet("username", "' .$GLOBALS['username']. '", "ifrSessionInfo", true)) {
+                    updateDisplay("ifrSessionInfo");
+                    if (varGet("sessionValue", "ifrSessionInfo") != SESSION_VALUE) {
+                        location.replace("../LoginView/loginView.php");
+                    }
                 }
             }
+            catch (err) { }
             setTimeout(validateSession, 1000);
         }
         setTimeout(validateSession, 1000);

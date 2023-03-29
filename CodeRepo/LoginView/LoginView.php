@@ -82,8 +82,8 @@ you to use display.php and displayInterface.js -->
 <html>
     <head>
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
-        <!-- gives you access to setVar, getVar, removeVar, 
-        clearVars, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
+        <!-- gives you access to varSet, varGet, varRem, 
+        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         <script>
             function allElementsLoaded() {
@@ -102,7 +102,7 @@ you to use display.php and displayInterface.js -->
                     cboLoginRole.selectedIndex = setIndex;
                 }
                 
-                setVar('route', cboLoginRole.options[cboLoginRole.selectedIndex].getAttribute('route'));
+                varSet('route', cboLoginRole.options[cboLoginRole.selectedIndex].getAttribute('route'));
                 document.getElementById('loginForm').submit();
             }
 
@@ -182,7 +182,7 @@ you to use display.php and displayInterface.js -->
                                     // on the client side, set the password hash and reset a new password hash.
                                     $_POST['validatedPassword'] = $passResult;
                                     echo("<script>
-                                            setVar('validatedPassword', '$passResult');
+                                            varSet('validatedPassword', '$passResult');
                                         </script>");
                                 }
                                 else {
@@ -191,13 +191,13 @@ you to use display.php and displayInterface.js -->
                                     if (isset($_POST['password'])) {
                                         $newPasswordHash = password_hash($_POST['password'], PASSWORD_BCRYPT);
                                         echo("<script>
-                                            setVar('validatedPassword', '$passResult');
-                                            setVar('nph', '$newPasswordHash');
+                                            varSet('validatedPassword', '$passResult');
+                                            varSet('nph', '$newPasswordHash');
                                         </script>");
                                     }
                                     else {
                                         echo("<script>
-                                                setVar('validatedPassword', '$passResult');
+                                                varSet('validatedPassword', '$passResult');
                                             </script>");
                                         }
                                 }
@@ -245,7 +245,7 @@ you to use display.php and displayInterface.js -->
                                                 $sql->bind_param("ss", $newPasswordHash, $_POST['username']);
                                                 $sql->execute();
                                                 $message = "Password&nbsp;Updated";
-                                                echo("<script>setVar('validatedPassword','$newPasswordHash');</script>");
+                                                echo("<script>varSet('validatedPassword','$newPasswordHash');</script>");
                                             }
                                             else {
                                                 $errorMessage = "Invalid Password Insertion Detected!"; 
