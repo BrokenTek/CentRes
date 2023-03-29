@@ -49,6 +49,7 @@ Otherwise will reroute to logon page -->
         if (getVar("ticket") != null) {
             // if you previously had items selected
             var selItems = getVar("selectedTicketItem");
+            var newList = ""
             if (selItems != null) {
                 selItems = selItems.split(",");
                 let count = 0;
@@ -59,6 +60,7 @@ Otherwise will reroute to logon page -->
                     var lookAt = document.querySelector("#" + selItems[i]);
                     if (lookAt != null) {
                         lookAt.classList.add("selected");
+                        newList += "," + selItems[i];
                         count++;
                     }   
                 }
@@ -71,6 +73,7 @@ Otherwise will reroute to logon page -->
                         }   
                     }
                 }
+                setVar("selectedTicketItem", newList.length == 0 ? undefined : newList.substring(1));
             }
 
             // if we just added a ticket item, we need to ensure we scroll to the bottom and select it.
@@ -82,9 +85,9 @@ Otherwise will reroute to logon page -->
 
             //begin listening for updates to the ticket.
             rememberScrollPosition();
-            setState();
             setInterval(eventLoop, 1000);
         }
+        setState();
         
 
         //create ticket item select listeners
@@ -115,29 +118,28 @@ Otherwise will reroute to logon page -->
         // this will set variables to control the state of the buttons on the serverView
         var enabledButtons = "";
         if (document.querySelectorAll(".pending").length > 0) {
-            enabledButtons += "CancelSubmit";
+            enabledButtons += ",Cancel,Submit";
         }
         if (document.querySelectorAll(".ready").length > 0) {
-            enabledButtons += "Deliver";
+            enabledButtons += ",Deliver";
         }
         if (document.querySelectorAll(".selected").length  > 0) {
-            // can edit
             if (document.querySelectorAll(".selected.editable").length > 0 && document.querySelectorAll(".multiselect.editable").length == 0) {
-                enabledButtons += "Edit";
+                enabledButtons += ",Edit";
             }
             // can remove
             if (document.querySelectorAll(".selected.removable").length == document.querySelectorAll(".selected").length) {
-                enabledButtons += "Remove";
+                enabledButtons += ",Remove";
             }
             // can move
             if (document.querySelectorAll(".selected.moveable").length == document.querySelectorAll(".selected").length) {
-                enabledButtons += "Move";
+                enabledButtons += ",Move";
             }
             if (document.querySelectorAll(".selected.splittable").length == document.querySelectorAll(".selected").length) {
-                enabledButtons += "Split";
+                enabledButtons += ",Split";
             }
         }
-        setVar("enabledButtons", enabledButtons);
+        setVar("enabledButtons", enabledButtons.length > 0 ? enabledButtons.substring(1) : undefined);
         
     }
     

@@ -192,7 +192,6 @@
                     catch(err) {
                     }
                 }
-
                 updateButtonStates();
                 startUpdateLoopTimer();
             }
@@ -418,11 +417,8 @@
             
 
             function updateButtonStates(buttonPressed = false) {
-                try {
-                    if (buttonPressed) {
-                        removeVar("enabledButtons");
-                    }
-                    if (varXfr("enabledButtons", "ticketContainer", null, false, true) || buttonPressed) {
+                try {                   
+                    if (varCpy("enabledButtons", "ticketContainer", null, false, true)) {
                         var updatedButtons = getVar("enabledButtons");
                         if (updatedButtons === undefined) {updatedButtons = '';}
                         btnDeliver.disabled = updatedButtons.indexOf("Deliver") == -1; 

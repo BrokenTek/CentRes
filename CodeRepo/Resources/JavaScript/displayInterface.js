@@ -1,7 +1,8 @@
 
 function setVar(variableName, value, id = null, update = false) {
-    if (value == null || value === undefined || value.length == 0) {
-        if (getVar(variableName, id) === undefined) {
+    value = nvl(value);
+    if (value === undefined) {
+        if (nvl(getVar(variableName, id)) === undefined) {
             return false;
         }
         return removeVar(variableName, id, update);
@@ -75,7 +76,7 @@ function getVar(variableName, id = null) {
         return undefined;
     }
     else {
-        return variableElement.getAttribute("value");
+        return nvl(variableElement.getAttribute("value"));
     }
 }
 
@@ -89,7 +90,7 @@ function getVarOnce(variableName, id = null, update = false) {
             updateDisplay(id);
         }
     }
-    return val;
+    return nvl(val);
 }
 
 
@@ -160,38 +161,29 @@ function renameVar(oldVarName, newVarName, id = null, update = false) {
 // If you need to update the destination if a variable is copied, set updateDestination to true.
 // NOTE: variable does not get copied if the value at the source and destination are the same.
 function varCpy(variableName, source = null, destination = null, updateDestination = false, allowUndefinedVariables = false) {
-    let val = getVar(variableName, source);
-    let val2 = getVar(variableName, destination);
-    if (val === val2 || (val === undefined && !allowUndefinedVariables)) {        
+    let val = nvl(getVar(variableName, source));
+    let val2 = nvl(getVar(variableName, destination));
+    if (val === val2 || (val === undefined && !allowUndefinedVariables)) {    
         return false;
     }
     if (val !== undefined) {
         return setVar(variableName, val, destination, updateDestination);
     }
-    else {
-        try {
-            return removeVar(variableName, destination, updateDestination);
-        }
-        catch (err) {
-            alert("Error: " + err);
-        }
-    } 
+    return removeVar(variableName, destination, updateDestination);
 }
 
 
 // see varCpy function commment. Additionally allows to specify a different destination variable name with destinationVariableName
 function varCpyRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateDestination, allowUndefinedVariables = false) {
-    let val = getVar(sourceVariableName, source);
-    let val2 = getVar(destinationVariableName, destination);
+    let val = nvl(getVar(sourceVariableName, source));
+    let val2 = nvl(getVar(destinationVariableName, destination));
     if (val === val2 || (val === undefined && !allowUndefinedVariables)) {
         return false;
     }
     if (val !== undefined) {
         return setVar(destinationVariableName, val, destination, updateDestination);
     }
-    else {
-        return removeVar(destinationVariableName, destination, updateDestination);
-    }
+    return removeVar(destinationVariableName, destination, updateDestination);
 }
 
 // transfer a variable from source to destination. Specify if you want to update the source and or destination
@@ -365,4 +357,11 @@ function clearSortKeys(tableId) {
         removeVar(sortKeyPrefix + keyIndex);
         keyIndex ++;
     }
+}
+
+function nvl(data) {
+    if (data === undefined || data === null || data.length == 0) {
+        return undefined;
+    }
+    return data;
 }
