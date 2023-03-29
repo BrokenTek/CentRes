@@ -391,6 +391,8 @@ Otherwise will reroute to logon page -->
                 echo("<h1 class='message' id='ticketHeader'>" .$header. "</h1>");
             }
 
+            $ticketSubtotal = 0;
+
             while($ticketItem = $ticketItems->fetch_assoc()) {
                 $sql = "SELECT ticketItemStatus(" .$ticketItem['id']. ") as status;";
                 $status = connection()->query($sql)->fetch_assoc()['status'];
@@ -550,10 +552,16 @@ Otherwise will reroute to logon page -->
                     }
                 }
 
+                //added the value of calcTicketItemPrice for each ticket item to $ticketSubtotal:
+                $ticketSubtotal += $ticketItem['calcTicketItemPrice'];
                 echo("</div>");
 
             }
 
+            // display the subtotal of all splits or a particular split
+            echo("<h2 class='message' id='ticketSubtotal'>Ticket Subtotal: $" .$ticketSubtotal. "</h2>");
+
+            
             if ($footer != "") {
                 echo("<h1 class='message highlighted' id='ticketFooter'>" .$footer. "</h1>");
                 echo("<script>addError = true;</script>");
