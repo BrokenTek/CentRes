@@ -211,7 +211,7 @@ you to use display.php and displayInterface.js -->
                             <input id='txtUsername' name='username' type='text' value='<?php echo $_POST['username']; ?>' required>
                             <label id='lblPassword' for='password'>Password</label>
                             <input id='pwdPassword' name='password' type=password value='<?php echo $_POST['password']; ?>' required>
-                            <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
+                            <button id='btnClear' class='button' onpointerdown='clearFields()'>Clear</button>
                             <input id='btnLogin' type='submit' class='button' value='Login'>
                         <?php else: ?>
                             <label id='lblUsername' for='txtUsername'>Username</label>

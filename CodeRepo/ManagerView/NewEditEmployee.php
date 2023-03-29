@@ -226,7 +226,7 @@ you'll be routed to whatever the home page is for your specified role level -->
                     echo("<option value='".$roleOption['id']."'>".$roleOption['title']."</option>");
                 }
                 echo("</select>
-                    <label for='passphraseField'>Passphrase</label><input name='passphraseField' id='passphraseField' required></input>
+                    <label for='passphraseField'>Passphrase</label><input name='passphraseField' id='passphraseField'  placeholder='Temporary Password' required></input>
                     </fieldset>"
                 );
             }

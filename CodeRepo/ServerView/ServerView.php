@@ -417,12 +417,12 @@
             }
             
 
-            function updateButtonStates(forceUpdate = false) {
+            function updateButtonStates(buttonPressed = false) {
                 try {
-                    if (forceUpdate) {
+                    if (buttonPressed) {
                         removeVar("enabledButtons");
                     }
-                    if (varXfr("enabledButtons", "ticketContainer", null, false, true) || forceUpdate) {
+                    if (varXfr("enabledButtons", "ticketContainer", null, false, true) || buttonPressed) {
                         var updatedButtons = getVar("enabledButtons");
                         if (updatedButtons === undefined) {updatedButtons = '';}
                         btnDeliver.disabled = updatedButtons.indexOf("Deliver") == -1; 
@@ -799,18 +799,21 @@
                     setVar("command", "deliver", "ticketContainer");
                     setVar("ticketItem",deliverString.substring(1).replaceAll("ticketItem",""),"ticketContainer", true);
                 }
+                updateButtonStates(true);
             }
 
             function submitButtonPressed(e) {
                 if (e.target.getAttribute("disabled") == '') { return; }
                 setVar("ignoreUpdate", "yes please", "ticketContainer");
                 setVar("command", "submitPending" ,"ticketContainer", true);
+                updateButtonStates(true);
             }
 
             function cancelButtonPressed(e) {
                 if (e.target.getAttribute("disabled") == '') { return; }
                 setVar("ignoreUpdate", "yes please", "ticketContainer");
                 setVar("command", "cancelPending" ,"ticketContainer", true);
+                updateButtonStates(true);
             }
 
             function editButtonPressed(e) {
@@ -820,6 +823,7 @@
                 cboSplit.disabled = true;
                 btnMove.classList.remove("toggled");
                 btnSplit.classList.remove("toggled");
+                updateButtonStates(true);
             }
 
             function removeButtonPressed(e) {
@@ -832,9 +836,10 @@
                 str = str.replaceAll("ticketItem","").substring(1);
                 //setVar("ignoreUpdate", "yes please", "ticketContainer");
 
-                setVar("ignoreUpdate", "yes please", "ticketContainer");
+               
                 setVar("command", "remove", "ticketContainer");
-                setVar("ticketItem", str, "ticketContainer", true);
+                setVar("ticketItem", str, "ticketContainer");
+                setVar("ignoreUpdate", "yes please", "ticketContainer", true);
 
                 cboSeat.disabled = false;
                 cboSplit.disabled = false;
@@ -846,7 +851,8 @@
                 btnSplit.classList.remove("toggled");
                 btnMove.classList.toggle("toggled");
 
-                cboSeat.disabled = false;        
+                cboSeat.disabled = false;
+                updateButtonStates(true);        
             }
 
             function splitButtonPressed(e) {
@@ -854,8 +860,9 @@
                 btnMove.classList.remove("toggled");
                 btnSplit.classList.toggle("toggled");
 
-               
                 cboSeat.disabled = (document.getElementsByClassName("toggled").length == 1);
+
+                updateButtonStates(true);
             }
         </script>
     </head>

@@ -1,6 +1,6 @@
 
 function setVar(variableName, value, id = null, update = false) {
-    if (value == null || value === undefined || value === '') {
+    if (value == null || value === undefined || value.length == 0) {
         if (getVar(variableName, id) === undefined) {
             return false;
         }
@@ -71,7 +71,7 @@ function getVar(variableName, id = null) {
         }
     }
     
-    if (variableElement == null || variableElement == "null") {
+    if (variableElement === null || variableElement === undefined) {
         return undefined;
     }
     else {
@@ -165,7 +165,17 @@ function varCpy(variableName, source = null, destination = null, updateDestinati
     if (val === val2 || (val === undefined && !allowUndefinedVariables)) {        
         return false;
     }
-    return setVar(variableName, val, destination, updateDestination);
+    if (val !== undefined) {
+        return setVar(variableName, val, destination, updateDestination);
+    }
+    else {
+        try {
+            return removeVar(variableName, destination, updateDestination);
+        }
+        catch (err) {
+            alert("Error: " + err);
+        }
+    } 
 }
 
 
@@ -176,7 +186,12 @@ function varCpyRen(sourceVariableName, source = null, destinationVariableName, d
     if (val === val2 || (val === undefined && !allowUndefinedVariables)) {
         return false;
     }
-    return setVar(destinationVariableName, val, destination, updateDestination);
+    if (val !== undefined) {
+        return setVar(destinationVariableName, val, destination, updateDestination);
+    }
+    else {
+        return removeVar(destinationVariableName, destination, updateDestination);
+    }
 }
 
 // transfer a variable from source to destination. Specify if you want to update the source and or destination
