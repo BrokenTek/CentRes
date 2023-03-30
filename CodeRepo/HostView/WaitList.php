@@ -90,8 +90,8 @@ Otherwise will reroute to logon page -->
                     connection()->query($sql);
                 }
 
-                $sql = "SELECT id as ticketNumber, timeRequested, timeReserved, nickname, partySize FROM Tickets WHERE timeSeated IS NULL
-                        AND timeRequested <= ADDTIME(NOW(), '24:0:0') ORDER BY timeRequested, timeReserved;";
+                $sql = "SELECT id as ticketNumber, timeRequested, timeReserved, nickname, partySize FROM Tickets WHERE timeSeated IS NULL 
+                        AND timeClosed IS NULL AND timeRequested <= ADDTIME(NOW(), '24:0:0') ORDER BY timeRequested, timeReserved;";
                 $parties = connection()->query($sql);
                 echo("<table id='tblWaitList'><tr><th>Time</th><th>Name</th><th>#</th></tr>");
                 while ($party = $parties->fetch_assoc()) {
