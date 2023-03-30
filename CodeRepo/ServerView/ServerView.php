@@ -888,7 +888,6 @@
                         <button type="button" id="btnDeliver" disabled>DELIVER</button>
                         <button type="button" id="btnSubmit" disabled>SUBMIT</button>
                         <button type="button" id="btnCancel" disabled>CANCEL</button>
-                        <button type="button" id="btnPrintReceipt" style="display: none;" disabled>PRINT RECIEPT</button>
                     </div>
                 </div>
             
