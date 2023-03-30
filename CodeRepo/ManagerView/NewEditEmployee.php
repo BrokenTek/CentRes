@@ -26,12 +26,17 @@ you'll be routed to whatever the home page is for your specified role level -->
                 grid-template-areas: ". tabHeader ."
                                      ". fields    ."
                                      ". buttons   ."
-                                     ". errors    .";
+                                     ". messages    .";
                 grid-template-columns: 1fr min-content 1fr;
-                grid-template-rows: min-content min-content min-content;
+                grid-template-rows: min-content min-content min-content min-content;
                 background-color: black;
                 color: white;
                 padding-bottom: 1rem;
+                font-size: 1rem;
+            }
+            #sessionBody * {
+                font-weight: bold;
+                font-size: 1.25rem;
             }
             #tabHeader {
                 grid-area: tabHeader;
@@ -54,8 +59,9 @@ you'll be routed to whatever the home page is for your specified role level -->
             .hidden {
                 display: none;
             }
-            .highlighted{
-                grid-area:errors;
+            .highlighted, .message{
+                grid-area:messages;
+                margin-block: 1rem;
                 
             }
             fieldset{
@@ -89,15 +95,6 @@ you'll be routed to whatever the home page is for your specified role level -->
         
 
         <script>
-            function finalize(){
-                varSet("finished", "yes");
-                if(varGet('roleField')!=''){
-                    document.getElementById("btnSubmit").click();
-                }
-                //unreachable unless the form submission fails for any reason, such as missing a required value.
-                varSet("errorState", "Please fill out all required fields");
-                varRem("finished");
-            }
             function allElementsLoaded() {
                 if(varGet("defaultRole")){
                     let valueTarget = varGet("defaultRole");
@@ -111,11 +108,12 @@ you'll be routed to whatever the home page is for your specified role level -->
                         }
                     }
                 }
-                document.getElementById("btnFinish").addEventListener('pointerdown', finalize);
                 document.getElementById("btnBack").addEventListener('pointerdown', function(){
                     window.location.href="EmployeeRoster.php";
                 })
             }
+
+
 
             //Place your JavaScript Code here
         </script>
@@ -155,11 +153,13 @@ you'll be routed to whatever the home page is for your specified role level -->
                             $actionClause = $actionClause.", passwordbcrypt = ?";
                         }
                         $conditionClause = " WHERE id = ".$_POST['selectedEmp'];
+                        $successMessage = "Profile&nbsp;Updated&nbsp;:&nbsp;" . $_POST['usernameField'];
                     }
                     else{
                         $firstClause = "INSERT INTO employees (lastname, firstname, username, rolelevel, passwordbcrypt) ";
                         $passphraseHash = strrev(password_hash($_POST['passphraseField'], PASSWORD_BCRYPT));
                         $actionClause = "VALUES (?, ?, ?, ?, ?)";
+                        $successMessage = "Profile&nbsp;Created&nbsp;:&nbsp;" . $_POST['usernameField'];
                     }
                     $sql = $firstClause.$actionClause.$conditionClause.";";
                     $sql = connection()->prepare($sql);
@@ -171,10 +171,12 @@ you'll be routed to whatever the home page is for your specified role level -->
                     }
                     if(!$sql->execute()){
                         throw new Exception('SQL statement failed silently, investigate.');
+                        unset($successMessage);
                     }
 
-            }
+                }
                 catch(mysqli_sql_exception $e){
+                    echo("<h1>".$e->getmessage()."</h1>");
                     if(str_contains($e->getmessage(), "null")){
                         $_POST['errorState'] = "Sorry, we can't add a user without a role.";
                     }
@@ -234,15 +236,18 @@ you'll be routed to whatever the home page is for your specified role level -->
             disconnect();
             ?>
             <div id="buttonSet">
-                <button type="button" id= btnBack value="Back">Back</button>
-                <input type="reset" id= "btnReset" class="button" value="<?php echo $revertButtonText; ?>"></input>
-                <button type="button" id= "btnFinish" value="Finish"><?php echo $commitButtonText; ?></button>
+                <button id="btnBack">Back</button>
+                <input type="reset" id="btnReset" class="button" value="<?php echo $revertButtonText; ?>">
+                <input type="submit" id="btnFinish" class="button" name="finished" value="<?php echo $commitButtonText; ?>">
             </div>
-            <input id="btnSubmit" type="submit" style="display:none">
             <?php
                 if(isset($_POST['errorState'])){
                     echo('<div class="highlighted">'.$_POST['errorState']."</div>");
                     unset($_POST['errorState']);
+                }
+                if(isset($successMessage)){
+                    echo('<div class="message">'.$successMessage."</div>");
+                    unset($successMessage);
                 }
             ?>
             </div>
