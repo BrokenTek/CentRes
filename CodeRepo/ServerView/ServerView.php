@@ -14,6 +14,7 @@
             var ticketContainer;
             var menuContainer;
             var modEditorContainer;
+            var btnClose;
             var btnDeliver;
             var btnSubmit;
             var btnCancel;
@@ -31,6 +32,7 @@
                 ticketContainer = document.getElementById("ticketContainer");
                 modEditorContainer = document.getElementById("modEditorContainer");
                 menuContainer = document.getElementById("menuContainer");
+                btnClose = document.getElementById("btnClose");
                 btnDeliver = document.getElementById("btnDeliver"); 
                 btnSubmit = document.getElementById("btnSubmit");
                 btnCancel = document.getElementById("btnCancel");
@@ -40,6 +42,7 @@
                 btnSplit = document.getElementById("btnSplit");
                 ticketHeader = document.getElementById("ticketHeaderText");
 
+                btnClose.addEventListener('pointerup', (event) => {closeButtonPressed(event)});
                 btnDeliver.addEventListener('pointerup', (event) => {deliverButtonPressed(event)});
                 btnSubmit.addEventListener('pointerup', (event) => {submitButtonPressed(event)});
                 btnCancel.addEventListener('pointerup', (event) => {cancelButtonPressed(event)});
@@ -421,6 +424,7 @@
                     if (varCpy("enabledButtons", "ticketContainer", null, false, true)) {
                         var updatedButtons = varGet("enabledButtons");
                         if (updatedButtons === undefined) {updatedButtons = '';}
+                        btnClose.disabled = updatedButtons.indexOf("Close") == -1;
                         btnDeliver.disabled = updatedButtons.indexOf("Deliver") == -1; 
                         btnSubmit.disabled = updatedButtons.indexOf("Submit") == -1;
                         btnCancel.disabled = updatedButtons.indexOf("Cancel") == -1;
@@ -784,6 +788,13 @@
 
             // =========================== BUTTON PRESS EVENTS =====================================
 
+            function closeButtonPressed(e){
+                if (e.target.getAttribute("disabled") == '') { return; }
+                varSet("ignoreUpdate", "yes please", "ticketContainer");
+                varSet("command", "close", "ticketContainer", true);
+                updateButtonStates();
+            }
+
             function deliverButtonPressed(e) {
                 if (e.target.getAttribute("disabled") == '') { return; }
                 let deliverString = "";
@@ -873,6 +884,7 @@
                         <!-- options are dynamically added and removed here with JavaScript -->
                     </select>
                     <div id="headerButtonGroup">
+                        <button type="button" id="btnClose" disabled>CLOSE TICKET</button>
                         <button type="button" id="btnDeliver" disabled>DELIVER</button>
                         <button type="button" id="btnSubmit" disabled>SUBMIT</button>
                         <button type="button" id="btnCancel" disabled>CANCEL</button>

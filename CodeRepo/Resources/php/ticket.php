@@ -131,6 +131,13 @@ Otherwise will reroute to logon page -->
     function setState() {
         // this will set variables to control the state of the buttons on the serverView
         var enabledButtons = "";
+        //DEBUG: add any other non-closeable ticket item states to this if statement.
+        //can't check for a null delivery time as some items may be removed during preparation
+        //which would prevent the ticket from closing in that case.
+        if(document.querySelectorAll(".pending").length == 0 && document.querySelectorAll(".ready").length == 0 
+           && document.querySelectorAll(".updated").length == 0 && document.querySelectorAll(".preparing").length == 0){
+            enabledButtons += ",Close";
+        }
         if (document.querySelectorAll(".pending").length > 0) {
             enabledButtons += ",Cancel,Submit";
         }
@@ -302,6 +309,10 @@ Otherwise will reroute to logon page -->
 					$sql = "CALL submitPendingTicketItems(" .$_POST['ticket']. ", ". (isset($_POST['split']) ? $_POST['split'] : "10") . ");";
                     connection()->query($sql);
 				}
+                elseif ($_POST['command'] == 'close'){
+                    $sql = "CALL closeTicket(".$_POST['ticket'].");";
+                    connection()->query($sql);
+                }
 				elseif (isset($_POST['ticketItem'])) {
                     $ticketItems = explode(",", $_POST['ticketItem']);
                     if ($_POST['command'] == 'remove') {

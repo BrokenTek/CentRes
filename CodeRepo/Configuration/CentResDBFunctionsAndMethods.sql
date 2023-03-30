@@ -45,6 +45,7 @@ DROP PROCEDURE IF EXISTS removeTicket;
 DROP PROCEDURE IF EXISTS addSplit;
 DROP PROCEDURE IF EXISTS removeSplit;
 DROP PROCEDURE IF EXISTS createTicketItem;
+DROP PROCEDURE IF EXISTS closeTicket;
 DROP PROCEDURE IF EXISTS removeTicketItem;
 DROP PROCEDURE IF EXISTS modifyTicketItem;
 DROP PROCEDURE IF EXISTS overrideTicketItemPrice;
@@ -806,6 +807,17 @@ BEGIN
 						   WHERE id = ticketItemNumber;
 		CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 	END IF;
+END;
+
+CREATE PROCEDURE closeTicket(IN ticketNumber INT UNSIGNED)
+BEGIN
+	DECLARE targetTableID VARCHAR(3);
+	SELECT tableId INTO targetTableID FROM Tickets WHERE id = ticketNumber;
+	UPDATE Tickets SET timeClosed = NOW()  
+					WHERE id = ticketNumber;
+	CALL updateTicketSplitsTimeStamp(ticketNumber, 0);
+	INSERT INTO tableLog(tableId, action, ticketId)
+		VALUES (targetTableID, 'remove', ticketNumber);
 END;
 
 CREATE PROCEDURE removeTicketItem(IN ticketItemNumber INT UNSIGNED)
