@@ -134,7 +134,7 @@ Otherwise will reroute to logon page -->
         //DEBUG: add any other non-closeable ticket item states to this if statement.
         //can't check for a null delivery time as some items may be removed during preparation
         //which would prevent the ticket from closing in that case.
-        if(document.querySelectorAll(".pending").length == 0 && document.querySelectorAll(".ready").length == 0 
+        if(varGet('ticket')&&document.querySelectorAll(".pending").length == 0 && document.querySelectorAll(".ready").length == 0 
            && document.querySelectorAll(".updated").length == 0 && document.querySelectorAll(".preparing").length == 0){
             enabledButtons += ",Close";
         }
