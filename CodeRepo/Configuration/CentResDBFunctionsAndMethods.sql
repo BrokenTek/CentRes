@@ -54,7 +54,7 @@ DROP PROCEDURE IF EXISTS moveTicketItemToSeat;
 DROP PROCEDURE IF EXISTS removeTicketItemFromSplit;
 DROP PROCEDURE IF EXISTS addTicketItemToSplit;
 DROP PROCEDURE IF EXISTS markTicketItemAsReady;
-DROP PROCEDURE IF EXISTS rescindTicketReadyState;
+DROP PROCEDURE IF EXISTS rescindTicketItemReadyState;
 DROP PROCEDURE IF EXISTS markTicketItemAsDelivered;
 DROP PROCEDURE IF EXISTS reprepareTicketItem;
 DROP PROCEDURE IF EXISTS hideTicketItem;
