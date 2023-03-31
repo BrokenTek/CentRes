@@ -984,7 +984,7 @@ BEGIN
 	
 	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
 
-	UPDATE TicketItems SET readyTime = NULL, deliverTime = NULL WHERE id = ticketItemNumber;
+	UPDATE TicketItems SET readyTime = NULL, deliveredTime = NULL WHERE id = ticketItemNumber;
 	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 END;
 
