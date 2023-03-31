@@ -1103,4 +1103,40 @@ BEGIN
 	RETURN SUBSTRING(splitStr,2);	
 END;
 
+/* I haven't figured out how to return cursors yet. Enabling these
+procedures will cause the tables to not load in HostView amongst other problems.
 
+// get all of the ticket items and their associated menu items for a specified groupId.
+// limited by route
+CREATE PROCEDURE getTicketGroup(IN grpId DECIMAL(6, 2), IN rte CHAR(1))
+BEGIN
+	SELECT TicketItems.*, MenuItems.* FROM TicketItems
+		INNER JOIN MenuItems ON TicketItems.menuItemQuickCode = MenuItems.quickCode
+		WHERE TicketItems.groupId = grpId AND MenuItems.route = rte;  
+END;
+
+// get list of all active ticket groups (groups that have ticket items with 'Preparing' status)
+// limited by route
+CREATE PROCEDURE getActiveTicketGroupIdList(IN rte CHAR(1))
+BEGIN
+	SELECT DISTINCT TicketItems.groupId AS groupId FROM TicketItems
+		INNER JOIN MenuItems ON TicketItems.menuItemQuickCode = MenuItems.quickCode
+		WHERE MenuItems.route = rte
+		AND TicketItems.submitTime IS NOT NULL AND TicketItems.readyTime IS NULL
+		AND (TicketItems.flag IS NULL OR UPPER(TicketItems.flag) = UPPER('updated')); 
+END;
+
+
+// returns true/false.... Well 1/0. Will return false/0 if you specify an invalid groupId.
+CREATE FUNCTION ticketGroupActive(grpId DECIMAL(6, 2), rte CHAR(1)) RETURNS BOOLEAN
+BEGIN
+	DECLARE cnt INT UNSIGNED;
+	SELECT COUNT(*) INTO cnt FROM TicketItems
+		INNER JOIN MenuItems ON TicketItems.menuItemQuickCode = MenuItems.quickCode
+		WHERE groupId = grpId
+		AND MenuItems.route = rte
+		AND TicketItems.submitTime IS NOT NULL AND TicketItems.readyTime IS NULL
+		AND (TicketItems.flag IS NULL OR UPPER(TicketItems.flag) = UPPER('updated'));
+	RETURN cnt > 0;
+END;
+*/
