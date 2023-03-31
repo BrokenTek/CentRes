@@ -1,16 +1,16 @@
 
-function varSet(variableName, value, id = null, update = false) {
-    value = nvl(value);
+function varSet(variableName, value, childIframeName = null, update = false) {
+    value = coerce(value);
     if (value === undefined) {
-        if (nvl(varGet(variableName, id)) === undefined) {
+        if (coerce(varGet(variableName, childIframeName)) === undefined) {
             return false;
         }
-        return varRem(variableName, id, update);
+        return varRem(variableName, childIframeName, update);
     }
-    var container = document.getElementById(id);
+    var container = document.getElementById(childIframeName);
     var form;
     var variableElement;
-    if (id == undefined) {
+    if (childIframeName == undefined) {
         form = document.getElementsByTagName('form')[0];
         variableElement = document.getElementById(variableName);
     }
@@ -33,7 +33,7 @@ function varSet(variableName, value, id = null, update = false) {
         variableElement.setAttribute('value', value);
     }
     else {
-        if (id == null){
+        if (childIframeName == null){
             variableElement = document.createElement('input');
         }
         else {
@@ -50,17 +50,17 @@ function varSet(variableName, value, id = null, update = false) {
     }
 
     if (update) {
-        updateDisplay(id);
+        updateDisplay(childIframeName);
     }
     return true;
 }
 
-function varGet(variableName, id = null) {
-    var container = document.getElementById(id);
+function varGet(variableName, childIframeName = null) {
+    var container = document.getElementById(childIframeName);
     var form;
     var variableElement;
    
-    if (id == null) {
+    if (childIframeName == null) {
         form = document.getElementsByTagName('form')[0];
         variableElement = document.getElementById(variableName);
     }
@@ -68,7 +68,7 @@ function varGet(variableName, id = null) {
         form = container.contentWindow.document.getElementsByTagName('form')[0]; 
         variableElement = container.contentWindow.document.getElementById(variableName);
         if (form == null) {
-            throw "varGet error! Variable unavailable";
+            throw "varGet error! " + variableName + " was unreachable at " + childIframeName;
         }
     }
     
@@ -76,30 +76,30 @@ function varGet(variableName, id = null) {
         return undefined;
     }
     else {
-        return nvl(variableElement.getAttribute("value"));
+        return coerce(variableElement.getAttribute("value"));
     }
 }
 
 // get a var. If its defined, remove the var and return its value.
 // If the variable was retrieved, specify you want to update the target display by setting update = true;
-function varGetOnce(variableName, id = null, update = false) {
-    let val = varGet(variableName, id);
+function varGetOnce(variableName, childIframeName = null, update = false) {
+    let val = varGet(variableName, childIframeName);
     if (val !== undefined) {
-        varRem(variableName, id);
+        varRem(variableName, childIframeName);
         if (update) {
-            updateDisplay(id);
+            updateDisplay(childIframeName);
         }
     }
-    return nvl(val);
+    return coerce(val);
 }
 
 
 // returns false if variable doesn't exist
-function varRem(variableName, id = null, update = false) {
-    var container = document.getElementById(id);
+function varRem(variableName, childIframeName = null, update = false) {
+    var container = document.getElementById(childIframeName);
     var form;
     var variableElement;
-    if (id == null) {
+    if (childIframeName == null) {
         form = document.getElementsByTagName('form')[0];
         variableElement = document.getElementById(variableName);
     }
@@ -122,16 +122,19 @@ function varRem(variableName, id = null, update = false) {
         return false;
     }
     if (update) {
-        updateDisplay(id);
+        updateDisplay(childIframeName);
     }
     return true;
 }
 
-function varRen(oldVarName, newVarName, id = null, update = false) {
-    var container = document.getElementById(id);
+function varRen(oldVarName, newVarName, childIframeName = null, update = false) {
+    if (getVar(oldVarName, childIframeName) !== undefined) {
+        return false;
+    }
+    var container = document.getElementById(childIframeName);
     var form;
     var variableElement;
-    if (id == null) {
+    if (childIframeName == null) {
         form = document.getElementsByTagName('form')[0];
         variableElement = document.getElementById(oldVarName);
     }
@@ -148,12 +151,13 @@ function varRen(oldVarName, newVarName, id = null, update = false) {
         }
     }
     if (variableElement != null) {
-        variableElement.id = newVarName;
+        variableElement.childIframeName = newVarName;
         variableElement.setAttribute("name",newVarName);
     }
     if (update) {
-        updateDisplay(id);
+        updateDisplay(childIframeName);
     }
+    return true;
 }
 
 // get a variable and copy it. Returns true/false if copied. If you want to allow transfereing an undefined variable
@@ -161,8 +165,8 @@ function varRen(oldVarName, newVarName, id = null, update = false) {
 // If you need to update the destination if a variable is copied, set updateDestination to true.
 // NOTE: variable does not get copied if the value at the source and destination are the same.
 function varCpy(variableName, source = null, destination = null, updateDestination = false, allowUndefinedVariables = false) {
-    let val = nvl(varGet(variableName, source));
-    let val2 = nvl(varGet(variableName, destination));
+    let val = coerce(varGet(variableName, source));
+    let val2 = coerce(varGet(variableName, destination));
     if (val === val2 || (val === undefined && !allowUndefinedVariables)) {    
         return false;
     }
@@ -175,8 +179,8 @@ function varCpy(variableName, source = null, destination = null, updateDestinati
 
 // see varCpy function commment. Additionally allows to specify a different destination variable name with destinationVariableName
 function varCpyRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateDestination, allowUndefinedVariables = false) {
-    let val = nvl(varGet(sourceVariableName, source));
-    let val2 = nvl(varGet(destinationVariableName, destination));
+    let val = coerce(varGet(sourceVariableName, source));
+    let val2 = coerce(varGet(destinationVariableName, destination));
     if (val === val2 || (val === undefined && !allowUndefinedVariables)) {
         return false;
     }
@@ -205,10 +209,10 @@ function varXfrRen(sourceVariableName, source = null, destinationVariableName, d
 }
 
 
-function varClr(id = null, update = false) {
-    var container = document.getElementById(id);
+function varClr(childIframeName = null, update = false) {
+    var container = document.getElementById(childIframeName);
     var form;
-    if (id == null) {
+    if (childIframeName == null) {
         form = document.getElementsByTagName('form')[0];
     }
     else {
@@ -223,15 +227,15 @@ function varClr(id = null, update = false) {
     }
 
     if (update) {
-        updateDisplay(id);
+        updateDisplay(childIframeName);
     }
 }
 
-function updateDisplay(id = null) {
-    var container = document.getElementById(id);
+function updateDisplay(childIframeName = null) {
+    var container = document.getElementById(childIframeName);
     var form;
     var btnSubmit;
-    if (id == null) {
+    if (childIframeName == null) {
         form = document.getElementsByTagName('form')[0];
         btnSubmit = document.getElementById("btnSubmit");
         if (btnSubmit !== null) {
@@ -281,14 +285,14 @@ window.addEventListener('scroll', function(event) {
     }
 }, true);
 
-function rememberScrollPosition(id = null) {
-    varSet("scrollX", window.scrollX, id);
-    varSet("scrollY", window.scrollY, id); 
+function rememberScrollPosition(childIframeName = null) {
+    varSet("scrollX", window.scrollX, childIframeName);
+    varSet("scrollY", window.scrollY, childIframeName); 
 }
 
 function forgetScrollPosition() {
-    varRem("scrollX", id);
-    varRem("ScrollY", id);
+    varRem("scrollX", childIframeName);
+    varRem("ScrollY", childIframeName);
 }
 
 function toggleSortKey(tableId, columnName, refresh = true) {
@@ -359,7 +363,7 @@ function clearSortKeys(tableId) {
     }
 }
 
-function nvl(data) {
+function coerce(data) {
     if (data === undefined || data === null || data.length == 0) {
         return undefined;
     }

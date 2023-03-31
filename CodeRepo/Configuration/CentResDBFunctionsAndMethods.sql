@@ -54,7 +54,9 @@ DROP PROCEDURE IF EXISTS moveTicketItemToSeat;
 DROP PROCEDURE IF EXISTS removeTicketItemFromSplit;
 DROP PROCEDURE IF EXISTS addTicketItemToSplit;
 DROP PROCEDURE IF EXISTS markTicketItemAsReady;
+DROP PROCEDURE IF EXISTS rescindTicketReadyState;
 DROP PROCEDURE IF EXISTS markTicketItemAsDelivered;
+DROP PROCEDURE IF EXISTS reprepareTicketItem;
 DROP PROCEDURE IF EXISTS hideTicketItem;
 DROP PROCEDURE IF EXISTS updateTicketSplitTimeStamp;
 DROP PROCEDURE IF EXISTS updateTicketSplitsTimeStamp;
@@ -953,6 +955,17 @@ BEGIN
 	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 END;
 
+CREATE PROCEDURE rescindTicketItemReadyState(IN ticketItemNumber INT UNSIGNED)
+BEGIN
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE splitFlg SMALLINT UNSIGNED;
+	
+	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
+
+	UPDATE TicketItems SET readyTime = NULL WHERE id = ticketItemNumber;
+	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
+END;
+
 CREATE PROCEDURE markTicketItemAsDelivered(IN ticketItemNumber INT UNSIGNED)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
@@ -964,6 +977,16 @@ BEGIN
 	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 END;
 
+CREATE PROCEDURE reprepareTicketItem(IN ticketItemNumber INT UNSIGNED)
+BEGIN
+	DECLARE tickNum INT UNSIGNED;
+	DECLARE splitFlg SMALLINT UNSIGNED;
+	
+	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
+
+	UPDATE TicketItems SET readyTime = NULL, deliverTime = NULL WHERE id = ticketItemNumber;
+	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
+END;
 
 CREATE PROCEDURE hideTicketItem(IN ticketItemNumber INT UNSIGNED)
 BEGIN
