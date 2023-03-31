@@ -249,6 +249,8 @@ CREATE TABLE TicketItems (
 	overrideAuthorization INT UNSIGNED,
 	overrideTimeStamp DATETIME,
 	prepPriority SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+	groupIndex SMALLINT UNSIGNED,
+	groupId DECIMAL(6,2) GENERATED ALWAYS AS (id DIV 10000 + COALESCE(groupIndex, 0) / 100),
 	submitTime DATETIME,
 	readyTime DATETIME,
 	deliveredTime DATETIME,

@@ -987,12 +987,14 @@ END;
 -- otherwise submits a single split 0 - 9.
 CREATE PROCEDURE submitPendingTicketItems(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
 BEGIN
+	DECLARE groupNum SMALLINT UNSIGNED;
 	DECLARE sf SMALLINT UNSIGNED;
+	SELECT (COALESCE(MAX(groupIndex), 0) + 1) INTO groupNum FROM TicketItems WHERE ticketId = ticketNumber;
 	IF (split = 10) THEN
-		UPDATE TicketItems SET submitTime = NOW() WHERE ticketId = ticketNumber AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
+		UPDATE TicketItems SET submitTime = NOW(), groupIndex = groupNum WHERE ticketId = ticketNumber AND submitTime IS NULL AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
 	ELSE
 		SELECT POWER(2, split) INTO sf;
-		UPDATE TicketItems SET submitTime = NOW() WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
+		UPDATE TicketItems SET submitTime = NOW(), groupIndex = groupNum WHERE ticketId = ticketNumber AND submitTime IS NULL AND (splitFlag & sf) = sf AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
 	END IF;
 	CALL updateTicketSplitsTimeStamp(ticketNumber, 1023);
 END;
@@ -1100,3 +1102,5 @@ BEGIN
  	END LOOP splitLoop;
 	RETURN SUBSTRING(splitStr,2);	
 END;
+
+
