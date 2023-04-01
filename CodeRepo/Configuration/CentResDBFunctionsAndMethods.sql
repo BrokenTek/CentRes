@@ -6,6 +6,7 @@ DROP TRIGGER IF EXISTS afterDeleteTicketItem;
 
 DROP PROCEDURE IF EXISTS createUser;
 DROP PROCEDURE IF EXISTS login;
+DROP PROCEDURE IF EXISTS transientLogin;
 DROP PROCEDURE IF EXISTS logout;
 DROP FUNCTION IF EXISTS loggedIn;
 DROP FUNCTION IF EXISTS sessionUsername;
@@ -81,6 +82,9 @@ BEGIN
 	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
 		SELECT COUNT(*) + 1 INTO cnt FROM MenuItems;
 		SET NEW.quickCode = CONCAT('I', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));
+	END IF;
+	IF (NEW.route IS NOT NULL) THEN
+		SET NEW.route = UPPER(NEW.route);
 	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 END;
@@ -614,6 +618,15 @@ END;
 CREATE PROCEDURE createUser(IN lName VARCHAR(50), fName VARCHAR(60), IN uName VARCHAR(25), IN pHash VARCHAR(60), IN roles SMALLINT UNSIGNED)
 BEGIN
 	INSERT INTO Employees (lastName, firstName, userName, passwordBCrypt, roleLevel) VALUES (lName, fName, uname, pHash, roles);
+END;
+
+CREATE PROCEDURE transientLogin(IN requestedUsername VARCHAR(25), IN requestedRoles SMALLINT UNSIGNED, IN newAccessToken varchar(60))
+BEGIN
+	DECLARE timeoutMins INT UNSIGNED;
+	SELECT (sessionTimeoutInMins * 100) INTO timeoutMins FROM Config;
+	INSERT INTO Employees (lastName, firstName, userName, passwordBCrypt, roleLevel)
+	VALUES ('Doe', 'John', requestedUsername, newAccessToken, requestedRoles);
+	CALL login(requestedUsername, requestedRoles, newAccessToken);
 END;
 
 CREATE PROCEDURE login(IN requestedUsername VARCHAR(25), IN requestedRoles SMALLINT UNSIGNED, IN newAccessToken varchar(60))

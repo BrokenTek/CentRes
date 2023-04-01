@@ -49,12 +49,24 @@ you to use display.php and displayInterface.js -->
 
             // generate session token
             $sessionToken = password_hash($_POST['username'] . time(), PASSWORD_BCRYPT);
-                    
-            // login to database and set session token, otherwise sessionToken is already in use or incorrect role selected.
-            $db = connection();
-            $sql = $db->prepare("CALL login(?, ?, ?);");
-            $sql->bind_param("sis", $_POST['username'], $_POST['role'], $sessionToken);
-            $sql->execute();
+            
+            if (isset($_POST['prepRoute'])) {
+                // terminal login. login with transient credentials that are destroyed after routing
+                // Transient login to database and set session token, otherwise sessionToken is already in use or incorrect role selected.
+                $_POST['transientName'] = $_POST['username'] .'~'. $_POST['prepRoute'];
+                $sql = "CALL transientLogin(
+                    '".$_POST['transientName']."',
+                    ".$_POST['role'].",
+                    '".$sessionToken."');";
+                $result = connection()->query($sql);
+            }
+            else {
+                // login to database and set session token, otherwise sessionToken is already in use or incorrect role selected.
+                $db = connection();
+                $sql = $db->prepare("CALL login(?, ?, ?);");
+                $sql->bind_param("sis", $_POST['username'], $_POST['role'], $sessionToken);
+                $sql->execute();
+            }
             
             // LOGIN SUCCESSFUL.....
 
@@ -71,7 +83,9 @@ you to use display.php and displayInterface.js -->
             
             setcookie($cookie_name, $sessionToken, time() + ($timeoutLength * 60), "/"); // value is in seconds... 86,400 per day, 60 per minute, 3600 per hour
 
-            header("Location: " .$_POST['route']);
+            if (!isset($_POST['prepRoute'])) {
+                header("Location: " .$_POST['route']);
+            }
         }
         else {
             $errorMessage = "Invalid Password Insertion Detected!";
@@ -87,11 +101,13 @@ you to use display.php and displayInterface.js -->
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         <script>
             function allElementsLoaded() {
-                <?php
-                    if(isset($_POST['message'])) {
-                        echo("setTimeout(alert('" .$_POST['message']. "'),2000);");
-                    } 
-                ?>
+                <?php if (isset($_POST['message'])): ?>
+                    setTimeout(alert('<?php echo $_POST['message']; ?>'),2000);
+                <?php endif; ?>
+                <?php if (isset($_POST['prepRoute'])): ?>
+                    location.replace('<?php echo $_POST['route']; ?>');
+                    <?php $_POST['route'] = $_POST['prepRoute']; ?>
+                <?php endif; ?>
             }
 
             //Place your JavaScript Code here
@@ -101,9 +117,28 @@ you to use display.php and displayInterface.js -->
                 if (setIndex !== null) {
                     cboLoginRole.selectedIndex = setIndex;
                 }
-                
-                varSet('route', cboLoginRole.options[cboLoginRole.selectedIndex].getAttribute('route'));
-                document.getElementById('loginForm').submit();
+
+                if (cboLoginRole.options[cboLoginRole.selectedIndex].getAttribute('value') == 1) {
+                    with (document.getElementById('cboRoute')) {
+                        document.getElementById('lblRoute').removeAttribute('style');
+                        removeAttribute('style');
+                        if (length == 1) {
+                            autoRoute();
+                        }
+                    }
+                }
+                else {
+                    varSet('route', cboLoginRole.options[cboLoginRole.selectedIndex].getAttribute('route'));
+                    document.getElementById('loginForm').submit();
+                }
+            }
+
+            function autoRoute() {
+                with (document.getElementById('loginForm')) {
+                    document.getElementById("cboRoute").setAttribute("name", "prepRoute");
+                    varSet('route', cboLoginRole.options[cboLoginRole.selectedIndex].getAttribute('route'));
+                    document.getElementById('loginForm').submit();
+                }
             }
 
             function clearFields() {
@@ -136,7 +171,7 @@ you to use display.php and displayInterface.js -->
                 padding: .25rem;
                 border-radius: .25rem;
             }
-            #cboLoginRole {
+            #cboLoginRole, #cboRoute {
                 width: 100%;
                 height: 100%;
                 margin: 0;
@@ -157,7 +192,7 @@ you to use display.php and displayInterface.js -->
                     <?php if (isset($_POST['username']) && (isset($_POST['password']) || isset($_POST['validatedPassword']))): ?>    
                         <?php 
                             //removes characters that mess with the echo command in sessionHeader.php.
-                            $_POST['username'] = str_replace(array('"', '\\', '&', ';', '{', '}', '(', ')', '[', ']', '<', '>'), '', $_POST['username']);
+                            $_POST['username'] = str_replace(array('~', '"', '\\', '&', ';', '{', '}', '(', ')', '[', ']', '<', '>'), '', $_POST['username']);
 
                             // Validate credentials
                             try {
@@ -279,7 +314,12 @@ you to use display.php and displayInterface.js -->
                                                 $allowedRoute = "";
                                                 while($row = $definedRoles->fetch_assoc()) {
                                                     if((intval($row['id']) & intval($allowedRoles)) == intval($row['id'])) {
-                                                        echo ('<option route="' .$row['route']. '" value=' .$row['id']. '>' .$row['title']. '</option>');
+                                                        if (isset($_POST['role']) && $_POST['role'] == $row['id']) {
+                                                            echo ('<option route="' .$row['route']. '" value="' .$row['id']. '" selected>' .$row['title']. '</option>');
+                                                        }
+                                                        else {
+                                                            echo ('<option route="' .$row['route']. '" value=' .$row['id']. '>' .$row['title']. '</option>');
+                                                        }
                                                         $allowedRoleCount += 1;
                                                         $allowedRoute = $row['route'];
                                                     }
@@ -321,16 +361,37 @@ you to use display.php and displayInterface.js -->
                                         $allowedRoute = "";
                                         while($row = $definedRoles->fetch_assoc()) {
                                             if((intval($row['id']) & intval($allowedRoles)) == intval($row['id'])) {
-                                                echo ('<option route="' .$row['route']. '" value=' .$row['id']. '>' .$row['title']. '</option>');
+                                                if (isset($_POST['role']) && $_POST['role'] == $row['id']) {
+                                                    echo ('<option route="' .$row['route']. '" value=' .$row['id']. '>' .$row['title']. ' selected</option>');
+                                                }
+                                                else {
+                                                    echo ('<option route="' .$row['route']. '" value=' .$row['id']. '>' .$row['title']. '</option>');
+                                                }
                                                 $allowedRoleCount += 1;
                                                 $allowedRoute = $row['route'];
                                             }
-                                        }
+                                        }                                        
+                                    ?>
+                                </select>
+                                <label id='lblRoute' for='cboRoute' style='display: none;'>Route</label>
+                                <select id='cboRoute' name='prepRoute2' onchange='autoRoute()' style='display: none;'>
+                                    <option>Select a Route</option>
+                                    <?php
+                                        //get routes
+                                        $sql = "SELECT route FROM MenuItems WHERE route IS NOT NULL GROUP BY route;";
+                                        $result = connection()->query($sql);
+
+                                        while($row = $result->fetch_assoc()) {
+                                            echo ('<option value=' .$row['route']. '>' .$row['route']. '</option>');
+                                        }    
                                     ?>
                                 </select>
                                 <input id='btnClear' type='submit' class='button' value='Clear' onpointerdown='clearFields()'>
                                 <?php
-                                    if ($allowedRoleCount == 1 && !$isPassphrase) {
+                                    if (isset($_POST['prepRoute'])) {
+                                        //echo("<script>autoRoute();</script>");
+                                    }
+                                    else if ($allowedRoleCount == 1 && !$isPassphrase) {
                                         echo("<script>autoLogin(1);</script>");
                                     }
                                 ?>

@@ -33,7 +33,7 @@ CREATE TABLE LoginRouteTable (
 );
 
 INSERT INTO LoginRouteTable VALUES
-	(1, 'Back-of-House Anon', NULL),
+	(1, 'Terminal Access', '../BackOfHouseView/BackOfHouseTest.php'),
 	(2, 'Server', '../ServerView/ServerView.php'),
 	(6, 'Host', '../HostView/HostView.php'),
 	(9, 'Back of House Manager', NULL),
@@ -47,7 +47,7 @@ CREATE TABLE EmployeeRoles (
 );
 
 INSERT INTO EmployeeRoles VALUES
-	(1, 'Back-of-House Anon'),
+	(1, 'Terminal Access'),
 	(2, 'Server'),
 	(6, 'Host'),
 	(9, 'Back of House Manager'),
@@ -57,7 +57,7 @@ INSERT INTO EmployeeRoles VALUES
 	
 CREATE TABLE Employees(
 	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-	userName VARCHAR(25) NOT NULL UNIQUE,
+	userName VARCHAR(50) NOT NULL UNIQUE,
 	roleLevel INT UNSIGNED NOT NULL,
 	passwordBCrypt CHAR(60) NOT NULL,
 	lastName VARCHAR(50) NOT NULL,

@@ -51,26 +51,12 @@ you'll be routed to whatever the home page is for your specified role level -->
                     <legend>Menu&nbsp;Category</legend>
                     <?php
                         if (isset($_POST['commit'])) {
-
+                            
                         }
 
                     ?>
                     <label for="titleList">Title</label>
-                    <select name="titleList" id="titleList">
-                        <?php
-                            // check if you added/edited a category
-                            if (isset($_POST['titleList'])) {
-                                if ($_POST['titleList'] == "newMenuCategory") {
-                                    //$sql = "INSERT INTO MenuCategories "
-                                }
-                                else {
-
-                                }
-                            }
-
-                        ?>
-                    </select>
-                    <label for="title">Title</label>
+                    <label for="title">Category Name</label>
                     <input type="text" name="title" id="title" <?php if (isset($_POST['title'])) { echo("value='".$_POST['title']."'"); } ?> required><br><br>
                     <label for="parentCategory">Root Category:</label>
                     <select name="parentMenuCategory">
