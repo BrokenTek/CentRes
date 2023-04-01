@@ -10,8 +10,17 @@ Otherwise will reroute to logon page -->
 		<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
 		<script>
 			function createMenuSelectEventHandlers() {
-	    		var menuItemSelected = function() {
-					varSet("selectedMenuItem", this.id);
+				
+				var menuItemSelected = function(event) {
+					event.stopPropagation();
+					if (varGet("selectedMenuItem") == this.id) {
+						varRem("selectedMenuItem");
+					}
+					else {
+						varRem("selectedMenuCategory");
+						varSet("selectedMenuItem", this.id);
+					}
+					
 				};
 
 				var elements = document.getElementsByClassName("menuItem");
@@ -20,6 +29,33 @@ Otherwise will reroute to logon page -->
 	    				elements[i].addEventListener('pointerdown', menuItemSelected);
 					}
 				}
+
+				var menuCategorySelected = function(event) {
+					event.stopPropagation();
+					varRem("selectedMenuItem");
+					if (this.getAttribute("open") == null) {
+						varSet("selectedMenuCategory", this.id);
+					}
+					else {
+						varRem("selectedMenuCategory");
+					}
+					
+				};
+
+				var elements = document.getElementsByClassName("menuCategory");
+				if (elements != null) {
+					for (var i = 0; i < elements.length; i++) {
+	    				elements[i].addEventListener('pointerdown', menuCategorySelected);
+					}
+				}
+
+				var clearSelectedVars = function(event) {
+					varRem("selectedMenuCategory");
+					varRem("selectedMenuItem");
+				};
+
+				document.getElementsByTagName("body")[0].addEventListener('pointerDown', clearSelectedVars);
+
 
 			}
 			addEventListener('load', createMenuSelectEventHandlers);

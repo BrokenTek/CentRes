@@ -6,7 +6,7 @@ DELETE FROM MenuModificationCategories;
 /* 1 INSERT CATEGORIES */
 
 INSERT INTO menucategories (quickCode, title)
-VALUES ('ROOT','root'),('DRK','Drinks'),('APP','Appetizers'),('ENT','Entrees'),('DES','Desserts'),('DNA','Non-Alcoholic'),('DAA','Alcoholic'),('FAP','Fried'),('SAP','Salads'),('SEN','Sandwiches'),('GRL','Grilled'),('SEA','Seafood'),('ICC','Ice Cream'),('BAK','Baked');
+VALUES ('DRK','Drinks'),('APP','Appetizers'),('ENT','Entrees'),('DES','Desserts'),('DNA','Non-Alcoholic'),('DAA','Alcoholic'),('FAP','Fried'),('SAP','Salads'),('SEN','Sandwiches'),('GRL','Grilled'),('SEA','Seafood'),('ICC','Ice Cream'),('BAK','Baked');
 
 
 /* 2 INSERT MENU ITEMS */

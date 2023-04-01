@@ -83,10 +83,12 @@ CREATE TABLE ActiveEmployees (
 CREATE TABLE QuickCodes (
 	id VARCHAR(40) PRIMARY KEY
 );
+INSERT INTO QuickCodes VALUES('ROOT');
+
 
 CREATE TABLE MenuCategories (
 	quickCode VARCHAR(40) PRIMARY KEY,
-	title VARCHAR(75) NOT NULL,
+	title VARCHAR(75) NOT NULL UNIQUE,
 	description VARCHAR(1000),
 	route char(1),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
@@ -97,7 +99,7 @@ CREATE TABLE MenuCategories (
 
 CREATE TABLE MenuItems (
 	quickCode VARCHAR(40) PRIMARY KEY,
-	title VARCHAR(75) NOT NULL,
+	title VARCHAR(75) NOT NULL UNIQUE,
 	description varchar(1000),
 	price DECIMAL(6, 2) UNSIGNED,
 	route char(1),

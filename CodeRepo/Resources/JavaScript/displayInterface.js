@@ -1,5 +1,5 @@
 
-function varSet(variableName, value, childIframeName = null, update = false) {
+function varSet(variableName, value, childIframeName = null, update = false, bypassValidationCheck = false) {
     value = coerce(value);
     if (value === undefined) {
         if (coerce(varGet(variableName, childIframeName)) === undefined) {
@@ -50,7 +50,7 @@ function varSet(variableName, value, childIframeName = null, update = false) {
     }
 
     if (update) {
-        updateDisplay(childIframeName);
+        updateDisplay(childIframeName, bypassValidationCheck);
     }
     return true;
 }
@@ -82,12 +82,12 @@ function varGet(variableName, childIframeName = null) {
 
 // get a var. If its defined, remove the var and return its value.
 // If the variable was retrieved, specify you want to update the target display by setting update = true;
-function varGetOnce(variableName, childIframeName = null, update = false) {
+function varGetOnce(variableName, childIframeName = null, update = false, bypassValidationCheck = false) {
     let val = varGet(variableName, childIframeName);
     if (val !== undefined) {
         varRem(variableName, childIframeName);
         if (update) {
-            updateDisplay(childIframeName);
+            updateDisplay(childIframeName, bypassValidationCheck);
         }
     }
     return coerce(val);
@@ -95,7 +95,7 @@ function varGetOnce(variableName, childIframeName = null, update = false) {
 
 
 // returns false if variable doesn't exist
-function varRem(variableName, childIframeName = null, update = false) {
+function varRem(variableName, childIframeName = null, update = false, bypassValidationCheck = false) {
     var container = document.getElementById(childIframeName);
     var form;
     var variableElement;
@@ -122,12 +122,12 @@ function varRem(variableName, childIframeName = null, update = false) {
         return false;
     }
     if (update) {
-        updateDisplay(childIframeName);
+        updateDisplay(childIframeName, bypassValidationCheck);
     }
     return true;
 }
 
-function varRen(oldVarName, newVarName, childIframeName = null, update = false) {
+function varRen(oldVarName, newVarName, childIframeName = null, update = false, bypassValidationCheck = false) {
     if (getVar(oldVarName, childIframeName) !== undefined) {
         return false;
     }
@@ -155,7 +155,7 @@ function varRen(oldVarName, newVarName, childIframeName = null, update = false) 
         variableElement.setAttribute("name",newVarName);
     }
     if (update) {
-        updateDisplay(childIframeName);
+        updateDisplay(childIframeName, bypassValidationCheck);
     }
     return true;
 }
@@ -164,52 +164,52 @@ function varRen(oldVarName, newVarName, childIframeName = null, update = false) 
 // aka deleting it at the destination, set allowUndefinedVariables = true
 // If you need to update the destination if a variable is copied, set updateDestination to true.
 // NOTE: variable does not get copied if the value at the source and destination are the same.
-function varCpy(variableName, source = null, destination = null, updateDestination = false, allowUndefinedVariables = false) {
+function varCpy(variableName, source = null, destination = null, updateDestination = false, allowUndefinedVariables = false, bypassValidationCheck) {
     let val = coerce(varGet(variableName, source));
     let val2 = coerce(varGet(variableName, destination));
     if (val === val2 || (val === undefined && !allowUndefinedVariables)) {    
         return false;
     }
     if (val !== undefined) {
-        return varSet(variableName, val, destination, updateDestination);
+        return varSet(variableName, val, destination, updateDestination, bypassValidationCheck);
     }
-    return varRem(variableName, destination, updateDestination);
+    return varRem(variableName, destination, updateDestination, bypassValidationCheck);
 }
 
 
 // see varCpy function commment. Additionally allows to specify a different destination variable name with destinationVariableName
-function varCpyRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateDestination, allowUndefinedVariables = false) {
+function varCpyRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateDestination, allowUndefinedVariables = false, bypassValidationCheck = false) {
     let val = coerce(varGet(sourceVariableName, source));
     let val2 = coerce(varGet(destinationVariableName, destination));
     if (val === val2 || (val === undefined && !allowUndefinedVariables)) {
         return false;
     }
     if (val !== undefined) {
-        return varSet(destinationVariableName, val, destination, updateDestination);
+        return varSet(destinationVariableName, val, destination, updateDestination, bypassValidationCheck);
     }
-    return varRem(destinationVariableName, destination, updateDestination);
+    return varRem(destinationVariableName, destination, updateDestination, bypassValidationCheck);
 }
 
 // transfer a variable from source to destination. Specify if you want to update the source and or destination
 // allowUndefinedVariables = true will clear the variable at the destination.
-function varXfr(variableName, source = null, destination = null, updateSource = false, updateDestination = false, allowUndefinedVariables = false) {
-    if (varCpy(variableName, source, destination, updateDestination, allowUndefinedVariables)) {
-        return varRem(variableName, source, updateSource);
+function varXfr(variableName, source = null, destination = null, updateSource = false, updateDestination = false, allowUndefinedVariables = false, bypassValidationCheck = false) {
+    if (varCpy(variableName, source, destination, updateDestination, allowUndefinedVariables, bypassValidationCheck)) {
+        return varRem(variableName, source, updateSource, bypassValidationCheck);
     }
     return false;
 }
 
 // transfer a variable from source to destination. Specify if you want to update the source and or destination
 // allowUndefinedVariables = true will clear the variable at the destination.
-function varXfrRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateSource = false, updateDestination = false, allowUndefinedVariables = false) {
-    if (varCpyRen(sourceVariableName, source, destinationVariableName, destination, updateDestination, allowUndefinedVariables)) {
-        return varRem(sourceVariableName, source, updateSource);
+function varXfrRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateSource = false, updateDestination = false, allowUndefinedVariables = false, bypassValidationCheck = false) {
+    if (varCpyRen(sourceVariableName, source, destinationVariableName, destination, updateDestination, allowUndefinedVariables, bypassValidationCheck)) {
+        return varRem(sourceVariableName, source, updateSource, bypassValidationCheck);
     }
     return false;
 }
 
 
-function varClr(childIframeName = null, update = false) {
+function varClr(childIframeName = null, update = false, bypassValidationCheck = false) {
     var container = document.getElementById(childIframeName);
     var form;
     if (childIframeName == null) {
@@ -227,18 +227,18 @@ function varClr(childIframeName = null, update = false) {
     }
 
     if (update) {
-        updateDisplay(childIframeName);
+        updateDisplay(childIframeName, bypassValidationCheck);
     }
 }
 
-function updateDisplay(childIframeName = null) {
+function updateDisplay(childIframeName = null, bypassValidationCheck = false) {
     var container = document.getElementById(childIframeName);
     var form;
     var btnSubmit;
     if (childIframeName == null) {
         form = document.getElementsByTagName('form')[0];
         btnSubmit = document.getElementById("btnSubmit");
-        if (btnSubmit !== null) {
+        if (btnSubmit !== null && !bypassValidationCheck) {
           btnSubmit.click();  
         }
         else {
@@ -252,7 +252,7 @@ function updateDisplay(childIframeName = null) {
             if (form == null && btnSubmit === null) {
                return false;
             }
-            else if (btnSubmit !== null) {
+            else if (btnSubmit !== null && !bypassValidationCheck) {
                 btnSubmit.click();
             }
             else {

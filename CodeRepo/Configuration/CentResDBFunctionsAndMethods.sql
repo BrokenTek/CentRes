@@ -66,24 +66,44 @@ DROP PROCEDURE IF EXISTS cancelPendingTicketItems;
 CREATE TRIGGER beforeAddMenuCategory
 BEFORE INSERT ON MenuCategories FOR EACH ROW
 BEGIN
+	DECLARE cnt INTEGER UNSIGNED;
+	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
+		SELECT COUNT(*) + 1 INTO cnt FROM MenuCategories;
+		SET NEW.quickCode = CONCAT('C', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));
+	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 END;
 
 CREATE TRIGGER beforeAddMenuItem
 BEFORE INSERT ON MenuItems FOR EACH ROW
 BEGIN
+	DECLARE cnt INTEGER UNSIGNED;
+	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
+		SELECT COUNT(*) + 1 INTO cnt FROM MenuItems;
+		SET NEW.quickCode = CONCAT('I', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));
+	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 END;
 
 CREATE TRIGGER beforeAddMenuModificationCategory
 BEFORE INSERT ON MenuModificationCategories FOR EACH ROW
 BEGIN
+	DECLARE cnt INTEGER UNSIGNED;
+	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
+		SELECT COUNT(*) + 1 INTO cnt FROM MenuModificationCategories;
+		SET NEW.quickCode = CONCAT('MC', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));	
+	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 END;
 
 CREATE TRIGGER beforeAddMenuModificationItem
 BEFORE INSERT ON MenuModificationItems FOR EACH ROW
 BEGIN
+	DECLARE cnt INTEGER UNSIGNED;
+	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
+		SELECT COUNT(*) + 1 INTO cnt FROM MenuModificationItems;
+		SET NEW.quickCode = CONCAT('M', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));	
+	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 END;
 
