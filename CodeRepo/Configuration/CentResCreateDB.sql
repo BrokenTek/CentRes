@@ -213,7 +213,8 @@ CREATE TABLE Tickets (
 	timeReserved DATETIME NOT NULL DEFAULT NOW(),
 	timeSeated DATETIME,
 	timeClosed DATETIME,
-	timeModified DATETIME NOT NULL DEFAULT NOW()
+	timeModified DATETIME NOT NULL DEFAULT NOW(),
+	ticketHash CHAR(40)
 );
 
 CREATE TABLE Splits (

@@ -2,14 +2,6 @@
 This template includes starter code that allows
 you to use display.php and displayInterface.js -->
 
-
-<!-- ensures you are logged in before rendering page, and are logged in under the correct role.
-If you aren't logged in, it will reroute to the login page.
-If you are logged in but don't have the correct role to view this page,
-you'll be routed to whatever the home page is for your specified role level -->
-<?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(1, $GLOBALS['role']); ?>
-<!-- CHANGE 255 TO THE ALLOWED ROLE LEVEL FOR THE PAGE -->
-
 <!DOCTYPE html>
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <html>
@@ -31,7 +23,6 @@ you'll be routed to whatever the home page is for your specified role level -->
     <body id="sessionForm" onload="allElementsLoaded()">
         <!-- this form submits to itself -->
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
-            <?php require_once "../Resources/php/sessionHeader.php"; ?>
             <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
             
             <!-- If you want to forget/not carry over variables, use PHP unset function
@@ -41,7 +32,7 @@ you'll be routed to whatever the home page is for your specified role level -->
             <!-- retain any POST vars. When updateDisplay() is called or the form is submitted,
             these variables will be carried over -->
             <?php require_once '../Resources/php/display.php'; ?>
-            <?php echo("<h1>Looking at Traffic for Route " .$_POST['route']. "</h1>"); ?>
+           
         </form>
     </body>
 </html>

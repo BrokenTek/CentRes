@@ -9,9 +9,9 @@ DELETE FROM MenuCategories;
 
 /* Insert The Root For Association. Script For Populating The Menu Iframe Disregards The Category 'root' So
    It Will Not Display In The Server View */
-INSERT INTO `menucategories` (`quickCode`, `title`, `description`, `route`, `visible`, `defaultPrice`)
- VALUES
-('root', 'root', NULL, NULL, 1, NULL);
+--   INSERT INTO `menucategories` (`quickCode`, `title`, `description`, `route`, `visible`, `defaultPrice`)
+--   VALUES
+-- ('root', 'root', NULL, NULL, 1, NULL);
 
 /* Insert Root Categories And Sub Categories */
 INSERT INTO `menucategories` (`quickCode`, `title`, `description`, `route`, `visible`, `defaultPrice`)

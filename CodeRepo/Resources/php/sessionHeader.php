@@ -24,6 +24,7 @@
         $sql = "DELETE FROM Employees WHERE userName = '" .$GLOBALS['username']. "';";
         connection()->query($sql);
         $GLOBALS['username'] = $nameParts[0];
+        $_POST['route'] = $nameParts[1];
     }
 
 

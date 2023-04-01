@@ -24,7 +24,7 @@ you to use display.php and displayInterface.js -->
 	}
 
     // Barring hacking attempts, you are here after selecting which role to login as
-    if (isset($_POST['route'])) {
+    if (isset($_POST['route']) && isset($_POST['username'])) {
         // before officially logging in, check that $_POST['validatedPassword'] matches what is stored in db.
         // Otherwise hackers could supply a bogus value for validated password, and if not checked, allows
         // anybody to bypass the password verification step.
@@ -83,9 +83,7 @@ you to use display.php and displayInterface.js -->
             
             setcookie($cookie_name, $sessionToken, time() + ($timeoutLength * 60), "/"); // value is in seconds... 86,400 per day, 60 per minute, 3600 per hour
 
-            if (!isset($_POST['prepRoute'])) {
-                header("Location: " .$_POST['route']);
-            }
+            header("Location: " .$_POST['route']);
         }
         else {
             $errorMessage = "Invalid Password Insertion Detected!";

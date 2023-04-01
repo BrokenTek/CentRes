@@ -712,7 +712,7 @@ END;
 
 CREATE PROCEDURE createTicket(IN ticketNickname VARCHAR(25), IN peopleCount INT UNSIGNED, OUT newTicketNumber INT UNSIGNED)
 BEGIN
-	INSERT INTO Tickets (nickname, partySize) VALUES (ticketNickname, peopleCount);
+	INSERT INTO Tickets (nickname, partySize, ticketHash) VALUES (ticketNickname, peopleCount, SHA1(NOW()));
 	SELECT MAX(id) INTO newTicketNumber FROM Tickets; 
 END;
 
