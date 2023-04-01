@@ -63,7 +63,7 @@
                 print("<h1>☑ Loaded 3 Stooges as Employees</h1>");
 
                 // Populate Menu
-                $query = file_get_contents("CentResPopuolateMenuAndModsWithAssociations.sql");
+                $query = file_get_contents("CentResPopulateMenuWithAssociations.sql"); // Populate not Popuolate
                 $dbh->exec($query);
                 //include 'menuPop.php';
                 print("<h1>☑ Loaded Menu as to Database</h1>");
