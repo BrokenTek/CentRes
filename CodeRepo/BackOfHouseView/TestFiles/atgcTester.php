@@ -7,7 +7,6 @@ you to use display.php and displayInterface.js -->
 If you aren't logged in, it will reroute to the login page.
 If you are logged in but don't have the correct role to view this page,
 you'll be routed to whatever the home page is for your specified role level -->
-<?php require_once '../../Resources/php/sessionLogic.php'; restrictAccess(255, $GLOBALS['role']); ?>
 <!-- CHANGE 255 TO THE ALLOWED ROLE LEVEL FOR THE PAGE -->
 
 <!DOCTYPE html>
