@@ -56,6 +56,7 @@ DROP PROCEDURE IF EXISTS removeTicketItemFromSplit;
 DROP PROCEDURE IF EXISTS addTicketItemToSplit;
 DROP PROCEDURE IF EXISTS markTicketItemAsReady;
 DROP PROCEDURE IF EXISTS rescindTicketItemReadyState;
+DROP PROCEDURE IF EXISTS toggleTicketItemReadyState;
 DROP PROCEDURE IF EXISTS markTicketItemAsDelivered;
 DROP PROCEDURE IF EXISTS reprepareTicketItem;
 DROP PROCEDURE IF EXISTS hideTicketItem;
@@ -1008,6 +1009,20 @@ BEGIN
 	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 END;
 
+CREATE PROCEDURE toggleTicketItemReadyState(IN ticketItemNumber INT UNSIGNED)
+BEGIN
+	DECLARE timeSubmitted, timeReady, timeDelivered DATETIME;
+	SELECT submitTime, readyTime, deliveredTime INTO timeSubmitted, timeReady, timeDelivered
+	FROM TicketItems WHERE id = ticketItemNumber;
+	IF (timeSubmitted IS NOT NULL AND timeDelivered IS NULL) THEN
+		IF (timeReady IS NULL) THEN
+			CALL markTicketItemAsReady(ticketItemNumber);
+		ELSE
+			CALL rescindTicketItemReadyState(ticketItemNumber);
+		END IF;
+	END IF;
+END;
+
 CREATE PROCEDURE markTicketItemAsDelivered(IN ticketItemNumber INT UNSIGNED)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
@@ -1102,7 +1117,7 @@ BEGIN
 		-- ticket item is sent back to the kitchen to be reprepared.
 		IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) IN ('Preparing', 'Updated')) > 0
 			AND (SELECT COUNT(*) FROM ActiveTicketGroups WHERE id = tickGrp) = 0) THEN
-			INSERT INTO ActiveTicketGroups (id) VALUES (tickGrp);
+			INSERT INTO ActiveTicketGroups (id, atgHash) VALUES (tickGrp, SHA1(NOW()));
 		END IF;
 	END IF; 
 

@@ -268,5 +268,6 @@ CREATE TABLE TicketItems (
 
 CREATE TABLE ActiveTicketGroups (
 	id DECIMAL(6, 2) PRIMARY KEY,
-	timeModified DATETIME NOT NULL DEFAULT NOW()
+	timeModified DATETIME NOT NULL DEFAULT NOW(),
+	atgHash CHAR(40)
 );
