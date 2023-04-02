@@ -53,6 +53,10 @@
 
             $_POST['recordedGroups'] = $groupsIn;
         }
+        else {
+            $_POST['removedGroups'] = $_POST['recordedGroups'];
+            unset($_POST['recordedGroups']);
+        }
     }
 
     if (!isset($errorMessage)) {
@@ -83,7 +87,23 @@
                 varRem("addedGroups");
                 varRem("removedGroups");
                 varRem("updatedGroups");
-                updateDisplay();
+                with (document.getElementById("addGrp")) {
+                    innerText = "undefined";
+                    classList.remove("highlighted");
+                }
+                with (document.getElementById("remGrp")) {
+                    innerText = "undefined";
+                    classList.remove("highlighted");
+                }
+                with (document.getElementById("updGrp")) {
+                    innerText = "undefined";
+                    classList.remove("highlighted");
+                }
+                var errMsg = document.getElementById("errorMessage");
+                if (errMsg != null) {
+                    errMsg.remove();
+                }
+                //updateDisplay();
             }
 
         </script>
@@ -118,7 +138,7 @@
         </table>
         <?php
             if (isset($errorMessage)) {
-                echo("<h1 class='highlighted'>$errorMessage</h1>");
+                echo("<h1 class='highlighted' id='errorMessage'>$errorMessage</h1>");
             }
         ?>
     </body>
