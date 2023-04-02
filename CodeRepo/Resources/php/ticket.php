@@ -600,7 +600,7 @@ Otherwise will reroute to logon page -->
         else {
             $header = "No Ticket/Table Selected";
             echo("<h1 class='message' id='ticketHeader'>" .$header. "</h1>");
-            unset($_POST['recordedModificationTime'], $_POST['recordedModificationTime'], $_POST['seat'], $_POST['split'], $_POST['selectedTicketItem']);
+            unset($_POST['recordedModificationTime'], $_POST['recordedModificationTime'], $_POST['selectedTicketItem']);
             $_POST['enabledButtons'] = "";
         }
         unset($_POST['command'], $_POST['modificationNotes'],$_POST['menuItem'], $_POST['ticketItem'], $_POST['overrideValue'], $_POST['overrideNote'], $_POST['authorizationUsername'], $_POST['toSeat'], $_POST['toSplit']);

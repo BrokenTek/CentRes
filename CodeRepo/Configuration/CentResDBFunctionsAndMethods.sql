@@ -63,6 +63,7 @@ DROP PROCEDURE IF EXISTS updateTicketSplitTimeStamp;
 DROP PROCEDURE IF EXISTS updateTicketSplitsTimeStamp;
 DROP PROCEDURE IF EXISTS submitPendingTicketItems;
 DROP PROCEDURE IF EXISTS cancelPendingTicketItems;
+DROP PROCEDURE IF EXISTS updateTicketGroup;
 
 CREATE TRIGGER beforeAddMenuCategory
 BEFORE INSERT ON MenuCategories FOR EACH ROW
@@ -795,7 +796,8 @@ BEGIN
 	DECLARE stat VARCHAR(20);
 	DECLARE tickNum INT UNSIGNED;
 	DECLARE splitFlg SMALLINT UNSIGNED;
-	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
+	DECLARE tickGrp DECIMAL(6, 2);
+	SELECT ticketId, splitFlag, groupId INTO tickNum, splitFlg, tickGrp FROM TicketItems WHERE id = ticketItemNumber;
 	IF ((SELECT COUNT(*) FROM TicketItems WHERE id = ticketItemNumber) = 0) THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Ticket Item Number Doesn''t Exist!';
@@ -807,10 +809,11 @@ BEGIN
 		ELSE
 			UPDATE TicketItems SET modificationNotes = modNotes WHERE id = ticketItemNumber;
 			-- DEPRECATED needs to be recoded
-			-- UPDATE TicketItems SET calculatedPriceWithMods = ticketItemPrice(ticketItemNumber) WHERE id = ticketItemNumber;
+			UPDATE TicketItems SET calculatedPriceWithMods = ticketItemPrice(ticketItemNumber) WHERE id = ticketItemNumber;
 			IF (stat = 'Preparing') THEN
 				UPDATE TicketItems SET flag = 'Updated' WHERE id = ticketItemNumber;
-			END IF; 
+			END IF;
+			CALL updateTicketGroup(tickGrp, 0);
 			CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 		END IF;
 	END IF;
@@ -864,8 +867,9 @@ BEGIN
 	DECLARE splitFlg SMALLINT UNSIGNED;
 	DECLARE ticketNumber INT UNSIGNED;
 	DECLARE split SMALLINT UNSIGNED;
+	DECLARE tickGrp DECIMAL(6, 2);
 	SELECT ticketItemStatus(ticketItemNumber) INTO stat;
-	SELECT menuItemQuickCode, ticketId, splitFlag INTO qc, tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
+	SELECT menuItemQuickCode, ticketId, splitFlag, groupId INTO qc, tickNum, splitFlg, tickGrp FROM TicketItems WHERE id = ticketItemNumber;
 	SELECT LOG(2, splitFlg) INTO split;
 	SELECT quantity INTO qty FROM MenuItems WHERE quickCode = qc;
 	IF (stat IN ('Ready', 'Delivered', 'Hidden')) THEN
@@ -874,6 +878,7 @@ BEGIN
 		SET MESSAGE_TEXT = 'Ready/Delivered Ticket Items Cannot Be Removed!';
 	ELSEIF (stat IN ('Updated', 'Preparing', 'Removed')) THEN
 		UPDATE TicketItems SET flag = 'Removed' WHERE id = ticketItemNumber;
+		CALL updateTicketGroup(tickGrp, 2);
 	ELSE		
 		-- delete the actual ticket item
 		DELETE FROM TicketItems WHERE id = ticketItemNumber;
@@ -981,10 +986,12 @@ CREATE PROCEDURE markTicketItemAsReady(IN ticketItemNumber INT UNSIGNED)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
 	DECLARE splitFlg SMALLINT UNSIGNED;
+	DECLARE tickGrp DECIMAL(6,2);
 	
-	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
+	SELECT ticketId, splitFlag, groupId INTO tickNum, splitFlg, tickGrp FROM TicketItems WHERE id = ticketItemNumber;
 
 	UPDATE TicketItems SET readyTime = NOW() WHERE id = ticketItemNumber;
+	CALL updateTicketGroup(tickGrp, 2);
 	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 END;
 
@@ -992,10 +999,12 @@ CREATE PROCEDURE rescindTicketItemReadyState(IN ticketItemNumber INT UNSIGNED)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
 	DECLARE splitFlg SMALLINT UNSIGNED;
+	DECLARE tickGrp DECIMAL(6, 2);
 	
-	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
+	SELECT ticketId, splitFlag, groupId INTO tickNum, splitFlg, tickGrp FROM TicketItems WHERE id = ticketItemNumber;
 
 	UPDATE TicketItems SET readyTime = NULL WHERE id = ticketItemNumber;
+	CALL updateTicketGroup(tickGrp, 1);
 	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 END;
 
@@ -1014,10 +1023,12 @@ CREATE PROCEDURE reprepareTicketItem(IN ticketItemNumber INT UNSIGNED)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
 	DECLARE splitFlg SMALLINT UNSIGNED;
+	DECLARE tickGrp DECIMAL(6,2);
 	
-	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
+	SELECT ticketId, splitFlag, groupId INTO tickNum, splitFlg, tickGrp FROM TicketItems WHERE id = ticketItemNumber;
 
 	UPDATE TicketItems SET readyTime = NULL, deliveredTime = NULL WHERE id = ticketItemNumber;
+	CALL updateTicketGroup(tickGrp, 1);
 	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 END;
 
@@ -1052,6 +1063,7 @@ BEGIN
 		SELECT POWER(2, split) INTO sf;
 		UPDATE TicketItems SET submitTime = NOW(), groupIndex = groupNum WHERE ticketId = ticketNumber AND submitTime IS NULL AND (splitFlag & sf) = sf AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
 	END IF;
+	CALL updateTicketGroup(ticketNumber + groupNum / 100, 1);
 	CALL updateTicketSplitsTimeStamp(ticketNumber, 1023);
 END;
 
@@ -1067,6 +1079,33 @@ BEGIN
 		DELETE FROM TicketItems WHERE submitTime IS NULL AND ticketId = ticketNumber AND (splitFlag & sf) = sf AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
 	END IF;
 	CALL updateTicketSplitsTimeStamp(ticketNumber, sf);
+END;
+
+CREATE PROCEDURE updateTicketGroup(tickGrp DECIMAL(6, 2), flag TINYINT UNSIGNED)
+BEGIN
+	UPDATE ActiveTicketGroups SET timeModified = NOW() WHERE id = tickGrp;
+	IF (flag = 2) THEN
+		-- ticket group may no longer be active.
+		-- check TicketItems table and find any item with matching tickGrp that is "Preparing" or "Modified"
+		
+		-- if no matches are found, delete tickGrp from ActiveTicketGroups table.
+		-- Occurs when ticket item is canceled after submission, or item marked as ready
+		IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) IN ('Preparing', 'Updated')) = 0) THEN
+			DELETE FROM ActiveTicketGroups WHERE id = tickGrp;
+		END IF;
+	ELSEIF (flag = 1) THEN
+		-- ticket group may have become active again.
+		-- check TicketItems table and find any item with matching tickGrp that is "Preparing" or "Modified"
+		-- if a match is found, insert tickGrp into ActiveTicketGroups table.
+
+		-- occurs when a ticket items's ready state is rescinded or
+		-- ticket item is sent back to the kitchen to be reprepared.
+		IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) IN ('Preparing', 'Updated')) > 0
+			AND (SELECT COUNT(*) FROM ActiveTicketGroups WHERE id = tickGrp) = 0) THEN
+			INSERT INTO ActiveTicketGroups (id) VALUES (tickGrp);
+		END IF;
+	END IF; 
+
 END;
 
 CREATE PROCEDURE updateTicketSplitTimeStamp(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)

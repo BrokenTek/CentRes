@@ -8,9 +8,9 @@
     // makes sure the reset script is accessible if there is an error with the database,
     // there are no employees in the database, or a manager is logged in and wants to reset.
     try {
-        require_once '../Resources/php/connect_disconnect.php';
-        require_once '../Resources/php/sessionLogic.php';
-        restrictAccess(8, $GLOBALS['role']);
+        //require_once '../Resources/php/connect_disconnect.php';
+        //require_once '../Resources/php/sessionLogic.php';
+        //restrictAccess(8, $GLOBALS['role']);
     }
     catch (Exception $e) {
         die($e);

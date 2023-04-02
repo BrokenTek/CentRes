@@ -212,7 +212,6 @@
                     cboSplit.disabled = true;
                     btnSubmit.disabled = true;
                     btnCancel.disabled = true;
-                    document.querySelector("#btnPrintReceipt").disabled = true;
                     
                     btnEdit.disabled = true;
                     btnRemove.disabled = true;
@@ -503,7 +502,6 @@
                     
                     btnSubmit.disabled = true;
                     btnCancel.disabled = true;
-                    document.querySelector("#btnPrintReceipt").disabled = true;
         
                     btnEdit.disabled = true;
                     btnRemove.disabled = true;
@@ -562,7 +560,7 @@
                     maxSeat = varGet("maxSeat", "serverListener");
                 }
                 catch (err) {
-                    setTimeout(populateSeats, 250);
+                    setTimeout( function() {populateSeats(forceReset); }, 250);
                     return;
                 }
                 var changed = false;
@@ -625,7 +623,7 @@
                     }
                 }
                 catch (err) {
-                    setTimeout(populateSplits, 250);
+                    setTimeout( function() {populateSplits(forceReset); }, 250);
                     return;
                 }
                 var changed = false;
