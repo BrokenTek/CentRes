@@ -130,7 +130,7 @@
                             }
                         }
                         echo("</div>");
-                    }*/
+                    }
                 ?>
             </div>
             <?php require_once '../Resources/php/display.php'; ?>
