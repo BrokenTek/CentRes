@@ -22,15 +22,70 @@ you'll be routed to whatever the home page is for your specified role level -->
         <!-- remove this script tag -->
         <script>
             function allElementsLoaded() {
-                
+
+                setTimeout(eventLoop, 1000);
             }
+            
+            function eventLoop(){
+                var addedGroups = varGetOnce("addedGroups", "ifrTGC");
+                //alert(addedGroups);
+                var removedGroups = varGetOnce("removedGroups", "ifrTGC");
+                var updatedGroups = varGetOnce("updatedGroups", "ifrTGC");
+                
+
+                // create Donovan window
+                if(addedGroups !== undefined){
+                
+                    addedGroups = addedGroups.split(',');
+                    for(let i = 0; i < addedGroups.length; i++){
+                        var newIfr = document.createElement('iframe');
+                        newIfr.setAttribute('id', "ifr" + addedGroups[i]);
+                        document.getElementById('frmBOH').appendChild(newIfr);
+
+                        newIfr.setAttribute('src', "HelloWorld.html");
+                        varSet('activeGroupId', addedGroups[i], "ifr" + addedGroups[i]);
+                        varCpy('route', null, "ifr" + addedGroups[i]);
+                        // connector will get the variable for David to complete
+                        updateDisplay("ifr" + addedGroups[i]);
+
+                    }
+
+
+                }
+                if(removedGroups !== undefined){
+                    removedGroups = removedGroups.split(',');
+                    for(let i = 0; i < removedGroups.length; i++){
+                        let removeIfr = document.getElementById('ifrm'+ removedGroups[i]);
+                        if (removeIfr  != null){
+                            removeIfr.remove();
+                        }
+                    }
+                    
+
+                }
+                if(updatedGroups !== undefined){
+                    updatedGroups = updatedGroups.split(',');
+                    for(let i = 0; i < removedGroups.length; i++){
+                        
+                        let updatedIfr = document.getElementById('ifrm'+ updatedGroups[i]);
+                        if (updateIfr  != null){
+                            updateDisplay('ifrm'+ updatedGroups[i]);
+                        }
+                    }
+                }
+                updateDisplay("ifrTGC");
+                setTimeout(eventLoop, 1000);
+
+            }
+
+
 
             //Place your JavaScript Code here
         </script>
     </head>
     <body id="sessionForm" onload="allElementsLoaded()">
         <!-- this form submits to itself -->
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" id="frmBOH" method="POST">
             <?php require_once "../Resources/php/sessionHeader.php"; ?>
             <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
             
@@ -43,5 +98,6 @@ you'll be routed to whatever the home page is for your specified role level -->
             <?php require_once '../Resources/php/display.php'; ?>
             <?php echo("<h1>Looking at Traffic for Route " .$_POST['route']. "</h1>"); ?>
         </form>
+        <iframe src="ticketGroupConnector.php" id="ifrTGC" frameborder="0" style = "display: none;"></iframe>
     </body>
 </html>
