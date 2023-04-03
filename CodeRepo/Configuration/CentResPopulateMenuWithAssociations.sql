@@ -206,4 +206,8 @@ INSERT INTO `menuassociations` (`parentQuickCode`, `childQuickCode`, `displayInd
 ('S017', 'I079', NULL),
 ('S018', 'I081', NULL),
 ('S018', 'I082', NULL),
-('S018', 'I083', NULL);
+('S018', 'I083', NULL),
+('S009', 'I084', NULL),
+('S009', 'I085', NULL),
+('S009', 'I086', NULL),
+('S009', 'I087', NULL);
