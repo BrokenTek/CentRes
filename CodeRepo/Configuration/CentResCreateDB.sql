@@ -130,6 +130,7 @@ CREATE TABLE MenuModificationItems (
 	title VARCHAR(75) NOT NULL,
 	description varchar(1000),
 	priceOrModificationValue DECIMAL(6, 2),
+	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
 	ON DELETE CASCADE ON UPDATE CASCADE
