@@ -65,6 +65,7 @@ DROP PROCEDURE IF EXISTS updateTicketSplitsTimeStamp;
 DROP PROCEDURE IF EXISTS submitPendingTicketItems;
 DROP PROCEDURE IF EXISTS cancelPendingTicketItems;
 DROP PROCEDURE IF EXISTS updateTicketGroup;
+DROP PROCEDURE IF EXISTS closeTicketGroup;
 
 CREATE TRIGGER beforeAddMenuCategory
 BEFORE INSERT ON MenuCategories FOR EACH ROW
@@ -879,7 +880,7 @@ BEGIN
 		SET MESSAGE_TEXT = 'Ready/Delivered Ticket Items Cannot Be Removed!';
 	ELSEIF (stat IN ('Updated', 'Preparing', 'Removed')) THEN
 		UPDATE TicketItems SET flag = 'Removed' WHERE id = ticketItemNumber;
-		CALL updateTicketGroup(tickGrp, 2);
+		CALL updateTicketGroup(tickGrp, 0);
 	ELSE		
 		-- delete the actual ticket item
 		DELETE FROM TicketItems WHERE id = ticketItemNumber;
@@ -992,7 +993,7 @@ BEGIN
 	SELECT ticketId, splitFlag, groupId INTO tickNum, splitFlg, tickGrp FROM TicketItems WHERE id = ticketItemNumber;
 
 	UPDATE TicketItems SET readyTime = NOW() WHERE id = ticketItemNumber;
-	CALL updateTicketGroup(tickGrp, 2);
+	CALL updateTicketGroup(tickGrp, 0);
 	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 END;
 
@@ -1122,6 +1123,14 @@ BEGIN
 	END IF; 
 
 END;
+
+CREATE PROCEDURE closeTicketGroup(tickGrp DECIMAL(6, 2), flag TINYINT UNSIGNED)
+BEGIN
+	IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) IN ('Preparing', 'Updated')) = 0) THEN
+			DELETE FROM ActiveTicketGroups WHERE id = tickGrp;
+	END IF;
+END;
+
 
 CREATE PROCEDURE updateTicketSplitTimeStamp(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
 BEGIN
