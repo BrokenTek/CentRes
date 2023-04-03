@@ -23,6 +23,9 @@
             .ticketItems{
                 grid-area:ticketItems;
             }
+            .updated{
+                background-color: #F6941D;
+            }
         </style>
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
         <script>
@@ -30,13 +33,30 @@
                 varCpyRen("groupIndex", null,"activeGroupId","activeTicketGroupConnector");
                 varSet("ticketItemNumber", this.id, "activeTicketGroupConnector");
                 varCpy("atgHash", null,"activeTicketGroupConnector",true);
+                updateDisplay();
             }
-        
+            
+            function closeMe(){
+                varSet("closeMe", "yes");
+            }
+
             function allElementsLoaded(){
                 let ticketItemElements = document.getElementsByName("ticketItem");
+                let clearable = true;
                     for(let i = 0; i < ticketItemElements.length; i++){
-                        ticketItemElements[i].addEventListener('pointerdown',toggleReadyListener);
+                        let element = ticketItemElements[i];
+                        if(!(element.classList.contains("disabled"))){
+                            element.addEventListener('pointerdown',toggleReadyListener);
+                        }
+                        if(!(element.classList.contains("ready")||element.classList.contains("disabled")||element.classList.contains("hidden")||)){
+                            clearable = false;
+                        }
                 }
+                if(clearable){
+                    document.getElementById("btnClose").addEventListener('pointerdown',closeMe);
+                }
+                
+                
             }
         </script>
     </head>
@@ -68,20 +88,20 @@
                     while($ticketItem = $itemList->fetch_assoc()){
                         $itemState = connection()->query("SELECT ticketItemStatus(".$ticketItem['id'].") AS status;")->fetch_assoc()['status'];
                         $itemClass = 'ticketItem';
-                        $readyChar = ' '
+                        $readyChar = ' ';
                         switch($itemState){
                             case "delivered":
 
                             case "ready":
-                                $itemClass.=" ready"
-                                $readyChar = '✔'
+                                $itemClass.=" ready";
+                                $readyChar = '✔';
                                 break;
 
                             case "removed":
-                                $itemClass.=" removed"
+                                $itemClass.=" disabled";
                                 break;
                             case "hidden":
-                                $itemClass.=" hidden"
+                                $itemClass.=" hidden";
                                 break;
                         }
                         if($ticketItem['flag'] == "updated"){
@@ -94,14 +114,14 @@
                             $modList = explode(",", $ticketItem['mods']);
                             $modLength = count($modList);
                             //iterate through each pair of modification values.
-                            for($i=0; ($i + 1)<$modLength; i+=2){
+                            for($i=0; ($i + 1)<$modLength; $i+=2){
                                 echo("<ul>");
                                 $sql = "SELECT title, selfDescriptive FROM MenuModificationCategories WHERE quickCode = ".$modList[$i].";";
                                 $mod = connection()->query($sql)->fetch_assoc();
                                 if(!$mod['selfDescriptive']){
                                     echo($mod['title']);
                                 }
-                                echo($modList[i + 1])
+                                echo($modList[i + 1]);
                                 echo("</ul>");
                             }
                             //append the last odd note, which should be a custom one for instructions or whatever, to the list of modifications
@@ -109,7 +129,7 @@
                                 echo("<ul>".htmlspecialchars($modList[$modLength - 1])."</ul>");
                             }
                         }
-                        echo("</div>")
+                        echo("</div>");
                     }*/
                 ?>
             </div>
