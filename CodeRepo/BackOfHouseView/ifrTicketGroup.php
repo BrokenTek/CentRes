@@ -2,8 +2,8 @@
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <html>
     <head>
-        <link rel="stylesheet" href="../CSS/baseStyle.css">
-        <link rel="stylesheet" href="../CSS/ticketStyle.css">
+        <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
+        <link rel="stylesheet" href="../Resources/CSS/ticketStyle.css">
         <style>
             #sessionForm{
                 display:grid;
@@ -48,7 +48,7 @@
                         if(!(element.classList.contains("disabled"))){
                             element.addEventListener('pointerdown',toggleReadyListener);
                         }
-                        if(!(element.classList.contains("ready")||element.classList.contains("disabled")||element.classList.contains("hidden")||)){
+                        if(!(element.classList.contains("ready")||element.classList.contains("disabled")||element.classList.contains("hidden"))){
                             clearable = false;
                         }
                 }
