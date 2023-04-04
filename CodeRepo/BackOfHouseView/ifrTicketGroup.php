@@ -30,7 +30,7 @@
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
         <script>
             function toggleReadyListener(){
-                varCpyRen("groupIndex", null,"activeGroupId","activeTicketGroupConnector");
+                varCpyRen("groupId", null,"activeGroupId","activeTicketGroupConnector");
                 varSet("ticketItemNumber", this.id, "activeTicketGroupConnector");
                 varCpy("atgHash", null,"activeTicketGroupConnector",true);
                 updateDisplay();
@@ -66,13 +66,13 @@
             <button id= "btnClose">Close</button>
             <div class='descriptors'>
                 <?php
-                    $sql = "SELECT timecreated FROM activeticketgroups WHERE id = ".$_POST['groupIndex'].";";
+                    $sql = "SELECT timecreated FROM activeticketgroups WHERE id = ".$_POST['groupId'].";";
                     $timeSubmitted = connection()->query($sql)->fetch_assoc();
                     echo("<p>".$timeSubmitted['timecreated']."</p><p>Submitted</p>");
-                    echo("<p>".$_POST['groupIndex']."</p><p>Ticket-Group</p>");
+                    echo("<p>".$_POST['groupId']."</p><p>Ticket-Group</p>");
 
                     //gets the id of the LATEST table this ticket is assigned to.
-                    $sql = "SELECT tableid FROM tablelog WHERE ticketid = ".floor($_POST['groupIndex'])."
+                    $sql = "SELECT tableid FROM tablelog WHERE ticketid = ".floor($_POST['groupId'])."
                     ORDER BY timeStamp DESC;";
                     $currentTable = connection()->query($sql)->fetch_assoc();
                     echo("<p>".$currentTable['tableid']."</p><p>Table</p>");
@@ -82,7 +82,7 @@
                 <?php
                     $sql = "SELECT menuItems.title AS 'itemName', id, flag, modificationNotes AS 'mods' 
                     FROM (ticketItems LEFT JOIN menuItems ON menuItemQuickCode=quickCode) 
-                    WHERE groupid = ".$_POST['groupIndex']."
+                    WHERE groupid = ".$_POST['groupId']."
                     AND route=".$_POST['route'].";";
                     $itemList = connection()->query($sql);
                     while($ticketItem = $itemList->fetch_assoc()){
