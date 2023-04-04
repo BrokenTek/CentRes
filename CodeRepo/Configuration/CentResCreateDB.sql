@@ -20,6 +20,7 @@ DROP TABLE IF EXISTS Employees;
 DROP TABLE IF EXISTS EmployeeRoles;
 DROP TABLE IF EXISTS LoginRouteTable;
 DROP TABLE IF EXISTS Config;
+DROP TABLE IF EXISTS ATG_Window_Registry;
 
 CREATE TABLE Config (
 	sessionTimeoutInMins INT UNSIGNED NOT NULL DEFAULT 5
@@ -84,7 +85,7 @@ CREATE TABLE ActiveEmployees (
 CREATE TABLE QuickCodes (
 	id VARCHAR(40) PRIMARY KEY
 );
-INSERT INTO QuickCodes VALUES('ROOT');
+INSERT INTO QuickCodes VALUES('root');
 
 
 CREATE TABLE MenuCategories (
@@ -272,4 +273,11 @@ CREATE TABLE ActiveTicketGroups (
 	timeCreated DATETIME NOT NULL DEFAULT NOW(),
 	timeModified DATETIME NOT NULL DEFAULT NOW(),
 	atgHash CHAR(40)
+);
+
+CREATE TABLE ATG_Window_Registry (
+	groupId DECIMAL(6, 2),
+	route CHAR(1),
+	atgHash CHAR(40),
+	windowHash CHAR(40)
 );

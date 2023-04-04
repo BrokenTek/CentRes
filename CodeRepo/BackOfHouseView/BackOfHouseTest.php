@@ -25,28 +25,51 @@ you'll be routed to whatever the home page is for your specified role level -->
 
                 setTimeout(eventLoop, 1000);
             }
-            
+            var newNames = [];
             function eventLoop(){
                 var addedGroups = varGetOnce("addedGroups", "ifrTGC");
-                //alert(addedGroups);
                 var removedGroups = varGetOnce("removedGroups", "ifrTGC");
                 var updatedGroups = varGetOnce("updatedGroups", "ifrTGC");
                 
-
                 // create Donovan window
                 if(addedGroups !== undefined){
-                
                     addedGroups = addedGroups.split(',');
                     for(let i = 0; i < addedGroups.length; i++){
-                        var newIfr = document.createElement('iframe');
-                        newIfr.setAttribute('id', "ifr" + addedGroups[i]);
-                        document.getElementById('frmBOH').appendChild(newIfr);
 
-                        newIfr.setAttribute('src', "HelloWorld.html");
-                        varSet('activeGroupId', addedGroups[i], "ifr" + addedGroups[i]);
-                        varCpy('route', null, "ifr" + addedGroups[i]);
-                        // connector will get the variable for David to complete
-                        updateDisplay("ifr" + addedGroups[i]);
+                        var newName = "ifr" + addedGroups[i];
+                        newNames.push(newName);
+
+                        var template = document.getElementById("template")
+                        template.setAttribute("id", newName);
+                        var newIfr = template.cloneNode(true);
+                        template.setAttribute("id", "template");
+                        
+                        
+                        newIfr.removeAttribute("style");
+                        //newIfr.removeAttribute('id');
+
+                        // compose the string that contains the groupId, route, and, hash here
+                        //
+                        
+                        document.getElementById('frmBOH').appendChild(newIfr);
+                
+
+                        newIfr.addEventListener("load", function() {
+                            
+                            var lookAt = newNames.shift();
+                            //document.getElementById(lookAt).contentWindow.document.getElementById("consternation").innerHTML += "<h1 id='getMe' getMeVal='1234' >" + lookAt +"</h1>";
+                            //this.setAttribute("id", lookAt);
+                            //this.id = "ifr" + lookAt;
+                            this.contentWindow.document.getElementsByTagName("form")[0].submit();
+                            //document.getElementById(lookAt).contentWindow.document.getElementById("consternation").innerHTML += "<h1 id='getMe' getMeVal='1234' >" + lookAt +"</h1>";
+                            //document.getElementById(lookAt).contentWindow.document.getElementsByTagName("form")[0].submit();
+                            //varSet('activeGroupId', addedGroups[i], newName);
+                            //varCpy('route', null, newName);
+                            //connector will get the hash for David to complete
+                            //updateDisplay(newName);
+                        });
+
+                        
 
                     }
 
@@ -78,7 +101,10 @@ you'll be routed to whatever the home page is for your specified role level -->
 
             }
 
-
+           
+            function wowness() {
+                document.getElementsByTagName("iframe").contentWindow.document.getElementsByTagName('form')[0].submit();
+            }
 
             //Place your JavaScript Code here
         </script>
@@ -97,7 +123,9 @@ you'll be routed to whatever the home page is for your specified role level -->
             these variables will be carried over -->
             <?php require_once '../Resources/php/display.php'; ?>
             <?php echo("<h1>Looking at Traffic for Route " .$_POST['route']. "</h1>"); ?>
+        
         </form>
         <iframe src="ticketGroupConnector.php" id="ifrTGC" frameborder="0" style = "display: none;"></iframe>
+        <iframe src="activeGroupAutoForm.html" id="template" style="display: none;"></iframe>
     </body>
 </html>

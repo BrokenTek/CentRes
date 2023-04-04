@@ -80,7 +80,7 @@ require_once '../Resources/php/connect_disconnect.php';
 $sql = "SELECT childQuickCode, title
 		FROM MenuAssociations 
 		INNER JOIN MenuCategories ON MenuCategories.quickCode = MenuAssociations.childQuickCode 
-		WHERE MenuAssociations.parentQuickCode = 'ROOT';";
+		WHERE MenuAssociations.parentQuickCode = 'root';";
 $result = connection()->query($sql);
 
 if ($result->num_rows > 0) {

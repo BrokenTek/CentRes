@@ -59,8 +59,8 @@
 		<script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
 		<script>
 			function allElementsLoaded() {
-				varSet("tableIdOnly", "", "serverListener");
-				varSet("showAllTables", "", "serverListener");
+				varSet("tableIdOnly", "Yes", "serverListener");
+				varSet("showAllTables", "Yes", "serverListener");
 				varSet("authorizationId", USER_ID, "ifrSelectedTable");
 				if ((ROLE & 8) == 8) {
                 	varSet("authorizationId", USER_ID, "ifrRestaurantLayout");
@@ -80,7 +80,7 @@
 					
 					varCpyRen("goToTable", "ifrRestaurantLayout", "staticTableId", null, true);
 					
-					varCpy("employeeId", "ifrServerList", "serverListener", true, true);
+					if (varCpy("employeeId", "ifrServerList", "serverListener", true, true));
 					varCpyRen("employeeId", "ifrServerList", "addEmployeeId", "ifrSelectedTable", true, true);
 					
 					varCpyRen("ticketId", "ifrWaitList", "addTicketId", "ifrSelectedTable", true, true);
@@ -107,6 +107,27 @@
 				}
 				catch (error) { }
 				startEventLoopTimer();
+			}
+
+			function highlightTables() {
+				try {
+					var selectedServer = varGet("selectedServer");
+					var tableList = varGet("tableList", "serverListener");
+					if (selectedServer !== undefined && tableList == null) {
+						setTimeout(highlightTables, 250);
+						return;
+					}
+					else if (tableList !== undefined && selectedServer === undefined) {
+						setTimeout(highlightTables, 250);
+						return;
+					}
+					alert(tableList);
+					varSet("highlightedTables", (selectedServer === undefined ? "clear" : tableList) , "ifrRestaurantLayout");
+				}
+				catch (error) {
+					alert(error);
+					setTimeout(highlightTables, 250);
+				}
 			}
 
 			function stopEventLoopTimer() {

@@ -57,7 +57,7 @@
             let tables = varGet("highlightedTables");
             if (tables !== undefined) {
                 tables = tables.split(",");
-                for (let i = 0; i < tables.length; i+= 2) {
+                for (let i = 0; i < tables.length; i++) {
                     document.getElementById(tables[i]).classList.add("highlighted");
                 }
             }
