@@ -279,5 +279,5 @@ CREATE TABLE ATGwindowRegistry (
 	groupId DECIMAL(6, 2),
 	route CHAR(1),
 	atgHash CHAR(40),
-	windowHash CHAR(40)
+	windowHash CHAR(60)
 );

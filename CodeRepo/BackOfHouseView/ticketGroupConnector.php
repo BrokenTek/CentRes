@@ -29,7 +29,7 @@
                 $groupsIn .= "," . $row['id'];
                 if (!strpos("," .$_POST['recordedGroups']. ",", $row['id'])) {
                     $addedGroups .= "," . $row['id'];
-                    $windowHash = sha1($row['atgHash']);
+                    $windowHash = substr(password_hash($row['atgHash'] . time() . $_POST['recordedGroups'], PASSWORD_BCRYPT),7);
                     $windowHashes .= ",$windowHash";
  
                     $sql = "INSERT INTO ATGwindowRegistry (groupId, route, atgHash, windowHash) VALUES (" .$row['id']. ", '" .$_POST['route']. "', '" .$row['atgHash']. "', '$windowHash');";

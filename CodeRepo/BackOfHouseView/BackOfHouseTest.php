@@ -34,44 +34,61 @@ you'll be routed to whatever the home page is for your specified role level -->
         <!-- demonstration on how to use varGet, varSet, updateDisplay for just this page -->
         <!-- remove this script tag -->
         <script>
+            var groups;
+            var count = 0;
+            var capacity;
+            var unloaded;
             function allElementsLoaded() {
-                varSet("route", varGet("route"), "ifrTGC", true);
+                groups = document.getElementsByClassName("ticketGroup");
+                capacity = groups.length;
+                unloaded = capacity;
+
+                varCpy("route", null, "ifrTGC", true);
                 setTimeout(eventLoop, 1000);
             }
-            var newNames = [];
-            var newHashes = [];
+            
+            var atgDict = {};
+            var hashQueue = {};
+
+            var hashBuffer = [];
+            var groupBuffer = [];
+
             function eventLoop(){
                 try {
                     var addedGroups = varGetOnce("addedGroups", "ifrTGC");
                     var windowHashes = varGetOnce("windowHashes", "ifrTGC");
                     var removedGroups = varGetOnce("removedGroups", "ifrTGC");
                     var updatedGroups = varGetOnce("updatedGroups", "ifrTGC");
-                    
+                                        
                     // create ifrTicketGroup. Pass the windowHash via get.
                     if(addedGroups !== undefined){
                         addedGroups = addedGroups.split(',');
                         windowHashes = windowHashes.split(',');
                         for(let i = 0; i < addedGroups.length; i++){
-
-                            var newName = addedGroups[i];
-                            var newHash = windowHashes[i];
-                            newNames.push(newName);
-                            newHashes.push(newHash);
-
-                            var template = document.getElementById("template")
-                            var newIfr = template.cloneNode(false);
-                            template.setAttribute("id", "template");
-                            
-                            newIfr.removeAttribute("style");
-                            
-                            document.getElementById('frmBOH').appendChild(newIfr);
-                            newIfr.addEventListener("load", ifrLoaded);
+                            if (i >= capacity) {
+                                groupBuffer.push(addedGroups[i])
+                                hashBuffer.push(windowHashes[i])
+                            }
+                            else {
+                                atgDict[addedGroups[i]] = groups[count];
+                                //hashQueue['ifr' + addedGroups[i]] = windowHashes[i];
+                                groups[count].id = "ifr" + addedGroups[i];
+                                groups[count].removeAttribute("style");
+                                alert(groups[count].id);
+                                //groups[count].addEventListener("load", ifrLoaded);
+                                varSet("route", varGet("route"), groups[count].id);
+                                varSet("groupId", addedGroups[i], groups[count].id , true);
+                                updateDisplay(groups[count].id);
+                                //varSet()
+                                count++;
+                            }
                         }
 
 
                     }
                     if(removedGroups !== undefined){
                         removedGroups = removedGroups.split(',');
+                        counter -= addedGroups.length;
                         for(let i = 0; i < removedGroups.length; i++){
                             let removeIfr = document.querySelector('[id^="ifr' + removedGroups[i] + '"]');
                             if (removeIfr  != null){
@@ -105,9 +122,9 @@ you'll be routed to whatever the home page is for your specified role level -->
 
             function ifrLoaded(event) {
                 this.removeEventListener("load", ifrLoaded);
-                var lookAt = newNames.shift();
-                this.id = "ifr" + lookAt;
-                this.setAttribute("src", "ifrTicketGroup.php?windowHash=" + newHashes.shift());
+                
+                varSet("windowHash", hashQueue[this.id], this.id , false);
+                hashQueue.delete(this.id);
             }
 
            
@@ -135,6 +152,25 @@ you'll be routed to whatever the home page is for your specified role level -->
         
         </form>
         <iframe src="ticketGroupConnector.php" id="ifrTGC" frameborder="0" style = "display: none;"></iframe>
-        <iframe src="activeGroupAutoForm.html" id="template" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
     </body>
 </html>
