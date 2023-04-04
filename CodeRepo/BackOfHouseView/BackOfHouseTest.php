@@ -43,62 +43,62 @@ you'll be routed to whatever the home page is for your specified role level -->
             function eventLoop(){
                 try {
                     var addedGroups = varGetOnce("addedGroups", "ifrTGC");
-                var windowHashes = varGetOnce("windowHashes", "ifrTGC");
-                var removedGroups = varGetOnce("removedGroups", "ifrTGC");
-                var updatedGroups = varGetOnce("updatedGroups", "ifrTGC");
-                
-                // create ifrTicketGroup. Pass the windowHash via get.
-                if(addedGroups !== undefined){
-                    addedGroups = addedGroups.split(',');
-                    windowHashes = windowHashes.split(',');
-                    for(let i = 0; i < addedGroups.length; i++){
+                    var windowHashes = varGetOnce("windowHashes", "ifrTGC");
+                    var removedGroups = varGetOnce("removedGroups", "ifrTGC");
+                    var updatedGroups = varGetOnce("updatedGroups", "ifrTGC");
+                    
+                    // create ifrTicketGroup. Pass the windowHash via get.
+                    if(addedGroups !== undefined){
+                        addedGroups = addedGroups.split(',');
+                        windowHashes = windowHashes.split(',');
+                        for(let i = 0; i < addedGroups.length; i++){
 
-                        var newName = addedGroups[i];
-                        var newHash = windowHashes[i];
-                        newNames.push(newName);
-                        newHashes.push(newHash);
+                            var newName = addedGroups[i];
+                            var newHash = windowHashes[i];
+                            newNames.push(newName);
+                            newHashes.push(newHash);
 
-                        var template = document.getElementById("template")
-                        var newIfr = template.cloneNode(false);
-                        template.setAttribute("id", "template");
-                        
-                        newIfr.removeAttribute("style");
-                        
-                        document.getElementById('frmBOH').appendChild(newIfr);
-                        newIfr.addEventListener("load", ifrLoaded);
+                            var template = document.getElementById("template")
+                            var newIfr = template.cloneNode(false);
+                            template.setAttribute("id", "template");
+                            
+                            newIfr.removeAttribute("style");
+                            
+                            document.getElementById('frmBOH').appendChild(newIfr);
+                            newIfr.addEventListener("load", ifrLoaded);
+                        }
+
+
                     }
+                    if(removedGroups !== undefined){
+                        removedGroups = removedGroups.split(',');
+                        for(let i = 0; i < removedGroups.length; i++){
+                            let removeIfr = document.querySelector('[id^="ifr' + removedGroups[i] + '"]');
+                            if (removeIfr  != null){
+                                removeIfr.remove();
+                            }
+                        }
+                        
 
-
-                }
-                if(removedGroups !== undefined){
-                    removedGroups = removedGroups.split(',');
-                    for(let i = 0; i < removedGroups.length; i++){
-                        let removeIfr = document.querySelector('[id^="ifr' + removedGroups[i] + '"]');
-                        if (removeIfr  != null){
-                            removeIfr.remove();
+                    }
+                    if(updatedGroups !== undefined){
+                        updatedGroups = updatedGroups.split(',');
+                        for(let i = 0; i < removedGroups.length; i++){
+                            
+                            let updatedIfr = document.getElementById('ifrm'+ updatedGroups[i]);
+                            if (updateIfr  != null){
+                                updateDisplay('ifrm'+ updatedGroups[i]);
+                            }
                         }
                     }
                     
-
-                }
-                if(updatedGroups !== undefined){
-                    updatedGroups = updatedGroups.split(',');
-                    for(let i = 0; i < removedGroups.length; i++){
-                        
-                        let updatedIfr = document.getElementById('ifrm'+ updatedGroups[i]);
-                        if (updateIfr  != null){
-                            updateDisplay('ifrm'+ updatedGroups[i]);
-                        }
-                    }
-                }
-                updateDisplay("ifrTGC");
-                setTimeout(eventLoop, 1000);
-                
                 
                 }
                 catch(err) {
                     //alert(err);
                 }
+                updateDisplay("ifrTGC");
+                setTimeout(eventLoop, 1000);
                 
 
             }
