@@ -1124,7 +1124,7 @@ BEGIN
 
 END;
 
-CREATE PROCEDURE closeTicketGroup(tickGrp DECIMAL(6, 2), flag TINYINT UNSIGNED)
+CREATE PROCEDURE closeTicketGroup(tickGrp DECIMAL(6, 2))
 BEGIN
 	IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) IN ('Preparing', 'Updated')) = 0) THEN
 			DELETE FROM ActiveTicketGroups WHERE id = tickGrp;

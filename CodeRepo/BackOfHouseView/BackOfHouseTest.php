@@ -73,7 +73,7 @@ you'll be routed to whatever the home page is for your specified role level -->
                 if(removedGroups !== undefined){
                     removedGroups = removedGroups.split(',');
                     for(let i = 0; i < removedGroups.length; i++){
-                        let removeIfr = document.getElementById('ifrm'+ removedGroups[i]);
+                        let removeIfr = document.querySelector('[id^="ifr' + removedGroups[i] + '"]');
                         if (removeIfr  != null){
                             removeIfr.remove();
                         }

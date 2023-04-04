@@ -29,11 +29,11 @@
                 $groupsIn .= "," . $row['id'];
                 if (!strpos("," .$_POST['recordedGroups']. ",", $row['id'])) {
                     $addedGroups .= "," . $row['id'];
-                    $windowhash = sha1($row['atgHash']);
+                    $windowHash = sha1($row['atgHash']);
                     $windowHashes .= ",$windowHash";
-                    
-                    $sql = "INSERT INTO ATGwindowRegistry VALUES (" .$row['id']. ", '" .$_POST['route']. "', '" .$_POST['atgHash']. "', '$windowHash');";
-                    connection()->query();
+ 
+                    $sql = "INSERT INTO ATGwindowRegistry (groupId, route, atgHash, windowHash) VALUES (" .$row['id']. ", '" .$_POST['route']. "', '" .$row['atgHash']. "', '$windowHash');";
+                    connection()->query($sql);
                 }
                 else {
                     if (!isset($_POST['lastUpdated']) || $row['timeModified'] > $_POST['lastUpdated']) {
