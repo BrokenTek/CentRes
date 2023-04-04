@@ -1,18 +1,21 @@
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <?php
-    $sql = "SELECT id, timeModified FROM ActiveTicketGroups";
+    $sql = "SELECT * FROM ActiveTicketGroups";
     $result = connection()->query($sql);
     $result2 = connection()->query($sql);
-    if (isset($_POST['addedGroups']) || isset($_POST['removedGroups']) || isset($_POST['updatedGroups'])) {
-        $errorMessage = "Please Process the Highlighted Vars before continuing";
+    if (isset($_POST['addedGroups']) || isset($_POST['removedGroups']) || isset($_POST['updatedGroups']) || isset($_POST['windowHashes'])) {
+        $errorMessage = "Please Process the Highlighted Vars and Window Hashes before continuing";
     }
     elseif (!isset($_POST['recordedGroups'])) {
         if (mysqli_num_rows($result) > 0) {
             $_POST['addedGroups'] = "";
+            $_POST['windowHashes'] = "";
             while ($row = $result->fetch_assoc()) {
                 $_POST['addedGroups'] .= "," . $row['id'];
+                $_POST['windowHashes'] .= "," . sha1($row['atgHash']);
             }
             $_POST['addedGroups'] = substr($_POST['addedGroups'], 1);
+            $_POST['windowHashes'] = substr($_POST['windowHashes'], 1);
             $_POST['recordedGroups'] = $_POST['addedGroups'];
         }
     }
@@ -20,11 +23,17 @@
         if (mysqli_num_rows($result) > 0) {
             $groupsIn = "";
             $addedGroups = "";
+            $windowHashes = "";
             $updatedGroups = "";
             while ($row = $result->fetch_assoc()) {
                 $groupsIn .= "," . $row['id'];
                 if (!strpos("," .$_POST['recordedGroups']. ",", $row['id'])) {
                     $addedGroups .= "," . $row['id'];
+                    $windowhash = sha1($row['atgHash']);
+                    $windowHashes .= ",$windowHash";
+                    
+                    $sql = "INSERT INTO ATGwindowRegistry VALUES (" .$row['id']. ", '" .$_POST['route']. "', '" .$_POST['atgHash']. "', '$windowHash');";
+                    connection()->query();
                 }
                 else {
                     if (!isset($_POST['lastUpdated']) || $row['timeModified'] > $_POST['lastUpdated']) {
@@ -34,6 +43,8 @@
             }
             if (strlen($addedGroups) > 0) {
                 $_POST['addedGroups'] = substr($addedGroups, 1);
+                $_POST['windowHashes'] = substr($windowHashes, 1);
+                print $_POST['windowHashes'];
             }
             if (strlen($updatedGroups) > 0) {
                 $_POST['updatedGroups'] = substr($updatedGroups, 1);

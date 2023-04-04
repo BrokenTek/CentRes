@@ -121,11 +121,9 @@
 						setTimeout(highlightTables, 250);
 						return;
 					}
-					alert(tableList);
 					varSet("highlightedTables", (selectedServer === undefined ? "clear" : tableList) , "ifrRestaurantLayout");
 				}
 				catch (error) {
-					alert(error);
 					setTimeout(highlightTables, 250);
 				}
 			}

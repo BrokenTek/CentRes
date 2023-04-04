@@ -20,7 +20,7 @@ DROP TABLE IF EXISTS Employees;
 DROP TABLE IF EXISTS EmployeeRoles;
 DROP TABLE IF EXISTS LoginRouteTable;
 DROP TABLE IF EXISTS Config;
-DROP TABLE IF EXISTS ATG_Window_Registry;
+DROP TABLE IF EXISTS ATGwindowRegistry;
 
 CREATE TABLE Config (
 	sessionTimeoutInMins INT UNSIGNED NOT NULL DEFAULT 5
@@ -275,7 +275,7 @@ CREATE TABLE ActiveTicketGroups (
 	atgHash CHAR(40)
 );
 
-CREATE TABLE ATG_Window_Registry (
+CREATE TABLE ATGwindowRegistry (
 	groupId DECIMAL(6, 2),
 	route CHAR(1),
 	atgHash CHAR(40),

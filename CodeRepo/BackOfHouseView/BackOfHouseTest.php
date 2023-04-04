@@ -14,6 +14,19 @@ you'll be routed to whatever the home page is for your specified role level -->
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <html>
     <head>
+        <style>
+            form {
+                display-grid:
+                grid-auto-columns: 20rem;
+                grid-auto-rows: 60rem;
+                grid-gap: 4rem;
+                background-color: transparent;
+            }
+            iframe {
+                width: 20rem;
+                height: 30rem;
+            }
+        </style>
         <!-- gives you access to varSet, varGet, varRem, 
         varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
@@ -22,55 +35,37 @@ you'll be routed to whatever the home page is for your specified role level -->
         <!-- remove this script tag -->
         <script>
             function allElementsLoaded() {
-
+                varSet("route", varGet("route"), "ifrTGC", true);
                 setTimeout(eventLoop, 1000);
             }
             var newNames = [];
+            var newHashes = [];
             function eventLoop(){
-                var addedGroups = varGetOnce("addedGroups", "ifrTGC");
+                try {
+                    var addedGroups = varGetOnce("addedGroups", "ifrTGC");
+                var windowHashes = varGetOnce("windowHashes", "ifrTGC");
                 var removedGroups = varGetOnce("removedGroups", "ifrTGC");
                 var updatedGroups = varGetOnce("updatedGroups", "ifrTGC");
                 
-                // create Donovan window
+                // create ifrTicketGroup. Pass the windowHash via get.
                 if(addedGroups !== undefined){
                     addedGroups = addedGroups.split(',');
+                    windowHashes = windowHashes.split(',');
                     for(let i = 0; i < addedGroups.length; i++){
 
-                        var newName = "ifr" + addedGroups[i];
+                        var newName = addedGroups[i];
+                        var newHash = windowHashes[i];
                         newNames.push(newName);
+                        newHashes.push(newHash);
 
                         var template = document.getElementById("template")
-                        template.setAttribute("id", newName);
-                        var newIfr = template.cloneNode(true);
+                        var newIfr = template.cloneNode(false);
                         template.setAttribute("id", "template");
                         
-                        
                         newIfr.removeAttribute("style");
-                        //newIfr.removeAttribute('id');
-
-                        // compose the string that contains the groupId, route, and, hash here
-                        //
                         
                         document.getElementById('frmBOH').appendChild(newIfr);
-                
-
-                        newIfr.addEventListener("load", function() {
-                            
-                            var lookAt = newNames.shift();
-                            //document.getElementById(lookAt).contentWindow.document.getElementById("consternation").innerHTML += "<h1 id='getMe' getMeVal='1234' >" + lookAt +"</h1>";
-                            //this.setAttribute("id", lookAt);
-                            //this.id = "ifr" + lookAt;
-                            this.contentWindow.document.getElementsByTagName("form")[0].submit();
-                            //document.getElementById(lookAt).contentWindow.document.getElementById("consternation").innerHTML += "<h1 id='getMe' getMeVal='1234' >" + lookAt +"</h1>";
-                            //document.getElementById(lookAt).contentWindow.document.getElementsByTagName("form")[0].submit();
-                            //varSet('activeGroupId', addedGroups[i], newName);
-                            //varCpy('route', null, newName);
-                            //connector will get the hash for David to complete
-                            //updateDisplay(newName);
-                        });
-
-                        
-
+                        newIfr.addEventListener("load", ifrLoaded);
                     }
 
 
@@ -98,7 +93,21 @@ you'll be routed to whatever the home page is for your specified role level -->
                 }
                 updateDisplay("ifrTGC");
                 setTimeout(eventLoop, 1000);
+                
+                
+                }
+                catch(err) {
+                    //alert(err);
+                }
+                
 
+            }
+
+            function ifrLoaded(event) {
+                this.removeEventListener("load", ifrLoaded);
+                var lookAt = newNames.shift();
+                this.id = "ifr" + lookAt;
+                this.setAttribute("src", "ifrTicketGroup.php?windowHash=" + newHashes.shift());
             }
 
            
