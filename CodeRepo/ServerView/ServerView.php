@@ -869,9 +869,15 @@
 
                 updateButtonStates();
             }
+
+            function showAlertDiv(message) {
+                // DAVID'S CODE GOES HERE
+
+                //close button removes class of "visible" from #alertDiv
+            }
         </script>
     </head>
-    <body>
+    <body class="alertWrapper">
         <form id="sessionForm" action="ServerView.php" method="POST">
             <!-- session.php must be included after the opening for tag. It adds  -->
             <?php require_once "../Resources/php/sessionHeader.php"; ?>
@@ -891,8 +897,7 @@
             
                 <div id="menuTitle">Menu</div>
             
-                <iframe id="menuContainer" frameborder='0' src="menu.php">
-                </iframe>
+                <iframe id="menuContainer" frameborder='0' src="menu.php"></iframe>
                 
                 
                 <div id="ticketHeader">
@@ -906,10 +911,8 @@
                         <!-- options are dynamically added and removed here with JavaScript -->
                     </select>
                 </div>
-                <iframe id="ticketContainer" frameborder='0' src="../Resources/php/ticket.php">
-                </iframe>
-                <iframe id="modEditorContainer" frameborder='0' width="100%" height="100%" src="../Resources/php/modsWindowCARSON.php">
-                </iframe>
+                <iframe id="ticketContainer" frameborder='0' src="../Resources/php/ticket.php"></iframe>
+                <iframe id="modEditorContainer" frameborder='0' width="100%" height="100%" src="../Resources/php/modsWindowCARSON.php"></iframe>
                 <div id="ticketFlickerBackdrop"></div>
                 <div id="ticketFooter">
                     <div></div>
@@ -919,10 +922,16 @@
                     <button type="button" id="btnMove" disabled>Move To</button>
                     
                 </div>
+                
             </div>
             <?php require_once '../Resources/php/display.php'; ?>
+           
+            
         </form>
-        <iframe id="serverListener" src="../Resources/php/serverListener.php" style="display: none;">
+        <div id="alertDiv" class="visible">
+            <div>This should be hidden</div>
+            <button class="button">Hide Me</button>
         </div>
+        <iframe id="serverListener" src="../Resources/php/serverListener.php" style="display: none;">
     </body>
 </html>

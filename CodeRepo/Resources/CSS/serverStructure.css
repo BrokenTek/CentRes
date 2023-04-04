@@ -8,13 +8,41 @@
 		#sessionBody {
 			display: grid;
 			grid-template-areas: "serverViewHeader serverViewHeader serverViewHeader"
-								 "menuTitle        blank ticketHeader"
-		                         "menu             blank ticketAndOptions"
-							     "empty            blank ticketFooter";
+								 "menuTitle        blank            ticketHeader"
+		                         "menu             blank            ticketAndOptions"
+							     "empty            blank            ticketFooter";
 			grid-template-columns: 40fr 1rem 60fr;
 			grid-template-rows: min-content min-content 1fr min-content;
 			grid-auto-rows: min-content;
          }
+
+		 #alertWrapper {
+			position: relative;
+		 }
+
+		 #alertDiv.visible {
+			position: absolute;
+			display:block;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			background-color: #555;
+			opacity: 80%;
+			z-index: 1;
+		 }
+		 #alertDiv {
+			display: none;
+		 }
+
+		 #sessionForm {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+		 }
+
 		 #serverViewHeader {
 			 grid-area: serverViewHeader;
 			 display: grid;
