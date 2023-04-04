@@ -928,7 +928,7 @@
            
             
         </form>
-        <div id="alertDiv" class="visible">
+        <div id="alertDiv">
             <div>This should be hidden</div>
             <button class="button">Hide Me</button>
         </div>
