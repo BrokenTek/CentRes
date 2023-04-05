@@ -811,7 +811,7 @@ BEGIN
 		ELSE
 			UPDATE TicketItems SET modificationNotes = modNotes WHERE id = ticketItemNumber;
 			-- DEPRECATED needs to be recoded
-			UPDATE TicketItems SET calculatedPriceWithMods = ticketItemPrice(ticketItemNumber) WHERE id = ticketItemNumber;
+			UPDATE TicketItems SET calculatedPriceWithMods = ticketItemPrice(ticketItemNumber, 1023) WHERE id = ticketItemNumber;
 			IF (stat = 'Preparing') THEN
 				UPDATE TicketItems SET flag = 'Updated' WHERE id = ticketItemNumber;
 			END IF;
@@ -880,7 +880,7 @@ BEGIN
 		SET MESSAGE_TEXT = 'Ready/Delivered Ticket Items Cannot Be Removed!';
 	ELSEIF (stat IN ('Updated', 'Preparing', 'Removed')) THEN
 		UPDATE TicketItems SET flag = 'Removed' WHERE id = ticketItemNumber;
-		CALL updateTicketGroup(tickGrp, 0);
+		CALL updateTicketGroup(tickGrp, 2);
 	ELSE		
 		-- delete the actual ticket item
 		DELETE FROM TicketItems WHERE id = ticketItemNumber;
@@ -993,7 +993,7 @@ BEGIN
 	SELECT ticketId, splitFlag, groupId INTO tickNum, splitFlg, tickGrp FROM TicketItems WHERE id = ticketItemNumber;
 
 	UPDATE TicketItems SET readyTime = NOW() WHERE id = ticketItemNumber;
-	CALL updateTicketGroup(tickGrp, 0);
+	CALL updateTicketGroup(tickGrp, 2);
 	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 END;
 
@@ -1099,7 +1099,7 @@ END;
 
 CREATE PROCEDURE updateTicketGroup(tickGrp DECIMAL(6, 2), flag TINYINT UNSIGNED)
 BEGIN
-	UPDATE ActiveTicketGroups SET timeModified = NOW() WHERE id = tickGrp;
+	UPDATE ActiveTicketGroups SET updateCounter = updateCounter + 1  WHERE id = tickGrp;
 	IF (flag = 2) THEN
 		-- ticket group may no longer be active.
 		-- check TicketItems table and find any item with matching tickGrp that is "Preparing" or "Modified"
@@ -1118,7 +1118,7 @@ BEGIN
 		-- ticket item is sent back to the kitchen to be reprepared.
 		IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) IN ('Preparing', 'Updated')) > 0
 			AND (SELECT COUNT(*) FROM ActiveTicketGroups WHERE id = tickGrp) = 0) THEN
-			INSERT INTO ActiveTicketGroups (id, atgHash) VALUES (tickGrp, SHA1(NOW()));
+			INSERT INTO ActiveTicketGroups (id) VALUES (tickGrp);
 		END IF;
 	END IF; 
 

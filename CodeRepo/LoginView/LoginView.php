@@ -69,14 +69,6 @@ you to use display.php and displayInterface.js -->
             }
             
             // LOGIN SUCCESSFUL.....
-
-            if (isset($_POST['nph'])) {
-                // change the password hash to the new value.
-                $db = connection();
-                $sql = $db->prepare("UPDATE Employees SET passwordBCrypt = ? WHERE userName = ?;");
-                $sql->bind_param("ss", $_POST['nph'], $_POST['username']);
-                $sql->execute();
-            }
             
             $sql = "SELECT sessionTimeoutInMins FROM Config;";
             $timeoutLength = connection()->query($sql)->fetch_assoc()['sessionTimeoutInMins'];
@@ -225,7 +217,6 @@ you to use display.php and displayInterface.js -->
                                         $newPasswordHash = password_hash($_POST['password'], PASSWORD_BCRYPT);
                                         echo("<script>
                                             varSet('validatedPassword', '$passResult');
-                                            varSet('nph', '$newPasswordHash');
                                         </script>");
                                     }
                                     else {

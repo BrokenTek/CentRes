@@ -85,7 +85,7 @@ CREATE TABLE ActiveEmployees (
 CREATE TABLE QuickCodes (
 	id VARCHAR(40) PRIMARY KEY
 );
--- INSERT INTO QuickCodes VALUES('root');
+INSERT INTO QuickCodes VALUES('root');
 
 
 CREATE TABLE MenuCategories (
@@ -133,20 +133,15 @@ CREATE TABLE MenuModificationItems (
 	priceOrModificationValue DECIMAL(6, 2),
 	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
-	-- FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
-	-- ON DELETE CASCADE ON UPDATE CASCADE
+	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE MenuAssociations (
 	parentQuickCode VARCHAR(40),
 	childQuickCode VARCHAR(40),
 	displayIndex SMALLINT UNSIGNED,
-	UNIQUE(parentQuickCode, childQuickCode),
-	FOREIGN KEY (parentQuickCode) REFERENCES QuickCodes(id)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE,
-	-- FOREIGN KEY (childQuickCode) REFERENCES QuickCodes(id)
-	-- ON DELETE CASCADE ON UPDATE CASCADE
+	UNIQUE(parentQuickCode, childQuickCode)
 );
 
 CREATE TABLE StructureShapes (
@@ -271,13 +266,5 @@ CREATE TABLE TicketItems (
 CREATE TABLE ActiveTicketGroups (
 	id DECIMAL(6, 2) PRIMARY KEY,
 	timeCreated DATETIME NOT NULL DEFAULT NOW(),
-	timeModified DATETIME NOT NULL DEFAULT NOW(),
-	atgHash CHAR(40)
-);
-
-CREATE TABLE ATGwindowRegistry (
-	groupId DECIMAL(6, 2),
-	route CHAR(1),
-	atgHash CHAR(40),
-	windowHash CHAR(60)
+	updateCounter SMALLINT NOT NULL DEFAULT 0
 );

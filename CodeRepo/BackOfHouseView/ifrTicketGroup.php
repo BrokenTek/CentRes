@@ -26,46 +26,38 @@
             .updated{
                 background-color: #F6941D;
             }
+
+
         </style>
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
         <script>
             
             function toggleReadyListener(){
-                event.stopPropogation();
-                varCpyRen("groupId", null,"activeGroupId","activeTicketGroupConnector");
-                varSet("ticketItemNumber", this.id, "activeTicketGroupConnector");
-                varCpy("atgHash", null,"activeTicketGroupConnector",true);
-                updateDisplay();
+                varSet("ticketItemNumber", this.id, "activeTicketGroupConnector", true);
+                event.stopPropagation();
+                
             }
-            
-            function closeMe(){
-                varSet("closeMe", "yes");
-            }
-
+           
             function allElementsLoaded(){
-                if(!varGet('groupId')==undefined){
+                if(varGet('groupId') !== undefined){
+                    varCpyRen("groupId", null,"activeGroupId","activeTicketGroupConnector");
+                    
                     let ticketItemElements = document.getElementsByName("ticketItem");
-                    let clearable = true;
-                        for(let i = 0; i < ticketItemElements.length; i++){
-                            let element = ticketItemElements[i];
-                            if(!(element.classList.contains("disabled"))){
+                    for(let i = 0; i < ticketItemElements.length; i++){
+                        let element = ticketItemElements[i];
+                        with(element.classList) {
+                            if(!(contains("removed") || contains("delivered"))){
                                 element.addEventListener('pointerdown',toggleReadyListener);
                             }
-                            if(!(element.classList.contains("ready")||element.classList.contains("disabled")||element.classList.contains("hidden"))){
-                                clearable = false;
-                            }
                         }
-                    if(clearable){
-                        document.getElementById("btnClose").addEventListener('pointerdown',closeMe);
                     }
                 }
             }
-
         </script>
     </head>
     <body id="sessionForm" onload="allElementsLoaded()">
         
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="frmATG">
             <?php if(isset($_POST['groupId']) && isset($_POST['route'])): ?>
                 <?php
                     $sql = "SELECT timecreated FROM activeticketgroups WHERE id = ".$_POST['groupId'].";";
@@ -81,7 +73,10 @@
                         AND route='".$_POST['route']."';";
                     $itemList = connection()->query($sql);
                 ?>
-                <button id= "btnClose">Close</button>
+                <?php if(isset($_POST['completeAndCloseable'])): ?>
+                
+                <?php endif; ?>
+                <button id= "btnClose" onpointerdown="varRen('completeAndCloseable', 'closeMe')">Close</button>
                 <div class='descriptors'>
                     <p><?php echo $timeSubmitted?></p><p>&nbsp;Submitted</p>
                     <p><?php echo $_POST['groupId']; ?></p><p>&nbsp;Ticket-Group</p>
@@ -141,6 +136,6 @@
             
             <?php require_once '../Resources/php/display.php'; ?>
         </form>
-        <iframe src="activeGroupConnector.php" id="activeTicketGroupConnector" style="display: none"></iframe>
+        <iframe src="activeTicketGroupConnector.php" id="activeTicketGroupConnector" style="display: none;"></iframe>
     </body>
 </html>

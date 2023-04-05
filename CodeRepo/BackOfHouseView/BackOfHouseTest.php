@@ -21,10 +21,13 @@ you'll be routed to whatever the home page is for your specified role level -->
                 grid-auto-rows: 60rem;
                 grid-gap: 4rem;
                 background-color: transparent;
+                height: 100%;
             }
             iframe {
                 width: 20rem;
                 height: 30rem;
+                padding: 1rem;
+                background-color: #444;
             }
         </style>
         <!-- gives you access to varSet, varGet, varRem, 
@@ -34,85 +37,66 @@ you'll be routed to whatever the home page is for your specified role level -->
         <!-- demonstration on how to use varGet, varSet, updateDisplay for just this page -->
         <!-- remove this script tag -->
         <script>
-            var groups;
-            var count = 0;
-            var capacity;
-            var unloaded;
             function allElementsLoaded() {
-                groups = document.getElementsByClassName("ticketGroup");
-                capacity = groups.length;
-                unloaded = capacity;
-
                 varCpy("route", null, "ifrTGC", true);
-                setTimeout(eventLoop, 1000);
+                eventLoop();
             }
             
-            var atgDict = {};
-            var hashQueue = {};
-
-            var hashBuffer = [];
-            var groupBuffer = [];
+            var groupIdBuffer = [];
 
             function eventLoop(){
                 try {
                     var addedGroups = varGetOnce("addedGroups", "ifrTGC");
-                    var windowHashes = varGetOnce("windowHashes", "ifrTGC");
                     var removedGroups = varGetOnce("removedGroups", "ifrTGC");
                     var updatedGroups = varGetOnce("updatedGroups", "ifrTGC");
                                         
                     // create ifrTicketGroup. Pass the windowHash via get.
                     if(addedGroups !== undefined){
                         addedGroups = addedGroups.split(',');
-                        windowHashes = windowHashes.split(',');
+                        
                         for(let i = 0; i < addedGroups.length; i++){
-                            if (i >= capacity) {
-                                groupBuffer.push(addedGroups[i])
-                                hashBuffer.push(windowHashes[i])
+                            var newGrpIfr = document.getElementById("ifr" + addedGroups[i]);
+                            if (newGrpIfr != null) {
+                                varRem("closeMe");
+                                varRem("completeAndCloseable", "ifr" + addedGroups[i], true);
                             }
                             else {
-                                atgDict[addedGroups[i]] = groups[count];
-                                //hashQueue['ifr' + addedGroups[i]] = windowHashes[i];
-                                groups[count].id = "ifr" + addedGroups[i];
-                                groups[count].removeAttribute("style");
-                                alert(groups[count].id);
-                                //groups[count].addEventListener("load", ifrLoaded);
-                                varSet("route", varGet("route"), groups[count].id);
-                                varSet("groupId", addedGroups[i], groups[count].id , true);
-                                updateDisplay(groups[count].id);
-                                //varSet()
-                                count++;
+                                newGrpIfr = document.createElement("iframe");
+                                newGrpIfr.setAttribute("src", "ifrTicketGroup.php");
+                                newGrpIfr.setAttribute("frameborder", "0");
+                                newGrpIfr.setAttribute("class", "activeTicketGroup");
+                                newGrpIfr.addEventListener("load", ifrATGloaded);
+                                document.getElementById("frmBOH").append(newGrpIfr);
+                                groupIdBuffer.push(addedGroups[i]);
                             }
                         }
-
-
                     }
+                    document.getElementsByClassName("activeTicketGroup").foreach(closeCheck);
                     if(removedGroups !== undefined){
                         removedGroups = removedGroups.split(',');
-                        counter -= addedGroups.length;
                         for(let i = 0; i < removedGroups.length; i++){
-                            let removeIfr = document.querySelector('[id^="ifr' + removedGroups[i] + '"]');
+                            let removeIfr = document.getElementById("ifr" + removedGroups[i]);
                             if (removeIfr  != null){
-                                removeIfr.remove();
+                                varSet("completeAndClosable","true", "ifr" + removedGroups[i], true);
                             }
                         }
-                        
-
                     }
                     if(updatedGroups !== undefined){
                         updatedGroups = updatedGroups.split(',');
-                        for(let i = 0; i < removedGroups.length; i++){
-                            
+                        for(let i = 0; i < updatedGroups.length; i++){
                             let updatedIfr = document.getElementById('ifrm'+ updatedGroups[i]);
                             if (updateIfr  != null){
+                                varRem()
+                                
                                 updateDisplay('ifrm'+ updatedGroups[i]);
                             }
                         }
                     }
-                    
+
                 
                 }
                 catch(err) {
-                    //alert(err);
+                    
                 }
                 updateDisplay("ifrTGC");
                 setTimeout(eventLoop, 1000);
@@ -120,57 +104,32 @@ you'll be routed to whatever the home page is for your specified role level -->
 
             }
 
-            function ifrLoaded(event) {
-                this.removeEventListener("load", ifrLoaded);
+            function closeCheck(ATGifr) {
+                if (getVar("closeMe", ATGifr.id) !== undefined) {
+                    alert("Close");
+                    ATGifr.remove();
+                }
+            }
+
+            function ifrATGloaded(event) {
+                this.removeEventListener("load", ifrATGloaded);
                 
-                varSet("windowHash", hashQueue[this.id], this.id , false);
-                hashQueue.delete(this.id);
+                var grpId = groupIdBuffer.shift();
+                this.id = "ifr" + grpId;
+                varSet("route", varGet("route"), "ifr" + grpId);
+                varSet("groupId", grpId, "ifr" + grpId, true);
             }
-
-           
-            function wowness() {
-                document.getElementsByTagName("iframe").contentWindow.document.getElementsByTagName('form')[0].submit();
-            }
-
-            //Place your JavaScript Code here
         </script>
     </head>
     <body id="sessionForm" onload="allElementsLoaded()">
         <!-- this form submits to itself -->
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" id="frmBOH" method="POST">
+            <?php //echo("<h1>Looking at Traffic for Route " .$_POST['route']. "</h1>"); ?>
             <?php require_once "../Resources/php/sessionHeader.php"; ?>
-            <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
-            
-            <!-- If you want to forget/not carry over variables, use PHP unset function
-            to remove these variables -->
-            <?php unset($_POST['thisVariableIWantToForget'], $_POST['thisOtherVariableIDontNeed']) ?>
-
-            <!-- retain any POST vars. When updateDisplay() is called or the form is submitted,
-            these variables will be carried over -->
+           
             <?php require_once '../Resources/php/display.php'; ?>
-            <?php echo("<h1>Looking at Traffic for Route " .$_POST['route']. "</h1>"); ?>
         
         </form>
-        <iframe src="ticketGroupConnector.php" id="ifrTGC" frameborder="0" style = "display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
-        <iframe src="ifrTicketGroup.php" class="ticketGroup" style="display: none;"></iframe>
+        <iframe src="ticketGroupConnector.php" id="ifrTGC" frameborder="0" ></iframe>
     </body>
 </html>
