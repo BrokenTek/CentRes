@@ -31,6 +31,7 @@
         <script>
             
             function toggleReadyListener(){
+                event.stopPropogation();
                 varCpyRen("groupId", null,"activeGroupId","activeTicketGroupConnector");
                 varSet("ticketItemNumber", this.id, "activeTicketGroupConnector");
                 varCpy("atgHash", null,"activeTicketGroupConnector",true);
@@ -68,7 +69,7 @@
             <?php if(isset($_POST['groupId']) && isset($_POST['route'])): ?>
                 <?php
                     $sql = "SELECT timecreated FROM activeticketgroups WHERE id = ".$_POST['groupId'].";";
-                    $timeSubmitted = connection()->query($sql)->fetch_assoc();
+                    $timeSubmitted = connection()->query($sql)->fetch_assoc()['timecreated'];
 
                     $sql = "SELECT tableid FROM tablelog WHERE ticketid = ".floor($_POST['groupId'])."
                     ORDER BY timeStamp DESC;";
@@ -82,8 +83,9 @@
                 ?>
                 <button id= "btnClose">Close</button>
                 <div class='descriptors'>
-                    <p><?php echo $_POST['groupId']; ?></p>
-                    <p><?php echo $_POST['route']; ?></p>
+                    <p><?php echo $timeSubmitted?></p><p>&nbsp;Submitted</p>
+                    <p><?php echo $_POST['groupId']; ?></p><p>&nbsp;Ticket-Group</p>
+                    <p><?php echo $_POST['route']; ?></p><p>&nbsp;Route</p>
                 </div>
                 <div class='ticketItems'>
                 <?php
@@ -109,7 +111,7 @@
                         if($ticketItem['flag'] == "updated"){
                             $itemClass.=" updated";
                         }
-                        echo("<div name='ticketItem' id='".$ticketItem['id']."' class ='".$itemClass."'><p>".$readyChar.$ticketItem['itemName']."</p>");
+                        echo("<div name='ticketItem' id='".$ticketItem['id']."' class ='".$itemClass."'><p>".$readyChar.$ticketItem['itemName']."</p></div>");
 
 
                         if($ticketItem['mods']!=""){
