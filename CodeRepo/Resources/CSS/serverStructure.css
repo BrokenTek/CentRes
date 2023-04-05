@@ -21,19 +21,50 @@
 		 }
 
 		 #alertDiv.visible {
-			position: absolute;
-			display:block;
+			position: fixed;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
 			top: 0;
 			bottom: 0;
 			left: 0;
 			right: 0;
+			margin: auto;
+			width: 50%;
+			height: 50%;
+			max-width: 400px;
+			max-height: 300px;
 			background-color: #555;
-			opacity: 80%;
-			z-index: 1;
+			opacity: 100%;
+			z-index: 1000;
 		 }
 		 #alertDiv {
 			display: none;
 		 }
+
+		 .alert-message {
+			font-size: 24px; /* Increase the font size */
+			font-weight: bold; /* Make the text bold */
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			height: 100%;
+		}
+
+		 .button-container {
+			margin-top: auto;
+			margin-right: 10px;
+			display: flex;
+			justify-content: flex-end;
+			align-items: flex-end;
+		  }
+		  
+		  .button {
+			margin-top: 10px;
+			margin-right: 10px;
+		  }
 
 		 #sessionForm {
 			position: absolute;
@@ -42,6 +73,7 @@
 			left: 0;
 			right: 0;
 		 }
+		 
 
 		 #serverViewHeader {
 			 grid-area: serverViewHeader;

@@ -83,7 +83,7 @@
                 stopUpdateLoopTimer();
 
                 if (varGet("staticTableId") !== undefined && varGetOnce("ticketRemoved","ticketContainer") !== undefined) {
-                    alert("Ticket " + varGet("ticket", "ticketContainer") + " is not longer assigned to this table!\nRedirecting back to Host View.");
+                    showAlertDiv("Ticket " + varGet("ticket", "ticketContainer") + " is not longer assigned to this table!\nRedirecting back to Host View.");
                     location.replace(document.getElementById("mgrNavHostView").getAttribute("value"));
                 }
             
@@ -386,7 +386,7 @@
                         }
                         msg += (msg == "" ? "" : '\n') + "Tables Removed: " + removedStr;
                     }
-                    alert(msg);
+                    showAlertDiv(msg);
                 }
                 loaded = true;
             }
@@ -412,7 +412,7 @@
                         setTimeout(showTicketContainer, 250);
                     }
                     catch (err) {
-                        alert("menu load failed");
+                        showAlertDiv("menu load failed");
                     }
                 }
             }
@@ -872,9 +872,23 @@
 
             function showAlertDiv(message) {
                 // DAVID'S CODE GOES HERE
+                var alertDiv = document.getElementById('alertDiv');
+                var alertMessage = document.createElement('div');
+                alertMessage.textContent = message;
+                alertMessage.className = 'alert-message';
 
+                alertDiv.insertBefore(alertMessage, alertDiv.firstChild);
+                alertDiv.classList.add('visible');
+    
                 //close button removes class of "visible" from #alertDiv
+                var hideMeButton = document.getElementById('hideMeButton');
+                hideMeButton.addEventListener('click', function() {
+                alertDiv.classList.remove('visible');
+                });                
+
+                
             }
+
         </script>
     </head>
     <body class="alertWrapper">
@@ -929,8 +943,10 @@
             
         </form>
         <div id="alertDiv">
-            <div>This should be hidden</div>
-            <button class="button">Hide Me</button>
+            
+            <div class="button-container">
+                <button class="button" id="hideMeButton">OK</button>
+        </div>
         </div>
         <iframe id="serverListener" src="../Resources/php/serverListener.php" style="display: none;">
     </body>
