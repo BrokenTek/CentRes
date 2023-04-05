@@ -141,5 +141,6 @@
             
             <?php require_once '../Resources/php/display.php'; ?>
         </form>
+        <iframe src="activeGroupConnector.php" id="activeTicketGroupConnector" style="display: none"></iframe>
     </body>
 </html>
