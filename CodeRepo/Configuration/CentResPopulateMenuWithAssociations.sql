@@ -3,9 +3,10 @@
    MENU ITEMS. ALL ASSOCIATIONS ARE MADE IN THIS SCRIPT */
 
 /* Remove Existing Data In These Tables */
-DELETE FROM MenuAssociations;
-DELETE FROM MenuItems;
-DELETE FROM MenuCategories;
+-- DELETE FROM menuassociations;
+DELETE FROM menuitems;
+DELETE FROM menucategories;
+DELETE FROM menumodificationitems;
 
 /* Insert The Root For Association. Script For Populating The Menu Iframe Disregards The Category 'root' So
    It Will Not Display In The Server View */
@@ -113,9 +114,73 @@ INSERT INTO `menuitems` (`quickCode`, `title`, `description`, `price`, `route`, 
 ('I082', 'Apple Tart', NULL, '6.00', 'K', NULL, 0, NULL, 1),
 ('I083', 'Slice Of Cake', NULL, '5.50', 'K', NULL, 0, NULL, 1);
 
+/* Insert All Mods */
+INSERT INTO `menumodificationitems` (`quickCode`, `title`, `priceOrModificationValue`, `categoryType`)
+VALUES 
+    ('M000', 'American Cheese', 1, 'optionalAny'),
+    ('M001', 'Cheddar Cheese', 1, 'optionalAny'),
+    ('M002', 'Swiss Cheese', 1, 'optionalAny'),
+    ('M003', 'Provolone Cheese', 1, 'optionalAny'),
+    ('M004', 'Bacon', 2, 'optionalAny'),
+    ('M005', 'Avocado', 1.5, 'optionalAny'),
+    ('M006', 'Lettuce', 0, 'optionalAny'),
+    ('M007', 'Tomato', 0, 'optionalAny'),
+    ('M008', 'Onion', 0, 'optionalAny'),
+    ('M009', 'Pickles', 0, 'optionalAny'),
+    ('M010', 'Mayo', 0, 'optionalAny'),
+    ('M011', 'Mustard', 0, 'optionalAny'),
+    ('M012', 'Ketchup', 0, 'optionalAny'),
+    ('M013', 'BBQ Sauce', 0.5, 'optionalAny'),
+    ('M014', 'Hot Sauce', 0, 'optionalAny'),
+    ('M015', 'Sriracha', 0, 'optionalAny'),
+    ('M016', 'Jalapenos', 0.5, 'optionalAny'),
+    ('M017', 'Pico De Gallo', 0.5, 'optionalAny'),
+    ('M018', 'Guacamole', 2, 'optionalAny'),
+    ('M019', 'Buffalo Sauce', 0.5, 'optionalAny'),
+    ('M020', 'Ranch Dressing', 0, 'optionalOne'),             /* optOne */
+    ('M021', 'Thousand Island Dressing', 0, 'optionalOne'),   /* optOne */
+    ('M022', 'Garlic Aioli', 0.5, 'optionalAny'),
+    ('M023', 'Cheese Dip', 0.5, 'optionalAny'),
+    ('M024', 'Balsamic Vinaigrette', 0, 'optionalOne'),       /* optOne */
+    ('M025', 'Caesar Dressing', 0, 'optionalOne'),            /* optOne */
+    ('M026', 'Honey Mustard', 0, 'optionalAny'),
+    ('M027', 'Blue Cheese Dressing', 0, 'optionalOne'),       /* optOne */
+    ('M028', 'Tartar Sauce', 0.5, 'optionalAny'), 
+    ('M029', 'Cocktail Sauce', 0.5, 'optionalAny'),
+    ('M030', 'Garlic Butter Sauce', 0.5, 'optionalAny'),
+    ('M031', 'Cucumber', 0, 'optionalAny'),
+    ('M032', 'Spinach', 0, 'optionalAny'),
+    ('M033', 'Feta Cheese', 1, 'optionalAny'),
+    ('M034', 'Mozzarella Cheese', 1, 'optionalAny'),
+    ('M035', 'Fried Egg', 1, 'optionalAny'),
+    ('M036', 'Marinara Sauce', 0.5, 'optionalAny'),
+    ('M037', 'Honey Glaze Sauce', 1, 'optionalAny'),
+    ('M038', 'Lemon', 0, 'optionalAny'),
+    ('M039', 'Lime', 0, 'optionalAny'),
+    ('M040', 'Mango', 0.5, 'optionalAny'),
+    ('M041', 'Rare', 0, 'mandatoryOne'),                /* mandOne */
+    ('M042', 'Medium Rare', 0, 'mandatoryOne'),         /* mandOne */
+    ('M043', 'Medium', 0, 'mandatoryOne'),              /* mandOne */
+    ('M044', 'Medium Well', 0, 'mandatoryOne'),         /* mandOne */
+    ('M045', 'Well Done', 0, 'mandatoryOne'),           /* mandOne */
+    ('M046', '6oz', 0, 'mandatoryOne'),                 /* mandOne */
+    ('M047', '8oz', 3, 'mandatoryOne'),                 /* mandOne */
+    ('M048', '12oz', 5, 'mandatoryOne'),                /* mandOne */
+    ('M049', 'Salt', 0, 'optionalAny'),
+    ('M050', 'Pepper', 0, 'optionalAny'),
+    ('M051', 'Garlic', 0, 'optionalAny'),
+    ('M052', 'Mushroom', 0.5, 'optionalAny'),
+    ('M053', 'Sprinkles', 0.5, 'optionalAny'),
+    ('M054', 'Caramel', 0.5, 'optionalAny'),
+    ('M055', 'Chocolate Syrup', 0.5, 'optionalAny'),
+    ('M056', 'Whipped Cream', 0.5, 'optionalAny'),
+    ('M057', 'Caramel Syrup', 0.5, 'optionalAny'),
+    ('M058', 'Cinnamon', 0.5, 'optionalAny');
+
+
 /* Create All Associations For Menu Root/Sub (Parent/Child) Categories And Menu Items */
 INSERT INTO `menuassociations` (`parentQuickCode`, `childQuickCode`, `displayIndex`)
- VALUES
+VALUES
 ('root', 'R000', NULL),
 ('root', 'R001', NULL),
 ('root', 'R002', NULL),
@@ -211,3 +276,24 @@ INSERT INTO `menuassociations` (`parentQuickCode`, `childQuickCode`, `displayInd
 ('S009', 'I085', NULL),
 ('S009', 'I086', NULL),
 ('S009', 'I087', NULL);
+
+/* 
+   Modification Associations for menuassociations for (parent) item quickcode 
+      and (child) modification quickcode.
+*/
+
+INSERT INTO `menuassociations` (`parentQuickCode`, `childQuickCode`, `displayIndex`)
+VALUES
+('I053', 'M000', NULL),
+('I053', 'M001', NULL),
+('I053', 'M002', NULL),
+('I053', 'M003', NULL),
+('I054' ,'M000', NULL),
+('I054' ,'M001', NULL),
+('I054' ,'M002', NULL),
+('I054' ,'M003', NULL),
+('I055', 'M000', NULL),
+('I055', 'M001', NULL),
+('I055', 'M002', NULL),
+('I055', 'M003', NULL);
+

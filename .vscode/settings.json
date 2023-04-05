@@ -1,0 +1,22 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "localhost",
+            "database": "centres",
+            "username": "scott",
+            "askForPassword": true
+        }
+    ]
+}
+
+// Ignore this file if you are not using the VSCode plugin
+//  called SQLTools through the SQLTools MySQL/MariaDB driver!
+
+// Remove file for production // Carson
