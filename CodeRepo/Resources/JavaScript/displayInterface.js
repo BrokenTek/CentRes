@@ -1,16 +1,16 @@
 
-function varSet(variableName, value, childIframeName = null, update = false, bypassValidationCheck = false) {
+function varSet(variableName, value, childIframeId = null, update = false, bypassValidationCheck = false) {
     value = coerce(value);
     if (value === undefined) {
-        if (coerce(varGet(variableName, childIframeName)) === undefined) {
+        if (coerce(varGet(variableName, childIframeId)) === undefined) {
             return false;
         }
-        return varRem(variableName, childIframeName, update);
+        return varRem(variableName, childIframeId, update);
     }
-    var container = document.getElementById(childIframeName);
+    var container = document.getElementById(childIframeId);
     var form;
     var variableElement;
-    if (childIframeName == undefined) {
+    if (childIframeId == undefined) {
         form = document.getElementsByTagName('form')[0];
         variableElement = document.getElementById(variableName);
     }
@@ -33,7 +33,7 @@ function varSet(variableName, value, childIframeName = null, update = false, byp
         variableElement.setAttribute('value', value);
     }
     else {
-        if (childIframeName == null){
+        if (childIframeId == null){
             variableElement = document.createElement('input');
         }
         else {
@@ -50,17 +50,17 @@ function varSet(variableName, value, childIframeName = null, update = false, byp
     }
 
     if (update) {
-        updateDisplay(childIframeName, bypassValidationCheck);
+        updateDisplay(childIframeId, bypassValidationCheck);
     }
     return true;
 }
 
-function varGet(variableName, childIframeName = null) {
-    var container = document.getElementById(childIframeName);
+function varGet(variableName, childIframeId = null) {
+    var container = document.getElementById(childIframeId);
     var form;
     var variableElement;
    
-    if (childIframeName == null) {
+    if (childIframeId == null) {
         form = document.getElementsByTagName('form')[0];
         variableElement = document.getElementById(variableName);
     }
@@ -68,7 +68,7 @@ function varGet(variableName, childIframeName = null) {
         form = container.contentWindow.document.getElementsByTagName('form')[0]; 
         variableElement = container.contentWindow.document.getElementById(variableName);
         if (form == null) {
-            throw "varGet error! " + variableName + " was unreachable at " + childIframeName;
+            throw "varGet error! " + variableName + " was unreachable at " + childIframeId;
         }
     }
     
@@ -82,12 +82,12 @@ function varGet(variableName, childIframeName = null) {
 
 // get a var. If its defined, remove the var and return its value.
 // If the variable was retrieved, specify you want to update the target display by setting update = true;
-function varGetOnce(variableName, childIframeName = null, update = false, bypassValidationCheck = false) {
-    let val = varGet(variableName, childIframeName);
+function varGetOnce(variableName, childIframeId = null, update = false, bypassValidationCheck = false) {
+    let val = varGet(variableName, childIframeId);
     if (val !== undefined) {
-        varRem(variableName, childIframeName);
+        varRem(variableName, childIframeId);
         if (update) {
-            updateDisplay(childIframeName, bypassValidationCheck);
+            updateDisplay(childIframeId, bypassValidationCheck);
         }
     }
     return coerce(val);
@@ -95,11 +95,11 @@ function varGetOnce(variableName, childIframeName = null, update = false, bypass
 
 
 // returns false if variable doesn't exist
-function varRem(variableName, childIframeName = null, update = false, bypassValidationCheck = false) {
-    var container = document.getElementById(childIframeName);
+function varRem(variableName, childIframeId = null, update = false, bypassValidationCheck = false) {
+    var container = document.getElementById(childIframeId);
     var form;
     var variableElement;
-    if (childIframeName == null) {
+    if (childIframeId == null) {
         form = document.getElementsByTagName('form')[0];
         variableElement = document.getElementById(variableName);
     }
@@ -122,19 +122,19 @@ function varRem(variableName, childIframeName = null, update = false, bypassVali
         return false;
     }
     if (update) {
-        updateDisplay(childIframeName, bypassValidationCheck);
+        updateDisplay(childIframeId, bypassValidationCheck);
     }
     return true;
 }
 
-function varRen(oldVarName, newVarName, childIframeName = null, update = false, bypassValidationCheck = false) {
-    if (getVar(oldVarName, childIframeName) !== undefined) {
+function varRen(oldVarName, newVarName, childIframeId = null, update = false, bypassValidationCheck = false) {
+    if (varGet(oldVarName, childIframeId) !== undefined) {
         return false;
     }
-    var container = document.getElementById(childIframeName);
+    var container = document.getElementById(childIframeId);
     var form;
     var variableElement;
-    if (childIframeName == null) {
+    if (childIframeId == null) {
         form = document.getElementsByTagName('form')[0];
         variableElement = document.getElementById(oldVarName);
     }
@@ -151,11 +151,11 @@ function varRen(oldVarName, newVarName, childIframeName = null, update = false, 
         }
     }
     if (variableElement != null) {
-        variableElement.childIframeName = newVarName;
+        variableElement.childIframeId = newVarName;
         variableElement.setAttribute("name",newVarName);
     }
     if (update) {
-        updateDisplay(childIframeName, bypassValidationCheck);
+        updateDisplay(childIframeId, bypassValidationCheck);
     }
     return true;
 }
@@ -209,10 +209,10 @@ function varXfrRen(sourceVariableName, source = null, destinationVariableName, d
 }
 
 
-function varClr(childIframeName = null, update = false, bypassValidationCheck = false) {
-    var container = document.getElementById(childIframeName);
+function varClr(childIframeId = null, update = false, bypassValidationCheck = false) {
+    var container = document.getElementById(childIframeId);
     var form;
-    if (childIframeName == null) {
+    if (childIframeId == null) {
         form = document.getElementsByTagName('form')[0];
     }
     else {
@@ -227,15 +227,15 @@ function varClr(childIframeName = null, update = false, bypassValidationCheck = 
     }
 
     if (update) {
-        updateDisplay(childIframeName, bypassValidationCheck);
+        updateDisplay(childIframeId, bypassValidationCheck);
     }
 }
 
-function updateDisplay(childIframeName = null, bypassValidationCheck = false) {
-    var container = document.getElementById(childIframeName);
+function updateDisplay(childIframeId = null, bypassValidationCheck = false) {
+    var container = document.getElementById(childIframeId);
     var form;
     var btnSubmit;
-    if (childIframeName == null) {
+    if (childIframeId == null) {
         form = document.getElementsByTagName('form')[0];
         btnSubmit = document.getElementById("btnSubmit");
         if (btnSubmit !== null && !bypassValidationCheck) {
@@ -285,14 +285,14 @@ window.addEventListener('scroll', function(event) {
     }
 }, true);
 
-function rememberScrollPosition(childIframeName = null) {
-    varSet("scrollX", window.scrollX, childIframeName);
-    varSet("scrollY", window.scrollY, childIframeName); 
+function rememberScrollPosition(childIframeId = null) {
+    varSet("scrollX", window.scrollX, childIframeId);
+    varSet("scrollY", window.scrollY, childIframeId); 
 }
 
 function forgetScrollPosition() {
-    varRem("scrollX", childIframeName);
-    varRem("ScrollY", childIframeName);
+    varRem("scrollX", childIframeId);
+    varRem("ScrollY", childIframeId);
 }
 
 function toggleSortKey(tableId, columnName, refresh = true) {

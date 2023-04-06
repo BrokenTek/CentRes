@@ -98,16 +98,16 @@
                     // if a seat and split are selected and the mod window is not open,
                     // check if a menu item was selected. otherwise ignore if you clicked a menu item.
                     try {
-                            if (!(varGet("selectedMenuItem", "menuContainer") === undefined)) {
-                                if (cboSeat.selectedIndex == 0 || cboSplit.selectedIndex == 0) {
-                                    ticketContainer.contentWindow.document.getElementById("ticketHeader").classList.add("highlighted");
-                                    setTimeout(() => {
-                                    ticketContainer.contentWindow.document.getElementById("ticketHeader").classList.remove("highlighted");
-                                }, 1100);
-                                varRem("selectedMenuItem", "menuContainer");
-                                }
+                        if (!(varGet("selectedMenuItem", "menuContainer") === undefined)) {
+                            if (cboSeat.selectedIndex == 0 || cboSplit.selectedIndex == 0) {
+                                ticketContainer.contentWindow.document.getElementById("ticketHeader").classList.add("highlighted");
+                                setTimeout(() => {
+                                ticketContainer.contentWindow.document.getElementById("ticketHeader").classList.remove("highlighted");
+                            }, 1100);
+                            varRem("selectedMenuItem", "menuContainer");
                             }
                         }
+                    }
                     catch (err) { }
                     var tick;
                     var seat;
@@ -241,8 +241,9 @@
                         cboSplit.removeAttribute("disabled");
                         updateButtonStates();
                         ticketContainer.classList.remove("hidden");
-                        }
+                        updateButtonStates();
                     }
+                }
                 catch (err) {
                     setTimeout(hideModWindow, 250);
                 }
@@ -405,7 +406,11 @@
             function showTicketContainer() {
                 try {
                     varGet("ticket", "ticketContainer");
+                    updateDisplay("ticketContainer");
                     ticketContainer.classList.remove("clear");
+                    setTimeout(() => {
+                        updateButtonStates();
+                    }, 1000);
                 }
                 catch (err) {
                     try {

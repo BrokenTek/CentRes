@@ -1,0 +1,87 @@
+.delivered {
+    background-color: black;
+    color: white; 
+}
+ .ready {
+    background-color: #42280e;
+    color: white;
+   
+}
+.updated{
+    background-color: #F6941D;
+}
+
+
+.removed {
+    background-color: #777;
+    color: white;
+}
+
+.ticketItem {
+    margin: auto auto auto auto;
+    font-size: 1.25rem;
+    border: 2px solid #FFF;
+    min-height: 4rem;
+ }
+ .ticketItem > ul {
+    font-size: .9rem;
+    margin-left: .75rem;
+    margin-block: 0;
+    padding: 0;
+ }
+
+ .ticketItemStatus {
+    font-size: .8rem;
+ }
+
+ .ticketItemText {
+    padding-left: 2rem;
+ }
+
+ 
+
+
+
+#frmATG {
+    font-family: helvetica;
+    background-color: #FFE699;
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    right: 0;
+    padding: 1rem;
+}
+
+#sessionForm{
+    width: 5rem;
+}
+#descriptors{
+    grid-area:descriptors;
+    display:grid;
+    grid-template-columns: max-content max-content;
+    grid-auto-rows: min-content;
+    grid-column-gap: 1rem;
+}
+#descriptors:nth-child(odd) {
+    font-weight: bold;
+    margin-left: auto;
+}
+.ticketItems{
+    grid-area:ticketItems;
+}
+
+#btnClose {
+    grid-column: 1 / span 2;
+    
+}
+
+button, .button {
+    background-color: #F6941D;
+    color: white;
+    font-weight: bold;
+    margin: .25rem .25rem .25rem .25rem;
+    min-width: 5rem;
+    min-height: 2rem;
+    
+  }
+

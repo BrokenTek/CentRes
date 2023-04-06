@@ -1028,10 +1028,12 @@ CREATE PROCEDURE markTicketItemAsDelivered(IN ticketItemNumber INT UNSIGNED)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
 	DECLARE splitFlg SMALLINT UNSIGNED;
+	DECLARE tickGrp DECIMAL(6, 2);
 	
-	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
-
+	SELECT ticketId, splitFlag, groupId INTO tickNum, splitFlg, tickGrp FROM TicketItems WHERE id = ticketItemNumber;
+	
 	UPDATE TicketItems SET deliveredTime = NOW() WHERE id = ticketItemNumber;
+	CALL updateTicketGroup(tickGrp, 2);
 	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 END;
 

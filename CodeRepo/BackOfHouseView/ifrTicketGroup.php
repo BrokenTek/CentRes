@@ -2,30 +2,10 @@
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <html>
     <head>
-        <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
-        <link rel="stylesheet" href="../Resources/CSS/ticketStyle.css">
+        <link rel="stylesheet" href="../Resources/CSS/atgStyle.css">
         <style>
-            #sessionForm{
-                display:grid;
-                grid-template-areas: "btnClose    descriptors"
-                                     "ticketItems ticketItems";
-                grid-template-columns: min-content max-content;
-            }
-            #btnClose{
-                grid-area:btnClose;
-            }
-            .descriptors{
-                grid-area:descriptors;
-                display:grid;
-                grid-template-columns: max-content max-content;
-                grid-template-rows: 1fr 1fr 1fr;
-            }
-            .ticketItems{
-                grid-area:ticketItems;
-            }
-            .updated{
-                background-color: #F6941D;
-            }
+            
+            
 
 
         </style>
@@ -51,7 +31,13 @@
                             }
                         }
                     }
+                    //document.getElementById("btnClose").addEventListener("pointerdown", setClosed);
                 }
+            }
+
+            function setClosed(event) {
+                varSet("closeMe", "yes");
+                varRen('completeAndCloseable', 'closeMe');
             }
         </script>
     </head>
@@ -60,27 +46,30 @@
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="frmATG">
             <?php if(isset($_POST['groupId']) && isset($_POST['route'])): ?>
                 <?php
-                    $sql = "SELECT timecreated FROM activeticketgroups WHERE id = ".$_POST['groupId'].";";
-                    $timeSubmitted = connection()->query($sql)->fetch_assoc()['timecreated'];
-
                     $sql = "SELECT tableid FROM tablelog WHERE ticketid = ".floor($_POST['groupId'])."
                     ORDER BY timeStamp DESC;";
                     $currentTable = connection()->query($sql)->fetch_assoc();
-                    
+
                     $sql = "SELECT menuItems.title AS 'itemName', id, flag, modificationNotes AS 'mods' 
                         FROM (ticketItems LEFT JOIN menuItems ON menuItemQuickCode=quickCode) 
                         WHERE groupid = ".$_POST['groupId']."
                         AND route='".$_POST['route']."';";
                     $itemList = connection()->query($sql);
                 ?>
-                <?php if(isset($_POST['completeAndCloseable'])): ?>
-                
-                <?php endif; ?>
-                <button id= "btnClose" onpointerdown="varRen('completeAndCloseable', 'closeMe')">Close</button>
-                <div class='descriptors'>
-                    <p><?php echo $timeSubmitted?></p><p>&nbsp;Submitted</p>
-                    <p><?php echo $_POST['groupId']; ?></p><p>&nbsp;Ticket-Group</p>
-                    <p><?php echo $_POST['route']; ?></p><p>&nbsp;Route</p>
+                <div id='descriptors'>
+                    <?php if (isset($_POST['completeAndCloseable']) || isset($_POST['closeMe'])): ?>
+                        <button id="btnClose" type="button" onpointerdown="setClosed()">Close</button>
+                    <?php else: ?>
+                        <?php
+                            if (!(isset($_POST['completeAndCloseable']) || isset($_POST['closeMe']))) {
+                                $sql = "SELECT timecreated FROM activeticketgroups WHERE id = ".$_POST['groupId'].";";
+                                $timeSubmitted = connection()->query($sql)->fetch_assoc()['timecreated'];
+                            } 
+                        ?>
+                        <div id="lblSubmitted">Submitted:</div><div id="valSubmitted"><?php echo substr($timeSubmitted,11,5)?></div>                                  
+                    <?php endif; ?>
+                    <div id="lblGroupId">Ticket-Group:</div><div id="valGroupId"><?php echo $_POST['groupId']; ?></div>
+                    <div id="lblRoute">Route:</div><div id="valRoute"><?php echo $_POST['route']; ?></div>
                 </div>
                 <div class='ticketItems'>
                 <?php
@@ -89,24 +78,29 @@
                         $itemClass = 'ticketItem';
                         $readyChar = ' ';
                         switch($itemState){
-                            case "delivered":
-
-                            case "ready":
+                            case "Delivered":
+                                $itemClass.=" delivered";
+                                $readyChar = '✔';
+                                break;
+                            case "Ready":
                                 $itemClass.=" ready";
                                 $readyChar = '✔';
                                 break;
 
-                            case "removed":
-                                $itemClass.=" disabled";
+                            case "Removed":
+                                $itemClass.=" removed";
                                 break;
-                            case "hidden":
+                            case "Updated":
+                                $itemClass.=" updated";
+                                break;
+                            case "Hidden":
                                 $itemClass.=" hidden";
                                 break;
                         }
                         if($ticketItem['flag'] == "updated"){
                             $itemClass.=" updated";
                         }
-                        echo("<div name='ticketItem' id='".$ticketItem['id']."' class ='".$itemClass."'><p>".$readyChar.$ticketItem['itemName']."</p></div>");
+                        echo("<div name='ticketItem' id='".$ticketItem['id']."' class ='".$itemClass."'><p>".$readyChar.$ticketItem['itemName']."</p>");
 
 
                         if($ticketItem['mods']!=""){
@@ -128,6 +122,7 @@
                                 echo("<ul>".htmlspecialchars($modList[$modLength - 1])."</ul>");
                             }
                         }
+                        echo("</div>");
                     } 
                 ?>
                 </div>

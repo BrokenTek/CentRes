@@ -1,6 +1,6 @@
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <?php
-    $sql = "SELECT * FROM ActiveTicketGroups";
+    $sql = "SELECT * FROM ActiveTicketGroups ORDER BY TimeCreated";
     $result = connection()->query($sql);
     if (isset($_POST['addedGroups']) || isset($_POST['removedGroups']) || isset($_POST['updatedGroups'])) {
         $errorMessage = "Please Process the Highlighted Vars before continuing";
@@ -11,7 +11,7 @@
                 $_POST['addedGroups'] = "";
                 while ($row = $result->fetch_assoc()) {
                     $_POST['addedGroups'] .= "," . $row['id'];
-                    $_POST['grp'. $row['id']] = $row['updateCounter'];
+                    $_POST[str_replace(".","_",'grp'. $row['id'])] = $row['updateCounter'];
                 }
                 $_POST['addedGroups'] = substr($_POST['addedGroups'], 1);
                 $_POST['recordedGroups'] = $_POST['addedGroups'];
@@ -25,12 +25,13 @@
                 while ($row = $result->fetch_assoc()) {
                     $groupsIn .= "," . $row['id'];
                     if (strpos(',' . $_POST['recordedGroups'] . ',', $row['id']) == 0) {
+                        $val =  $row['id']; 
                         $addedGroups .= "," . $row['id'];
                     }
-                    elseif (isset($_POST['grp' . $row['id']]) && $_POST['grp' . $row['id']] < $row['updateCounter'] )  {
+                    elseif (isset($_POST[str_replace(".","_",'grp'. $row['id'])]) && $_POST[str_replace(".","_",'grp'. $row['id'])] != $row['updateCounter'] )  {
                         $updatedGroups .= "," . $row['id'];    
                     }
-                    $_POST['grp'. $row['id']] = $row['updateCounter'];
+                    $_POST[str_replace(".","_",'grp'. $row['id'])] = $row['updateCounter'];
                 }
                 if (strlen($addedGroups) > 0) {
                     $_POST['addedGroups'] = substr($addedGroups, 1);
@@ -45,7 +46,7 @@
                 foreach ($recGrpLst as $recGrp) {
                     if (!strpos("," .$groupsIn. ",", $recGrp)) {
                         $removedGroups .= "," . $recGrp;
-                        unset($_POST['grp'. $_POST[$recGrp]]);
+                        unset($_POST[('grp'. $_POST[str_replace(".","_",$recGrp)])]);
                     }
                 }
                 if (strlen($removedGroups) > 0) {
@@ -135,6 +136,7 @@
             if (isset($errorMessage)) {
                 echo("<h1 class='highlighted' id='errorMessage'>$errorMessage</h1>");
             }
+            print_r($_POST);
         ?>
     </body>
 </html>
