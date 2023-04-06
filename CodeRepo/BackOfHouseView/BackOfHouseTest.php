@@ -30,8 +30,9 @@ you'll be routed to whatever the home page is for your specified role level -->
                 height: 100%;
             }
             iframe {
-                height: 90vh;
+                height: 45vh;
                 width: 15rem;
+                background-color: transparent;
             }
             .activeTicketGroup {
                 grid-row: 1;

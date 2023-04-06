@@ -50,7 +50,15 @@
     top: 1rem;
     right: 0;
     padding: 1rem;
+    animation: intro .6s ease-in-out 1 backwards;
 }
+
+@keyframes intro {
+    0% { transform: scale(1); opacity:91%;}
+    70% { transform: scale(.9); opacity:91%;}
+    90% { transform: scale(.95); opacity:97%;}
+    100% { transform: scale(1); opacity:100%;}
+  }
 
 #sessionForm{
     width: 5rem;

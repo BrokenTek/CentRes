@@ -408,9 +408,7 @@
                     varGet("ticket", "ticketContainer");
                     updateDisplay("ticketContainer");
                     ticketContainer.classList.remove("clear");
-                    setTimeout(() => {
-                        updateButtonStates();
-                    }, 1000);
+                    updateButtonStates();
                 }
                 catch (err) {
                     try {
