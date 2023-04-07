@@ -115,7 +115,7 @@ CREATE TABLE MenuItems (
 
 CREATE TABLE MenuModificationCategories (
 	quickCode VARCHAR(40) PRIMARY KEY,
-	title VARCHAR(75) NOT NULL,
+	title VARCHAR(75) NOT NULL UNIQUE,
 	description VARCHAR(1000),
 	defaultPrice DECIMAL(6, 2) UNSIGNED,
 	priceOrModificationValue DECIMAL(6, 2),
@@ -128,7 +128,7 @@ CREATE TABLE MenuModificationCategories (
 
 CREATE TABLE MenuModificationItems (
 	quickCode VARCHAR(40) PRIMARY KEY,
-	title VARCHAR(75) NOT NULL,
+	title VARCHAR(75) NOT NULL UNIQUE,
 	description varchar(1000),
 	priceOrModificationValue DECIMAL(6, 2),
 	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),

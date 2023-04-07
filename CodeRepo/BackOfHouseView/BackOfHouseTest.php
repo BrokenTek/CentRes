@@ -34,9 +34,6 @@ you'll be routed to whatever the home page is for your specified role level -->
                 width: 15rem;
                 background-color: transparent;
             }
-            .activeTicketGroup {
-                grid-row: 1;
-            }
         </style>
         <!-- gives you access to varSet, varGet, varRem, 
         varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
@@ -133,6 +130,7 @@ you'll be routed to whatever the home page is for your specified role level -->
 
             function ifrATGloaded(event) {
                 try {
+                    this.removeEventListener("load", ifrATGloaded);
                     var grpId = groupIdBuffer.shift();
                     this.id = "ifr" + grpId.replace(".","_");
                     varSet("route", varGet("route"), "ifr" + grpId.replace(".","_"));
