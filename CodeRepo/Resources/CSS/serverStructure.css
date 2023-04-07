@@ -17,40 +17,59 @@
          }
 
 		 #alertWrapper {
-			position: relative;
+			position: absolute;
 		 }
 
 		 #alertDiv.visible {
-			position: fixed;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
+			position: absolute;
+			display: grid;
 			top: 0;
 			bottom: 0;
 			left: 0;
 			right: 0;
-			margin: auto;
-			width: 50%;
-			height: 50%;
-			max-width: 400px;
-			max-height: 300px;
-			background-color: #555;
-			opacity: 100%;
-			z-index: 1000;
+			grid-template-rows: 1fr max-content 1fr;
+			grid-template-columns: 1fr max-content 1fr;
+			background-color: black;
+			opacity: 90%;
+			z-index: 1;
 		 }
 		 #alertDiv {
 			display: none;
 		 }
 
-		 .alert-message {
+		 #alertBox {
 			font-size: 24px; /* Increase the font size */
 			font-weight: bold; /* Make the text bold */
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-			height: 100%;
+			grid-row: 2;
+			grid-column: 2;
+			background-color: black;
+			color: white;
+			min-height: 10rem;
+			min-width: 30rem;
+			border: .125rem solid #777;
+			padding: 1rem;
+		}
+
+		#alertDiv.visible > #alertBox {
+			animation: alertAppear .5s ease-in-out 1 backwards;
+			display: grid;
+			grid-auto-rows: min-content;
+			grid-template-columns: max-content;
+		}
+
+		#alertDiv.visible > #alertBox > div {
+			margin-inline: auto;
+			padding-bottom: 2rem;
+		}
+
+		#alertMessage {
+			margin-inline: auto;
+		}
+
+		@keyframes alertAppear {
+			0% { transform: scale(.9);}
+			50% { transform: scale(1.1); }
+			100% { transform: scale(1);}
 		}
 
 		 .button-container {

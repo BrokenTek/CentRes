@@ -66,6 +66,11 @@
 
                 ignoreUpdates = false;
 
+                document.querySelector("#btnHideMessage").addEventListener('click', function() {
+
+                    document.querySelector("#alertDiv").classList.remove('visible');
+                });                
+
             }
             addEventListener("load", loaded);
             
@@ -874,22 +879,8 @@
             }
 
             function showAlertDiv(message) {
-                // DAVID'S CODE GOES HERE
-                var alertDiv = document.getElementById('alertDiv');
-                var alertMessage = document.createElement('div');
-                alertMessage.textContent = message;
-                alertMessage.className = 'alert-message';
-
-                alertDiv.insertBefore(alertMessage, alertDiv.firstChild);
-                alertDiv.classList.add('visible');
-    
-                //close button removes class of "visible" from #alertDiv
-                var hideMeButton = document.getElementById('hideMeButton');
-                hideMeButton.addEventListener('click', function() {
-                alertDiv.classList.remove('visible');
-                });                
-
-                
+                document.querySelector("#alertMessage").textContent = message;
+                document.querySelector("#alertDiv").classList.add("visible");
             }
 
         </script>
@@ -946,10 +937,14 @@
             
         </form>
         <div id="alertDiv">
-            
-            <div class="button-container">
-                <button class="button" id="hideMeButton">OK</button>
-        </div>
+            <div id="alertBox">
+                <div id="alertMessage">
+                    <!-- content dynamically inserted and removed here -->
+                </div>
+                <div id="alertButtonContainer">
+                    <button class="button" id="btnHideMessage">OK</button>
+                </div>
+            </div>
         </div>
         <iframe id="serverListener" src="../Resources/php/serverListener.php" style="display: none;">
     </body>
