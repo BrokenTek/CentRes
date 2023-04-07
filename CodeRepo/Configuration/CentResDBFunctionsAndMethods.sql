@@ -118,24 +118,28 @@ CREATE TRIGGER afterDeleteMenuCategory
 AFTER DELETE ON MenuCategories FOR EACH ROW
 BEGIN
 	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
+	DELETE FROM MenuAssociations WHERE parentQuickCode = OLD.quickCode OR childQuickCode = OLD.quickCode;
 END;
 
 CREATE TRIGGER afterDeleteMenuItem
 AFTER DELETE ON MenuItems FOR EACH ROW
 BEGIN
 	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
+	DELETE FROM MenuAssociations WHERE parentQuickCode = OLD.quickCode OR childQuickCode = OLD.quickCode;
 END;
 
 CREATE TRIGGER afterDeleteMenuModificationCategory
 AFTER DELETE ON MenuModificationCategories FOR EACH ROW
 BEGIN
 	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
+	DELETE FROM MenuAssociations WHERE parentQuickCode = OLD.quickCode OR childQuickCode = OLD.quickCode;
 END;
 
 CREATE TRIGGER afterDeleteMenuModificationItem
 AFTER DELETE ON MenuModificationItems FOR EACH ROW
 BEGIN
 	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
+	DELETE FROM MenuAssociations WHERE parentQuickCode = OLD.quickCode OR childQuickCode = OLD.quickCode;
 END;
 
 CREATE TRIGGER beforeUpdateMenuCategory
