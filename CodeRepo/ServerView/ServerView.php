@@ -377,20 +377,20 @@
                 }
 
                 if (tablesAdded.length > 0 || tablesRemoved.length > 0) {
-                    let msg = "Your table assignments have changed.\n\n";
+                    let msg = "Your table assignments have changed.<hr><br>";
                     if (tablesAdded.length > 0) {
                         var addedStr = tablesAdded[0];
                         for (let i = 1; i < tablesAdded.length; i++) {
                             addedStr += "," + tablesAdded[i];
                         }
-                        msg = "Tables Added: " + addedStr;
+                        msg += "Tables Added: " + addedStr + '\n';
                     }
                     if (tablesRemoved.length > 0) {
                         var removedStr = tablesRemoved[0];
                         for (let i = 1; i < tablesRemoved.length; i++) {
                             removedStr += "," + tablesRemoved[i];
                         }
-                        msg += (msg == "" ? "" : '\n') + "Tables Removed: " + removedStr;
+                        msg += "<hr><br>Tables Removed: " + removedStr;
                     }
                     showAlertDiv(msg);
                 }
@@ -879,7 +879,7 @@
             }
 
             function showAlertDiv(message) {
-                document.querySelector("#alertMessage").textContent = message;
+                document.querySelector("#alertMessage").innerHTML = message;
                 document.querySelector("#alertDiv").classList.add("visible");
             }
 
