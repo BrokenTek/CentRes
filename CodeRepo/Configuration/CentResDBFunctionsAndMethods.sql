@@ -1113,6 +1113,7 @@ BEGIN
 			CALL updateTicketSplitsTimeStamp(ticketNumber, 1023);
 		END IF;
 	END LOOP;
+	CLOSE myCursor;
 END;
 
 /* Old version of submitPendingTicketItems
