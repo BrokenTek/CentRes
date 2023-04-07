@@ -1078,6 +1078,48 @@ CREATE PROCEDURE submitPendingTicketItems(IN ticketNumber INT UNSIGNED, IN split
 BEGIN
 	DECLARE groupNum SMALLINT UNSIGNED;
 	DECLARE sf SMALLINT UNSIGNED;
+	DECLARE done INT DEFAULT FALSE;
+	DECLARE selectedRoute char(1);
+	--get every route involved with the items being submitted.
+	DECLARE CURSOR myCursor
+		FOR
+			SELECT DISTINCT MenuItems.route FROM (TicketItems INNER JOIN MenuItems ON TicketItems.menuItemQuickCode = MenuItems.quickCode) WHERE ticketId = ticketNumber AND submitTime IS NULL AND ticketItemStatus(TicketItems.id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+	
+	OPEN myCursor;
+	submitLoop:
+	LOOP
+		FETCH myCursor INTO selectedRoute;
+		IF (done = 1) THEN
+			LEAVE submitLoop;
+		END IF;
+		--prevent items without a route from being added to a new group.
+		IF (selectedRoute IS NULL)
+			IF (split = 10) THEN
+			UPDATE TicketItems SET submitTime = NOW() WHERE ticketId = ticketNumber AND menuItemQuickCode IN (SELECT quickCode FROM MenuItems WHERE MenuItems.route IS NULL) AND submitTime IS NULL AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
+			ELSE
+			SELECT POWER(2, split) INTO sf;
+			UPDATE TicketItems SET submitTime = NOW() WHERE ticketId = ticketNumber AND menuItemQuickCode IN (SELECT quickCode FROM MenuItems WHERE MenuItems.route IS NULL) AND submitTime IS NULL AND (splitFlag & sf) = sf AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
+			END IF;
+		ELSE
+			SELECT (COALESCE(MAX(groupIndex), 0) + 1) INTO groupNum FROM TicketItems WHERE ticketId = ticketNumber;
+			IF (split = 10) THEN
+			UPDATE TicketItems SET submitTime = NOW(), groupIndex = groupNum WHERE ticketId = ticketNumber AND menuItemQuickCode IN (SELECT quickCode FROM MenuItems WHERE MenuItems.route = selectedRoute) AND submitTime IS NULL AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
+			ELSE
+			SELECT POWER(2, split) INTO sf;
+			UPDATE TicketItems SET submitTime = NOW(), groupIndex = groupNum WHERE ticketId = ticketNumber AND menuItemQuickCode IN (SELECT quickCode FROM MenuItems WHERE MenuItems.route = selectedRoute) AND submitTime IS NULL AND (splitFlag & sf) = sf AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
+			END IF;
+			CALL updateTicketGroup(ticketNumber + groupNum / 100, 1);
+			CALL updateTicketSplitsTimeStamp(ticketNumber, 1023);
+		END IF;
+	END LOOP;
+END;
+
+/* Old version of submitPendingTicketItems
+CREATE PROCEDURE submitPendingTicketItems(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
+BEGIN
+	DECLARE groupNum SMALLINT UNSIGNED;
+	DECLARE sf SMALLINT UNSIGNED;
 	SELECT (COALESCE(MAX(groupIndex), 0) + 1) INTO groupNum FROM TicketItems WHERE ticketId = ticketNumber;
 	IF (split = 10) THEN
 		UPDATE TicketItems SET submitTime = NOW(), groupIndex = groupNum WHERE ticketId = ticketNumber AND submitTime IS NULL AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
@@ -1088,6 +1130,7 @@ BEGIN
 	CALL updateTicketGroup(ticketNumber + groupNum / 100, 1);
 	CALL updateTicketSplitsTimeStamp(ticketNumber, 1023);
 END;
+*/
 
 -- passing in a split value of 10 indicates submit all ticket items for specified ticket
 -- otherwise submits a single split 0 - 9.
