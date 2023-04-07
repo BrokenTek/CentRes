@@ -241,7 +241,7 @@
                         cboSplit.removeAttribute("disabled");
                         updateButtonStates();
                         ticketContainer.classList.remove("hidden");
-                        updateButtonStates();
+                        updateButtonStates(true);
                     }
                 }
                 catch (err) {
@@ -421,9 +421,9 @@
             }
             
 
-            function updateButtonStates() {
+            function updateButtonStates(forceUpdate = false) {
                 try {                   
-                    if (varCpy("enabledButtons", "ticketContainer", null, false, true)) {
+                    if (varCpy("enabledButtons", "ticketContainer", null, false, true) || forceUpdate) {
                         var updatedButtons = varGet("enabledButtons");
                         if (updatedButtons === undefined) {updatedButtons = '';}
                         btnClose.disabled = updatedButtons.indexOf("Close") == -1;
