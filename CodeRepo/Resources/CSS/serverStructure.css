@@ -44,8 +44,6 @@
 			grid-column: 2;
 			background-color: black;
 			color: white;
-			min-height: 10rem;
-			min-width: 30rem;
 			border: .125rem solid #777;
 			padding: 1rem;
 		}
