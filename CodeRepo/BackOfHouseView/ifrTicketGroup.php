@@ -36,7 +36,6 @@
             }
 
             function setClosed(event) {
-                //varSet("closeMe", "yes");
                 varRen('completeAndCloseable', 'closeMe');
             }
         </script>

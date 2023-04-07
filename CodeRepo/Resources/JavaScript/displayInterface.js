@@ -128,7 +128,7 @@ function varRem(variableName, childIframeId = null, update = false, bypassValida
 }
 
 function varRen(oldVarName, newVarName, childIframeId = null, update = false, bypassValidationCheck = false) {
-    if (varGet(oldVarName, childIframeId) !== undefined) {
+    if (varGet(newVarName, childIframeId) !== undefined) {
         return false;
     }
     var container = document.getElementById(childIframeId);
@@ -145,13 +145,14 @@ function varRen(oldVarName, newVarName, childIframeId = null, update = false, by
             if (form == null) {
                 return false;
             }
+            
         }
         catch (err) {
             return false;
         }
     }
     if (variableElement != null) {
-        variableElement.childIframeId = newVarName;
+        variableElement.id = newVarName;
         variableElement.setAttribute("name",newVarName);
     }
     if (update) {
