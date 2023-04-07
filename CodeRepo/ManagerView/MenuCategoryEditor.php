@@ -31,10 +31,69 @@
     /////////////////////////////////////////////////////////
 
     try {
+        if(isset($_POST['quickCode'])&&!isset($_POST['menuTitle'])){
+            $sql = "SELECT MenuCategories.title AS 'categoryTitle', MenuAssociations.parentQuickCode AS 'parent'
+                    FROM (MenuCategories LEFT JOIN MenuAssociations ON MenuCategories.quickCode = MenuAssociations.childQuickCode)
+                    WHERE quickCode = '".$_POST['quickCode']."';";
+            $fieldData = connection()->query($sql)->fetch_assoc();
+            //just in case the quickCode persists after a deletion, these statements are wrapped in a condition
+            //to prevent unwanted warnings from showing up. Note to self: unwrap this if you account for this.
+            if(isset($fieldData)){
+            $_POST['menuTitle'] = $fieldData['categoryTitle'];
+            $_POST['parentCategory'] = $fieldData['parent'];
+            }
+        }
+
+        if(isset($_POST['commit'])){
+            if($_POST['commit'] == 'Update'){
+                //attempt to update the category to reflect the changes made in the form
+                $sql = "UPDATE MenuCategories SET title = ? WHERE quickCode = ?;
+                         UPDATE MenuAssociations SET parentQuickCode = ? WHERE quickCode = ?;";
+                $sql = connection()->prepare($sql);
+                $sql->bind_param('ssss', $_POST['menuTitle'], $_POST['quickCode'] $_POST['parentCategory'], $_POST['quickCode']);
+                $sql->execute();
+            }
+            else{
+                //attempt to create the new category
+                $sql = "INSERT INTO MenuCategories (title) VALUES (?);";
+                $sql = connection()->prepare($sql);
+                $sql->bind_param('s', $_POST['menuTitle']);
+                $sql->execute();
+
+                //get its new quick code and bind it to the $_POST variable.
+                $sql2 = "SELECT quickCode FROM MenuCategories WHERE title = ?;";
+                $sql2 = connection()->prepare($sql2);
+                $sql2->bind_param('s', $_POST['menuTitle']);
+                $sql2->execute();
+                $_POST['quickCode'] = $sql2->get_result()->fetch_assoc()['quickCode'];
+
+                //make the new association
+                $sql3 = "INSERT INTO MenuAssociations (parentQuickCode, childQuickCode)
+                        VALUES (".$_POST['parentCategory'].", ".$_POST['childCategory'].");";
+                connection()->query($sql3);
+            }
+        }
+        if(isset($_POST['delete'])){
+            $sql = "UPDATE MenuCategories SET visible = FALSE WHERE quickCode = '".$_POST['quickCode']."';";
+            connection()->query($sql);
+            unset($_POST['quickCode']);
+        }
+
 
     }
+    catch (mysql_sql_exception $se){
+        if($se->getSqlState()=='23000'){
+            //sql state for when one attempts to duplicate a field with a UNIQUE or PRIMARY KEY constraint, or causes some other integrity violation.
+            //TODO: discuss if the application should restore a hidden record here if adding a category with a title matching it.
+            $errorMessage = "Sorry, we can't have multiple categories with the same title. Try using a different title.";
+        }
+        else{
+            $errorMessage = "An unexpected error occurred, please contact your system administrator or developer(s). ".$se->getMessage();
+        }
+    }
     catch (Exception $e) {
-        
+        //in practice, the error message being appended would instead be sent to an error log of some sort.
+        $errorMessage = "An unexpected error occurred, please contact your system administrator or developer(s). ".$e->getMessage();
     }
 ?>
 

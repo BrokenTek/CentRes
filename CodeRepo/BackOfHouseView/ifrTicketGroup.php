@@ -47,7 +47,7 @@
                 <?php
                     $sql = "SELECT tableid FROM tablelog WHERE ticketid = ".floor($_POST['groupId'])."
                     ORDER BY timeStamp DESC;";
-                    $currentTable = connection()->query($sql)->fetch_assoc();
+                    $currentTable = connection()->query($sql)->fetch_assoc()['tableid'];
 
                     $sql = "SELECT menuItems.title AS 'itemName', id, flag, modificationNotes AS 'mods' 
                         FROM (ticketItems LEFT JOIN menuItems ON menuItemQuickCode=quickCode) 
@@ -69,6 +69,7 @@
                     <?php endif; ?>
                     <div id="lblGroupId">Ticket-Group:</div><div id="valGroupId"><?php echo $_POST['groupId']; ?></div>
                     <div id="lblRoute">Route:</div><div id="valRoute"><?php echo $_POST['route']; ?></div>
+                    <div id="lblTableId">Table:</div><div id=valTableId><?php echo $currentTable; ?></div>
                 </div>
                 <div class='ticketItems'>
                 <?php
