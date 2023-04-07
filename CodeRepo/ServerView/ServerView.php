@@ -67,8 +67,9 @@
                 ignoreUpdates = false;
 
                 document.querySelector("#btnHideMessage").addEventListener('click', function() {
-
                     document.querySelector("#alertDiv").classList.remove('visible');
+                    recAddedTables = [];
+                    recRemovedTables = [];
                 });                
 
             }
@@ -254,7 +255,8 @@
                 }
             }
             
-
+            var recAddedTables = [];
+            var recRemovedTables = [];
             // check for the server's current table assignments
             function checkTableAssignments() {
                 var checkStr;
@@ -377,22 +379,42 @@
                 }
 
                 if (tablesAdded.length > 0 || tablesRemoved.length > 0) {
-                    let msg = "Your table assignments have changed.<hr><br>";
-                    if (tablesAdded.length > 0) {
-                        var addedStr = tablesAdded[0];
-                        for (let i = 1; i < tablesAdded.length; i++) {
-                            addedStr += "," + tablesAdded[i];
-                        }
-                        msg += "Tables Added: " + addedStr + '\n';
+                    for (let i = 0; i < tablesAdded.length; i++) {
+                        let append = recRemovedTables.indexOf(tablesAdded[i]) == -1;
+                        recRemovedTables = recRemovedTables.filter(e => e !== tablesAdded[i]);
+                        if (append) { recAddedTables.push(tablesAdded[i]); }
+                        
                     }
-                    if (tablesRemoved.length > 0) {
-                        var removedStr = tablesRemoved[0];
-                        for (let i = 1; i < tablesRemoved.length; i++) {
-                            removedStr += "," + tablesRemoved[i];
-                        }
-                        msg += "<hr><br>Tables Removed: " + removedStr;
+                    for (let i = 0; i < tablesRemoved.length; i++) {
+                        let append = recAddedTables.indexOf(tablesRemoved[i]) == -1;
+                        recAddedTables = recAddedTables.filter(e => e !== tablesRemoved[i]);
+                        if (append) { recRemovedTables.push(tablesRemoved[i]); }
                     }
-                    showAlertDiv(msg);
+                                        
+                    let addedStr = "";
+                    for (let i = 0; i < recAddedTables.length; i++) {
+                        addedStr += "," + recAddedTables[i];    
+                    }
+                    
+                    let removedStr = "";
+                    for (let i = 0; i < recRemovedTables.length; i++) {
+                        removedStr += "," + recRemovedTables[i];    
+                    }
+                    
+                    let msg = "Your table assignments have changed.<hr><br>" +
+                        (addedStr.length > 0 ? "Tables Added: " + addedStr.substring(1) + "<br>" : "") +
+                        (removedStr.length > 0 ? "Tables Removed: " + removedStr.substring(1) + "<br>" : "");
+                    
+                    if (recAddedTables.length > 0 || recRemovedTables.length > 0 ) {
+                        showAlertDiv(msg);
+                    }
+                    else {
+                        document.querySelector("#alertDiv").classList.remove('visible');
+                    }
+                }
+                if (!loaded) {
+                    recAddedTables = [];
+                    recRemovedTables = [];
                 }
                 loaded = true;
             }
