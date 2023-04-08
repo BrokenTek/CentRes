@@ -1,6 +1,5 @@
 <?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(8, $GLOBALS['role']); ?>
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
-
 <?php
     /////////////////////////////////////////////////////////
     //
@@ -34,11 +33,6 @@
     /////////////////////////////////////////////////////////
 
     try {
-        if (isset($_POST['quickCode']) && $_POST['quickCode'] == "" ) { unset($_POST['quickCode']);}
-        if (isset($_POST['lookAt']) && $_POST['lookAt'] == "" ) { unset($_POST['lookAt']);}
-        if (isset($_POST['parentCategory']) && $_POST['parentCategory'] == "" ) { unset($_POST['parentCategory']);}
-        if (isset($_POST['recallParentCategory']) && $_POST['recallParentCategory'] == "" ) { unset($_POST['recallParentCategory']);}
-
         if(isset($_POST['quickCode'])&&!isset($_POST['menuTitle'])){
             $sql = "SELECT MenuItems.title AS 'itemTitle',
                             MenuItems.price AS 'price',

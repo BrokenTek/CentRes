@@ -72,7 +72,7 @@ BEFORE INSERT ON MenuCategories FOR EACH ROW
 BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
 	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-		SELECT COUNT(*) + 1 INTO cnt FROM MenuCategories;
+		SELECT COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0) + 1 INTO cnt FROM MenuCategories;
 		SET NEW.quickCode = CONCAT('C', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));
 	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
@@ -83,7 +83,7 @@ BEFORE INSERT ON MenuItems FOR EACH ROW
 BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
 	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-		SELECT COUNT(*) + 1 INTO cnt FROM MenuItems;
+		SELECT COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0) + 1 INTO cnt FROM MenuItems;
 		SET NEW.quickCode = CONCAT('I', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));
 	END IF;
 	IF (NEW.route IS NOT NULL) THEN
@@ -97,7 +97,7 @@ BEFORE INSERT ON MenuModificationCategories FOR EACH ROW
 BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
 	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-		SELECT COUNT(*) + 1 INTO cnt FROM MenuModificationCategories;
+		SELECT COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0) + 1 INTO cnt FROM MenuModificationCategories;
 		SET NEW.quickCode = CONCAT('MC', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));	
 	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
@@ -108,7 +108,7 @@ BEFORE INSERT ON MenuModificationItems FOR EACH ROW
 BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
 	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-		SELECT COUNT(*) + 1 INTO cnt FROM MenuModificationItems;
+		SELECT COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0) + 1 INTO cnt FROM MenuModificationItems;
 		SET NEW.quickCode = CONCAT('M', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));	
 	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
@@ -1072,6 +1072,7 @@ BEGIN
 	END IF;
 END;
 
+/*
 -- passing in a split value of 10 indicates submit all ticket items for specified ticket
 -- otherwise submits a single split 0 - 9.
 CREATE PROCEDURE submitPendingTicketItems(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
@@ -1115,8 +1116,9 @@ BEGIN
 	END LOOP;
 	CLOSE myCursor;
 END;
+*/
 
-/* Old version of submitPendingTicketItems
+ -- Old version of submitPendingTicketItems
 CREATE PROCEDURE submitPendingTicketItems(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
 BEGIN
 	DECLARE groupNum SMALLINT UNSIGNED;
@@ -1131,7 +1133,7 @@ BEGIN
 	CALL updateTicketGroup(ticketNumber + groupNum / 100, 1);
 	CALL updateTicketSplitsTimeStamp(ticketNumber, 1023);
 END;
-*/
+
 
 -- passing in a split value of 10 indicates submit all ticket items for specified ticket
 -- otherwise submits a single split 0 - 9.

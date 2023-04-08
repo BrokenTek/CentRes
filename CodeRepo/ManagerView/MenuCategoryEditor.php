@@ -113,7 +113,6 @@
         }
 
         if (isset($_POST['parentCategory']) && strpos(" " . $_POST['parentCategory'], "!") == 1) {
-            $errorMessage = $_POST['parentCategory'];
             if ($_POST['parentCategory'] != '!root' && $_POST['parentCategory'] != '!!root') {
                 $sql = "SELECT parentQuickCode as qc FROM MenuAssociations WHERE childQuickCode = '".substr($_POST['parentCategory'],1). "';";
                 $_POST['parentCategory'] = connection()->query($sql)->fetch_assoc()['qc'];

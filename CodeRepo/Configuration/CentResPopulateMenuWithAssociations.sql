@@ -55,22 +55,13 @@ INSERT INTO `menuitems` (`quickCode`, `title`, `description`, `price`, `route`, 
 ('I011', 'Sierra Nevada Pale Ale', NULL, '5.75', 'B', NULL, 0, NULL, 1),
 ('I012', 'Newcastle Brown Ale', NULL, '5.00', 'B', NULL, 0, NULL, 1),
 ('I013', 'Dogfish Head 60 Minute IPA', NULL, '6.25', 'B', NULL, 0, NULL, 1),
-
-('I014', 'Slice Of Cake', NULL, '5.50', 'K', NULL, 0, NULL, 1),
-
 ('I015', 'Lagunitas IPA', NULL, '6.00', 'B', NULL, 0, NULL, 1),
 ('I016', 'Coca-Cola', NULL, '3.50', 'B', NULL, 0, NULL, 1),
 ('I017', 'Coke Zero', NULL, '3.50', 'B', NULL, 0, NULL, 1),
-
-('I018', 'Apple Tart', NULL, '6.00', 'K', NULL, 0, NULL, 1),
-
 ('I019', 'Diet Coke', NULL, '3.50', 'B', NULL, 0, NULL, 1),
 ('I020', 'Sprite', NULL, '3.50', 'B', NULL, 0, NULL, 1),
 ('I021', 'Fanta Orange', NULL, '3.50', 'B', NULL, 0, NULL, 1),
 ('I022', 'Fanta Grape', NULL, '3.50', 'B', NULL, 0, NULL, 1),
-
-('I023', 'Cinnamon Bun', NULL, '6.25', 'K', NULL, 0, NULL, 1),
-
 ('I024', 'Barqs Root Beer', NULL, '3.50', 'B', NULL, 0, NULL, 1),
 ('I025', 'Seagrams Ginger Ale', NULL, '4.00', 'B', NULL, 0, NULL, 1),
 ('I026', 'Fresca', NULL, '3.50', 'B', NULL, 0, NULL, 1),
@@ -79,30 +70,16 @@ INSERT INTO `menuitems` (`quickCode`, `title`, `description`, `price`, `route`, 
 ('I029', 'Black Tea', NULL, '4.00', 'B', NULL, 0, NULL, 1),
 ('I030', 'Sweet Tea', NULL, '3.50', 'B', NULL, 0, NULL, 1),
 ('I031', 'Unsweet Tea', NULL, '3.50', 'B', NULL, 0, NULL, 1),
-
-('I032', 'Keylime Pie', NULL, '6.50', 'K', NULL, 0, NULL, 1),
-
 ('I033', 'Coffee', NULL, '4.00', 'B', NULL, 0, NULL, 1),
-('I034', 'Cherry Pie', NULL, '6.50', 'K', NULL, 0, NULL, 1),
-
 ('I035', 'Mozzarella Sticks', NULL, '7.00', 'K', NULL, 0, NULL, 1),
 ('I036', 'Onion Ring Tower', NULL, '10.50', 'K', NULL, 0, NULL, 1),
 ('I037', 'Loaded Fries', NULL, '7.50', 'K', NULL, 0, NULL, 1),
 ('I038', 'Buffalo Cauliflower', NULL, '8.50', 'K', NULL, 0, NULL, 1),
 ('I039', 'French Fries', NULL, '3.50', 'K', NULL, 0, NULL, 1),
-
-('I040', 'Apple Pie', NULL, '6.50', 'K', NULL, 0, NULL, 1),
-
 ('I041', 'Onion Rings', NULL, '3.50', 'K', NULL, 0, NULL, 1),
 ('I042', 'Fresh Chips', NULL, '4.00', 'K', NULL, 0, NULL, 1),
 ('I043', 'Seasonable Veggies', NULL, '4.25', 'K', NULL, 0, NULL, 1),
-
-('I044', 'Oreo', NULL, '6.00', 'K', NULL, 0, NULL, 1),
-
 ('I045', 'Rice Pilaf', NULL, '4.00', 'K', NULL, 0, NULL, 1),
-
-('I046', 'Moose Tracks', NULL, '6.00', 'K', NULL, 0, NULL, 1),
-
 ('I047', 'Mashed Potatos', NULL, '4.00', 'K', NULL, 0, NULL, 1),
 ('I048', 'Baked Potato', NULL, '6.50', 'K', NULL, 0, NULL, 1),
 ('I049', 'Blackened Chicken', NULL, '10.00', 'K', NULL, 0, NULL, 1),
@@ -113,9 +90,6 @@ INSERT INTO `menuitems` (`quickCode`, `title`, `description`, `price`, `route`, 
 ('I054', 'Carolina Burger', NULL, '11.00', 'K', NULL, 0, NULL, 1),
 ('I055', 'Bacon Cheeseburger', NULL, '12.00', 'K', NULL, 0, NULL, 1),
 ('I056', 'Honey Glazed Salmon', NULL, '11.00', 'K', NULL, 0, NULL, 1),
-
-('I057', 'Pecans and Pralines', NULL, '6.25', 'K', NULL, 0, NULL, 1),
-
 ('I058', 'Blackened Tilapia', NULL, '10.00', 'K', NULL, 0, NULL, 1),
 ('I059', 'Jumbo Coconut Shrimp', NULL, '11.50', 'K', NULL, 0, NULL, 1),
 ('I060', 'Popcorn Shrimp', NULL, '9.50', 'K', NULL, 0, NULL, 1),
@@ -125,23 +99,20 @@ INSERT INTO `menuitems` (`quickCode`, `title`, `description`, `price`, `route`, 
 ('I064', 'Top Sirloin', NULL, '17.75', 'K', NULL, 0, NULL, 1),
 ('I065', 'Fresh Pesto Flatbread', NULL, '10.00', 'K', NULL, 0, NULL, 1),
 ('I066', 'Royal BLT', NULL, '11.50', 'K', NULL, 0, NULL, 1),
-
-('I067', 'Cookie Dough', NULL, '6.00', 'K', NULL, 0, NULL, 1),
-
 ('I068', 'Buffalo Chicken Sandwich', NULL, '10.75', 'K', NULL, 0, NULL, 1),
 ('I069', 'Grilled Chicken Sandwich', NULL, '12.00', 'K', NULL, 0, NULL, 1),
 ('I070', 'Chocolate', NULL, '6.00', 'K', NULL, 0, NULL, 1),
-('I071', 'Vanilla', NULL, '6.00', 'K', NULL, 0, NULL, 1);
-
-
-
-
-
-
-
-
-
-
+('I071', 'Vanilla', NULL, '6.00', 'K', NULL, 0, NULL, 1),
+('I072', 'Moose Tracks', NULL, '6.00', 'K', NULL, 0, NULL, 1),
+('I073', 'Oreo', NULL, '6.00', 'K', NULL, 0, NULL, 1),
+('I075', 'Cookie Dough', NULL, '6.00', 'K', NULL, 0, NULL, 1),
+('I076', 'Pecans and Pralines', NULL, '6.25', 'K', NULL, 0, NULL, 1),
+('I077', 'Apple Pie', NULL, '6.50', 'K', NULL, 0, NULL, 1),
+('I078', 'Cherry Pie', NULL, '6.50', 'K', NULL, 0, NULL, 1),
+('I079', 'Keylime Pie', NULL, '6.50', 'K', NULL, 0, NULL, 1),
+('I081', 'Cinnamon Bun', NULL, '6.25', 'K', NULL, 0, NULL, 1),
+('I082', 'Apple Tart', NULL, '6.00', 'K', NULL, 0, NULL, 1),
+('I083', 'Slice Of Cake', NULL, '5.50', 'K', NULL, 0, NULL, 1);
 
 /* Insert All Mods */
 INSERT INTO `menumodificationitems` (`quickCode`, `title`, `priceOrModificationValue`, `categoryType`)
@@ -291,16 +262,16 @@ VALUES
 ('S015', 'I069', NULL),
 ('S016', 'I070', NULL),
 ('S016', 'I071', NULL),
-('S016', 'I046', NULL),
-('S016', 'I044', NULL),
-('S016', 'I067', NULL),
-('S016', 'I057', NULL),
-('S017', 'I040', NULL),
-('S017', 'I034', NULL),
-('S017', 'I032', NULL),
-('S018', 'I023', NULL),
-('S018', 'I018', NULL),
-('S018', 'I014', NULL),
+('S016', 'I072', NULL),
+('S016', 'I073', NULL),
+('S016', 'I075', NULL),
+('S016', 'I076', NULL),
+('S017', 'I077', NULL),
+('S017', 'I078', NULL),
+('S017', 'I079', NULL),
+('S018', 'I081', NULL),
+('S018', 'I082', NULL),
+('S018', 'I083', NULL),
 ('S009', 'I084', NULL),
 ('S009', 'I085', NULL),
 ('S009', 'I086', NULL),
@@ -325,4 +296,3 @@ VALUES
 ('I055', 'M001', NULL),
 ('I055', 'M002', NULL),
 ('I055', 'M003', NULL);
-
