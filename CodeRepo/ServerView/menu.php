@@ -13,13 +13,8 @@ Otherwise will reroute to logon page -->
 				
 				var menuItemSelected = function(event) {
 					event.stopPropagation();
-					if (varGet("selectedMenuItem") == this.id) {
-						varRem("selectedMenuItem");
-					}
-					else {
-						varRem("selectedMenuCategory");
-						varSet("selectedMenuItem", this.id);
-					}
+					varRem("selectedMenuCategory");
+					varSet("selectedMenuItem", this.id);
 					
 				};
 
@@ -33,12 +28,7 @@ Otherwise will reroute to logon page -->
 				var menuCategorySelected = function(event) {
 					event.stopPropagation();
 					varRem("selectedMenuItem");
-					if (this.getAttribute("open") == null) {
-						varSet("selectedMenuCategory", this.id);
-					}
-					else {
-						varRem("selectedMenuCategory");
-					}
+					varSet("selectedMenuCategory", this.id);
 					
 				};
 
@@ -56,6 +46,16 @@ Otherwise will reroute to logon page -->
 
 				document.getElementsByTagName("body")[0].addEventListener('pointerDown', clearSelectedVars);
 
+				if (varGet("focusedMenuObject") != null) {
+					let lookAt = document.querySelector("#" + varGet("focusedMenuObject"));
+					if (lookAt != null) {
+						while (lookAt != null) {
+							lookAt.setAttribute("open", "");
+							lookAt = lookAt.parentElement;
+						}
+					}
+				}
+
 
 			}
 			addEventListener('load', createMenuSelectEventHandlers);
@@ -63,13 +63,6 @@ Otherwise will reroute to logon page -->
 			
 
 		</script>
-        <script src="../InDev/cwpribble.js"></script>
-        <script src="../InDev/dbutshudiema.js"></script>
-        <script src="../InDev/dlmahan.js"></script>
-        <script src="../InDev/kcdine.js"></script>
-        <script src="../InDev/sashort.js"></script>
-        <script src="../InDev/OVERRIDEEXAMPLE.js"></script>
-        <script>templateFunction("Hello World");</script>
 	</head>
 	<body>
 		<form>
@@ -77,10 +70,10 @@ Otherwise will reroute to logon page -->
 require_once '../Resources/php/connect_disconnect.php';
 
 
-$sql = "SELECT childQuickCode, title
+$sql = "SELECT childQuickCode, title, visible
 		FROM MenuAssociations 
 		INNER JOIN MenuCategories ON MenuCategories.quickCode = MenuAssociations.childQuickCode 
-		WHERE MenuAssociations.parentQuickCode = 'root';";
+		WHERE MenuAssociations.parentQuickCode = 'root' AND visible = true;";
 $result = connection()->query($sql);
 
 if ($result->num_rows > 0) {
@@ -95,7 +88,7 @@ if ($result->num_rows > 0) {
 		echo "<details id='". $qc ."' class='menuCategory'>
 			<summary>". $title ."</summary>";
 
-		$sql = "SELECT childQuickCode, title 
+		$sql = "SELECT childQuickCode, title, visible 
 		FROM MenuAssociations 
 		INNER JOIN MenuCategories ON MenuCategories.quickCode = MenuAssociations.childQuickCode 
 		WHERE MenuAssociations.parentQuickCode = '$qc';";
@@ -103,21 +96,25 @@ if ($result->num_rows > 0) {
 
 		if ($result->num_rows > 0) {
 			while($row = $result->fetch_assoc()) {
-				printMenuCategory($row['childQuickCode'], $row['title']);
+				if ($row['visible'] == true) {
+					printMenuCategory($row['childQuickCode'], $row['title']);
+				}
 			}
 		}
 
-		$sql = "SELECT childQuickCode, title, price 
+		$sql = "SELECT childQuickCode, title, price, visible 
 		FROM MenuAssociations 
 		INNER JOIN MenuItems ON MenuItems.quickCode = MenuAssociations.childQuickCode 
-		WHERE MenuAssociations.parentQuickCode = '$qc';";
+		WHERE MenuAssociations.parentQuickCode = '$qc' AND visible = true;";
 		$result = connection()->query($sql);
 
 		if ($result->num_rows > 0) {
 			echo "<div>";
 			while($row = $result->fetch_assoc()) {
 				// ** NEEDS TO PASS IN CALCULATED PRICE AND THE CALCULATED MODS STR (COMMA DELIMINATED) **
-				printMenuItem($row['childQuickCode'], $row['title'], $row['price']);
+				if ($row['visible'] == true) {
+					printMenuItem($row['childQuickCode'], $row['title'], $row['price']);
+				}
 			}
 			echo "</div>";
 		}		

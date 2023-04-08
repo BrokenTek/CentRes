@@ -6,11 +6,11 @@
     //
     // NOTE: This page will be called from MenuEditor.php
     // $_POST['quickCode] will be passed in if you are editing
-    // and existing menu object. Check if $_POST['menuTitle']
+    // an existing menu object. Check if $_POST['menuTitle']
     // is set.
     // 
     // if it isn't, you're going to have to grab your
-    // data form the db and set them into the appropriate
+    // data from the db and set them into the appropriate
     // $_POST[] variables.
     // 
     // See the bottom of the file
@@ -22,19 +22,106 @@
     // process $_POST['commit'] or $_POST['delete'] here.
     // if any errors occur, set a message in $errorMessage
     // to display at the bottom of the page.
+    // 
+    // If no error messages occur, set a success $message.
     //
     // if you create a new item, make sure you set
     // $_POST['quickCode'] for what you just created.
-    // look up the quickCode >>>> hint: all titles are unique 
-    // per table
+    // look up the quickCode >>>> hint: titles
+    // are not unique but duplicates will have a different
+    // creationDate
     //
     /////////////////////////////////////////////////////////
 
     try {
+        if (isset($_POST['quickCode']) && $_POST['quickCode'] == "" ) { unset($_POST['quickCode']);}
+        if (isset($_POST['lookAt']) && $_POST['lookAt'] == "" ) { unset($_POST['lookAt']);}
+        if (isset($_POST['parentCategory']) && $_POST['parentCategory'] == "" ) { unset($_POST['parentCategory']);}
+        if (isset($_POST['recallParentCategory']) && $_POST['recallParentCategory'] == "" ) { unset($_POST['recallParentCategory']);}
 
+        if(isset($_POST['quickCode'])&&!isset($_POST['menuTitle'])){
+            $sql = "SELECT MenuItems.title AS 'itemTitle',
+                            MenuItems.price AS 'price',
+                            MenuItems.route AS 'route',
+                            MenuAssociations.parentQuickCode AS 'parent'
+                    FROM (MenuItems LEFT JOIN MenuAssociations ON MenuItems.quickCode = MenuAssociations.childQuickCode)
+                    WHERE quickCode = '".$_POST['quickCode']."' ORDER BY id DESC LIMIT 1;";
+            $fieldData = connection()->query($sql)->fetch_assoc();
+            
+            //just in case the quickCode persists after a deletion, these statements are wrapped in a condition
+            //to prevent unwanted warnings from showing up. Note to self: unwrap this if you account for this.
+            if(isset($fieldData)){
+                $_POST['menuTitle'] = $fieldData['itemTitle'];
+                $_POST['price'] = $fieldData['price'];
+                $_POST['route'] = $fieldData['route'];
+                $_POST['parentCategory'] = $fieldData['parent'];
+            }
+        }
+
+        if(isset($_POST['commit'])){
+            if($_POST['commit'] == 'Update'){
+                //attempt to update the category to reflect the changes made in the form
+                $sql = "UPDATE MenuItems SET title = ?, route = ?, price = ? WHERE quickCode = ?;";      
+                $sql = connection()->prepare($sql);
+                $sql->bind_param('ssds', $_POST['menuTitle'], $_POST['route'], $_POST['price'], $_POST['quickCode']);
+                $sql->execute();
+
+                $sql = "UPDATE MenuAssociations SET parentQuickCode = ? WHERE childQuickCode = ?;";  
+                $sql = connection()->prepare($sql);
+                $sql->bind_param('ss', $_POST['parentCategory'], $_POST['quickCode']);
+                $sql->execute();
+
+                $message = "Menu Item updated.";
+                $_POST['lookAt'] = $_POST['quickCode'];
+            }
+            else{
+                //attempt to create the new category
+                $sql = "INSERT INTO MenuItems (title, route, price) VALUES (?, ?, ?);";
+                $sql = connection()->prepare($sql);
+                $sql->bind_param('ssd', $_POST['menuTitle'], $_POST['route'], $_POST['price'],);
+                $sql->execute();
+
+                //get its new quick code and bind it to the $_POST variable.
+                $sql2 = "SELECT quickCode FROM MenuItems WHERE title = ? ORDER BY id DESC LIMIT 1;";
+                $sql2 = connection()->prepare($sql2);
+                $sql2->bind_param('s', $_POST['menuTitle']);
+                $sql2->execute();
+                $_POST['quickCode'] = $sql2->get_result()->fetch_assoc()['quickCode'];
+
+                //make the new association
+                $sql3 = "INSERT INTO MenuAssociations (parentQuickCode, childQuickCode)
+                        VALUES ('".$_POST['parentCategory']."', '".$_POST['quickCode']."');";
+                connection()->query($sql3);
+                $message = "<b>" .$_POST['menuTitle']. "</b> created.";
+
+                $_POST['lookAt'] = $_POST['quickCode'];
+                unset($_POST['quickCode'], $_POST['menuTitle']);
+            }
+
+            // menu editor has an event listener for this window to onload.
+            // It checks varGet('updated', [ifrActiveWindow]) to see if menu needs to be reloaded. 
+            $_POST['updated'] = "true";
+        }
+        if(isset($_POST['delete'])){
+            $sql = "UPDATE MenuItems SET visible = FALSE WHERE quickCode = '".$_POST['quickCode']."';";
+            connection()->query($sql);
+            $message = "<b>" .$_POST['menuTitle']. "</b> deleted.";
+            unset($_POST['quickCode'], $_POST['menuTitle']);
+
+            // menu editor has an event listener for this window to onload.
+            // It checks varGet('updated', [ifrActiveWindow]) to see if menu needs to be reloaded. 
+            $_POST['updated'] = "true";
+        }
+        else if (isset($_POST['parentCategory']) && !isset($_POST['quickCode']) && !isset($_POST['lookAt'])) {
+            $_POST['lookAt'] = $_POST['parentCategory'];
+        }
     }
     catch (Exception $e) {
-        
+        $errorMessage = "An unexpected error occurred, please contact your system administrator or developer(s). ".$e->getMessage();
+    }
+    if (!isset($errorMessage) && isset($_POST['errorMessage'])) {
+        $errorMessage = $_POST['errorMessage'];
+        unset($_POST['errorMessage']);
     }
 ?>
 
@@ -43,76 +130,130 @@
 <html>
     <head>
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
-        <style>
-            #sessionForm {
-                height: 100%;
-                background-color: black;
-            }
-            .sessionBody {
-                background-color: black;
-                margin: auto auto auto auto;
-                color: white;
-                display: grid;
-                grid-template-columns: 1fr min-content 1fr;
-                height: 100%;
-            }
-            fieldset {
-                display: grid;
-                grid-auto-rows: min-content;
-                grid-template-columns: max-content max-content;
-                grid-gap: .125rem;
-                grid-column: 2;
-            }
-            legend, #buttonGroup {
-                grid-column: 1 / span 2;
-            }
-            legend {
-                margin-inline: auto;
-                line-height: 2rem;
-                font-size: 2rem !important;
-                margin-bottom: 1.5rem;
-            }
-            #selParentCategory {
-                margin: 0;
-            }
-            #buttonGroup {
-                display: grid;
-                grid-template-rows: min-content;
-                grid-template-columns: 1fr 1fr 1fr;
-            }
-            input[type="reset"] {
-                grid-column: 2;
-            }
-
-            .button {
-                background-color: #F6941D;
-                color: white;
-                font-weight: bold;
-                margin: .25rem .25rem .25rem .25rem;
-                min-width: 5rem;
-                min-height: 2rem;
-            }
-
-        </style>
+        <link rel="stylesheet" href="../Resources/CSS/menuEditorStyle.css">
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         <script>
             function allElementsLoaded() {
                 // any startup tasks go here after page has fully loaded.
+
+                document.querySelector("#sessionForm").addEventListener("keydown", keydown);
+                document.querySelector("#sessionForm").addEventListener("keyup", keyup);
+
+                document.querySelector("#btnMenuCategoryEditor").addEventListener("pointerdown", 
+                function() {redirect("MenuCategoryEditor.php", (shiftDown ? "!" : "") + document.querySelector("#selParentCategory").value);});
+
+                document.querySelector("#btnMenuItemEditor").addEventListener("pointerdown", 
+                function() { redirect("MenuItemEditor.php", document.querySelector("#selParentCategory").value); });
+
+                document.querySelector("#btnMenuModificationEditor").addEventListener("pointerdown", 
+                function() {redirect("MenuModificationEditor.php");});
+
+                with (document.querySelector("#txtMenuTitle")) {
+                    focus();
+                    setSelectionRange(0, value.length);
+                } 
+
+                with (document.querySelector("#selParentCategory")) {
+                    addEventListener("change", function() {  
+                        varSet("lookAt", value);
+                        varSet("recallParentCategory", value);
+                        with (document.querySelector("#txtMenuTitle")) {
+                            focus();
+                            setSelectionRange(0, value.length);
+                        }
+                     });
+                }
+            }
+
+            ///////////////////////////////////////////////////
+            //           RAPID ENTRY KEYBOARD EVENTS
+            ///////////////////////////////////////////////////
+            
+            let ctrlDown = false;
+            let shiftDown = false;
+
+            function keydown(event) {
+                //alert(event.keyCode2);
+                switch (event.keyCode) {
+                    case 16:
+                        shiftDown = true;
+                        break;
+                    case 17:
+                        ctrlDown = true;
+                        break;
+                    default:
+                        let parentRecall = varGet("recallParentCategory");
+                        if (ctrlDown) {
+                            if (event.keyCode == 13 && parentRecall !== undefined && parentRecall != null) { 
+                                if (shiftDown) { //  CTRL + SHIFT + ENTER >>>>> Navigate to MenuCategory 1 Level Up
+                                    redirect("MenuCategoryEditor.php", "!" + parentRecall.replace("!", ""));
+                                }
+                                else { // CTRL ENTER >>>>> Navigate to MenuCategory at Current Level
+                                    redirect("MenuCategoryEditor.php", parentRecall);
+                                }
+                            }
+                            else if (event.keyCode == 46) { // CTRL + DELETE >>>>> Delete current record if one selected
+                                let btnDelete = document.querySelector("#btnDelete");
+                                if (btnDelete != null) {
+                                    btnDelete.click(); 
+                                }
+                                else { // Nothing to delete. Generate error message.
+                                    varSet("errorMessage", "Oops! Nothing to delete.", null, true, true);
+                                }
+                            }
+                            else if (event.keyCode == 8) { // CTRL + BACKSPACE >>>>> Reset form
+                                document.querySelector("#btnReset").click();
+                            }
+                            else if (event.keyCode == 77) { // CTRL + M >>>>> Go to mod editor window.
+                                redirect("MenuModificationEditor.php");
+                            }
+                        }
+                }       
+            }
+
+            function keyup(event) {
+                switch (event.keyCode) {
+                    case 16:
+                        shiftDown = false;
+                        break;
+                    case 17:
+                        ctrlDown = false;
+                        break;
+                }
+            }
+
+            ///////////////////////////////////////////////////
+            //             MENU REDIRECT FUNCTION
+            ///////////////////////////////////////////////////
+
+            function redirect(loc, parentCategory) {
+                if (parentCategory != undefined && parentCategory != null) {
+                    document.querySelector("#txtParentCategory").setAttribute("value", parentCategory);
+                    document.querySelector("#txtLookAt").setAttribute("value", parentCategory);
+                }
+                with (document.querySelector("#frmRedirect")) {
+                    setAttribute("action", loc);
+                    submit();
+                }
+                
             }
 
         </script>
         
     </head>
-    <body id="sessionForm" onload="allElementsLoaded()">
+    <body id="sessionForm" onload="allElementsLoaded()" class="fadeIntro">
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <div class="sessionBody">
+                <div id="menuEditorNavBar">
+                    <button id="btnMenuCategoryEditor" type="button" class="button menuNavButton">New Category</button>
+                    <button id="btnMenuItemEditor" type="button" class="button menuNavButton">New Item</button>
+                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton">Mods Editor</button>
+                </div>
                 <fieldset>
                     <legend>Menu&nbsp;Item&nbsp;Editor</legend>
                 
-                    <label for="txtMenuTitle">Category Title</label>
-                    <input id="txtMenuTitle" name="menuTitle" required <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
                     <label for="selParentCategory">Parent Category</label>
-                    <select id="selParentCategory" name="parentCategory" required  <?php if(isset($_POST['parentCategory'])) { echo(' value="' . $_POST['parentCategory'] . '"'); } ?>>
+                    <select id="selParentCategory" name="parentCategory" required>
                         <?php
                             $sql = "SELECT * FROM MenuCategories ORDER BY title";
                             $result = connection()->query($sql);
@@ -125,46 +266,64 @@
                                 // the values should be the quick quick code
                                 /////////////////////////////////////////////////////////
                                 while ($row = $result->fetch_assoc()) {
-                                    echo('<option value="' .$row['quickCode']. '">' .$row['title']. '</option>');
+                                    echo('<option value="' .$row['quickCode']. '")');
+                                    if (isset($_POST['parentCategory']) && $_POST['parentCategory'] == $row['quickCode']) {
+                                        echo(" selected");
+                                    }
+                                    echo('>' .$row['title']. '</option>');
                                 }
                             }
                         ?>
                     </select>
+                    <label for="txtMenuTitle">Menu Item Name</label>
+                    <input id="txtMenuTitle" name="menuTitle" required pattern="^([a-zA-Z]+\s{1})*[a-zA-Z]+$" maxlength=75 <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
                     <label for="txtPrice">Price</label>
                     <input id="txtPrice" name="price" pattern="^[1-9]\d*(\.\d+)?$" required <?php if(isset($_POST['price'])) { echo(' value="' . $_POST['price'] . '"'); } ?>>
                     <label for="txtRoute">Route</label>
-                    <input id="txtRoute" name="route" maxlength="1" required <?php if(isset($_POST['route'])) { echo(' value="' . $_POST['route'] . '"'); } ?>>
-                    <div id="buttonGroup">
+                    <input id="txtRoute" name="route" maxlength="1" <?php if(isset($_POST['route'])) { echo(' value="' . $_POST['route'] . '"'); } ?>>
+                    <div class="buttonGroup">
                         <?php if (isset($_POST['quickCode']) && 
                                 (!isset($_POST['delete']) || isset($errorMessage))): ?>
-                            <input type="submit" name="delete" value="Delete" class="button">
-                            <input type="reset" value="Reset" class="button">
-                            <input type="submit" name="commit" value="Update" class="button">
+                            <input id="btnSubmit" type="submit" name="commit" value="Update" class="button">
+                            <input id="btnReset" type="reset" value="Reset" class="button">
+                            <input id="btnDelete" type="submit" name="delete" value="Delete" class="button">
+                            
                         <?php else: ?>
-                            <input type="reset" value="Clear" class="button">
-                            <input type="submit" name="commit" value="Create" class="button">
+                            <input id="btnSubmit" type="submit" name="commit" value="Create" class="button">
+                            <input id="btnReset" type="reset" value="Reset" class="button">
                         <?php endif; ?>
                     </div>
-                    <?php if (isset($errorMessage)): ?>
-                        <div class="errorMessage">
-                            <?php echo $errorMessage; ?>
-                        </div>
-                    <?php endif; ?>
+                    
                 </fieldset>
+                <?php if (isset($errorMessage)): ?>
+                    <div class="errorMessage">
+                        <?php echo $errorMessage; ?>
+                    </div>
+                <?php elseif (isset($message)): ?>
+                    <div class="message">
+                        <?php echo $message; ?>
+                    </div>
+                <?php endif; ?>
             </div>
             
 
             <?php unset($_POST['delete'], 
                         $_POST['commit'],
                         $_POST['menuTitle'],
-                        $_POST['parentCategory'],
                         $_POST['price'],
-                        $_POST['route']);  
+                        $_POST['route'],
+                        $_POST['parentCategory']);  
                      // $_POST['quickCode'] stays ?>
 
             <!-- must be placed at the bottom of the form to submit values form one refresh to the next -->
             <?php require_once '../Resources/php/display.php'; ?>
            
+        </form>
+        <form id="frmRedirect" style="display: none;" method="POST">
+            <input type="text" id="txtParentCategory" name="parentCategory">
+            <input type="text" id="txtRecallParentCategory" name="recallParentCategory">
+            <input type="text" id="txtLookAt" name="lookAt">
+            <input type="text" id="txtQC" name="quickCode">
         </form>
     </body>
 </html>

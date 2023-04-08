@@ -1,0 +1,105 @@
+#sessionForm {
+    height: 100%;
+    background-color: transparent;
+     
+    background-color: transparent;
+}
+.sessionBody {
+    background-color: transparent;
+    margin: auto auto auto auto;
+    color: white;
+    display: grid;
+    grid-template-columns: 1fr max-content 1fr;
+    height: 100%;
+}
+#menuEditorNavBar {
+    grid-row: 1;
+    grid-column: 2;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: min-content;
+    padding-bottom: 1rem;
+    margin-block: 1rem;
+    border-bottom: .25rem solid white;
+}
+fieldset {
+    display: grid;
+    grid-auto-rows: min-content;
+    grid-template-columns: max-content max-content;
+    grid-gap: .125rem;
+    grid-row: 2;
+    grid-column: 2;
+    margin-inline: auto;
+}
+form, body, html {
+    background-color: transparent;
+}
+body {
+    animation: fadeIn .75s ease-in-out 1 backwards;
+}
+html {
+    background-color: transparent;
+}
+#flickControl {
+    position: relative;
+top: 0;
+bottom: 0;
+left: 0;
+right: 0;
+    grid-column: 1;
+    grid-row: 1;
+    background-color: transparent;
+    opacity: 90%;
+    width: 100%;
+    height: 100%;
+}
+legend, .buttonGroup {
+    grid-column: 1 / span 2;
+}
+legend {
+    margin-inline: auto;
+    line-height: 2rem;
+    font-size: 2rem !important;
+    margin-bottom: 1.5rem;
+}
+#selParentCategory {
+    margin: 0;
+}
+.buttonGroup {
+    display: grid;
+    grid-template-rows: min-content;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.button {
+    background-color: #F6941D;
+    color: white;
+    font-weight: bold;
+    margin: .25rem .25rem .25rem .25rem;
+    min-width: 5rem;
+    min-height: 2rem;
+}
+.menuNavButton {
+    min-width: 7rem;
+}
+
+.errorMessage, .message {
+    grid-row: 3;
+    grid-column: 1 / span 3;
+    margin-top: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 20rem;
+    border: .25rem solid white;
+    padding: .5rem;
+}
+
+.errorMessage {
+    animation: highlightFlash .5s ease-in-out 2 backwards;
+}
+
+
+
+@keyframes fadeIn {
+    0% { opacity: 0%; }
+    100% { opacity: 90%;}
+  }

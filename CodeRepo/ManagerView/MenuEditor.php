@@ -46,23 +46,59 @@ you'll be routed to whatever the home page is for your specified role level -->
         <!-- demonstration on how to use varGet, varSet, updateDisplay for just this page -->
         <!-- remove this script tag -->
         <script>
+            var mnu;
+            var mnuEditor;
             function allElementsLoaded() {
-                setTimeout(eventLoop, 1000);
+                mnu = document.getElementById("ifrMenu");
+                mnuEditor = document.getElementById("ifrMenuEditor");
+
+                mnu.contentDocument.addEventListener("click", menuUpdated);
+                mnuEditor.addEventListener("load", editorRefreshed);
+                
             }
 
-            function eventLoop() {
-                if (varGetOnce("updated", "ifrMenuEditor") !== undefined) {
-                    document.getElementById("ifrMenu").setAttribute("src", "../ServerView/menu.php");
-                    document.getElementById("ifrMenuEditor").setAttribute("src", "menuEditorIframe.php");
+            function editorRefreshed(event) {
+                ignoreUpdate = true;
+                if (varGet("updated", "ifrMenuEditor") != null) {
+                    varCpyRen("lookAt", "ifrMenu", "focusedMenuObject", "ifrMenu");
+                    updateDisplay("ifrMenu");
+                    setTimeout(() => {
+                        mnu.contentDocument.addEventListener("click", menuUpdated);
+                    }, 1000);
                 }
-                else {
-                    varCpy("selectedMenuItem", "ifrMenu", "ifrMenuEditor", true, true, true);
-                    varCpy("selectedMenuCategory", "ifrMenu", "ifrMenuEditor", true, true, true);
-                }
-                setTimeout(eventLoop, 1000);
+                ignoreUpdate = false;
+                
             }
 
-            
+            let ignoreUpdate = false
+            function menuUpdated(event) {
+                if (ignoreUpdate) {
+                    ignoreUpdate = false;
+                    return;
+                }
+                var itm = varGet("selectedMenuItem", "ifrMenu");
+                var cat = varGet("selectedMenuCategory", "ifrMenu");
+                if (itm != undefined) {
+                    let parentId = mnu.contentDocument.getElementById(itm).parentElement.id; //.parentElement.id;
+                    mnuEditor.contentDocument.getElementById("txtParentCategory").setAttribute("value", parentId);
+                    mnuEditor.contentDocument.getElementById("txtRecallParentCategory").setAttribute("value","!" + parentId);
+                    mnuEditor.contentDocument.getElementById("txtQC").setAttribute("value", itm);
+                    with (mnuEditor.contentDocument.getElementById("frmRedirect")) {
+                        action = "MenuItemEditor.php";
+                        submit();
+                    }
+                    
+                }
+                else if (cat != undefined) {
+                    mnuEditor.contentDocument.getElementById("txtParentCategory").setAttribute("value", cat);
+                    with (mnuEditor.contentDocument.getElementById("frmRedirect")) {
+                        action = "MenuCategoryEditor.php";
+                        submit();
+                    }
+
+                }
+            }
+          
 
             //Place your JavaScript Code here
         </script>
@@ -71,8 +107,10 @@ you'll be routed to whatever the home page is for your specified role level -->
         <!-- this form submits to itself -->
         <form id='frmMenuEditor' action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <?php require_once '../Resources/php/sessionHeader.php'; ?>
+            <iframe id="ifrMenuEditor" src="MenuEditorHome.php"></iframe>
             <iframe id="ifrMenu" src="../ServerView/menu.php"></iframe>
-            <iframe id="ifrMenuEditor" src="menuEditorIframe.php"></iframe>
+            <div id="flickControl"></div>
+            
             <?php unset($_POST['thisVariableIWantToForget'], $_POST['thisOtherVariableIDontNeed']) ?>
 
             <!-- retain any POST vars. When updateDisplay() is called or the form is submitted,
