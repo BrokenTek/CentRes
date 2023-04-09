@@ -28,7 +28,7 @@
                 <div id="menuEditorNavBar">
                     <button id="btnMenuCategoryEditor" type="button" class="button menuNavButton">New Category</button>
                     <button id="btnMenuItemEditor" type="button" class="button menuNavButton">New Item</button>
-                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton">Mods Editor</button>
+                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton"  style="display: none;">Mods Editor</button>
                 </div>
                 <fieldset>
                     <legend>Menu&nbsp;Editor&nbsp;Home</legend>
