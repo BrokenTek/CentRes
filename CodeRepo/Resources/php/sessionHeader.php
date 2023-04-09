@@ -108,7 +108,7 @@
                     <option id='mgrNavHostView' value='../HostView/HostView.php'>Host&nbsp;View</option>
                     <option id='mgrNavIPW' value = '../ManagerView/InventoryPopularityWindow.php'>Inventory/Popularity&nbsp;Window</option>
                     <option id='mgrNavEmpRoster' value='../ManagerView/EmployeeRoster.php'>Employee&nbsp;Roster</option>
-                    <option id='mgrNavMenuEditor' value=''>Menu&nbsp;Editor</option>
+                    <option id='mgrNavMenuEditor' value='../ManagerView/MenuEditor.php'>Menu&nbsp;Editor</option>
                     <option id='mgrNavResetDB' value='../Configuration/resetDB.php'>DEBUG:&nbsp;Reset&nbsp;DB</option>
                 </select>
             </div>
