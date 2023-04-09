@@ -90,7 +90,6 @@ INSERT INTO QuickCodes VALUES('root');
 
 CREATE TABLE MenuCategories (
 	quickCode VARCHAR(40) PRIMARY KEY,
-	id INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	title VARCHAR(75) NOT NULL,
 	description VARCHAR(1000),
 	route char(1),
@@ -102,7 +101,6 @@ CREATE TABLE MenuCategories (
 
 CREATE TABLE MenuItems (
 	quickCode VARCHAR(40) PRIMARY KEY,
-	id INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	title VARCHAR(75) NOT NULL,
 	description varchar(1000),
 	price DECIMAL(6, 2) UNSIGNED,
@@ -117,7 +115,6 @@ CREATE TABLE MenuItems (
 
 CREATE TABLE MenuModificationCategories (
 	quickCode VARCHAR(40) PRIMARY KEY,
-	id INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	title VARCHAR(75) NOT NULL,
 	description VARCHAR(1000),
 	defaultPrice DECIMAL(6, 2) UNSIGNED,
@@ -131,7 +128,6 @@ CREATE TABLE MenuModificationCategories (
 
 CREATE TABLE MenuModificationItems (
 	quickCode VARCHAR(40) PRIMARY KEY,
-	id INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	title VARCHAR(75) NOT NULL,
 	description varchar(1000),
 	priceOrModificationValue DECIMAL(6, 2),

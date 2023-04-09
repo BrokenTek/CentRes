@@ -1054,6 +1054,7 @@ BEGIN
 	CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 END;
 
+
 CREATE PROCEDURE hideTicketItem(IN ticketItemNumber INT UNSIGNED)
 BEGIN
 	DECLARE tickNum INT UNSIGNED;
@@ -1072,7 +1073,8 @@ BEGIN
 	END IF;
 END;
 
-/*
+
+
 -- passing in a split value of 10 indicates submit all ticket items for specified ticket
 -- otherwise submits a single split 0 - 9.
 CREATE PROCEDURE submitPendingTicketItems(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
@@ -1081,8 +1083,8 @@ BEGIN
 	DECLARE sf SMALLINT UNSIGNED;
 	DECLARE done INT DEFAULT FALSE;
 	DECLARE selectedRoute char(1);
-	--get every route involved with the items being submitted.
-	DECLARE CURSOR myCursor
+	-- get every route involved with the items being submitted.
+	DECLARE myCursor CURSOR
 		FOR
 			SELECT DISTINCT MenuItems.route FROM (TicketItems INNER JOIN MenuItems ON TicketItems.menuItemQuickCode = MenuItems.quickCode) WHERE ticketId = ticketNumber AND submitTime IS NULL AND ticketItemStatus(TicketItems.id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
 	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -1094,8 +1096,8 @@ BEGIN
 		IF (done = 1) THEN
 			LEAVE submitLoop;
 		END IF;
-		--prevent items without a route from being added to a new group.
-		IF (selectedRoute IS NULL)
+		-- prevent items without a route from being added to a new group.
+		IF (selectedRoute IS NULL) THEN
 			IF (split = 10) THEN
 			UPDATE TicketItems SET submitTime = NOW() WHERE ticketId = ticketNumber AND menuItemQuickCode IN (SELECT quickCode FROM MenuItems WHERE MenuItems.route IS NULL) AND submitTime IS NULL AND ticketItemStatus(id) COLLATE utf8mb4_unicode_ci <> 'n/a' COLLATE utf8mb4_unicode_ci;
 			ELSE
@@ -1116,8 +1118,8 @@ BEGIN
 	END LOOP;
 	CLOSE myCursor;
 END;
-*/
 
+/*
  -- Old version of submitPendingTicketItems
 CREATE PROCEDURE submitPendingTicketItems(IN ticketNumber INT UNSIGNED, IN split SMALLINT UNSIGNED)
 BEGIN
@@ -1133,6 +1135,7 @@ BEGIN
 	CALL updateTicketGroup(ticketNumber + groupNum / 100, 1);
 	CALL updateTicketSplitsTimeStamp(ticketNumber, 1023);
 END;
+*/
 
 
 -- passing in a split value of 10 indicates submit all ticket items for specified ticket
