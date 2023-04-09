@@ -105,7 +105,8 @@ Otherwise will reroute to logon page -->
 
                         if (document.getElementById('txtModString').value != "") {
                             var customModNote = document.getElementById('txtModString');
-                            newModValue += customModNote.value;
+                            customModNote = customModNote.value.replaceAll(',', '.');
+                            newModValue += customModNote;
                         }
 
                         else {
@@ -138,24 +139,7 @@ Otherwise will reroute to logon page -->
                 else {
                     if (isset($_POST['newModValue'])) {
 
-                        //===================================================================================================   (Setting the newModValue)
-                        // if (isset($_POST['newModChosen[]']) && isset($_POST['newModSuffix[]'])) {
-                        //     $newModChosenArray = $_POST['newModChosen[]'];
-                        //     $newModSuffixArray = $_POST['newModSuffix[]'];
-                        //     $newModValue = "";
 
-                        //     for ($i = 0; $i < count($newModChosenArray); $i++) {
-                        //         $newModValue .= strval($newModChosenArray[$i]) . "," . strval($newModSuffixArray[$i]) . ",";
-                        //     }
-                        //     if (isset($_POST['newModNote'])) {
-                        //         // $newModValue .= str_replace(',', '_', $_POST['newModNote']);
-                        //         $newModValue .= $_POST['newModNote'];
-                        //     } 
-                            
-                        //     echo("<script>");
-                        //     echo("varSet('. $newModValue .', ' . $newModValue . ');");
-                        //     echo("</script>");
-                        // }
 
                         // // FOR IF ITEM IS MANDATORY OR DOES NOT NEED A SUFFIX
                         // // else if (isset($_POST['newModChosen[]']) && !isset($_POST['newModSuffix[]'])) {
@@ -169,15 +153,6 @@ Otherwise will reroute to logon page -->
                         // //         // $newModValue .= str_replace(',', '_', $_POST['newModNote']);
                         // //         $newModValue .= $_POST['newModNote'];
                         // //     }
-                        // // }
-
-                        // // TEMPORARY DEBUG
-                        // else {
-                        //     $newModValue = "None";
-                        //     echo("<h1>ERRRRROR DUBUIG</h1>");
-                        // }
-
-
 
                          //===================================================================================================
                         
@@ -192,7 +167,6 @@ Otherwise will reroute to logon page -->
                         //===================================================================================================
                         echo("<script>signalStatus('pending');</script>");
 
-                        // Initialize the return string    // "M002,Xtra,M054,None,Make sure to actually use extra, Jack"	*** Remove COMMAS from explicit mod***
                         $newModValue = "";
 
                         // Get the menu item's quick code
@@ -314,12 +288,6 @@ Otherwise will reroute to logon page -->
                                 echo($modAvailableArray[$i][0] . " - $" . $modAvailableArray[$i][1]);
                                 echo("</label>");
                                 echo("<input class='modChoice' type='checkbox' name='newModChosen[]' value='$modQuickCodeArray[$i]'>");
-                                // echo("<fieldSet class='chooseSuffix'>");
-
-                                // echo("<legend id='prefixBtn' style='font-size: 75%; color: grey;'>Choose Suffix</legend>");
-    
-                                // echo("</fieldSet>");
-
                                 echo("</div>");
                                                                
                             }
@@ -329,10 +297,6 @@ Otherwise will reroute to logon page -->
                             
                         echo("<hr>");
                         
-                        // echo("<script>");
-                        // echo("varSet('. $newModValue .', ' . $newModValue . ');");
-                        // echo("</script>");
-
                         // Custom mod note name changed from newModValue -> newModNote
                         echo("<label for='txtModString'>Mod String w/ commas</label>
                         <input type='text' id='txtModString' name='newModNote'>    
