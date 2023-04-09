@@ -118,22 +118,18 @@
                         }
                         echo("<div name='ticketItem' id='".$ticketItem['id']."' class ='".$itemClass."'><p>".$readyChar.$ticketItem['itemName']."</p>");
 
-
                         if($ticketItem['mods']!=""){
                             $modList = explode(",", $ticketItem['mods']);
                             $modLength = count($modList);
                             //iterate through each pair of modification values.
                             for($i=0; ($i + 1)<$modLength; $i+=2){
                                 echo("<ul>");
-                                $sql = "SELECT title, selfDescriptive FROM MenuModificationCategories WHERE quickCode = ?;";
-                                $sql = connection()->prepare($sql);
-                                $sql->bind_param("s",$modlist[$i]);
-                                $sql->execute();
-                                $result = $sql->get_result();
+                                $sql = "SELECT title FROM MenuModificationItems WHERE quickCode = '".$modList[$i]."';";
+                                
+                                $result = connection()->query($sql);
                                 $mod = $result->fetch_assoc();
-                                if(!$mod['selfDescriptive']){
-                                    echo($mod['title']);
-                                }
+                                echo($mod['title']);
+                                echo(": ");
                                 echo($modList[$i + 1]);
                                 echo("</ul>");
                             }
