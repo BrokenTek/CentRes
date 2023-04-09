@@ -81,7 +81,7 @@
                 $sql->execute();
 
                 //get its new quick code and bind it to the $_POST variable.
-                $sql2 = "SELECT quickCode FROM MenuItems WHERE title = ? ORDER BY id DESC LIMIT 1;";
+                $sql2 = "SELECT quickCode FROM MenuItems WHERE title = ? ORDER BY counter DESC LIMIT 1;";
                 $sql2 = connection()->prepare($sql2);
                 $sql2->bind_param('s', $_POST['menuTitle']);
                 $sql2->execute();
@@ -293,7 +293,7 @@
                     <label for="selParentCategory">Parent Category</label>
                     <select id="selParentCategory" name="parentCategory" required>
                         <?php
-                            $sql = "SELECT * FROM MenuCategories ORDER BY title";
+                            $sql = "SELECT * FROM MenuCategories WHERE visible = 1 ORDER BY title;";
                             $result = connection()->query($sql);
                             if (mysqli_num_rows($result) == 0) {
                                 $errorMessage = "Create a Menu Category Please!";

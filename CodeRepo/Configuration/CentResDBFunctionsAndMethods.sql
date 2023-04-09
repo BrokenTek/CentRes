@@ -72,7 +72,7 @@ BEFORE INSERT ON MenuCategories FOR EACH ROW
 BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
 	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-		SELECT COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0) + 1 INTO cnt FROM MenuCategories;
+		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuCategories;
 		SET NEW.quickCode = CONCAT('C', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));
 	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
@@ -83,7 +83,7 @@ BEFORE INSERT ON MenuItems FOR EACH ROW
 BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
 	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-		SELECT COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0) + 1 INTO cnt FROM MenuItems;
+		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuItems;
 		SET NEW.quickCode = CONCAT('I', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));
 	END IF;
 	IF (NEW.route IS NOT NULL) THEN
@@ -97,7 +97,7 @@ BEFORE INSERT ON MenuModificationCategories FOR EACH ROW
 BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
 	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-		SELECT COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0) + 1 INTO cnt FROM MenuModificationCategories;
+		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationCategories;
 		SET NEW.quickCode = CONCAT('MC', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));	
 	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
@@ -108,7 +108,7 @@ BEFORE INSERT ON MenuModificationItems FOR EACH ROW
 BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
 	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-		SELECT COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0) + 1 INTO cnt FROM MenuModificationItems;
+		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationItems;
 		SET NEW.quickCode = CONCAT('M', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));	
 	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
@@ -1154,6 +1154,7 @@ END;
 
 CREATE PROCEDURE updateTicketGroup(tickGrp DECIMAL(6, 2), flag TINYINT UNSIGNED)
 BEGIN
+	DECLARE rte CHAR(1);
 	UPDATE ActiveTicketGroups SET updateCounter = updateCounter + 1  WHERE id = tickGrp;
 	IF (flag = 2) THEN
 		-- ticket group may no longer be active.
@@ -1173,7 +1174,11 @@ BEGIN
 		-- ticket item is sent back to the kitchen to be reprepared.
 		IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) IN ('Preparing', 'Updated')) > 0
 			AND (SELECT COUNT(*) FROM ActiveTicketGroups WHERE id = tickGrp) = 0) THEN
-			INSERT INTO ActiveTicketGroups (id) VALUES (tickGrp);
+			
+			SELECT route into rte FROM TicketItems
+			INNER JOIN MenuItems ON menuItemQuickCode = quickCode
+			WHERE groupId = tickGrp LIMIT 1;
+			INSERT INTO ActiveTicketGroups (id, route) VALUES (tickGrp, rte);
 		END IF;
 	END IF; 
 

@@ -1,6 +1,11 @@
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <?php
-    $sql = "SELECT * FROM ActiveTicketGroups ORDER BY TimeCreated";
+    if (isset($_POST['route'])) {
+        $sql = "SELECT * FROM ActiveTicketGroups WHERE route = '" .$_POST['route']. "' ORDER BY TimeCreated";
+    }
+    else {
+        $sql = "SELECT * FROM ActiveTicketGroups ORDER BY TimeCreated";
+    }
     $result = connection()->query($sql);
     if (isset($_POST['addedGroups']) || isset($_POST['removedGroups']) || isset($_POST['updatedGroups'])) {
         $errorMessage = "Please Process the Highlighted Vars before continuing";
