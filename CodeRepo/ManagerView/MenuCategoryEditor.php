@@ -1,6 +1,5 @@
 <?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(8, $GLOBALS['role']); ?>
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
-
 <?php
     /////////////////////////////////////////////////////////
     //
@@ -32,6 +31,11 @@
     // creationDate
     //
     /////////////////////////////////////////////////////////
+    foreach($_POST as $key => $value){
+        if ($value == ""){
+            unset($_POST[$key]);  
+        }
+    }
 
     try {
         if(isset($_POST['quickCode'])&&!isset($_POST['menuTitle'])){
@@ -113,18 +117,41 @@
         }
 
         if (isset($_POST['parentCategory']) && strpos(" " . $_POST['parentCategory'], "!") == 1) {
-            if ($_POST['parentCategory'] != '!root' && $_POST['parentCategory'] != '!!root') {
+            
+            if ($_POST['parentCategory'] != '!root') {
                 $sql = "SELECT parentQuickCode as qc FROM MenuAssociations WHERE childQuickCode = '".substr($_POST['parentCategory'],1). "';";
                 $_POST['parentCategory'] = connection()->query($sql)->fetch_assoc()['qc'];
+                $_POST['lookAt'] = $_POST['parentCategory'];
             }
             else {
                 $errorMessage = "Cannot navigate above root menu item.";
                 $_POST['parentCategory'] = 'root';
             }
         }
+        if (isset($_POST['lookAt']) && strpos(" " . $_POST['lookAt'], "!") == 1) {
+            if ($_POST['lookAt'] != '!root') {
+                $sql = "SELECT parentQuickCode as qc FROM MenuAssociations WHERE childQuickCode = '".substr($_POST['lookAt'],1). "';";
+                $_POST['lookAt'] = connection()->query($sql)->fetch_assoc()['qc'];
+            }
+            else {
+                $_POST['lookAt'] = 'root';
+            }
+        }
+        if (!isset($_POST['lookAt'])) {
+            if (isset($_POST['quickCode'])) {
+                $_POST['lookAt'] = $_POST['quickCode'];
+            }
+            elseif (isset($_POST['parentCategory'])) {
+                $_POST['lookAt'] = $_POST['parentCategory'];
+            }
+        }
+        if (isset($_POST['parentCategory']) && isset($_POST['lookAt']) && $_POST['lookAt'] == 'root' && $_POST['parentCategory'] != 'root' ) {
+            $_POST['lookAt'] = $_POST['parentCategory'];
+        }
     }
     catch (Exception $e) {
         $errorMessage = "An unexpected error occurred, please contact your system administrator or developer(s). ".$e->getMessage();
+
     }
     if (!isset($errorMessage) && isset($_POST['errorMessage'])) {
         $errorMessage = $_POST['errorMessage'];
@@ -142,6 +169,12 @@
         <script>
             function allElementsLoaded() {
                 // any startup tasks go here after page has fully loaded.
+
+                document.querySelector("#selParentCategory").addEventListener("change", selChanged);
+
+                document.querySelector("#btnReset").addEventListener("pointerdown", btnResetPressed);
+
+                document.querySelector("#btnDelete").addEventListener("pointerdown", btnDeletePressed);
 
                 document.querySelector("#sessionForm").addEventListener("keydown", keydown);
                 document.querySelector("#sessionForm").addEventListener("keyup", keyup);
@@ -170,6 +203,37 @@
                             setSelectionRange(0, value.length);
                         }
                      });
+                }
+            }
+
+            function btnResetPressed(event) {
+                varSet("lookAt", "root")
+                varRem("quickCode");
+                document.getElementById("selParentCategory").selectedIndex = 0;
+                with (document.getElementById("btnDelete")) {
+                    setAttribute("disabled", "");
+                    classList.add("disabled");
+                }
+            }
+
+            function btnDeletePressed (event) {
+                varSet("delete", "yes");
+                varSet("quickCode", document.getElementById("selParentCategory").value);
+                updateDisplay(null, true);
+            }
+
+            function selChanged(event) {
+                if (selChanged) {
+                    with (document.querySelector("#btnDelete")) {
+                        if (this.options[this.selectedIndex].value == "root") {
+                            setAttribute("disabled", "");
+                            classList.add("disabled");
+                        }
+                        else {
+                            removeAttribute("disabled", "");
+                            classList.remove("disabled");
+                        }
+                    }
                 }
             }
 
@@ -295,15 +359,17 @@
                     <label for="txtMenuTitle">Category Title</label>
                     <input id="txtMenuTitle" name="menuTitle" required  pattern="^([a-zA-Z]+\s{1})*[a-zA-Z]+$"  maxlength=75 <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
                     <div class="buttonGroup">
-                        <?php if (isset($_POST['quickCode']) && 
+                        <?php if (isset($_POST['quickCode']) && strlen($_POST['quickCode']) > 0 &&
                                 (!isset($_POST['delete']) || isset($errorMessage))): ?>
                             <input id="btnSubmit" type="submit" name="commit" value="Update" class="button">
-                            <input id="btnReset" type="reset" value="Reset" class="button">
-                            <input id="btnDelete" type="submit" name="delete" value="Delete" class="button">
-                            
                         <?php else: ?>
                             <input id="btnSubmit" type="submit" name="commit" value="Create" class="button">
-                            <input id="btnReset" type="reset" value="Reset" class="button">
+                        <?php endif; ?>
+                        <button type="button" id="btnReset" class="button">Reset</Button>
+                        <?php if (isset($_POST['parentCategory']) && $_POST['parentCategory'] != 'root' ): ?>
+                            <button type="button" id="btnDelete" class="button">Delete Parent</Button>
+                        <?php else: ?>
+                            <button type="button" id="btnDelete" class="button disabled">Delete Parent</Button>
                         <?php endif; ?>
                     </div>
                     
@@ -333,7 +399,9 @@
         <form id="frmRedirect" style="display: none;" method="POST">
             <input type="text" id="txtParentCategory" name="parentCategory">
             <input type="text" id="txtRecallParentCategory" name="recallParentCategory">
-            <input type="text" id="txtQC" name="recallParentCategory">
+            <input type="text" id="txtQC" name="quickCode">
+            <input type="text" id="txtLookAt" name="lookAt">
+        </form>
         </form>
     </body>
 </html>

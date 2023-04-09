@@ -1,6 +1,7 @@
 <?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(8, $GLOBALS['role']); ?>
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <?php
+
     /////////////////////////////////////////////////////////
     //
     // NOTE: This page will be called from MenuEditor.php
@@ -31,7 +32,11 @@
     // creationDate
     //
     /////////////////////////////////////////////////////////
-
+    foreach($_POST as $key => $value){
+        if ($value == ""){
+            unset($_POST[$key]);  
+        }
+    }
     try {
         if(isset($_POST['quickCode'])&&!isset($_POST['menuTitle'])){
             $sql = "SELECT MenuItems.title AS 'itemTitle',
@@ -130,6 +135,10 @@
             function allElementsLoaded() {
                 // any startup tasks go here after page has fully loaded.
 
+                document.querySelector("#selParentCategory").addEventListener("change", selParentChanged);
+
+                document.querySelector("#btnReset").addEventListener("pointerdown", btnResetPressed);
+
                 document.querySelector("#sessionForm").addEventListener("keydown", keydown);
                 document.querySelector("#sessionForm").addEventListener("keyup", keyup);
 
@@ -156,6 +165,41 @@
                             setSelectionRange(0, value.length);
                         }
                      });
+                }
+            }
+
+            function btnResetPressed(event) {
+                with (document.querySelector("#selParentCategory").options[document.querySelector("#selParentCategory").selectedIndex]) {
+                    varRem("quickCode");
+                    varSet("parentCategory", value);
+                    varSet("recallParentCategory", value);
+                    varSet("lookAt", value);
+                    document.getElementById("selParentCategory").selectedIndex = 0;
+                    document.getElementById("txtMenuTitle").removeAttribute("value");
+                    document.getElementById("txtMenuTitle").removeAttribute("value");
+                    document.getElementById("txtPrice").removeAttribute("value");
+                    document.getElementById("txtRoute").removeAttribute("value");
+                    varSet("parentCategory", value);
+                    varSet("recallParentCategory", value);
+                    varSet("lookAt", value);
+                    document.getElementById("btnSubmit").setAttribute("value", "Create");
+                    if (document.getElementById("btnDelete") != null) {    
+                        document.getElementById("btnDelete").remove();
+                    }
+                }
+            }
+            function selParentChanged(event) {
+                with (this.options[this.selectedIndex]) {
+                    varRem("quickCode");
+                    varSet("parentCategory", value);
+                    varSet("recallParentCategory", value);
+                    varSet("lookAt", value);
+                    document.getElementById("txtMenuTitle").removeAttribute("value");
+                    document.getElementById("txtMenuTitle").removeAttribute("value");
+                    document.getElementById("btnSubmit").setAttribute("value", "Create");
+                    if (document.getElementById("btnDelete") != null) {    
+                        document.getElementById("btnDelete").remove();
+                    }
                 }
             }
 
@@ -279,12 +323,12 @@
                         <?php if (isset($_POST['quickCode']) && 
                                 (!isset($_POST['delete']) || isset($errorMessage))): ?>
                             <input id="btnSubmit" type="submit" name="commit" value="Update" class="button">
-                            <input id="btnReset" type="reset" value="Reset" class="button">
+                            <button id="btnReset" type="button" class="button" onpointerpown="clearVals()">Clear</button>
                             <input id="btnDelete" type="submit" name="delete" value="Delete" class="button">
                             
                         <?php else: ?>
                             <input id="btnSubmit" type="submit" name="commit" value="Create" class="button">
-                            <input id="btnReset" type="reset" value="Reset" class="button">
+                            <button id="btnReset" type="button" class="button" onpointerdown="clearVals()">Clear</button>
                         <?php endif; ?>
                     </div>
                     

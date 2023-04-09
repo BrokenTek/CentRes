@@ -78,11 +78,12 @@ you'll be routed to whatever the home page is for your specified role level -->
                 }
                 var itm = varGet("selectedMenuItem", "ifrMenu");
                 var cat = varGet("selectedMenuCategory", "ifrMenu");
-                if (itm != undefined) {
+                if (itm != undefined && itm.length > 0) {
                     let parentId = mnu.contentDocument.getElementById(itm).parentElement.parentElement.id; //.parentElement.id;
                     mnuEditor.contentDocument.getElementById("txtParentCategory").setAttribute("value", parentId);
                     mnuEditor.contentDocument.getElementById("txtRecallParentCategory").setAttribute("value",parentId);
                     mnuEditor.contentDocument.getElementById("txtQC").setAttribute("value", itm);
+                    mnuEditor.contentDocument.getElementById("txtLookAt").setAttribute("value", itm);
                     with (mnuEditor.contentDocument.getElementById("frmRedirect")) {
                         action = "MenuItemEditor.php";
                         submit();
