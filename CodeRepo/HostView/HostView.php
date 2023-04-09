@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<title>Hello</title>
 		<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
 		<style>
 			iframe {
@@ -66,6 +67,7 @@
                 	varSet("authorizationId", USER_ID, "ifrRestaurantLayout");
 					verifyAuthProcessed = true;
             	}
+				setTitle("CentRes POS: Host Station", "Host Station");
 				startEventLoopTimer();
 			}
 			

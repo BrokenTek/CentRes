@@ -15,11 +15,10 @@
 #menuEditorNavBar {
     grid-row: 1;
     grid-column: 2;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
+    margin-inline: auto;
     grid-template-rows: min-content;
-    padding-bottom: 1rem;
     margin-block: 1rem;
-    border-bottom: .25rem solid white;
 }
 fieldset {
     display: grid;
@@ -56,10 +55,13 @@ legend, .buttonGroup {
     grid-column: 1 / span 2;
 }
 legend {
+    border-top: .25rem solid white;
     margin-inline: auto;
     line-height: 2rem;
     font-size: 2rem !important;
     margin-bottom: 1.5rem;
+    padding-top: 1rem;
+    width: 100%;
 }
 #selParentCategory {
     margin: 0;

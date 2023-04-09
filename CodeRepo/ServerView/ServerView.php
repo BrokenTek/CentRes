@@ -70,7 +70,9 @@
                     document.querySelector("#alertDiv").classList.remove('visible');
                     recAddedTables = [];
                     recRemovedTables = [];
-                });                
+                }); 
+                
+                setTitle("CentRes POS: Server Window", "Server Window");
 
             }
             addEventListener("load", loaded);

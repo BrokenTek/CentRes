@@ -32,8 +32,10 @@
                 </div>
                 <fieldset>
                     <legend>Menu&nbsp;Editor&nbsp;Home</legend>
+                    <div>Press a red menu category<br>or one of the orange buttons above<br>to get started.</div> 
                 </fieldset>
             </div>  
+            
         </form>
         <form id="frmRedirect" style="display: none;" method="POST">
             <input type="text" id="txtParentCategory" name="parentCategory">

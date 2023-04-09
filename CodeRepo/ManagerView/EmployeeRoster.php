@@ -249,6 +249,8 @@ you'll be routed to whatever the home page is for your specified role level -->
                         elements[i].addEventListener('pointerup', pointerUp);
                     }
                 }
+
+                setTitle("CentRes POS: Management Tools - Employee Roster", "Management Tools");
             }
 
             //Place your other JavaScript Code here

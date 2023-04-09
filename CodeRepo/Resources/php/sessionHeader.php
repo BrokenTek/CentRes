@@ -99,6 +99,7 @@
     
         <div id="sessionHeader">
             <img src="../Resources/Images/centresLogo.png" id="lgoSession" width=50 height=50>
+            <div id="sessionBarTitle"></div>
             <div id="sessionDetails">' .$GLOBALS['username']. '</div>');
 
     if (($GLOBALS['role'] & 8) == 8) {

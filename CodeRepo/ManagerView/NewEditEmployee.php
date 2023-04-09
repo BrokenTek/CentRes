@@ -110,7 +110,9 @@ you'll be routed to whatever the home page is for your specified role level -->
                 }
                 document.getElementById("btnBack").addEventListener('pointerdown', function(){
                     window.location.href="EmployeeRoster.php";
-                })
+                });
+
+                setTitle("CentRes POS: Management Tools - Employee Roster Editor", "Management Tools");
             }
 
 

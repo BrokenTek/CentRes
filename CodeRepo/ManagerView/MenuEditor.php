@@ -54,13 +54,13 @@ you'll be routed to whatever the home page is for your specified role level -->
 
                 mnu.contentDocument.addEventListener("click", menuUpdated);
                 mnuEditor.addEventListener("load", editorRefreshed);
-                
+                setTitle("CentRes POS: Management Tools - Menu Editor", "Management Tools");
             }
 
             function editorRefreshed(event) {
                 ignoreUpdate = true;
                 if (varGet("updated", "ifrMenuEditor") != null) {
-                    varCpyRen("lookAt", "ifrMenu", "focusedMenuObject", "ifrMenu");
+                    varCpyRen("lookAt", "ifrMenuEditor", "updated", "ifrMenu");
                     updateDisplay("ifrMenu");
                     setTimeout(() => {
                         mnu.contentDocument.addEventListener("click", menuUpdated);

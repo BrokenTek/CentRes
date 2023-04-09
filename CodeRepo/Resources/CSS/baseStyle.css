@@ -17,7 +17,7 @@ body {
     background-image: linear-gradient(black, #333, black);
     
     color: white;
-    grid-template-areas: "logo . viewText cboViewer . sessionDetails managementNavigation btnLogout";
+    grid-template-areas: "logo title viewText cboViewer . sessionDetails managementNavigation btnLogout";
     grid-template-columns: min-content 1fr min-content min-content 1fr min-content min-content min-content;
     grid-template-rows: min-content;
     font-weight: bold;
@@ -25,6 +25,15 @@ body {
     top: 0;
     width: 100%;
     */
+  }
+
+  #sessionBarTitle {
+    grid-area: title;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-block: auto;
+    margin-left: 1.5rem;
+    color: white;
   }
 
   #sessionForm {

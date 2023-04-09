@@ -4,7 +4,7 @@
         $sql = "SELECT * FROM ActiveTicketGroups WHERE route = '" .$_POST['route']. "' ORDER BY TimeCreated";
     }
     else {
-        $sql = "SELECT * FROM ActiveTicketGroups ORDER BY TimeCreated";
+        $sql = "SELECT * FROM ActiveTicketGroups where 0 = 1";
     }
     $result = connection()->query($sql);
     if (isset($_POST['addedGroups']) || isset($_POST['removedGroups']) || isset($_POST['updatedGroups'])) {

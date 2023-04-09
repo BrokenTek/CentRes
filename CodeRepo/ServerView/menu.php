@@ -2,6 +2,7 @@
 Otherwise will reroute to logon page -->
 <?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(255, $GLOBALS['role']); ?>
 <?php require_once '../Resources/php/currencyPrinter.php'; ?>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -29,8 +30,41 @@ Otherwise will reroute to logon page -->
 					event.stopPropagation();
 					varRem("selectedMenuItem");
 					varSet("selectedMenuCategory", this.id);
-					
+					this.toggleAttribute("open");
+					let openDetails = document.querySelectorAll('details[open=""'); 
+					if (openDetails.length == 0) {
+						varRem("openDetails");
+					}
+					else if (openDetails.length == 1) {
+						varSet("openDetails", openDetails[0].id);
+					}
+					else {
+						let str = openDetails[0].id;
+						for (let i = 1; i < openDetails.length; i++) {
+							str += "," + openDetails[i].id;
+						}
+						varSet("openDetails", str);
+					}
+					this.toggleAttribute("open");
 				};
+
+				var openDetails = varGet("openDetails");
+				if (openDetails !== undefined) {
+					newDetails = ""
+					openDetails = openDetails.split(",");
+					for (let i = 0; i < openDetails.length; i++) {
+						if (document.querySelector("#" + openDetails[i]) != null) {
+							document.getElementById(openDetails[i]).setAttribute("open", "");
+							newDetails += "," + openDetails[i];
+						}
+					}
+					if (newDetails == "") {
+						varRem("openDetails");
+					}
+					else {
+						varSet("openDetails", newDetails.substring(1));
+					}
+				}
 
 				var elements = document.getElementsByClassName("menuCategory");
 				if (elements != null) {
@@ -44,17 +78,20 @@ Otherwise will reroute to logon page -->
 					varRem("selectedMenuItem");
 				};
 
-				document.getElementsByTagName("body")[0].addEventListener('pointerDown', clearSelectedVars);
+				let x = varGet("scrollX");
+                let y = varGet("scrollY");
+                if (x !== undefined) {
+                    window.scroll({
+                    top: y,
+                    left: x,
+                    behavior: "smooth",
+                    });
+                }
 
-				if (varGet("focusedMenuObject") != null) {
-					let lookAt = document.querySelector("#" + varGet("focusedMenuObject"));
-					if (lookAt != null) {
-						while (lookAt != null) {
-							lookAt.setAttribute("open", "");
-							lookAt = lookAt.parentElement;
-						}
-					}
-				}
+                window.addEventListener('scroll', function(event) {
+                    varSet("scrollX", window.scrollX);
+                    varSet("scrollY", window.scrollY);
+                }, true);
 
 
 			}
@@ -65,7 +102,7 @@ Otherwise will reroute to logon page -->
 		</script>
 	</head>
 	<body>
-		<form>
+		<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
 <?php 
 require_once '../Resources/php/connect_disconnect.php';
 
@@ -84,8 +121,14 @@ if ($result->num_rows > 0) {
 
 
 	function printMenuCategory(string $qc, string $title) {
-
-		echo "<details id='". $qc ."' class='menuCategory'>
+		$classList = "menuCategory";
+		if (isset($_POST['updated']) && $qc == $_POST['updated']) {
+			$classList .= " updated";
+		}
+		if (isset($_POST['selected']) && $qc == $_POST['selected']) {
+			$classList .= " selected";
+		}
+		echo "<details id='". $qc ."' class='$classList'>
 			<summary>". $title ."</summary>";
 
 		$sql = "SELECT childQuickCode, title, visible 
@@ -127,10 +170,19 @@ if ($result->num_rows > 0) {
 
 		// ** NEEDS TO HAVE THE DATA ATTRIBUTE PASSED INTO 'PRICE' BE THE CALCULATED PRICE^ AND CALCULATED MODS STR (COMMA DELIMINATED) **
 		// GOING TO NEED TO REVISIT FOR THE DATA-MODS ATTR (X)
-		echo "<span id='".$qc."' class='menuItem menuItemTitle' data-text='".$title."' data-price='".$price."' data-mods='X'><span class='menuItemPrice'>". currencyPrint($price) ."</span><span class='menuItemTitle'>".$title."</span>";
+		$classList = "menuItem menuTitleItem";
+		if (isset($_POST['updated']) && $qc == $_POST['updated']) {
+			$classList .= " updated";
+		}
+		if (isset($_POST['selected']) && $qc == $_POST['selected']) {
+			$classList .= " selected";
+		}
+		echo "<span id='".$qc."' class='$classList' data-text='".$title."' data-price='".$price."' data-mods='X'><span class='menuItemPrice'>". currencyPrint($price) ."</span><span class='menuItemTitle'>".$title."</span>";
 		echo "</span>";
 
 	}
+
+	unset($_POST['updated']);
 	require_once "../Resources/php/display.php";
 ?>
 </form>

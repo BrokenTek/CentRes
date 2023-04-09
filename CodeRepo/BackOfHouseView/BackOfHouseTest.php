@@ -44,6 +44,7 @@ you'll be routed to whatever the home page is for your specified role level -->
         <script>
             function allElementsLoaded() {
                 varCpy("route", null, "ifrTGC", true);
+                setTitle("CentRes POS: Terminal Window", "Terminal Window: Viewing Route " + varGet("route"));
                 eventLoop();
             }
             

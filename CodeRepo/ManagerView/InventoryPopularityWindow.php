@@ -283,6 +283,8 @@
                     }, true);   
                 }
 
+                setTitle("CentRes POS: Management Tools - Inventory and Popularity Window", "Management Tools");
+
                 setTimeout(updateDisplay, 30000);
             }
 

@@ -25,11 +25,6 @@ details > .menuItem {
 	background-color: #8EA9DB;
 }
 
-
-
-
-
-
 summary {
 	
 	font-weight: bold;
@@ -52,3 +47,16 @@ details > summary > details {
 	border-top: 3px solid black;
 }
 
+.selected {
+	border: .5rem solid black;
+}
+
+.updated, updated * {
+	animation: updateFlash .5s ease-in-out 2 backwards;
+}
+
+@keyframes updateFlash {
+	0% { background-color: revert; color: revert;}
+	50% { background-color: #000; color: #fff;}
+	100% { background-color: revert; color: revert;}
+  }

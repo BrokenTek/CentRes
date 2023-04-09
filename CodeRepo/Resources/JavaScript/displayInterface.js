@@ -370,3 +370,20 @@ function coerce(data) {
     }
     return data;
 }
+
+function setTitle(title, sessionBarTitle) {
+    let titleTag = document.getElementsByTagName("title");
+    if (titleTag.length == 0) {
+        titleTag = document.createElement('title');
+        document.querySelector("head").appendChild(titleTag);    
+    }
+    else {
+        titleTag = titleTag[0];
+    }
+    titleTag.innerText = title;
+
+    let sessionBarTitleDiv = document.querySelector("#sessionBarTitle");
+    if (sessionBarTitleDiv != null) {
+        sessionBarTitleDiv.innerHTML = sessionBarTitle;
+    }
+}
