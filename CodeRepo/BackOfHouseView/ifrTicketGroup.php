@@ -33,7 +33,23 @@
                     }
                     //document.getElementById("btnClose").addEventListener("pointerdown", setClosed);
                 }
+                let x = varGet("scrollX");
+                let y = varGet("scrollY");
+                if (x !== undefined) {
+                    window.scroll({
+                    top: y,
+                    left: x,
+                    behavior: "smooth",
+                    });
+                }
+
+        window.addEventListener('scroll', function(event) {
+            varSet("scrollX", window.scrollX);
+            varSet("scrollY", window.scrollY);
+        }, true);
             }
+
+            
 
             function setClosed(event) {
                 varRen('completeAndCloseable', 'closeMe');
