@@ -109,12 +109,16 @@
                             //iterate through each pair of modification values.
                             for($i=0; ($i + 1)<$modLength; $i+=2){
                                 echo("<ul>");
-                                $sql = "SELECT title, selfDescriptive FROM MenuModificationCategories WHERE quickCode = ".$modList[$i].";";
-                                $mod = connection()->query($sql)->fetch_assoc();
+                                $sql = "SELECT title, selfDescriptive FROM MenuModificationCategories WHERE quickCode = ?;";
+                                $sql = connection()->prepare($sql);
+                                $sql->bind_param("s",$modlist[$i]);
+                                $sql->execute();
+                                $result = $sql->get_result();
+                                $mod = $result->fetch_assoc();
                                 if(!$mod['selfDescriptive']){
                                     echo($mod['title']);
                                 }
-                                echo($modList[i + 1]);
+                                echo($modList[$i + 1]);
                                 echo("</ul>");
                             }
                             //append the last odd note, which should be a custom one for instructions or whatever, to the list of modifications
