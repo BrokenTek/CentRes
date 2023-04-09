@@ -44,7 +44,7 @@
                             MenuItems.route AS 'route',
                             MenuAssociations.parentQuickCode AS 'parent'
                     FROM (MenuItems LEFT JOIN MenuAssociations ON MenuItems.quickCode = MenuAssociations.childQuickCode)
-                    WHERE quickCode = '".$_POST['quickCode']."' ORDER BY id DESC LIMIT 1;";
+                    WHERE quickCode = '".$_POST['quickCode']."' ORDER BY counter DESC LIMIT 1;";
             $fieldData = connection()->query($sql)->fetch_assoc();
             
             //just in case the quickCode persists after a deletion, these statements are wrapped in a condition
@@ -243,7 +243,7 @@
                                 document.querySelector("#btnReset").click();
                             }
                             else if (event.keyCode == 77) { // CTRL + M >>>>> Go to mod editor window.
-                                redirect("MenuModificationEditor.php");
+                                //redirect("MenuModificationEditor.php");
                             }
                         }
                 }       
@@ -285,7 +285,7 @@
                 <div id="menuEditorNavBar">
                     <button id="btnMenuCategoryEditor" type="button" class="button menuNavButton">New Category</button>
                     <button id="btnMenuItemEditor" type="button" class="button menuNavButton">New Item</button>
-                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton">Mods Editor</button>
+                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton" style="display: none;">Mods Editor</button>
                 </div>
                 <fieldset>
                     <legend>Menu&nbsp;Item&nbsp;Editor</legend>

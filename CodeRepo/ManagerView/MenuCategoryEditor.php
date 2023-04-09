@@ -41,7 +41,7 @@
         if(isset($_POST['quickCode'])&&!isset($_POST['menuTitle'])){
             $sql = "SELECT MenuCategories.title AS 'categoryTitle', MenuAssociations.parentQuickCode AS 'parent'
                     FROM (MenuCategories LEFT JOIN MenuAssociations ON MenuCategories.quickCode = MenuAssociations.childQuickCode)
-                    WHERE quickCode = '".$_POST['quickCode']."' ORDER BY id DESC LIMIT 1;";
+                    WHERE quickCode = '".$_POST['quickCode']."' ORDER BY counter DESC LIMIT 1;";
             $fieldData = connection()->query($sql)->fetch_assoc();
             //just in case the quickCode persists after a deletion, these statements are wrapped in a condition
             //to prevent unwanted warnings from showing up. Note to self: unwrap this if you account for this.
@@ -283,7 +283,7 @@
                                 redirect("MenuCategoryEditor.php", "!" + document.querySelector("#selParentCategory").value);
                             }
                             else if (event.keyCode == 77 && shiftDown) { // CTRL + M >>>>> Go to mod editor window.
-                                redirect("MenuModificationEditor.php");
+                                //redirect("MenuModificationEditor.php");
                             }
                             
                         }
@@ -327,7 +327,7 @@
                 <div id="menuEditorNavBar">
                     <button id="btnMenuCategoryEditor" type="button" class="button menuNavButton">New Category</button>
                     <button id="btnMenuItemEditor" type="button" class="button menuNavButton">New Item</button>
-                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton">Mods Editor</button>
+                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton" style="display: none;">Mods Editor</button>
                 </div>
                 <fieldset>
                     <legend>Menu&nbsp;Category&nbsp;Editor</legend>
