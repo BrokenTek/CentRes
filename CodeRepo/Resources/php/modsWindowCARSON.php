@@ -32,16 +32,6 @@ Otherwise will reroute to logon page -->
             //     var form = document.getElementById('modWindowId');
             // }
 
-            // Possible circumvention for input data discovery before Submit. Not Used.
-            function varSetMod(varName, varValue) {
-                var form = document.getElementById("modWindowId");
-                var input = document.createElement("input");
-                input.setAttribute("type", "hidden");
-                input.setAttribute("name", varName);
-                input.setAttribute("value", varValue);
-                form.appendChild(input);
-            }
-
             function addSuffixs() {    
                 
                 // Get the form element
@@ -86,8 +76,50 @@ Otherwise will reroute to logon page -->
                         }  
                     }
                 });
+
+                // Create newModValue string
+                form.addEventListener("pointerdown", function(event) {
+                    if (event.target.id === 'submitBtn') {
+                        var newModValue = "";
+
+                        // Get all the checked checkboxes
+                        var checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+
+                        // Loop through the checked checkboxes
+                        for (var i = 0; i < checkedBoxes.length; i++) {
+                            // Get the parent div of the checkbox
+                            var parentDiv = checkedBoxes[i].parentNode;
+
+                            // Get the select element
+                            var select = parentDiv.querySelector('select');
+
+                            // Get the value of the select element
+                            var selectValue = select.value;
+
+                            // Get the value of the checkbox
+                            var checkboxValue = checkedBoxes[i].value;
+
+                            // Append the checkbox value and select value to the newModValue string
+                            newModValue += checkboxValue + "," + selectValue + ",";
+                        }
+
+                        if (document.getElementById('txtModString').value != "") {
+                            var customModNote = document.getElementById('txtModString');
+                            newModValue += customModNote.value;
+                        }
+
+                        else {
+                            newModValue = newModValue.slice(0, -1);
+                        }
+
+                        varSet("newModValue", newModValue);
+
+                        // Click the submit button (end of function)
+                        document.getElementById('postSubmitBtn').click();
+                    }
+                });
+
             }
-              
         </script>
     </head>
     <body onload="addSuffixs()">
@@ -107,43 +139,43 @@ Otherwise will reroute to logon page -->
                     if (isset($_POST['newModValue'])) {
 
                         //===================================================================================================   (Setting the newModValue)
-                        if (isset($_POST['newModChosen[]']) && isset($_POST['newModSuffix[]'])) {
-                            $newModChosenArray = $_POST['newModChosen[]'];
-                            $newModSuffixArray = $_POST['newModSuffix[]'];
-                            $newModValue = "";
-
-                            for ($i = 0; $i < count($newModChosenArray); $i++) {
-                                $newModValue .= strval($newModChosenArray[$i]) . "," . strval($newModSuffixArray[$i]) . ",";
-                            }
-                            if (isset($_POST['newModNote'])) {
-                                // $newModValue .= str_replace(',', '_', $_POST['newModNote']);
-                                $newModValue .= $_POST['newModNote'];
-                            } 
-                            
-                            echo("<script>");
-                            echo("varSet('. $newModValue .', ' . $newModValue . ');");
-                            echo("</script>");
-                        }
-
-                        // FOR IF ITEM IS MANDATORY OR DOES NOT NEED A SUFFIX
-                        // else if (isset($_POST['newModChosen[]']) && !isset($_POST['newModSuffix[]'])) {
+                        // if (isset($_POST['newModChosen[]']) && isset($_POST['newModSuffix[]'])) {
                         //     $newModChosenArray = $_POST['newModChosen[]'];
+                        //     $newModSuffixArray = $_POST['newModSuffix[]'];
                         //     $newModValue = "";
 
                         //     for ($i = 0; $i < count($newModChosenArray); $i++) {
-                        //         $newModValue .= strval($newModChosenArray[$i]) . ",";
+                        //         $newModValue .= strval($newModChosenArray[$i]) . "," . strval($newModSuffixArray[$i]) . ",";
                         //     }
                         //     if (isset($_POST['newModNote'])) {
                         //         // $newModValue .= str_replace(',', '_', $_POST['newModNote']);
                         //         $newModValue .= $_POST['newModNote'];
-                        //     }
+                        //     } 
+                            
+                        //     echo("<script>");
+                        //     echo("varSet('. $newModValue .', ' . $newModValue . ');");
+                        //     echo("</script>");
                         // }
 
-                        // TEMPORARY DEBUG
-                        else {
-                            $newModValue = "None";
-                            echo("<h1>ERRRRROR DUBUIG</h1>");
-                        }
+                        // // FOR IF ITEM IS MANDATORY OR DOES NOT NEED A SUFFIX
+                        // // else if (isset($_POST['newModChosen[]']) && !isset($_POST['newModSuffix[]'])) {
+                        // //     $newModChosenArray = $_POST['newModChosen[]'];
+                        // //     $newModValue = "";
+
+                        // //     for ($i = 0; $i < count($newModChosenArray); $i++) {
+                        // //         $newModValue .= strval($newModChosenArray[$i]) . ",";
+                        // //     }
+                        // //     if (isset($_POST['newModNote'])) {
+                        // //         // $newModValue .= str_replace(',', '_', $_POST['newModNote']);
+                        // //         $newModValue .= $_POST['newModNote'];
+                        // //     }
+                        // // }
+
+                        // // TEMPORARY DEBUG
+                        // else {
+                        //     $newModValue = "None";
+                        //     echo("<h1>ERRRRROR DUBUIG</h1>");
+                        // }
 
 
 
@@ -292,15 +324,6 @@ Otherwise will reroute to logon page -->
                                                                
                             }
 
-                            // echo("<fieldSet id='chooseSuffix'>");
-                            // echo("<legend style='font-size: 75%; color: grey;'>Choose Suffix</legend>");
-                            // echo("</fieldSet>");
-                            // echo("<select name='prefixMod' id='prefixMod'>");
-                            // echo("<option value='Add'>Add</option>");
-                            // echo("<option value='None'>None</option>");
-                            // echo("<option value='Xtra'>Xtra</option>");
-                            // echo("<option value='Lite'>Lite</option>");
-                            // echo("</select>");
                         }
 
                             
@@ -313,7 +336,8 @@ Otherwise will reroute to logon page -->
                         // Custom mod note name changed from newModValue -> newModNote
                         echo("<label for='txtModString'>Mod String w/ commas</label>
                         <input type='text' id='txtModString' name='newModNote'>    
-                        <input class='submitBtn' type='submit' value='Update Mods'>
+                        <button id='submitBtn' type='button'>Update Mods</button> 
+                        <input id='postSubmitBtn' type='submit' value='Update Mods' style='display: none;' >
                         <button type='button' onpointerdown='signalStatus(" .'"await"'. ")'>Cancel Update</button>");
                         //===================================================================================================
                     }

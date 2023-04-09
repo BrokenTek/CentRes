@@ -74,7 +74,7 @@ body {
     
   }
 
-  button, .button, .submitBtn {
+  button, .button, #submitBtn {
     background-color: #F6941D;
     color: white;
     font-weight: bold;
