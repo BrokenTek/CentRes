@@ -76,9 +76,6 @@
     z-index: 1;
     background-color: #FFE699;
     margin-inline: 0;
-
-    overflow-x: hidden;
-    overflow-y: auto;
 }
 #descriptors:nth-child(odd) {
     font-weight: bold;
@@ -92,6 +89,8 @@
     max-width: 10.95rem;
     overflow-y: auto;
     background-color: #FFE699;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 #btnClose {
