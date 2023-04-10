@@ -29,7 +29,7 @@ you'll be routed to whatever the home page is for your specified role level -->
                 background-color: transparent;
                 height: 100%;
             }
-            iframe {
+            .activeTicketGroup {
                 height: 45vh;
                 width: 15rem;
                 background-color: transparent;

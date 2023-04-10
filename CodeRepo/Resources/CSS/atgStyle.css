@@ -39,6 +39,7 @@
  .ticketItemText {
     padding-left: 2rem;
  }
+ 
 
  
 
@@ -53,6 +54,12 @@
     right: 0;
     padding: 1rem;
     animation: intro .6s ease-in-out 1 backwards;
+
+    
+}
+
+body {
+    overflow-x: hidden;
 }
 
 @keyframes updateFlash {
@@ -89,8 +96,7 @@
     max-width: 10.95rem;
     overflow-y: auto;
     background-color: #FFE699;
-    overflow-x: hidden;
-    overflow-y: auto;
+    
 }
 
 #btnClose {
