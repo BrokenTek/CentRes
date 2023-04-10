@@ -16,6 +16,9 @@
  .ticketItemText {
     padding-left: 2rem;
  }
+ .modText, .modCustom {
+   padding-left: 3rem;
+ }
 
  .disabled {
     background-color: #777;

@@ -558,11 +558,11 @@ Otherwise will reroute to logon page -->
                               
                                 if ($modItem['priceOrModificationValue'] < 0) {
                                     // discount applied
-                                    echo($modItem['priceOrModificationValue']);
+                                    echo(currencyPrint($modItem['priceOrModificationValue']));
                                 }
                                 elseif ( $modItem['priceOrModificationValue'] >= 1 ) {
                                      // price set to a value
-                                     echo($modItem['priceOrModificationValue']);
+                                     echo(currencyPrint($modItem['priceOrModificationValue']));
                                 }
                                 elseif ( $modItem['priceOrModificationValue'] == 0 ) {
                                     // free
