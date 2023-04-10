@@ -37,10 +37,10 @@
                     });
                 }
 
-        window.addEventListener('scroll', function(event) {
-            varSet("scrollX", window.scrollX);
-            varSet("scrollY", window.scrollY);
-        }, true);
+                window.addEventListener('scroll', function(event) {
+                    varSet("scrollX", window.scrollX);
+                    varSet("scrollY", window.scrollY);
+                }, true);
             }
 
             
