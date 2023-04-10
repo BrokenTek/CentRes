@@ -20,8 +20,10 @@
 .ticketItem {
     margin: auto auto auto auto;
     font-size: 1.25rem;
-    border: 2px solid #FFF;
+    border-block: 2px solid #FFF;
     min-height: 4rem;
+    min-width: 10.95rem;
+    max-width: 10.95rem;
  }
  .ticketItem > ul {
     font-size: .9rem;
@@ -44,8 +46,8 @@
 
 #frmATG {
     font-family: helvetica;
-    background-color: #FFE699;
-    position: absolute;
+    background-color: transparent;
+    position: relative;
     left: 1rem;
     top: 1rem;
     right: 0;
@@ -53,29 +55,43 @@
     animation: intro .6s ease-in-out 1 backwards;
 }
 
-@keyframes intro {
-    0% { transform: scale(1); opacity:91%;}
-    70% { transform: scale(.9); opacity:91%;}
-    90% { transform: scale(.95); opacity:97%;}
-    100% { transform: scale(1); opacity:100%;}
+@keyframes updateFlash {
+	0% { background-color: #FFE699; color: revert;}
+	50% { background-color: #000; color: #fff;}
+	100% { background-color: #FFE699; color: revert;}
   }
 
-#sessionForm{
-    width: 5rem;
-}
 #descriptors{
-    grid-area:descriptors;
     display:grid;
     grid-template-columns: max-content max-content;
     grid-auto-rows: min-content;
     grid-column-gap: 1rem;
+    
+    animation: updateFlash 1s ease-in-out 1 backwards;
+    position: fixed;
+    top: 1rem;
+    left: 1.5rem;
+    min-width: 10.95rem;
+    max-width: 10.95rem;
+    z-index: 1;
+    background-color: #FFE699;
+    margin-inline: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 #descriptors:nth-child(odd) {
     font-weight: bold;
     margin-left: auto;
 }
 .ticketItems{
-    grid-area:ticketItems;
+    position: relative;
+    top: 3.5rem;
+    left: -1rem;
+    min-width: 10.95rem;
+    max-width: 10.95rem;
+    overflow-y: auto;
+    background-color: #FFE699;
 }
 
 #btnClose {
@@ -92,4 +108,3 @@ button, .button {
     min-height: 2rem;
     
   }
-

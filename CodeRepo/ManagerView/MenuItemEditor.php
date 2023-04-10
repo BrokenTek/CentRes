@@ -65,10 +65,15 @@
                 $sql->bind_param('ssds', $_POST['menuTitle'], $_POST['route'], $_POST['price'], $_POST['quickCode']);
                 $sql->execute();
 
-                $sql = "UPDATE MenuAssociations SET parentQuickCode = ? WHERE childQuickCode = ?;";  
-                $sql = connection()->prepare($sql);
-                $sql->bind_param('ss', $_POST['parentCategory'], $_POST['quickCode']);
-                $sql->execute();
+                try {
+                    $sql = "UPDATE MenuAssociations SET parentQuickCode = ? WHERE childQuickCode = ?;";  
+                    $sql = connection()->prepare($sql);
+                    $sql->bind_param('ss', $_POST['parentCategory'], $_POST['quickCode']);
+                    $sql->execute();
+                }
+                catch (Exception $ex) {
+                    
+                }
 
                 $message = "Menu Item updated.";
                 $_POST['lookAt'] = $_POST['quickCode'];

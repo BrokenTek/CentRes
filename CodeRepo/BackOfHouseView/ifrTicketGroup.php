@@ -3,12 +3,6 @@
 <html>
     <head>
         <link rel="stylesheet" href="../Resources/CSS/atgStyle.css">
-        <style>
-            
-            
-
-
-        </style>
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
         <script>
             
