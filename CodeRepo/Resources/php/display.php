@@ -10,7 +10,10 @@ foreach($_POST as $key => $value)
     $value = str_replace("#", "", $value);
     $value = str_replace(";", "", $value);
     $value = str_replace("'", "\'", $value);
-    echo("<input type='hidden' class='variable' id=" .$key. " name='" .$key. "' value='" .$value. "' style:'display: none;'>");
+
+    echo("<input type='hidden' class='variable' id=" .$key. " name='" .$key. "' value='".
+        (is_array($value) ? implode($value) : $value)
+        ."' style:'display: none;'>");
 }
 echo("<input type='submit' style='display: none;' id='btnSubmit'>");
 

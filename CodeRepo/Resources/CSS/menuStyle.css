@@ -47,10 +47,6 @@ details > summary > details {
 	border-top: 3px solid black;
 }
 
-.selected {
-	border: .5rem solid black;
-}
-
 .updated, updated * {
 	animation: updateFlash .5s ease-in-out 2 backwards;
 }
