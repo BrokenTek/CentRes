@@ -13,6 +13,8 @@ DROP TABLE IF EXISTS MenuModificationItems;
 DROP TABLE IF EXISTS MenuModificationCategories;
 DROP TABLE IF EXISTS MenuItems;
 DROP TABLE IF EXISTS MenuCategories;
+DROP TABLE IF EXISTS ModActions;
+DROP TABLE IF EXISTS ModActionCategories;
 DROP TABLE IF EXISTS QuickCodes;
 DROP TABLE IF EXISTS ActiveEmployees;
 DROP TABLE IF EXISTS EmployeeLog;
@@ -83,13 +85,13 @@ CREATE TABLE ActiveEmployees (
 );
 
 CREATE TABLE QuickCodes (
-	id VARCHAR(40) PRIMARY KEY
+	id VARCHAR(4) PRIMARY KEY
 );
 INSERT INTO QuickCodes VALUES('root');
 
 
 CREATE TABLE MenuCategories (
-	quickCode VARCHAR(40) PRIMARY KEY,
+	quickCode VARCHAR(4) PRIMARY KEY,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	title VARCHAR(75) NOT NULL,
 	description VARCHAR(1000),
@@ -101,7 +103,7 @@ CREATE TABLE MenuCategories (
 );
 
 CREATE TABLE MenuItems (
-	quickCode VARCHAR(40) PRIMARY KEY,
+	quickCode VARCHAR(4) PRIMARY KEY,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	title VARCHAR(75) NOT NULL,
 	description varchar(1000),
@@ -116,7 +118,7 @@ CREATE TABLE MenuItems (
 );
 
 CREATE TABLE MenuModificationCategories (
-	quickCode VARCHAR(40) PRIMARY KEY,
+	quickCode VARCHAR(4) PRIMARY KEY,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	title VARCHAR(75) NOT NULL,
 	description VARCHAR(1000),
@@ -130,7 +132,7 @@ CREATE TABLE MenuModificationCategories (
 );
 
 CREATE TABLE MenuModificationItems (
-	quickCode VARCHAR(40) PRIMARY KEY,
+	quickCode VARCHAR(4) PRIMARY KEY,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	title VARCHAR(75) NOT NULL,
 	description varchar(1000),
@@ -142,8 +144,8 @@ CREATE TABLE MenuModificationItems (
 );
 
 CREATE TABLE MenuAssociations (
-	parentQuickCode VARCHAR(40),
-	childQuickCode VARCHAR(40),
+	parentQuickCode VARCHAR(4),
+	childQuickCode VARCHAR(4),
 	displayIndex SMALLINT UNSIGNED,
 	UNIQUE(parentQuickCode, childQuickCode)
 );
@@ -272,4 +274,16 @@ CREATE TABLE ActiveTicketGroups (
 	timeCreated DATETIME NOT NULL DEFAULT NOW(),
 	updateCounter SMALLINT NOT NULL DEFAULT 0,
 	route char(1)
+);
+
+CREATE TABLE ModActionCategories (
+	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
+	quickCode VARCHAR(4) PRIMARY KEY,	
+	title VARCHAR(75) NOT NULL
+);
+
+CREATE TABLE ModActions (
+	title VARCHAR(75) NOT NULL,
+	multiplier TINYINT NOT NULL DEFAULT 0,
+	modActionCategory VARCHAR(4) NOT NULL
 );

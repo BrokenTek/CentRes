@@ -425,7 +425,7 @@
             function checkMenuItemSelected() {
                 if (varXfrRen("selectedMenuItem", "menuContainer", "menuItem", "ticketContainer")) {
                     varSet('command', 'add', 'ticketContainer');
-                    varSet('scrollY', Number.MAX_SAFE_INTEGER , 'ticketContainer');
+                    varSet('scrollY', Number.MAX_SAFE_INTEGER, 'ticketContainer');
                     varSet("ignoreUpdate", "Yes please" ,"ticketContainer");
                     showTicketContainer();
                     updateDisplay("ticketContainer");

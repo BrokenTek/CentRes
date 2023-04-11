@@ -10,7 +10,7 @@
     try {
         require_once '../Resources/php/connect_disconnect.php';
         require_once '../Resources/php/sessionLogic.php';
-        // restrictAccess(8, $GLOBALS['role']);
+        restrictAccess(8, $GLOBALS['role']);
     }
     catch (Exception $e) {
         die($e);

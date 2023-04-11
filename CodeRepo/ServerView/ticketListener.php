@@ -54,7 +54,8 @@
                 } 
                 else {
                     unset($_POST['modificationTime']);
-                }              
+                } 
+                disconnect();             
             ?>
         </form>
     </body>
