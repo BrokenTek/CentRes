@@ -92,7 +92,7 @@
                 updateDisplay("tableStatusListener");
             }
             try {
-                if (varGet("updatedTables", "tableStatusListener") !== undefined) {
+                if (varExists("updatedTables", "tableStatusListener")) {
                     updateTableStatuses();
                 }
             }
@@ -148,7 +148,7 @@
                 clearSelectedTables(this.id);
                 return;
             }
-            else if (varGet("authorizationId") !== undefined && this.classList.contains("seated")) {
+            else if (varExists("authorizationId") && this.classList.contains("seated")) {
                 targetTable = this;
                 doubleTouchTimer = setTimeout(() => {
                     targetTable = null;

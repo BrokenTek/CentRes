@@ -75,7 +75,7 @@
 			var eventLoopTimer;
 			function eventLoop() {
 				try {
-					if (verifyAuthProcessed && varGet("authorizationId", "ifrRestaurantLayout") === undefined) {
+					if (verifyAuthProcessed && !varExists("authorizationId", "ifrRestaurantLayout")) {
 						setTimeout(eventLoop, 250);
 					}
 					verifyAuthProcessed = false;

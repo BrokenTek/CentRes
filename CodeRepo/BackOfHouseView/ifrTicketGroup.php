@@ -13,7 +13,7 @@
             }
            
             function allElementsLoaded(){
-                if(varGet('groupId') !== undefined){
+                if(varExists('groupId')){
                     varCpyRen("groupId", null,"activeGroupId","activeTicketGroupConnector");
                     
                     let ticketItemElements = document.getElementsByName("ticketItem");

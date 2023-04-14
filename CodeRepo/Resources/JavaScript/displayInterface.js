@@ -1,5 +1,8 @@
+window.varExists = function(variableName, childIframeId = null) {
+    return !varGet(variableName, childIframeId) === undefined;
+}
 
-function varSet(variableName, value, childIframeId = null, update = false, bypassValidationCheck = false) {
+window.varSet = function(variableName, value, childIframeId = null, update = false, bypassValidationCheck = false) {
     value = coerce(value);
     if (value === undefined) {
         if (coerce(varGet(variableName, childIframeId)) === undefined) {
@@ -55,7 +58,7 @@ function varSet(variableName, value, childIframeId = null, update = false, bypas
     return true;
 }
 
-function varGet(variableName, childIframeId = null) {
+window.varGet = function(variableName, childIframeId = null) {
     var container = document.getElementById(childIframeId);
     var form;
     var variableElement;
@@ -82,7 +85,7 @@ function varGet(variableName, childIframeId = null) {
 
 // get a var. If its defined, remove the var and return its value.
 // If the variable was retrieved, specify you want to update the target display by setting update = true;
-function varGetOnce(variableName, childIframeId = null, update = false, bypassValidationCheck = false) {
+window.varGetOnce = function(variableName, childIframeId = null, update = false, bypassValidationCheck = false) {
     let val = varGet(variableName, childIframeId);
     if (val !== undefined) {
         varRem(variableName, childIframeId);
@@ -95,7 +98,7 @@ function varGetOnce(variableName, childIframeId = null, update = false, bypassVa
 
 
 // returns false if variable doesn't exist
-function varRem(variableName, childIframeId = null, update = false, bypassValidationCheck = false) {
+window.varRem = function(variableName, childIframeId = null, update = false, bypassValidationCheck = false) {
     var container = document.getElementById(childIframeId);
     var form;
     var variableElement;
@@ -127,7 +130,7 @@ function varRem(variableName, childIframeId = null, update = false, bypassValida
     return true;
 }
 
-function varRen(oldVarName, newVarName, childIframeId = null, update = false, bypassValidationCheck = false) {
+window.varRen = function(oldVarName, newVarName, childIframeId = null, update = false, bypassValidationCheck = false) {
     if (varGet(newVarName, childIframeId) !== undefined) {
         return false;
     }
@@ -165,7 +168,7 @@ function varRen(oldVarName, newVarName, childIframeId = null, update = false, by
 // aka deleting it at the destination, set allowUndefinedVariables = true
 // If you need to update the destination if a variable is copied, set updateDestination to true.
 // NOTE: variable does not get copied if the value at the source and destination are the same.
-function varCpy(variableName, source = null, destination = null, updateDestination = false, allowUndefinedVariables = false, bypassValidationCheck) {
+window.varCpy = function(variableName, source = null, destination = null, updateDestination = false, allowUndefinedVariables = false, bypassValidationCheck) {
     let val = coerce(varGet(variableName, source));
     let val2 = coerce(varGet(variableName, destination));
     if (val === val2 || (val === undefined && !allowUndefinedVariables)) {    
@@ -179,7 +182,7 @@ function varCpy(variableName, source = null, destination = null, updateDestinati
 
 
 // see varCpy function commment. Additionally allows to specify a different destination variable name with destinationVariableName
-function varCpyRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateDestination, allowUndefinedVariables = false, bypassValidationCheck = false) {
+window.varCpyRen = function(sourceVariableName, source = null, destinationVariableName, destination = null, updateDestination, allowUndefinedVariables = false, bypassValidationCheck = false) {
     let val = coerce(varGet(sourceVariableName, source));
     let val2 = coerce(varGet(destinationVariableName, destination));
     if (val === val2 || (val === undefined && !allowUndefinedVariables)) {
@@ -193,7 +196,7 @@ function varCpyRen(sourceVariableName, source = null, destinationVariableName, d
 
 // transfer a variable from source to destination. Specify if you want to update the source and or destination
 // allowUndefinedVariables = true will clear the variable at the destination.
-function varXfr(variableName, source = null, destination = null, updateSource = false, updateDestination = false, allowUndefinedVariables = false, bypassValidationCheck = false) {
+window.varXfr = function(variableName, source = null, destination = null, updateSource = false, updateDestination = false, allowUndefinedVariables = false, bypassValidationCheck = false) {
     if (varCpy(variableName, source, destination, updateDestination, allowUndefinedVariables, bypassValidationCheck)) {
         return varRem(variableName, source, updateSource, bypassValidationCheck);
     }
@@ -202,7 +205,7 @@ function varXfr(variableName, source = null, destination = null, updateSource = 
 
 // transfer a variable from source to destination. Specify if you want to update the source and or destination
 // allowUndefinedVariables = true will clear the variable at the destination.
-function varXfrRen(sourceVariableName, source = null, destinationVariableName, destination = null, updateSource = false, updateDestination = false, allowUndefinedVariables = false, bypassValidationCheck = false) {
+window.varXfrRen = function(sourceVariableName, source = null, destinationVariableName, destination = null, updateSource = false, updateDestination = false, allowUndefinedVariables = false, bypassValidationCheck = false) {
     if (varCpyRen(sourceVariableName, source, destinationVariableName, destination, updateDestination, allowUndefinedVariables, bypassValidationCheck)) {
         return varRem(sourceVariableName, source, updateSource, bypassValidationCheck);
     }
@@ -210,7 +213,7 @@ function varXfrRen(sourceVariableName, source = null, destinationVariableName, d
 }
 
 
-function varClr(childIframeId = null, update = false, bypassValidationCheck = false) {
+window.varClr = function(childIframeId = null, update = false, bypassValidationCheck = false) {
     var container = document.getElementById(childIframeId);
     var form;
     if (childIframeId == null) {
@@ -232,7 +235,7 @@ function varClr(childIframeId = null, update = false, bypassValidationCheck = fa
     }
 }
 
-function updateDisplay(childIframeId = null, bypassValidationCheck = false) {
+window.updateDisplay = function(childIframeId = null, bypassValidationCheck = false) {
     var container = document.getElementById(childIframeId);
     var form;
     var btnSubmit;
@@ -296,7 +299,7 @@ function forgetScrollPosition() {
     varRem("ScrollY", childIframeId);
 }
 
-function toggleSortKey(tableId, columnName, refresh = true) {
+window.toggleSortKey = function(tableId, columnName, refresh = true) {
     if (document.getElementById(tableId) == null) {
         throw("toggleSortKey Error! Table doesn't exist");
     }
@@ -349,7 +352,7 @@ function toggleSortKey(tableId, columnName, refresh = true) {
     }
 }
 
-function clearSortKeys(tableId) {
+window.clearSortKeys = function(tableId) {
     let sortKeyPrefix = tableId + "_SortKey";
     let keyIndex = 1;
     while (true) {
@@ -364,14 +367,14 @@ function clearSortKeys(tableId) {
     }
 }
 
-function coerce(data) {
+window.coerce = function(data) {
     if (data === undefined || data === null || data.length == 0) {
         return undefined;
     }
     return data;
 }
 
-function setTitle(title, sessionBarTitle) {
+window.setTitle = function(title, sessionBarTitle) {
     let titleTag = document.getElementsByTagName("title");
     if (titleTag.length == 0) {
         titleTag = document.createElement('title');
@@ -387,3 +390,43 @@ function setTitle(title, sessionBarTitle) {
         sessionBarTitleDiv.innerHTML = sessionBarTitle;
     }
 }
+
+////////////////////// PASSING JSON EVENT MESSAGES BETWEEN IFRAMES / PARENT //////////////////////
+// JASON Message Format: '{"sessionToken":"SESSION_TOKEN", "eventName":"EVENT_NAME", "eventArguments": {"param1": param1Value, "param2": "param2value"}, iframeId: IFRAMEID }'
+
+
+//when a json event message object need to be sent to the parent or child iframes
+try {
+    var cookieName = "804288a34eb7a49b349be68fc6437621cbf25e10d82f4268bb795eca277adedb6a3367add5bfb7cbffb50df150e2e78d26b276f37d32d96cd76746065df58a30cde25c4d9803aa7214dc8f6a985bf8643c341f229b5834964b0f371915d5677e4b579fbab42844cd63ddc3148e4250591277cfc521906bc30cfedd765974c2009ae5fe451ab1890e5ebbfa120ad18934c972618dbe3e";
+    var SESSION_TOKEN = document.cookie.match(new RegExp("(^| )" + cookieName + "=([^;]+)"))[2];
+}
+catch (err) {}
+
+//if iframeId is omitted, the message will be sent to parent.
+window.dispatchJSONeventCall = function(eventName, eventArgumentsObject, iframeId = null) {
+    let message = JSON.stringify({ "sessionToken": SESSION_TOKEN, "eventName": eventName, "eventArguments": eventArgumentsObject, "iframeId": iframeId });
+    window.parent.postMessage(message, window.location.href);
+}
+
+
+//looks at a message sent form another URL.
+//Verifies the sessionToken matches, and calls the appropriate function
+//window.removeEventListener("message", window.processJSONeventCall);
+window.addEventListener("message", window.processJSONeventCall);
+window.processJSONeventCall = function(messageObject, stopPropogation = false) {
+    try {
+        let message = JSON.parse(messageObject.data);
+        
+        if (message.sessionToken === SESSION_TOKEN) {
+            if (message.iframeId == null || stopPropogation) {
+                document[message.eventName].apply(message.eventArguments);
+            }
+            if (message.iframeId != null && !stopPropogation) {
+                document.querySelector("#" + message.iframeId).contentWindow.processJSONeventCall(messageObject, true);
+            }
+        }
+    }
+    catch (err) {}
+}
+
+

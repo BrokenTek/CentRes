@@ -10,6 +10,8 @@ Otherwise will reroute to logon page -->
         <link rel="stylesheet" href="../Resources/CSS/menuStyle.css">
 		<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
 		<script>
+			const menuObjectTest = new Event("menuObjectLoaded", {bubbles: true});
+			var bypassRecord = true;
 			function createMenuSelectEventHandlers() {
 				
 				var menuItemSelected = function(event) {
@@ -17,6 +19,12 @@ Otherwise will reroute to logon page -->
 					varRem("selectedMenuCategory");
 					varSet("selectedMenuItem", this.id);
 					
+					recordOpenDetails();
+					selectMenuObject(this);
+					console.log("dispatchJSONeventCall TEST\nSending message to parent (MenuEditor.php) and ifrMenuEditor");
+					dispatchJSONeventCall("menuItemSelected", {"menuItemId": this.id});
+					dispatchJSONeventCall("menuItemSelected", {"menuItemId": this.id}, "ifrMenuEditor");
+					//window.parent.postMessage("itemSelected", "http://localhost/CentRes/CodeRepo/ManagerView/MenuEditor.php");
 				};
 
 				var elements = document.getElementsByClassName("menuItem");
@@ -28,27 +36,22 @@ Otherwise will reroute to logon page -->
 
 				var menuCategorySelected = function(event) {
 					event.stopPropagation();
+					if (bypassRecord) { return; }
 					varRem("selectedMenuItem");
 					varSet("selectedMenuCategory", this.id);
-					this.toggleAttribute("open");
-					let openDetails = document.querySelectorAll('details[open=""'); 
-					if (openDetails.length == 0) {
-						varRem("openDetails");
-					}
-					else if (openDetails.length == 1) {
-						varSet("openDetails", openDetails[0].id);
+					if (this.hasAttribute("open")) {
+						varSet("selectedMenuCategory", this.id);
+						//window.parent.postMessage("categorySelected", "*");
 					}
 					else {
-						let str = openDetails[0].id;
-						for (let i = 1; i < openDetails.length; i++) {
-							str += "," + openDetails[i].id;
-						}
-						varSet("openDetails", str);
+						//window.parent.postMessage("nothingSelected", "http://localhost/CentRes/CodeRepo/ManagerView/MenuEditor.php");
 					}
-					this.toggleAttribute("open");
+					selectMenuObject(this);
+					recordOpenDetails();			
 				};
 
 				var openDetails = varGet("openDetails");
+				var updatedObjectId = varGetOnce("updated");
 				if (openDetails !== undefined) {
 					newDetails = ""
 					openDetails = openDetails.split(",");
@@ -65,11 +68,17 @@ Otherwise will reroute to logon page -->
 						varSet("openDetails", newDetails.substring(1));
 					}
 				}
+				if (updatedObjectId !== undefined) {
+					let updatedMenuObject = document.querySelector("#" + updatedObjectId);
+					if (updatedMenuObject !== undefined) {
+						selectMenuObject(updatedMenuObject);
+					}
+				} 
 
 				var elements = document.getElementsByClassName("menuCategory");
 				if (elements != null) {
 					for (var i = 0; i < elements.length; i++) {
-	    				elements[i].addEventListener('pointerdown', menuCategorySelected);
+	    				elements[i].addEventListener('toggle', menuCategorySelected);
 					}
 				}
 
@@ -93,9 +102,60 @@ Otherwise will reroute to logon page -->
                     varSet("scrollY", window.scrollY);
                 }, true);
 
-
+					
+				bypassRecord = false;
+				//document.dispatchEvent(menuObjectTest);
+				//alert("menuDispatched");
+				
 			}
 			addEventListener('load', createMenuSelectEventHandlers);
+
+			function selectMenuObject(menuObject) {
+				bypassRecord = true;
+				if (menuObject.hasAttribute("open")) {
+					menuObject.setAttribute("keepopen", "");
+				}
+				menuObject = menuObject.parentNode;
+				while (menuObject != null) {
+					if (menuObject.nodeType === Node.ELEMENT_NODE && menuObject.tagName === "DETAILS") {
+						menuObject.setAttribute("keepopen", "");
+					}
+					menuObject = menuObject.parentNode;
+				}
+				let openDetails = document.querySelectorAll('details');
+				for (let i = 0; i < openDetails.length; i++) {
+					with (openDetails[i]) {
+						//alert("a");
+						if (hasAttribute("keepopen")) {
+							setAttribute("open", "");
+							//removeAttribute("keepopen");
+						}
+						else {
+							removeAttribute("open");
+							removeAttribute("keepopen");
+						}
+					}
+				}
+				bypassRecord = false;
+			}
+
+			function recordOpenDetails() {
+				if (bypassRecord) { return; }
+				let openDetails = document.querySelectorAll('details[open=""'); 
+				if (openDetails.length == 0) {
+					varRem("openDetails");
+				}
+				else if (openDetails.length == 1) {
+					varSet("openDetails", openDetails[0].id);
+				}
+				else {
+					let str = openDetails[0].id;
+					for (let i = 1; i < openDetails.length; i++) {
+						str += "," + openDetails[i].id;
+					}
+					varSet("openDetails", str);
+				}
+			}
 
 			
 
@@ -181,8 +241,6 @@ if ($result->num_rows > 0) {
 		echo "</span>";
 
 	}
-
-	unset($_POST['updated']);
 	require_once "../Resources/php/display.php";
 ?>
 </form>

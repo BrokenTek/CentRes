@@ -185,7 +185,7 @@
                 document.querySelector("#btnMenuItemEditor").addEventListener("pointerdown", 
                 function() {
                     redirect("MenuItemEditor.php",
-                    varGet("lookAt") !== undefined ? varGet("lookAt") : document.querySelector("#selParentCategory").value); });
+                    varExists("lookAt") ? varGet("lookAt") : document.querySelector("#selParentCategory").value); });
 
                 document.querySelector("#btnMenuModificationEditor").addEventListener("pointerdown", 
                 function() {redirect("MenuModificationEditor.php");});
@@ -255,12 +255,12 @@
                         break;
                     default:
                         if (ctrlDown) {
-                            if (event.keyCode == 13 && varGet("lookAt") !== undefined) { 
+                            if (event.keyCode == 13 && varExists("lookAt")) { 
                                 if (shiftDown) { //  CTRL + SHIFT + ENTER >>>>> Navigate to MenuCategory 1 Level Up
                                     redirect("MenuCategoryEditor.php", "!" + document.querySelector("#selParentCategory").value);
                                 }
                                 else { // CTRL ENTER >>>>> Navigate to MenuCategory at Current Level
-                                    let target = (varGet("lookAt") !== undefined ? varGet("lookAt") : document.querySelector("#selParentCategory").value);  
+                                    let target = (varExists("lookAt") ? varGet("lookAt") : document.querySelector("#selParentCategory").value);  
                                     redirect("MenuItemEditor.php", target);
                                 }
                             }
@@ -318,6 +318,11 @@
                 
             }
 
+           //Test displayInterface's processJSONeventCall. STATUS: FUNCTIONING CORRECTLY
+           document.menuItemSelected = function() {
+                console.log("processJSONeventCall TEST\nHello From Menu Category Editor: Menu Item Clicked" + this.menuItemId);
+            }
+
         </script>
         
     </head>
@@ -357,7 +362,7 @@
                         ?>
                     </select>
                     <label for="txtMenuTitle">Category Title</label>
-                    <input id="txtMenuTitle" name="menuTitle" required  pattern="^([a-zA-Z]+\s{1})*[a-zA-Z]+$"  maxlength=75 <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
+                    <input id="txtMenuTitle" name="menuTitle" maxlength=75 <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
                     <div class="buttonGroup">
                         <?php if (isset($_POST['quickCode']) && strlen($_POST['quickCode']) > 0 &&
                                 (!isset($_POST['delete']) || isset($errorMessage))): ?>

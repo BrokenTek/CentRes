@@ -32,17 +32,21 @@ DROP TRIGGER IF EXISTS beforeAddMenuItem;
 DROP TRIGGER IF EXISTS beforeAddMenuModificationCategory;
 DROP TRIGGER IF EXISTS beforeAddMenuModificationItem;
 DROP TRIGGER IF EXISTS beforeAddModActionCategory;
+DROP TRIGGER IF EXISTS beforeAddModAction;
+
 DROP TRIGGER IF EXISTS beforeUpdateMenuCategory;
 DROP TRIGGER IF EXISTS beforeUpdateMenuItem;
 DROP TRIGGER IF EXISTS beforeUpdateMenuModificationCategory;
 DROP TRIGGER IF EXISTS beforeUpdateMenuModificationItem;
 DROP TRIGGER IF EXISTS beforeUpdateModActionCategory;
+DROP TRIGGER IF EXISTS beforeUpdateModAction;
+
 DROP TRIGGER IF EXISTS afterDeleteMenuCategory;
 DROP TRIGGER IF EXISTS afterDeleteMenuItem;
 DROP TRIGGER IF EXISTS afterDeleteMenuModificationCategory;
 DROP TRIGGER IF EXISTS afterDeleteMenuModificationItem;
-DROP TRIGGER IF EXISTS afterDeleteMenuModActionCategory;
 DROP TRIGGER IF EXISTS afterDeleteModActionCategory;
+DROP TRIGGER IF EXISTS afterDeleteModAction;
 
 DROP PROCEDURE IF EXISTS createTicket;
 DROP PROCEDURE IF EXISTS createReservation;
@@ -77,7 +81,7 @@ BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
 	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
 		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuCategories;
-		SET NEW.quickCode = CONCAT('C', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));
+		SET NEW.quickCode = CONCAT('C', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
 	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 END;
@@ -88,7 +92,7 @@ BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
 	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
 		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuItems;
-		SET NEW.quickCode = CONCAT('I', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));
+		SET NEW.quickCode = CONCAT('I', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
 	END IF;
 	IF (NEW.route IS NOT NULL) THEN
 		SET NEW.route = UPPER(NEW.route);
@@ -102,7 +106,7 @@ BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
 	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
 		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationCategories;
-		SET NEW.quickCode = CONCAT('MC', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));	
+		SET NEW.quickCode = CONCAT('W', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));	
 	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 END;
@@ -113,7 +117,7 @@ BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
 	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
 		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationItems;
-		SET NEW.quickCode = CONCAT('M', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));	
+		SET NEW.quickCode = CONCAT('X', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));	
 	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 END;
@@ -124,9 +128,25 @@ BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
 	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
 		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM ModActionCategories;
-		SET NEW.quickCode = CONCAT('A', LPAD(CONVERT(cnt, VARCHAR(3)),3,'0'));
+		SET NEW.quickCode = CONCAT('Y', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
 	END IF;
 	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
+END;
+
+CREATE TRIGGER beforeAddModAction
+BEFORE INSERT ON ModActions FOR EACH ROW
+BEGIN
+	DECLARE cnt INTEGER UNSIGNED;
+	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
+		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM ModActions;
+		SET NEW.quickCode = CONCAT('Z', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = NEW.quickCode;
+	ELSE
+		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
+	END IF;
+	
+	-- 
 END;
 
 CREATE TRIGGER afterDeleteMenuCategory
@@ -157,9 +177,15 @@ BEGIN
 	DELETE FROM MenuAssociations WHERE parentQuickCode = OLD.quickCode OR childQuickCode = OLD.quickCode;
 END;
 
-
 CREATE TRIGGER afterDeleteModActionCategory
 AFTER DELETE ON ModActionCategories FOR EACH ROW
+BEGIN
+	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
+	DELETE FROM MenuAssociations WHERE parentQuickCode = OLD.quickCode OR childQuickCode = OLD.quickCode;
+END;
+
+CREATE TRIGGER afterDeleteModAction
+AFTER DELETE ON ModActions FOR EACH ROW
 BEGIN
 	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
 	DELETE FROM MenuAssociations WHERE parentQuickCode = OLD.quickCode OR childQuickCode = OLD.quickCode;
@@ -179,6 +205,12 @@ BEGIN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM ModActionCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM ModActions WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		END IF; 
@@ -201,6 +233,12 @@ BEGIN
 		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM ModActionCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM ModActions WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		END IF; 
 	END IF;
 END;
@@ -219,6 +257,12 @@ BEGIN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM ModActionCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM ModActions WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		END IF; 
@@ -241,6 +285,12 @@ BEGIN
 		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM ModActionCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM ModActions WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		END IF; 
 	END IF;
 END;
@@ -259,6 +309,38 @@ BEGIN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM ModActionCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM ModActions WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		END IF; 
+	END IF;
+END;
+
+CREATE TRIGGER beforeUpdateModAction
+BEFORE UPDATE ON ModActions FOR EACH ROW
+BEGIN
+	IF (OLD.quickCode <> NEW.quickCode) THEN
+		IF ((SELECT COUNT(*) FROM menuCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM ModActionCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+		ELSEIF ((SELECT COUNT(*) FROM ModActions WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		END IF; 
@@ -1365,8 +1447,8 @@ END;
 */
 
 INSERT INTO ModActionCategories (title, quickCode) VALUES ('Default', 'A001');
-INSERT INTO ModActions (modActionCategory, title, multiplier) VALUES
-	('A001', 'None', 0),
-	('A001', 'Xtra', 0),
-	('A001', 'Lite', 0),
-	('A001', 'Add', 1);
+INSERT INTO ModActions (modActionCategory, title, cost, quickCode) VALUES
+	('A001', 'None', NULL, 'Y001'),
+	('A001', 'Xtra', NULL, 'Y002'),
+	('A001', 'Lite', NULL, 'Y003'),
+	('A001', 'Add', .99, 'Y004');

@@ -119,7 +119,7 @@ you'll be routed to whatever the home page is for your specified role level -->
 
             function closeCheck(ATGifr) {
                 try {
-                    if (varGet("closeMe", ATGifr.id) !== undefined) {
+                    if (varExists("closeMe", ATGifr.id)) {
                         ATGifr.remove();
                     }
                 }

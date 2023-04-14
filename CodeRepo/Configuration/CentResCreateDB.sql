@@ -22,7 +22,6 @@ DROP TABLE IF EXISTS Employees;
 DROP TABLE IF EXISTS EmployeeRoles;
 DROP TABLE IF EXISTS LoginRouteTable;
 DROP TABLE IF EXISTS Config;
-DROP TABLE IF EXISTS ATGwindowRegistry;
 
 CREATE TABLE Config (
 	sessionTimeoutInMins INT UNSIGNED NOT NULL DEFAULT 5
@@ -85,15 +84,15 @@ CREATE TABLE ActiveEmployees (
 );
 
 CREATE TABLE QuickCodes (
-	id VARCHAR(4) PRIMARY KEY
+	id VARCHAR(5) PRIMARY KEY
 );
 INSERT INTO QuickCodes VALUES('root');
 
 
 CREATE TABLE MenuCategories (
-	quickCode VARCHAR(4) PRIMARY KEY,
+	quickCode VARCHAR(5) PRIMARY KEY,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
-	title VARCHAR(75) NOT NULL,
+	title VARCHAR(75) NOT NULL DEFAULT '',
 	description VARCHAR(1000),
 	route char(1),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
@@ -103,9 +102,9 @@ CREATE TABLE MenuCategories (
 );
 
 CREATE TABLE MenuItems (
-	quickCode VARCHAR(4) PRIMARY KEY,
+	quickCode VARCHAR(5) PRIMARY KEY,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
-	title VARCHAR(75) NOT NULL,
+	title VARCHAR(75) NOT NULL DEFAULT '',
 	description varchar(1000),
 	price DECIMAL(6, 2) UNSIGNED,
 	route char(1),
@@ -118,9 +117,9 @@ CREATE TABLE MenuItems (
 );
 
 CREATE TABLE MenuModificationCategories (
-	quickCode VARCHAR(4) PRIMARY KEY,
+	quickCode VARCHAR(5) PRIMARY KEY,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
-	title VARCHAR(75) NOT NULL,
+	title VARCHAR(75) NOT NULL DEFAULT '',
 	description VARCHAR(1000),
 	defaultPrice DECIMAL(6, 2) UNSIGNED,
 	priceOrModificationValue DECIMAL(6, 2),
@@ -131,10 +130,36 @@ CREATE TABLE MenuModificationCategories (
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE MenuModificationItems (
-	quickCode VARCHAR(4) PRIMARY KEY,
+CREATE TABLE ModActionCategories (
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
-	title VARCHAR(75) NOT NULL,
+	quickCode VARCHAR(5) PRIMARY KEY,
+	displayIndex SMALLINT UNSIGNED,	
+	title VARCHAR(75) NOT NULL DEFAULT '',
+	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
+	ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- null cost will not display.
+-- cost of 0 displays (FREE)
+-- see currencyPrinter.php
+CREATE TABLE ModActions (
+	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
+	quickCode VARCHAR(5) PRIMARY KEY,
+	title VARCHAR(75) NOT NULL DEFAULT '',
+	cost DECIMAL(4, 2),
+	modActionCategory VARCHAR(5) NOT NULL,
+	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
+	ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (modActionCategory) REFERENCES QuickCodes(id)
+	ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE MenuModificationItems (
+	quickCode VARCHAR(5) PRIMARY KEY,
+	displayIndex SMALLINT UNSIGNED,
+	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
+	modActionCategory VARCHAR(5) NOT NULL,
+	title VARCHAR(75) NOT NULL DEFAULT '',
 	description varchar(1000),
 	priceOrModificationValue DECIMAL(6, 2),
 	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),
@@ -144,8 +169,8 @@ CREATE TABLE MenuModificationItems (
 );
 
 CREATE TABLE MenuAssociations (
-	parentQuickCode VARCHAR(4),
-	childQuickCode VARCHAR(4),
+	parentQuickCode VARCHAR(5),
+	childQuickCode VARCHAR(5),
 	displayIndex SMALLINT UNSIGNED,
 	UNIQUE(parentQuickCode, childQuickCode)
 );
@@ -276,14 +301,11 @@ CREATE TABLE ActiveTicketGroups (
 	route char(1)
 );
 
-CREATE TABLE ModActionCategories (
-	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
-	quickCode VARCHAR(4) PRIMARY KEY,	
-	title VARCHAR(75) NOT NULL
-);
-
-CREATE TABLE ModActions (
-	title VARCHAR(75) NOT NULL,
-	multiplier TINYINT NOT NULL DEFAULT 0,
-	modActionCategory VARCHAR(4) NOT NULL
-);
+--Data to prime the database to function correctly
+INSERT INTO quickCodes VALUES ('00000');
+INSERT INTO MenuCategories (quickCode) VALUES ('00000');
+INSERT INTO MenuItems (quickCode) VALUES ('00000');
+INSERT INTO MenuModificationCategories (quickCode) VALUES ('00000');
+INSERT INTO MenuModificationItems (quickCode) VALUES ('00000');
+INSERT INTO ModActionCategories (quickCode) VALUES ('00000');
+INSERT INTO ModActions (quickCode, modActionCategory) VALUES ('00000', '00000');

@@ -19,6 +19,9 @@
                 document.querySelector("#btnMenuModificationEditor").addEventListener("pointerdown", 
                 function() { location.replace("MenuModificationEditor.php") });
             }
+
+
+
         </script>
         
     </head>

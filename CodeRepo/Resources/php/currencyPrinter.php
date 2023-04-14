@@ -1,5 +1,12 @@
 <?php
     function currencyPrint($value, $currencyCharacter = "$", $groupSeparator = ",", $decimalCharacter = ".") {
+        if (is_null($value)) {
+            return "";
+        }
+        elseif ($value == 0) {
+            return "FREE";
+        }
+        $value = round($value, 2, PHP_ROUND_HALF_UP);
         $retVal = $value < 0 ? "-" : "";
         $retVal .= $currencyCharacter;
 

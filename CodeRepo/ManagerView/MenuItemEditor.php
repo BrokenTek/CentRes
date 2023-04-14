@@ -138,6 +138,7 @@
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         <script>
             function allElementsLoaded() {
+                window.addEventListener("message", window.processJSONeventCall);
                 // any startup tasks go here after page has fully loaded.
 
                 document.querySelector("#selParentCategory").addEventListener("change", selParentChanged);
@@ -281,6 +282,10 @@
                 
             }
 
+            //Test displayInterface's processJSONeventCall. STATUS: FUNCTIONING CORRECTLY
+           document.menuItemSelected = function() {
+                console.log("processJSONeventCall TEST\nHello From Menu Item Editor: Menu Item Clicked: " + this.menuItemId);
+            }
         </script>
         
     </head>

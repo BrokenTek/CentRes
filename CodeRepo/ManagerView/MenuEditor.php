@@ -55,6 +55,7 @@ you'll be routed to whatever the home page is for your specified role level -->
                 mnu.contentDocument.addEventListener("click", menuUpdated);
                 mnuEditor.addEventListener("load", editorRefreshed);
                 setTitle("CentRes POS: Management Tools - Menu Editor", "Management Tools");
+                //setup path for iframes to call this window's functions
             }
 
             function editorRefreshed(event) {
@@ -76,30 +77,30 @@ you'll be routed to whatever the home page is for your specified role level -->
                     ignoreUpdate = false;
                     return;
                 }
-                var itm = varGet("selectedMenuItem", "ifrMenu");
-                var cat = varGet("selectedMenuCategory", "ifrMenu");
-                if (itm != undefined && itm.length > 0) {
+                let selectedMenuObjectId = event.target.parentNode.id;
+                if (event.target.parentNode.tagName === "DETAILS") {
+                    mnuEditor.contentDocument.getElementById("txtParentCategory").setAttribute("value", selectedMenuObjectId);
+                }
+                else if (event.target.parentNode.tagName === "SPAN") {
+                    var itm = varGet("selectedMenuItem", "ifrMenu");
                     let parentId = mnu.contentDocument.getElementById(itm).parentElement.parentElement.id; //.parentElement.id;
                     mnuEditor.contentDocument.getElementById("txtParentCategory").setAttribute("value", parentId);
                     mnuEditor.contentDocument.getElementById("txtRecallParentCategory").setAttribute("value",parentId);
-                    mnuEditor.contentDocument.getElementById("txtQC").setAttribute("value", itm);
-                    mnuEditor.contentDocument.getElementById("txtLookAt").setAttribute("value", itm);
+                    mnuEditor.contentDocument.getElementById("txtQC").setAttribute("value", selectedMenuObjectId);
+                    mnuEditor.contentDocument.getElementById("txtLookAt").setAttribute("value", selectedMenuObjectId);
+                }
+                if (selectedMenuObjectId != '') {
                     with (mnuEditor.contentDocument.getElementById("frmRedirect")) {
                         action = "MenuItemEditor.php";
                         submit();
                     }
-                    
-                }
-                else if (cat != undefined) {
-                    mnuEditor.contentDocument.getElementById("txtParentCategory").setAttribute("value", cat);
-                    with (mnuEditor.contentDocument.getElementById("frmRedirect")) {
-                        action = "MenuCategoryEditor.php";
-                        submit();
-                    }
-
                 }
             }
-          
+
+           //Test displayInterface's processJSONeventCall. STATUS: FUNCTIONING CORRECTLY
+           document.menuItemSelected = function() {
+                console.log("processJSONeventCall TEST\nHello From Menu Editor: Menu Item Clicked: " + this.menuItemId);
+            }
 
             //Place your JavaScript Code here
         </script>

@@ -90,7 +90,7 @@
             function updateLoop() {
                 stopUpdateLoopTimer();
 
-                if (varGet("staticTableId") !== undefined && varGetOnce("ticketRemoved","ticketContainer") !== undefined) {
+                if (varExists("staticTableId") && varGetOnce("ticketRemoved","ticketContainer") !== undefined) {
                     showAlertDiv("Ticket " + varGet("ticket", "ticketContainer") + " is not longer assigned to this table!\nRedirecting back to Host View.");
                     location.replace(document.getElementById("mgrNavHostView").getAttribute("value"));
                 }
@@ -106,7 +106,7 @@
                     // if a seat and split are selected and the mod window is not open,
                     // check if a menu item was selected. otherwise ignore if you clicked a menu item.
                     try {
-                        if (!(varGet("selectedMenuItem", "menuContainer") === undefined)) {
+                        if (varExists("selectedMenuItem", "menuContainer")) {
                             if (cboSeat.selectedIndex == 0 || cboSplit.selectedIndex == 0) {
                                 ticketContainer.contentWindow.document.getElementById("ticketHeader").classList.add("highlighted");
                                 setTimeout(() => {
