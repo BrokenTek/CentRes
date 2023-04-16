@@ -63,7 +63,7 @@ legend {
     padding-top: 1rem;
     width: 100%;
 }
-#selParentCategory {
+select {
     margin: 0;
 }
 .buttonGroup {

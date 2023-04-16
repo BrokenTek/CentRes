@@ -200,7 +200,7 @@
 
                 with (document.querySelector("#selParentCategory")) {
                     addEventListener("change", function() { 
-                        varSet("lookAt", value);
+                        varSet("lookAt", varGet("quickCode"));
                         with (document.querySelector("#txtMenuTitle")) {
                             focus();
                             setSelectionRange(0, value.length);
@@ -213,9 +213,11 @@
                 varSet("lookAt", "root")
                 varRem("quickCode");
                 document.getElementById("selParentCategory").selectedIndex = 0;
-                with (document.getElementById("btnDelete")) {
-                    setAttribute("disabled", "");
-                    classList.add("disabled");
+                if (document.getElementById("btnDelete") != null) {    
+                    with (document.getElementById("btnDelete")) {
+                        setAttribute("disabled", "");
+                        classList.add("disabled");
+                    }
                 }
             }
 
@@ -225,19 +227,7 @@
             }
 
             function selChanged(event) {
-                if (selChanged) {
-                    with (document.querySelector("#btnDelete")) {
-                        if (this.options[this.selectedIndex].value == "root") {
-                            setAttribute("disabled", "");
-                            classList.add("disabled");
-                        }
-                        else {
-                            removeAttribute("disabled", "");
-                            classList.remove("disabled");
-                        }
-                    }
-                    dispatchJSONeventCall("selectMenuObject", {"menuObjectId": this.options[this.selectedIndex].value}, ["ifrMenu"]);
-                }
+                dispatchJSONeventCall("selectMenuObject", {"menuObjectId": this.options[this.selectedIndex].value}, ["ifrMenu"]);
             }
 
             ///////////////////////////////////////////////////
@@ -263,7 +253,7 @@
                                     redirect("menuCategoryEditor.php", "!" + document.querySelector("#selParentCategory").value);
                                 }
                                 else { // CTRL ENTER >>>>> Navigate to MenuCategory at Current Level
-                                    let target = (varExists("lookAt") ? varGet("lookAt") : document.querySelector("#selParentCategory").value);  
+                                    let target = (varExists("quickCode") ? varGet("quickCode") : document.querySelector("#selParentCategory").value);  
                                     redirect("menuItemEditor.php", target);
                                 }
                             }
@@ -285,8 +275,8 @@
                                 selStr = str_pad(event.keyCode - 48,2,"0", STR_PAD_LEFT) + document.querySelector("#selParentCategory").value;
                                 redirect("menuCategoryEditor.php", "!" + document.querySelector("#selParentCategory").value);
                             }
-                            else if (event.keyCode == 77 && shiftDown) { // CTRL + M >>>>> Go to mod editor window.
-                                //redirect("MenuModificationEditor.php");
+                            else if (event.keyCode == 77) { // CTRL + M >>>>> Go to mod editor window.
+                                redirect("menuModificationCategoryEditor.php");
                             }
                             
                         }
@@ -321,11 +311,6 @@
                 
             }
 
-           //Test displayInterface's processJSONeventCall. STATUS: FUNCTIONING CORRECTLY
-           document.menuItemSelected = function() {
-                console.log("processJSONeventCall TEST\nHello From Menu Category Editor: Menu Item Clicked: " + this.menuItemId);
-            }
-
         </script>
         
     </head>
@@ -335,7 +320,7 @@
                 <div id="menuEditorNavBar">
                     <button id="btnMenuCategoryEditor" type="button" class="button menuNavButton">New Category</button>
                     <button id="btnMenuItemEditor" type="button" class="button menuNavButton">New Item</button>
-                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton" style="display: none;">Mods Editor</button>
+                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton">Mods Editor</button>
                 </div>
                 <fieldset>
                     <legend>Menu&nbsp;Category&nbsp;Editor</legend>

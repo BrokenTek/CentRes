@@ -106,7 +106,7 @@ END;
 
 CREATE PROCEDURE associateByTitle(IN parentTitle VARCHAR(75), IN childTitle VARCHAR(75))
 BEGIN
-	INSERT INTO MenuAssociations (parentQuickCode, childQuickCode) VALUES (titleToQuickCode(parentTitle), titleToQuickCode(childQuickCode));
+	INSERT INTO MenuAssociations (parentQuickCode, childQuickCode) VALUES (titleToQuickCode(parentTitle), titleToQuickCode(childTitle));
 END;
 
 CREATE TRIGGER beforeDeleteEmployee

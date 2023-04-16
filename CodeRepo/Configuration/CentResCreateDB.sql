@@ -115,8 +115,8 @@ CREATE TABLE MenuModificationItems (
 	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),
 	selfDescriptive BOOLEAN NOT NULL DEFAULT FALSE,
 	description VARCHAR(1),
-	
 	price DECIMAL(6, 2),
+	
 	quickCode VARCHAR(5) PRIMARY KEY,
 	displayIndex SMALLINT UNSIGNED,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
