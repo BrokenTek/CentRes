@@ -1,5 +1,7 @@
-<!-- 
- File: connect_disconnect.php
+<?php
+
+/*
+File: connect_disconnect.php
  This file contains two functions to be called for database connection/disconnection.
  This allows for the connection code to be written once and used anywhere.
  
@@ -8,9 +10,7 @@
  
  Always call disconnect() when you are done accessing the databse.
  disconnect() an be called any amount of times and will not generate an error.
--->
-
-<?php
+ */
 
 global $conn;
 global $connection_level;

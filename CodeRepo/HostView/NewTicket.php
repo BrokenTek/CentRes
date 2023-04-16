@@ -1,5 +1,4 @@
-<!-- ensures you are logged in before rendering page.
-Otherwise will reroute to logon page -->
+
 <?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(4, $GLOBALS['role']); ?>
 <!DOCTYPE html>
 <html>
@@ -134,7 +133,7 @@ Otherwise will reroute to logon page -->
             <label id="lblReservation" for="chkReservation">Reserve:</label>
             <input id="chkReservation" type="checkbox" onpointerdown="setTimeRequestedToNow()">
             <div id="divButtons">
-                <button id="btnBack" type="button" onpointerdown="location.href='WaitList.php'">Back</button>
+                <button id="btnBack" type="button" onpointerdown="location.href='waitList.php'">Back</button>
                 <button id="btnCreate" type="submit" name="createTicket">Create Ticket</button>
             </div>
         </fieldset>

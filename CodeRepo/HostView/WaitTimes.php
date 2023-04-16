@@ -1,14 +1,6 @@
-<!-- DISPLAY TEMPLATE
-This template includes starter code that allows
-you to use display.php and displayInterface.js -->
 
-
-<!-- ensures you are logged in before rendering page, and are logged in under the correct role.
-If you aren't logged in, it will reroute to the login page.
-If you are logged in but don't have the correct role to view this page,
-you'll be routed to whatever the home page is for your specified role level -->
 <?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(255, $GLOBALS['role']); ?>
-<!-- CHANGE 255 TO THE ALLOWED ROLE LEVEL FOR THE PAGE -->
+
 
 <!DOCTYPE html>
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
@@ -48,14 +40,11 @@ you'll be routed to whatever the home page is for your specified role level -->
                 grid-template-columns: min-content 1fr;
             }
         </style>
-        <!-- gives you access to varSet, varGet, varRem, 
-        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
+        
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/waitListStructure.css">
-        
-        <!-- demonstration on how to use varGet, varSet, updateDisplay for just this page -->
-        <!-- remove this script tag -->
+
         <script>
             let initialLoad = true;
             function allElementsLoaded() {
@@ -147,9 +136,9 @@ you'll be routed to whatever the home page is for your specified role level -->
         </script>
     </head>
     <body onload="allElementsLoaded()"  class="intro">
-        <!-- this form submits to itself -->
-        <form action="WaitTimes.php" method="POST">
-            <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
+        
+        <form action="waitTimes.php" method="POST">
+            
             <fieldset>
            
                 <legend onpointerdown="updateDisplay()">Wait&nbsp;Time:&nbsp;<?php echo($waitTime); ?></legend>
@@ -166,12 +155,10 @@ you'll be routed to whatever the home page is for your specified role level -->
                 
                 <div id="lblTimeToRefresh">Refresh&nbsp;In&nbsp;</div><div id="valTimeToRefresh"></div>
             </fieldset>
-            <!-- If you want to forget/not carry over variables, use PHP unset function
-            to remove these variables -->
+            
             <?php unset($_POST['lowerPartySize'], $_POST['upperPartySize'], $_POST['timeSpan']); ?>
 
-            <!-- retain any POST vars. When updateDisplay() is called or the form is submitted,
-            these variables will be carried over -->
+            
             <?php require_once '../Resources/php/display.php'; ?>
            
         </form>

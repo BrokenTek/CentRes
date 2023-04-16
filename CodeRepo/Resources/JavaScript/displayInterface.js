@@ -1,5 +1,5 @@
 window.varExists = function(variableName, childIframeId = null) {
-    return !varGet(variableName, childIframeId) === undefined;
+    return varGet(variableName, childIframeId) !== undefined;
 }
 
 window.varSet = function(variableName, value, childIframeId = null, update = false, bypassValidationCheck = false) {
@@ -402,27 +402,37 @@ try {
 }
 catch (err) {}
 
-//if iframeId is omitted, the message will be sent to parent.
-window.dispatchJSONeventCall = function(eventName, eventArgumentsObject, iframeId = null) {
-    let message = JSON.stringify({ "sessionToken": SESSION_TOKEN, "eventName": eventName, "eventArguments": eventArgumentsObject, "iframeId": iframeId });
-    window.parent.postMessage(message, window.location.href);
+window.dispatchJSONeventCall = function(eventName, eventArgumentsObject, targetIframeIds = []) {
+    let message = JSON.stringify({ "sessionToken": SESSION_TOKEN, "eventName": eventName, "eventArguments": eventArgumentsObject, "targetIframeIds": targetIframeIds});
+    window.top.postMessage(message, window.location.href);
 }
 
 
 //looks at a message sent form another URL.
 //Verifies the sessionToken matches, and calls the appropriate function
-//window.removeEventListener("message", window.processJSONeventCall);
+
+//starts at the 
 window.addEventListener("message", window.processJSONeventCall);
-window.processJSONeventCall = function(messageObject, stopPropogation = false) {
+window.processJSONeventCall = function(messageObject) {
     try {
         let message = JSON.parse(messageObject.data);
-        
         if (message.sessionToken === SESSION_TOKEN) {
-            if (message.iframeId == null || stopPropogation) {
+            if (message.targetIframeIds.length > 0) {
+                for (let i = 0; i < message.targetIframeIds.length; i++) {
+                    try {
+                        document.querySelector("#" + message.targetIframeIds[i]).contentWindow.processJSONeventCall(messageObject);
+                    }
+                    catch (err) {}
+                }
+            }
+            try {
                 document[message.eventName].apply(message.eventArguments);
             }
-            if (message.iframeId != null && !stopPropogation) {
-                document.querySelector("#" + message.iframeId).contentWindow.processJSONeventCall(messageObject, true);
+            catch (err) {}
+
+            let elems = window.document.getElementsByTagName("iframe");
+            for (let i = 0; i < elems.length; i++) {
+                elems[i].contentWindow.processJSONeventCall(messageObject);
             }
         }
     }

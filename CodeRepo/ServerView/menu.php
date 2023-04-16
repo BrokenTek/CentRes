@@ -1,5 +1,4 @@
-<!-- ensures you are logged in before rendering page.
-Otherwise will reroute to logon page -->
+
 <?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(255, $GLOBALS['role']); ?>
 <?php require_once '../Resources/php/currencyPrinter.php'; ?>
 
@@ -11,7 +10,6 @@ Otherwise will reroute to logon page -->
 		<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
 		<script>
 			const menuObjectTest = new Event("menuObjectLoaded", {bubbles: true});
-			var bypassRecord = true;
 			function createMenuSelectEventHandlers() {
 				
 				var menuItemSelected = function(event) {
@@ -19,12 +17,8 @@ Otherwise will reroute to logon page -->
 					varRem("selectedMenuCategory");
 					varSet("selectedMenuItem", this.id);
 					
-					recordOpenDetails();
-					selectMenuObject(this);
-					console.log("dispatchJSONeventCall TEST\nSending message to parent (MenuEditor.php) and ifrMenuEditor");
-					dispatchJSONeventCall("menuItemSelected", {"menuItemId": this.id});
-					dispatchJSONeventCall("menuItemSelected", {"menuItemId": this.id}, "ifrMenuEditor");
-					//window.parent.postMessage("itemSelected", "http://localhost/CentRes/CodeRepo/ManagerView/MenuEditor.php");
+					let parentCategoryId = document.selectMenuObject(this.id);
+					dispatchJSONeventCall("menuItemSelected", {"menuItemId": this.id, "parentCategoryId": parentCategoryId});
 				};
 
 				var elements = document.getElementsByClassName("menuItem");
@@ -34,46 +28,24 @@ Otherwise will reroute to logon page -->
 					}
 				}
 
-				var menuCategorySelected = function(event) {
+				var menuCategorySelected = function() {
 					event.stopPropagation();
-					if (bypassRecord) { return; }
+					if (ignoreCount > 0) {
+						ignoreCount--;
+						return;
+					}
 					varRem("selectedMenuItem");
 					varSet("selectedMenuCategory", this.id);
+					let parentCategoryId = document.selectMenuObject(this.id);
 					if (this.hasAttribute("open")) {
 						varSet("selectedMenuCategory", this.id);
-						//window.parent.postMessage("categorySelected", "*");
+						dispatchJSONeventCall("menuCategorySelected", {"menuCategoryId": this.id, "parentCategoryId": parentCategoryId});
 					}
 					else {
-						//window.parent.postMessage("nothingSelected", "http://localhost/CentRes/CodeRepo/ManagerView/MenuEditor.php");
-					}
-					selectMenuObject(this);
-					recordOpenDetails();			
+						dispatchJSONeventCall("menuDeselected", {});
+						varRem("selectedMenuCategory");
+					}		
 				};
-
-				var openDetails = varGet("openDetails");
-				var updatedObjectId = varGetOnce("updated");
-				if (openDetails !== undefined) {
-					newDetails = ""
-					openDetails = openDetails.split(",");
-					for (let i = 0; i < openDetails.length; i++) {
-						if (document.querySelector("#" + openDetails[i]) != null) {
-							document.getElementById(openDetails[i]).setAttribute("open", "");
-							newDetails += "," + openDetails[i];
-						}
-					}
-					if (newDetails == "") {
-						varRem("openDetails");
-					}
-					else {
-						varSet("openDetails", newDetails.substring(1));
-					}
-				}
-				if (updatedObjectId !== undefined) {
-					let updatedMenuObject = document.querySelector("#" + updatedObjectId);
-					if (updatedMenuObject !== undefined) {
-						selectMenuObject(updatedMenuObject);
-					}
-				} 
 
 				var elements = document.getElementsByClassName("menuCategory");
 				if (elements != null) {
@@ -81,6 +53,14 @@ Otherwise will reroute to logon page -->
 	    				elements[i].addEventListener('toggle', menuCategorySelected);
 					}
 				}
+
+				var updatedObjectId = varGetOnce("updated");
+				if (updatedObjectId !== undefined) {
+					let updatedMenuObject = document.querySelector("#" + updatedObjectId);
+					if (updatedMenuObject != null) {
+						document.selectMenuObject(updatedMenuObject);
+					}
+				} 
 
 				var clearSelectedVars = function(event) {
 					varRem("selectedMenuCategory");
@@ -102,22 +82,35 @@ Otherwise will reroute to logon page -->
                     varSet("scrollY", window.scrollY);
                 }, true);
 
-					
-				bypassRecord = false;
 				//document.dispatchEvent(menuObjectTest);
 				//alert("menuDispatched");
 				
 			}
 			addEventListener('load', createMenuSelectEventHandlers);
 
-			function selectMenuObject(menuObject) {
-				bypassRecord = true;
+			let ignoreCount = 0;
+			document.selectMenuObject = function(menuObjectId) {
+				var forceOpen = false;
+				if (this.menuObjectId !== undefined) {
+					menuObjectId = this.menuObjectId;
+					forceOpen = true;
+				}
+				let menuObject = document.getElementById(menuObjectId); {
+					if (menuObject == null) {
+						return null;
+					}
+				}
+				let myNode = menuObject;
+				let myParent = null;
 				if (menuObject.hasAttribute("open")) {
 					menuObject.setAttribute("keepopen", "");
 				}
 				menuObject = menuObject.parentNode;
 				while (menuObject != null) {
 					if (menuObject.nodeType === Node.ELEMENT_NODE && menuObject.tagName === "DETAILS") {
+						if (myParent == null) {
+							myParent = menuObject;
+						}
 						menuObject.setAttribute("keepopen", "");
 					}
 					menuObject = menuObject.parentNode;
@@ -125,36 +118,30 @@ Otherwise will reroute to logon page -->
 				let openDetails = document.querySelectorAll('details');
 				for (let i = 0; i < openDetails.length; i++) {
 					with (openDetails[i]) {
-						//alert("a");
-						if (hasAttribute("keepopen")) {
+						if (hasAttribute("keepopen") && !hasAttribute("open")) {
+							ignoreCount += 1;
 							setAttribute("open", "");
-							//removeAttribute("keepopen");
 						}
-						else {
+						else if (!hasAttribute("keepopen") && hasAttribute("open")) {
+							ignoreCount += 1
 							removeAttribute("open");
+						}
+						else if (hasAttribute("keepopen")) {
 							removeAttribute("keepopen");
 						}
 					}
 				}
-				bypassRecord = false;
-			}
-
-			function recordOpenDetails() {
-				if (bypassRecord) { return; }
-				let openDetails = document.querySelectorAll('details[open=""'); 
-				if (openDetails.length == 0) {
-					varRem("openDetails");
+				if (myNode.hasAttribute("open")) {
+					myNode.removeAttribute("keepopen");
 				}
-				else if (openDetails.length == 1) {
-					varSet("openDetails", openDetails[0].id);
+				ignoreToggle = false;
+				if (forceOpen) {
+					myNode.setAttribute("open","");
 				}
-				else {
-					let str = openDetails[0].id;
-					for (let i = 1; i < openDetails.length; i++) {
-						str += "," + openDetails[i].id;
-					}
-					varSet("openDetails", str);
+				if (myParent == null) {
+					return null;
 				}
+				return myParent.id;
 			}
 
 			
@@ -166,6 +153,10 @@ Otherwise will reroute to logon page -->
 <?php 
 require_once '../Resources/php/connect_disconnect.php';
 
+//To prevent infinite recursion produced by manager adding a parent menu object to a child, each printed
+//menu item/category will increment a value by 1. If the value exceeds $menuObjectCount, execution will stop.
+$sql = "SELECT COUNT(*) as menuObjectCount FROM MenuAssociations";
+$menuObjectCount = connection()->query($sql)->fetch_assoc()['menuObjectCount'];
 
 $sql = "SELECT childQuickCode, title, visible
 		FROM MenuAssociations 
@@ -181,6 +172,10 @@ if ($result->num_rows > 0) {
 
 
 	function printMenuCategory(string $qc, string $title) {
+		if ($GLOBALS['menuObjectCount'] == 0) {
+			die("Menu Recursion Detected!");
+		}
+		$GLOBALS['menuObjectCount'] -= 1;
 		$classList = "menuCategory";
 		if (isset($_POST['updated']) && $qc == $_POST['updated']) {
 			$classList .= " updated";
@@ -214,7 +209,7 @@ if ($result->num_rows > 0) {
 		if ($result->num_rows > 0) {
 			echo "<div>";
 			while($row = $result->fetch_assoc()) {
-				// ** NEEDS TO PASS IN CALCULATED PRICE AND THE CALCULATED MODS STR (COMMA DELIMINATED) **
+				// ** NEEDS TO PASS IN CALCULATED price AND THE CALCULATED MODS STR (COMMA DELIMINATED) **
 				if ($row['visible'] == true) {
 					printMenuItem($row['childQuickCode'], $row['title'], $row['price']);
 				}
@@ -227,9 +222,11 @@ if ($result->num_rows > 0) {
 		return;		
 	}
 	function printMenuItem(string $qc, string $title, float $price) {
+		if ($GLOBALS['menuObjectCount'] == 0) {
+			die("Menu Recursion Detected!");
+		}
+		$GLOBALS['menuObjectCount'] -= 1;
 
-		// ** NEEDS TO HAVE THE DATA ATTRIBUTE PASSED INTO 'PRICE' BE THE CALCULATED PRICE^ AND CALCULATED MODS STR (COMMA DELIMINATED) **
-		// GOING TO NEED TO REVISIT FOR THE DATA-MODS ATTR (X)
 		$classList = "menuItem menuTitleItem";
 		if (isset($_POST['updated']) && $qc == $_POST['updated']) {
 			$classList .= " updated";

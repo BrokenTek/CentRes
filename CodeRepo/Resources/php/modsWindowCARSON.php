@@ -1,5 +1,4 @@
-<!-- ensures you are logged in before rendering page.
-Otherwise will reroute to logon page -->
+
 <?php require_once './sessionLogic.php'; ?>
 <!DOCTYPE html>
 <html>
@@ -27,10 +26,6 @@ Otherwise will reroute to logon page -->
 
 
         <script>
-
-            // function listenBtn() {
-            //     var form = document.getElementById('modWindowId');
-            // }
 
             function addSuffixs() {    
                 
@@ -221,12 +216,12 @@ Otherwise will reroute to logon page -->
                         $modAvailableArray = array();
                         // Get the menumodificationitems data based on the array of mod quick codes
                         for ($i = 0; $i<sizeof($modQuickCodeArray); $i++) {
-                            $sql = "SELECT title, priceOrModificationValue, categoryType FROM menumodificationitems WHERE quickCode = '$modQuickCodeArray[$i]';";
+                            $sql = "SELECT title, price, categoryType FROM menumodificationitems WHERE quickCode = '$modQuickCodeArray[$i]';";
                             $result = connection()->query($sql);
                             if($result->num_rows > 0) {
                                 while($row = $result->fetch_assoc()) {
                                     $modTitle = $row['title'];
-                                    $modPriceOrModValue = $row['priceOrModificationValue'];
+                                    $modPriceOrModValue = $row['price'];
                                     $modCategoryType = $row['categoryType'];
                                     array_push($modAvailableArray, $modTitle .",". $modPriceOrModValue .",". $modCategoryType);
                                     // echo("<input type='radio' name='newModValue' value='$modQuickCode,$modTitle,$modPriceOrModValue,$modCategoryType'>");

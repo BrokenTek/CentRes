@@ -174,17 +174,20 @@
 
                 document.querySelector("#btnReset").addEventListener("pointerdown", btnResetPressed);
 
-                document.querySelector("#btnDelete").addEventListener("pointerdown", btnDeletePressed);
+                let btnDelete = document.querySelector("#btnDelete");
+                if (btnDelete != null) {
+                    btnDelete.addEventListener("pointerdown", btnDeletePressed);
+                }
 
                 document.querySelector("#sessionForm").addEventListener("keydown", keydown);
                 document.querySelector("#sessionForm").addEventListener("keyup", keyup);
 
                 document.querySelector("#btnMenuCategoryEditor").addEventListener("pointerdown", 
-                function() {redirect("MenuCategoryEditor.php", (shiftDown ? "!" : "") + varGet("lookAt"));});
+                function() {redirect("menuCategoryEditor.php", (shiftDown ? "!" : "") + varGet("lookAt"));});
 
                 document.querySelector("#btnMenuItemEditor").addEventListener("pointerdown", 
                 function() {
-                    redirect("MenuItemEditor.php",
+                    redirect("menuItemEditor.php",
                     varExists("lookAt") ? varGet("lookAt") : document.querySelector("#selParentCategory").value); });
 
                 document.querySelector("#btnMenuModificationEditor").addEventListener("pointerdown", 
@@ -218,7 +221,6 @@
 
             function btnDeletePressed (event) {
                 varSet("delete", "yes");
-                varSet("quickCode", document.getElementById("selParentCategory").value);
                 updateDisplay(null, true);
             }
 
@@ -234,6 +236,7 @@
                             classList.remove("disabled");
                         }
                     }
+                    dispatchJSONeventCall("selectMenuObject", {"menuObjectId": this.options[this.selectedIndex].value}, ["ifrMenu"]);
                 }
             }
 
@@ -257,11 +260,11 @@
                         if (ctrlDown) {
                             if (event.keyCode == 13 && varExists("lookAt")) { 
                                 if (shiftDown) { //  CTRL + SHIFT + ENTER >>>>> Navigate to MenuCategory 1 Level Up
-                                    redirect("MenuCategoryEditor.php", "!" + document.querySelector("#selParentCategory").value);
+                                    redirect("menuCategoryEditor.php", "!" + document.querySelector("#selParentCategory").value);
                                 }
                                 else { // CTRL ENTER >>>>> Navigate to MenuCategory at Current Level
                                     let target = (varExists("lookAt") ? varGet("lookAt") : document.querySelector("#selParentCategory").value);  
-                                    redirect("MenuItemEditor.php", target);
+                                    redirect("menuItemEditor.php", target);
                                 }
                             }
                             else if (event.keyCode == 46) { // CTRL + DELETE >>>>> Delete current record if one selected
@@ -280,7 +283,7 @@
                                 // CTRL + SHIFT + [0-9] Quick Access to Sub Menu Category. Hopefully Sub Menu Categories won't exceed 10
                                 // per parent category.
                                 selStr = str_pad(event.keyCode - 48,2,"0", STR_PAD_LEFT) + document.querySelector("#selParentCategory").value;
-                                redirect("MenuCategoryEditor.php", "!" + document.querySelector("#selParentCategory").value);
+                                redirect("menuCategoryEditor.php", "!" + document.querySelector("#selParentCategory").value);
                             }
                             else if (event.keyCode == 77 && shiftDown) { // CTRL + M >>>>> Go to mod editor window.
                                 //redirect("MenuModificationEditor.php");
@@ -320,7 +323,7 @@
 
            //Test displayInterface's processJSONeventCall. STATUS: FUNCTIONING CORRECTLY
            document.menuItemSelected = function() {
-                console.log("processJSONeventCall TEST\nHello From Menu Category Editor: Menu Item Clicked" + this.menuItemId);
+                console.log("processJSONeventCall TEST\nHello From Menu Category Editor: Menu Item Clicked: " + this.menuItemId);
             }
 
         </script>
@@ -367,14 +370,11 @@
                         <?php if (isset($_POST['quickCode']) && strlen($_POST['quickCode']) > 0 &&
                                 (!isset($_POST['delete']) || isset($errorMessage))): ?>
                             <input id="btnSubmit" type="submit" name="commit" value="Update" class="button">
+                            <button type="button" id="btnReset" class="button">Reset</Button>
+                            <button type="button" id="btnDelete" class="button">Delete</Button>
                         <?php else: ?>
                             <input id="btnSubmit" type="submit" name="commit" value="Create" class="button">
-                        <?php endif; ?>
-                        <button type="button" id="btnReset" class="button">Reset</Button>
-                        <?php if (isset($_POST['parentCategory']) && $_POST['parentCategory'] != 'root' ): ?>
-                            <button type="button" id="btnDelete" class="button">Delete Parent</Button>
-                        <?php else: ?>
-                            <button type="button" id="btnDelete" class="button disabled">Delete Parent</Button>
+                            <button type="button" id="btnReset" class="button">Reset</Button>
                         <?php endif; ?>
                     </div>
                     
@@ -397,7 +397,6 @@
                         $_POST['parentCategory']);  
                      // $_POST['quickCode'] stays ?>
 
-            <!-- must be placed at the bottom of the form to submit values form one refresh to the next -->
             <?php require_once '../Resources/php/display.php'; ?>
            
         </form>

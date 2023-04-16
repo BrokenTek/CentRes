@@ -149,10 +149,10 @@
                 document.querySelector("#sessionForm").addEventListener("keyup", keyup);
 
                 document.querySelector("#btnMenuCategoryEditor").addEventListener("pointerdown", 
-                function() {redirect("MenuCategoryEditor.php", (shiftDown ? "!" : "") + document.querySelector("#selParentCategory").value);});
+                function() {redirect("menuCategoryEditor.php", (shiftDown ? "!" : "") + document.querySelector("#selParentCategory").value);});
 
                 document.querySelector("#btnMenuItemEditor").addEventListener("pointerdown", 
-                function() { redirect("MenuItemEditor.php", document.querySelector("#selParentCategory").value); });
+                function() { redirect("menuItemEditor.php", document.querySelector("#selParentCategory").value); });
 
                 document.querySelector("#btnMenuModificationEditor").addEventListener("pointerdown", 
                 function() {redirect("MenuModificationEditor.php");});
@@ -230,10 +230,10 @@
                         if (ctrlDown) {
                             if (event.keyCode == 13 && parentRecall !== undefined && parentRecall != null) { 
                                 if (shiftDown) { //  CTRL + SHIFT + ENTER >>>>> Navigate to MenuCategory 1 Level Up
-                                    redirect("MenuCategoryEditor.php", "!" + parentRecall.replace("!", ""));
+                                    redirect("menuCategoryEditor.php", "!" + parentRecall.replace("!", ""));
                                 }
                                 else { // CTRL ENTER >>>>> Navigate to MenuCategory at Current Level
-                                    redirect("MenuCategoryEditor.php", parentRecall);
+                                    redirect("menuCategoryEditor.php", parentRecall);
                                 }
                             }
                             else if (event.keyCode == 46) { // CTRL + DELETE >>>>> Delete current record if one selected
@@ -363,7 +363,6 @@
                         $_POST['parentCategory']);  
                      // $_POST['quickCode'] stays ?>
 
-            <!-- must be placed at the bottom of the form to submit values form one refresh to the next -->
             <?php require_once '../Resources/php/display.php'; ?>
            
         </form>

@@ -2,10 +2,6 @@
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <html lang='en'>
 <head>
-
-<!-- <IfModule mod_mime.c>
-    AddType application/manifest+json   webmanifest
-</IfModule> -->
     <meta charset='utf-8' />
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="../Resources/CSS/tableStyles.css" />
@@ -31,7 +27,6 @@
     </style>
     <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
     <script src="../Resources/JavaScript/SvgManipulation.js"></script>
-    <!-- Will Need To Change CSS File Path Later -->
 
     <script>
         function allElementsLoaded() {
@@ -339,7 +334,7 @@
         // window.addEventListener('DOMContentLoaded', setDimensions);
     </script>
     </form>
-    <iframe id="tableStatusListener" src="TableStatusListener.php" style="display: none;"></iframe>
+    <iframe id="tableStatusListener" src="tableStatusListener.php" style="display: none;"></iframe>
 </body>
 </html>
 

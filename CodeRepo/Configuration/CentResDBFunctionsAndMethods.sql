@@ -1,5 +1,6 @@
 -- todo switch to using menuItemPrice
 -- todo switch to using ticketItemPrice
+DROP TRIGGER IF EXISTS beforeDeleteEmployee;
 DROP TRIGGER IF EXISTS beforeInsertTableLog;
 DROP TRIGGER IF EXISTS afterInsertTableLog;
 DROP TRIGGER IF EXISTS afterDeleteTicketItem;
@@ -15,13 +16,11 @@ DROP FUNCTION IF EXISTS userPasswordHash;
 DROP FUNCTION IF EXISTS usernameFromId;
 DROP FUNCTION IF EXISTS idFromUsername;
 
-DROP FUNCTION IF EXISTS menuItemPrice; -- TODO
 DROP FUNCTION IF EXISTS ticketItemPrice;
 DROP FUNCTION IF EXISTS splitCount;
 DROP FUNCTION IF EXISTS lowestSplitFlag;
 DROP FUNCTION IF EXISTS ticketSubtotal;
 DROP FUNCTION IF EXISTS menuItemModifications;
-DROP FUNCTION IF EXISTS mipHelperFunction;
 DROP FUNCTION IF EXISTS ticketItemStatus;
 DROP FUNCTION IF EXISTS ticketSplitFlag;
 DROP FUNCTION IF EXISTS ticketItemPayStatus;
@@ -31,22 +30,16 @@ DROP TRIGGER IF EXISTS beforeAddMenuCategory;
 DROP TRIGGER IF EXISTS beforeAddMenuItem;
 DROP TRIGGER IF EXISTS beforeAddMenuModificationCategory;
 DROP TRIGGER IF EXISTS beforeAddMenuModificationItem;
-DROP TRIGGER IF EXISTS beforeAddModActionCategory;
-DROP TRIGGER IF EXISTS beforeAddModAction;
 
 DROP TRIGGER IF EXISTS beforeUpdateMenuCategory;
 DROP TRIGGER IF EXISTS beforeUpdateMenuItem;
 DROP TRIGGER IF EXISTS beforeUpdateMenuModificationCategory;
 DROP TRIGGER IF EXISTS beforeUpdateMenuModificationItem;
-DROP TRIGGER IF EXISTS beforeUpdateModActionCategory;
-DROP TRIGGER IF EXISTS beforeUpdateModAction;
 
 DROP TRIGGER IF EXISTS afterDeleteMenuCategory;
 DROP TRIGGER IF EXISTS afterDeleteMenuItem;
 DROP TRIGGER IF EXISTS afterDeleteMenuModificationCategory;
 DROP TRIGGER IF EXISTS afterDeleteMenuModificationItem;
-DROP TRIGGER IF EXISTS afterDeleteModActionCategory;
-DROP TRIGGER IF EXISTS afterDeleteModAction;
 
 DROP PROCEDURE IF EXISTS createTicket;
 DROP PROCEDURE IF EXISTS createReservation;
@@ -75,78 +68,126 @@ DROP PROCEDURE IF EXISTS cancelPendingTicketItems;
 DROP PROCEDURE IF EXISTS updateTicketGroup;
 DROP PROCEDURE IF EXISTS closeTicketGroup;
 
+DROP FUNCTION IF EXISTS menuObjectTitleUnique;
+DROP FUNCTION IF EXISTS titleToQuickCode;
+DROP PROCEDURE IF EXISTS associateByTitle;
+
+CREATE FUNCTION menuObjectTitleUnique(objTitle VARCHAR(75)) RETURNS BOOLEAN
+BEGIN
+	IF ((SELECT COUNT(*) FROM MenuCategories WHERE title = objTitle LIMIT 1) = 1) THEN
+		RETURN 0;
+	ELSEIF ((SELECT COUNT(*) FROM MenuItems WHERE title = objTitle LIMIT 1) = 1) THEN
+		RETURN 0;
+	ELSEIF ((SELECT COUNT(*) FROM MenuModificationCategories WHERE title = objTitle LIMIT 1) = 1) THEN
+		RETURN 0;
+	ELSEIF ((SELECT COUNT(*) FROM MenuModificationItems WHERE title = objTitle LIMIT 1) = 1) THEN
+		RETURN 0;
+	END IF;
+	RETURN 1;
+END;
+
+CREATE FUNCTION titleToQuickCode(objTitle VARCHAR(75)) RETURNS VARCHAR(5)
+BEGIN
+	DECLARE foundQuickCode VARCHAR(5) DEFAULT NULL;
+	IF (foundQuickCode IS NULL) THEN
+		SELECT quickCode INTO foundQuickCode FROM MenuItems WHERE title = objTitle;
+	END IF;
+	IF (foundQuickCode IS NULL) THEN
+		SELECT quickCode INTO foundQuickCode FROM MenuCategories WHERE title = objTitle;
+	END IF;
+	IF (foundQuickCode IS NULL) THEN
+		SELECT quickCode INTO foundQuickCode FROM MenuModificationCategories WHERE title = objTitle;
+	END IF;
+	IF (foundQuickCode IS NULL) THEN
+		SELECT quickCode INTO foundQuickCode FROM MenuModificationItems WHERE title = objTitle;
+	END IF;
+	RETURN foundQuickCode;
+END;
+
+CREATE PROCEDURE associateByTitle(IN parentTitle VARCHAR(75), IN childTitle VARCHAR(75))
+BEGIN
+	INSERT INTO MenuAssociations (parentQuickCode, childQuickCode) VALUES (titleToQuickCode(parentTitle), titleToQuickCode(childQuickCode));
+END;
+
+CREATE TRIGGER beforeDeleteEmployee
+BEFORE DELETE ON Employees FOR EACH ROW
+BEGIN
+  IF ((SELECT COUNT(*) FROM TableAssignments WHERE employeeId = OLD.id LIMIT 1) = 1) THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Employees cannot be deleted if they are currently assigned to any tables.';
+  END IF;
+END;
+
 CREATE TRIGGER beforeAddMenuCategory
 BEFORE INSERT ON MenuCategories FOR EACH ROW
 BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
-	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuCategories;
-		SET NEW.quickCode = CONCAT('C', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
+	DECLARE isUnique BOOLEAN;
+	SELECT menuObjectTitleUnique(NEW.title) INTO isUnique;
+	IF (NOT isUnique) THEN
+		SIGNAL SQLSTATE '45000'
+    	SET MESSAGE_TEXT = 'Menu Object Titles must be unique.';
+	ELSE 
+		IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
+			SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuCategories;
+			SET NEW.quickCode = CONCAT('C', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
+		END IF;
+		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 	END IF;
-	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 END;
 
 CREATE TRIGGER beforeAddMenuItem
 BEFORE INSERT ON MenuItems FOR EACH ROW
 BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
-	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuItems;
-		SET NEW.quickCode = CONCAT('I', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
+	DECLARE isUnique BOOLEAN;
+	SELECT menuObjectTitleUnique(NEW.title) INTO isUnique;
+	IF (NOT isUnique) THEN
+		SIGNAL SQLSTATE '45000'
+    	SET MESSAGE_TEXT = 'Menu Object Titles must be unique.';
+	ELSE 
+		IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
+			SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuItems;
+			SET NEW.quickCode = CONCAT('I', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
+		END IF;
+		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 	END IF;
-	IF (NEW.route IS NOT NULL) THEN
-		SET NEW.route = UPPER(NEW.route);
-	END IF;
-	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 END;
 
-CREATE TRIGGER beforeAddMenuModificationCategory
+CREATE TRIGGER beforeAddMenuModificationcATEGORY
 BEFORE INSERT ON MenuModificationCategories FOR EACH ROW
 BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
-	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationCategories;
-		SET NEW.quickCode = CONCAT('W', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));	
+	DECLARE isUnique BOOLEAN;
+	SELECT menuObjectTitleUnique(NEW.title) INTO isUnique;
+	IF (NOT isUnique) THEN
+		SIGNAL SQLSTATE '45000'
+    	SET MESSAGE_TEXT = 'Menu Object Titles must be unique.';
+	ELSE 
+		IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
+			SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationCategories;
+			SET NEW.quickCode = CONCAT('X', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
+		END IF;
+		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 	END IF;
-	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 END;
 
 CREATE TRIGGER beforeAddMenuModificationItem
 BEFORE INSERT ON MenuModificationItems FOR EACH ROW
 BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
-	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationItems;
-		SET NEW.quickCode = CONCAT('X', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));	
-	END IF;
-	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
-END;
-
-CREATE TRIGGER beforeAddModActionCategory
-BEFORE INSERT ON ModActionCategories FOR EACH ROW
-BEGIN
-	DECLARE cnt INTEGER UNSIGNED;
-	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM ModActionCategories;
-		SET NEW.quickCode = CONCAT('Y', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
-	END IF;
-	INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
-END;
-
-CREATE TRIGGER beforeAddModAction
-BEFORE INSERT ON ModActions FOR EACH ROW
-BEGIN
-	DECLARE cnt INTEGER UNSIGNED;
-	IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-		SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM ModActions;
-		SET NEW.quickCode = CONCAT('Z', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
+	DECLARE isUnique BOOLEAN;
+	SELECT menuObjectTitleUnique(NEW.title) INTO isUnique;
+	IF (NOT isUnique) THEN
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = NEW.quickCode;
-	ELSE
+    	SET MESSAGE_TEXT = 'Menu Object Titles must be unique.';
+	ELSE 
+		IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
+			SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationItems;
+			SET NEW.quickCode = CONCAT('Y', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
+		END IF;
 		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 	END IF;
-	
-	-- 
 END;
 
 CREATE TRIGGER afterDeleteMenuCategory
@@ -177,20 +218,6 @@ BEGIN
 	DELETE FROM MenuAssociations WHERE parentQuickCode = OLD.quickCode OR childQuickCode = OLD.quickCode;
 END;
 
-CREATE TRIGGER afterDeleteModActionCategory
-AFTER DELETE ON ModActionCategories FOR EACH ROW
-BEGIN
-	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
-	DELETE FROM MenuAssociations WHERE parentQuickCode = OLD.quickCode OR childQuickCode = OLD.quickCode;
-END;
-
-CREATE TRIGGER afterDeleteModAction
-AFTER DELETE ON ModActions FOR EACH ROW
-BEGIN
-	DELETE FROM QuickCodes WHERE id = OLD.quickCode;
-	DELETE FROM MenuAssociations WHERE parentQuickCode = OLD.quickCode OR childQuickCode = OLD.quickCode;
-END;
-
 CREATE TRIGGER beforeUpdateMenuCategory
 BEFORE UPDATE ON MenuCategories FOR EACH ROW
 BEGIN
@@ -205,12 +232,6 @@ BEGIN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM ModActionCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM ModActions WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		END IF; 
@@ -233,12 +254,6 @@ BEGIN
 		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM ModActionCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM ModActions WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		END IF; 
 	END IF;
 END;
@@ -259,12 +274,6 @@ BEGIN
 		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM ModActionCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM ModActions WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		END IF; 
 	END IF;
 END;
@@ -283,64 +292,6 @@ BEGIN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM ModActionCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM ModActions WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		END IF; 
-	END IF;
-END;
-
-CREATE TRIGGER beforeUpdateModActionCategory
-BEFORE UPDATE ON ModActionCategories FOR EACH ROW
-BEGIN
-	IF (OLD.quickCode <> NEW.quickCode) THEN
-		IF ((SELECT COUNT(*) FROM menuCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM ModActionCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM ModActions WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		END IF; 
-	END IF;
-END;
-
-CREATE TRIGGER beforeUpdateModAction
-BEFORE UPDATE ON ModActions FOR EACH ROW
-BEGIN
-	IF (OLD.quickCode <> NEW.quickCode) THEN
-		IF ((SELECT COUNT(*) FROM menuCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM ModActionCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM ModActions WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
 		END IF; 
@@ -485,127 +436,6 @@ BEGIN
 		SELECT id INTO empId FROM Employees WHERE userName = uname;
 		RETURN empId;
 	END IF;
-END;
-
--- parent Quick code is required because Menu Items can belong to more than 1 Menu Item Category.
--- specifying the parent uniquely identifies a specific instance of the menu item.
-CREATE FUNCTION menuItemPrice(qc VARCHAR(10), parentQuickCode VARCHAR(10)) RETURNS DECIMAL(6, 2)
-BEGIN
-	DECLARE prc DECIMAL(6, 2);
-	SELECT price INTO prc FROM MenuItems WHERE id = qc; 
-	RETURN mipHelperFunction(parentQuickCode, prc, NULL, NULL, NULL);
-END;
-
-CREATE FUNCTION mipHelperFunction(qc VARCHAR(10), basePrice DECIMAL(6, 2), minPercentage DECIMAL(6, 2), minDiscount DECIMAL(6, 2), minPriceOverride DECIMAL(6,2)) RETURNS DECIMAL(6, 2)
-BEGIN
-	DECLARE selectedValue DECIMAL(6, 2);
-	DECLARE defPrice DECIMAL(6, 2);
-	DECLARE done INT DEFAULT FALSE;
-	DECLARE parentQC VARCHAR(10);
-	DECLARE myCursor CURSOR
-		FOR 
-			SELECT priceModificationValue FROM MenuModificationItems INNER JOIN MenuAssociations ON MenuModificationItems.quickCode = MenuAssociations.childQuickCode WHERE parentQuickCode = qc;
-	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-	
-	OPEN myCursor;
-	modItemsLoop:
-	LOOP
-		FETCH myCursor INTO selectedValue;
-		IF (done = 1) THEN
-			LEAVE modItemsLoop;
-		END IF;
-		IF (selectedValue = 0) THEN
-			CLOSE myCursor;
-			RETURN 0;
-		ELSEIF (selectedValue < 0 AND (selectedValue < minDiscount OR minDiscount IS NULL)) THEN
-			SET minDiscount = selectedValue;
-		ELSEIF (selectedValue > 0 AND selectedValue < 1 and (selectedValue < minDiscount OR minDiscount IS NULL)) THEN
-			SET minPercentage = selectedValue;
-		ELSEIF (selectedValue >= 1 AND (selectedValue < minPriceOverride OR minPriceOverride IS NULL)) THEN
-			SET minPriceOverride = selectedValue;
-		END IF;
-	END LOOP modItemsLoop;
-	CLOSE myCursor;
-
-	IF (basePrice IS NULL) Then
-		SELECT defaultPrice INTO basePrice FROM MenuCategories WHERE quickCode = qc;
-	END IF;
-
-	SELECT parentQuickCode INTO parentQC FROM TableAssociations WHERE childQuickCode = qc;
-	IF (basePrice - minDiscount < 0) THEN
-		SET minDiscount = 0;
-	END IF;
-	IF parentQC IS NULL THEN
-		IF (basePrice IS NULL and minPriceOverride IS NULL) Then
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Menu Item doesn''t have a price set, and cannot be inferred from ancestors!';
-		ELSE
-			SET selectedValue = basePrice;
-			IF (minPercentage IS NOT NULL AND basePrice * minPercentage < selectedValue) THEN
-				SET selectedValue = basePrice * minPercentage;
-			End IF;
-			IF (minDiscount IS NOT NULL AND basePrice + minDiscount < selectedValue) THEN
-				SET selectedValue = basePrice + minDiscount;
-			End IF;
-			IF (minPriceOverride IS NOT NULL AND minPriceOverride < selectedValue) THEN
-				SET selectedValue = basePrice + minDiscount;
-			End IF;
-			RETURN selectedValue;
-		END IF;
-	ELSE
-		RETURN mipHelperFunction(parentQC, basePrice, minPercentage, minDiscount, minPriceOverride);
-	END IF;	
-END;
-
-CREATE FUNCTION menuItemModifications(qc VARCHAR(10), parentQC VARCHAR(10)) RETURNS VARCHAR(500)
-BEGIN
-	DECLARE inString VARCHAR(10);
-	DECLARE myString VARCHAR(500);
-	-- SET myString = '';
-
-	DECLARE done INT DEFAULT FALSE;
-	DECLARE myCursor CURSOR
-		FOR 
-			SELECT childQuickCode FROM MenuAssociations INNER JOIN MenuModificationCategories ON MenuAssociations.childQuickCode = MenuModificationsCategories.quickCode WHERE parentQuickCode = parentQC;
-	DECLARE myCursor2 CURSOR
-		FOR 
-			SELECT childQuickCode FROM MenuAssociations INNER JOIN MenuModificationCategories ON MenuAssociations.childQuickCode = MenuModificationsCategories.quickCode WHERE parentQuickCode = qc;
-	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-	
-	OPEN myCursor;
-	modItemsLoop:
-	LOOP
-		FETCH myCursor INTO inString;
-		IF (done = 1) THEN
-			LEAVE modItemsLoop;
-		END IF;
-		-- IF (myString = '') THEN
-		--	UPDATE myString SET myString = inString;
-		-- ELSE
-			UPDATE myString SET myString = myString + ',' + inString;
-		-- END IF;	
-	END LOOP modItemsLoop;
-	CLOSE myCursor;
-	SET done = FALSE;
-	
-	OPEN myCursor2;
-	modItemsLoop2:
-	LOOP
-		FETCH myCursor INTO inString;
-		IF (done = 1) THEN
-			LEAVE modItemsLoop2;
-		END IF;
-		-- IF (myString = '') THEN
-		--	UPDATE myString SET myString = inString;
-		-- ELSE
-			UPDATE myString SET myString = myString + ',' + inString;
-		-- END IF;
-		
-	END LOOP modItemsLoop2;
-	CLOSE myCursor2;
-
-	RETURN myString;
-
 END;
 
 -- calculates the ticket item price, taking into account it's split.
@@ -868,7 +698,7 @@ CREATE PROCEDURE createTicketItem(IN ticketNumber INT UNSIGNED, IN seatNumber SM
 BEGIN
 	DECLARE tbl VARCHAR(3);
 	DECLARE newItemIndex SMALLINT UNSIGNED;
-	DECLARE calcPrice DECIMAL(6, 2);
+	DECLARE calcprice DECIMAL(6, 2);
 	DECLARE qty SMALLINT;
 	DECLARE req SMALLINT;
 	DECLARE nextAvailableItmNum SMALLINT;
@@ -888,10 +718,10 @@ BEGIN
 		SET MESSAGE_TEXT = 'Menu Item Not Found!';
 	ELSE
 		-- todo switch to using menuItemPrice
-		SELECT price, quantity, requests INTO calcPrice, qty, req FROM MenuItems WHERE quickCode = menuItemQC;
-		IF (calcPrice IS NULL) THEN
+		SELECT price, quantity, requests INTO calcprice, qty, req FROM MenuItems WHERE quickCode = menuItemQC;
+		IF (calcprice IS NULL) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Menu Item Price Cannot Be Determined!';
+			SET MESSAGE_TEXT = 'Menu Item price Cannot Be Determined!';
 		ELSE
 			-- record a menu item was requested.
 			UPDATE MenuItems SET requests = req + 1 WHERE quickCode = menuItemQC;
@@ -906,7 +736,7 @@ BEGIN
 				SELECT (IFNULL(MAX(itemId),0) +1) INTO newItemIndex FROM TicketItems WHERE ticketId = ticketNumber;
 
 				-- create the ticket item
-				INSERT INTO TicketItems (id, splitFlag, seat, menuItemQuickCode, calculatedPrice, calculatedPriceWithMods) VALUES (ticketNumber * 10000 + newItemIndex, POWER(2, split),  seatNumber, menuItemQC, calcPrice, calcPrice);
+				INSERT INTO TicketItems (id, splitFlag, seat, menuItemQuickCode, calculatedPrice, calculatedPriceWithMods) VALUES (ticketNumber * 10000 + newItemIndex, POWER(2, split),  seatNumber, menuItemQC, calcprice, calcprice);
 				-- SET newTicketItemID = ticketNumber * 10000 + newItemIndex;
 
 				-- create the split if it doesn't exist
@@ -964,10 +794,10 @@ BEGIN
 		SET MESSAGE_TEXT = 'Ticket Item Number Doesn''t Exist!';
 	ELSEIF (authorizationUsername IS NULL) THEN
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'Price Overrides must include Employee# to Log Event!';
+		SET MESSAGE_TEXT = 'price Overrides must include Employee# to Log Event!';
 	ELSEIF (stat NOT IN ('Delivered', 'Hidden')) THEN
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'Price Overrides Can Only Be Applied to Delivered Ticket Items!';
+		SET MESSAGE_TEXT = 'price Overrides Can Only Be Applied to Delivered Ticket Items!';
 	ELSE
 		SELECT idFromUsername(authorizationUsername) INTO empId; 
 		UPDATE TicketItems SET overridePrice = adjustment, 
@@ -1281,14 +1111,13 @@ END;
 CREATE PROCEDURE updateTicketGroup(tickGrp DECIMAL(6, 2), flag TINYINT UNSIGNED)
 BEGIN
 	DECLARE rte CHAR(1);
-	UPDATE ActiveTicketGroups SET updateCounter = updateCounter + 1  WHERE id = tickGrp;
 	IF (flag = 2) THEN
 		-- ticket group may no longer be active.
 		-- check TicketItems table and find any item with matching tickGrp that is "Preparing" or "Modified"
 		
 		-- if no matches are found, delete tickGrp from ActiveTicketGroups table.
 		-- Occurs when ticket item is canceled after submission, or item marked as ready
-		IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) IN ('Preparing', 'Updated' ) LIMIT 1) = 0) THEN
+		IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) NOT IN ('Delivered', 'Canceled', 'Hidden' ) LIMIT 1) = 0) THEN
 			DELETE FROM ActiveTicketGroups WHERE id = tickGrp;
 		END IF;
 	ELSEIF (flag = 1) THEN
@@ -1307,6 +1136,7 @@ BEGIN
 			INSERT INTO ActiveTicketGroups (id, route) VALUES (tickGrp, rte);
 		END IF;
 	END IF; 
+	UPDATE ActiveTicketGroups SET updateCounter = updateCounter + 1  WHERE id = tickGrp;
 
 END;
 
@@ -1445,10 +1275,3 @@ BEGIN
 	RETURN cnt > 0;
 END;
 */
-
-INSERT INTO ModActionCategories (title, quickCode) VALUES ('Default', 'A001');
-INSERT INTO ModActions (modActionCategory, title, cost, quickCode) VALUES
-	('A001', 'None', NULL, 'Y001'),
-	('A001', 'Xtra', NULL, 'Y002'),
-	('A001', 'Lite', NULL, 'Y003'),
-	('A001', 'Add', .99, 'Y004');

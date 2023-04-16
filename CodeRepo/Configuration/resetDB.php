@@ -1,9 +1,3 @@
-<!-- (to be removed) SUGGESTION: Comments added to the JS
-    For the discovery of comments that are to be removed upon
-    the conclusion of integration testing (or before), use the
-    find in folder functionality (CTRL+Shift+F) to find all occurances 
-    in all files in a folder of the text string: (to be removed) 
-    **use this on CentRes folder to search all**  -->
 <?php
     // makes sure the reset script is accessible if there is an error with the database,
     // there are no employees in the database, or a manager is logged in and wants to reset.

@@ -1,6 +1,4 @@
-<!-- DISPLAY TEMPLATE
-This template includes starter code that allows
-you to use display.php and displayInterface.js -->
+
 
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <?php
@@ -86,8 +84,7 @@ you to use display.php and displayInterface.js -->
 <html>
     <head>
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
-        <!-- gives you access to varSet, varGet, varRem, 
-        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
+        
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         <script>
             function allElementsLoaded() {
@@ -176,9 +173,9 @@ you to use display.php and displayInterface.js -->
                 <div id="loginTitle">CentRes&nbsp;Employee&nbsp;Login</div>
             </div>
             <div>
-                <!-- this form submits to itself -->
+                
                 <form id="loginForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
-                    <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
+                    
                     <?php if (isset($_POST['username']) && (isset($_POST['password']) || isset($_POST['validatedPassword']))): ?>    
                         <?php 
                             //removes characters that mess with the echo command in sessionHeader.php.

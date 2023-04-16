@@ -11,10 +11,10 @@
                 // any startup tasks go here after page has fully loaded.
                 
                 document.querySelector("#btnMenuCategoryEditor").addEventListener("pointerdown", 
-                function() { location.replace("MenuCategoryEditor.php") });
+                function() { location.replace("menuCategoryEditor.php") });
 
                 document.querySelector("#btnMenuItemEditor").addEventListener("pointerdown", 
-                function() { location.replace("MenuItemEditor.php") });
+                function() { location.replace("menuItemEditor.php") });
 
                 document.querySelector("#btnMenuModificationEditor").addEventListener("pointerdown", 
                 function() { location.replace("MenuModificationEditor.php") });

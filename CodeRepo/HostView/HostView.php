@@ -136,18 +136,17 @@
 			function startEventLoopTimer() {
 				eventLoopTimer = setTimeout(eventLoop, 100);
 			}
-			<!-- event loop goes here -->
 		</script>
 	</head>
 	<body onload="allElementsLoaded()" class="intro">
 		<form id="sessionForm" action="../ServerView/ServerView.php" method="POST">
 			<?php require_once "../Resources/php/sessionHeader.php"; ?>
 			<div id="sessionBody">
-				<iframe id="ifrServerList" src="ServerList.php" frameborder='0' width="100%" height="100%"></iframe>
-				<iframe id="ifrWaitList" src="WaitList.php" frameborder='0' width="100%" height="100%"></iframe>
-				<iframe id="ifrWaitTimes" src="WaitTimes.php" frameborder='0' width="100%" height="100%"></iframe>
-				<iframe id="ifrSelectedTable" src="SelectedTable.php" frameborder='0' width="100%" height="100%"></iframe>
-				<iframe id="ifrRestaurantLayout" src="RestaurantLayout.php" frameborder='0' width="100%" height="100%"></iframe>
+				<iframe id="ifrServerList" src="serverList.php" frameborder='0' width="100%" height="100%"></iframe>
+				<iframe id="ifrWaitList" src="waitList.php" frameborder='0' width="100%" height="100%"></iframe>
+				<iframe id="ifrWaitTimes" src="waitTimes.php" frameborder='0' width="100%" height="100%"></iframe>
+				<iframe id="ifrSelectedTable" src="selectedTable.php" frameborder='0' width="100%" height="100%"></iframe>
+				<iframe id="ifrRestaurantLayout" src="restaurantLayout.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="serverListener" src="../Resources/php/serverListener.php" style="display: none;"></iframe>
 			</div>
 		</form>

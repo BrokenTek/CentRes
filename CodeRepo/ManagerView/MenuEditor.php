@@ -1,12 +1,4 @@
-<!-- DISPLAY TEMPLATE
-This template includes starter code that allows
-you to use display.php and displayInterface.js -->
 
-
-<!-- ensures you are logged in before rendering page, and are logged in under the correct role.
-If you aren't logged in, it will reroute to the login page.
-If you are logged in but don't have the correct role to view this page,
-you'll be routed to whatever the home page is for your specified role level -->
 <?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(8, $GLOBALS['role']); ?>
 
 <!DOCTYPE html>
@@ -39,12 +31,9 @@ you'll be routed to whatever the home page is for your specified role level -->
                 background-color: transparent;
             }
         </style>
-        <!-- gives you access to varSet, varGet, varRem, 
-        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
-        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         
-        <!-- demonstration on how to use varGet, varSet, updateDisplay for just this page -->
-        <!-- remove this script tag -->
+        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+
         <script>
             var mnu;
             var mnuEditor;
@@ -52,71 +41,64 @@ you'll be routed to whatever the home page is for your specified role level -->
                 mnu = document.getElementById("ifrMenu");
                 mnuEditor = document.getElementById("ifrMenuEditor");
 
-                mnu.contentDocument.addEventListener("click", menuUpdated);
                 mnuEditor.addEventListener("load", editorRefreshed);
                 setTitle("CentRes POS: Management Tools - Menu Editor", "Management Tools");
                 //setup path for iframes to call this window's functions
             }
 
             function editorRefreshed(event) {
-                ignoreUpdate = true;
                 if (varGet("updated", "ifrMenuEditor") != null) {
                     varCpyRen("lookAt", "ifrMenuEditor", "updated", "ifrMenu");
                     updateDisplay("ifrMenu");
-                    setTimeout(() => {
-                        mnu.contentDocument.addEventListener("click", menuUpdated);
-                    }, 1000);
-                }
-                ignoreUpdate = false;
-                
+                    
+                }                
             }
 
-            let ignoreUpdate = false
-            function menuUpdated(event) {
-                if (ignoreUpdate) {
-                    ignoreUpdate = false;
-                    return;
-                }
-                let selectedMenuObjectId = event.target.parentNode.id;
-                if (event.target.parentNode.tagName === "DETAILS") {
-                    mnuEditor.contentDocument.getElementById("txtParentCategory").setAttribute("value", selectedMenuObjectId);
-                }
-                else if (event.target.parentNode.tagName === "SPAN") {
-                    var itm = varGet("selectedMenuItem", "ifrMenu");
-                    let parentId = mnu.contentDocument.getElementById(itm).parentElement.parentElement.id; //.parentElement.id;
-                    mnuEditor.contentDocument.getElementById("txtParentCategory").setAttribute("value", parentId);
-                    mnuEditor.contentDocument.getElementById("txtRecallParentCategory").setAttribute("value",parentId);
-                    mnuEditor.contentDocument.getElementById("txtQC").setAttribute("value", selectedMenuObjectId);
-                    mnuEditor.contentDocument.getElementById("txtLookAt").setAttribute("value", selectedMenuObjectId);
-                }
-                if (selectedMenuObjectId != '') {
-                    with (mnuEditor.contentDocument.getElementById("frmRedirect")) {
-                        action = "MenuItemEditor.php";
+            document.menuItemSelected = function() {
+                with (document.getElementById("ifrMenuEditor").contentDocument) {
+                    getElementById("txtQC").setAttribute("value", this.menuItemId);
+                    getElementById("txtLookAt").setAttribute("value", this.menuItemId);
+                    if (this.parentCategoryId != null) {
+                        getElementById("txtParentCategory").setAttribute("value", this.parentCategoryId);
+                        getElementById("txtRecallParentCategory").setAttribute("value", this.parentCategoryId);
+                    }
+                    with (getElementById("frmRedirect")) {
+                        setAttribute("action", "menuItemEditor.php");
                         submit();
                     }
+
                 }
             }
 
-           //Test displayInterface's processJSONeventCall. STATUS: FUNCTIONING CORRECTLY
-           document.menuItemSelected = function() {
-                console.log("processJSONeventCall TEST\nHello From Menu Editor: Menu Item Clicked: " + this.menuItemId);
+            document.menuCategorySelected = function() {
+                with (document.getElementById("ifrMenuEditor").contentDocument) {
+                    getElementById("txtQC").setAttribute("value", this.menuCategoryId);
+                    getElementById("txtLookAt").setAttribute("value", this.menuCategoryId);
+                    if (this.parentCategoryId != null) {
+                        getElementById("txtParentCategory").setAttribute("value", this.menuCategoryId);
+                        getElementById("txtRecallParentCategory").setAttribute("value", this.menuCategoryId);
+                    }
+                    with (getElementById("frmRedirect")) {
+                        setAttribute("action", "menuCategoryEditor.php");
+                        submit();
+                    }
+
+                }
             }
 
             //Place your JavaScript Code here
         </script>
     </head>
     <body id="sessionForm" onload="allElementsLoaded()">
-        <!-- this form submits to itself -->
+        
         <form id='frmMenuEditor' action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <?php require_once '../Resources/php/sessionHeader.php'; ?>
-            <iframe id="ifrMenuEditor" src="MenuEditorHome.php"></iframe>
+            <iframe id="ifrMenuEditor" src="menuEditorHome.php"></iframe>
             <iframe id="ifrMenu" src="../ServerView/menu.php"></iframe>
-            <div id="flickControl"></div>
             
             <?php unset($_POST['thisVariableIWantToForget'], $_POST['thisOtherVariableIDontNeed']) ?>
 
-            <!-- retain any POST vars. When updateDisplay() is called or the form is submitted,
-            these variables will be carried over -->
+            
             <?php require_once '../Resources/php/display.php'; ?>
            
         </form>

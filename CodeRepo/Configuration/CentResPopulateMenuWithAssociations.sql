@@ -6,13 +6,9 @@
 -- DELETE FROM menuassociations;
 DELETE FROM menuitems;
 DELETE FROM menucategories;
+DELETE FROM menumodificationcategories;
 DELETE FROM menumodificationitems;
 
-/* Insert The Root For Association. Script For Populating The Menu Iframe Disregards The Category 'root' So
-   It Will Not Display In The Server View */
---   INSERT INTO `menucategories` (`quickCode`, `title`, `description`, `route`, `visible`, `defaultPrice`)
---   VALUES
--- ('root', 'root', NULL, NULL, 1, NULL);
 
 /* Insert Root Categories And Sub Categories */
 INSERT INTO `menucategories` (`quickCode`, `title`, `description`, `route`, `visible`, `defaultPrice`)
@@ -115,7 +111,7 @@ INSERT INTO `menuitems` (`quickCode`, `title`, `description`, `price`, `route`, 
 ('I083', 'Slice Of Cake', NULL, '5.50', 'K', NULL, 0, NULL, 1);
 
 /* Insert All Mods */
-INSERT INTO `menumodificationitems` (`quickCode`, `title`, `priceOrModificationValue`, `categoryType`)
+INSERT INTO `menumodificationitems` (`quickCode`, `title`, `price`, `categoryType`)
 VALUES 
     ('M000', 'American Cheese', 1, 'optionalAny'),
     ('M001', 'Cheddar Cheese', 1, 'optionalAny'),

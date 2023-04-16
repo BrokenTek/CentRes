@@ -1,5 +1,4 @@
-<!-- ensures you are logged in before rendering page.
-Otherwise will reroute to logon page -->
+
 <?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(4, $GLOBALS['role']); ?>
 <!DOCTYPE html>
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
@@ -14,8 +13,7 @@ Otherwise will reroute to logon page -->
     <head>
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/waitListStructure.css">
-        <!-- gives you access to varSet, varGet, varRem, 
-        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
+        
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>  
         <script>
             function createEventHandlers() {
@@ -74,16 +72,13 @@ Otherwise will reroute to logon page -->
     <body onload="createEventHandlers()" class="intro">
         <legend>
             <div onpointerdown="updateDisplay()">Wait List</div>
-            <button type="button" onpointerdown="location.href='NewTicket.php'" id="btnAddTicket">Add</button>
+            <button type="button" onpointerdown="location.href='newTicket.php'" id="btnAddTicket">Add</button>
             <button class="disabled" type="button" onpointerdown="removeSelectedTicket()" disabled id="btnRemoveSelectedTicket" onpointerdown="removeSelectedTicket()">Remove</button>
         </legend>
-        <!-- change the action to you filename -->
-        <form action="WaitList.php" method="POST" id="frmWaitList">
-            <!-- retain any POST vars. When updateDisplay() is called, these variables
-            will be carried over -->
+        <form action="waitList.php" method="POST" id="frmWaitList">
+            
             <?php require_once '../Resources/PHP/display.php'; ?>
             
-            <!-- PLACE YOUR CODE HERE -->
             <?php
                 if (isset($_POST['removeTicket'])) {
                     $sql = "DELETE FROM Tickets WHERE id = " .substr($_POST['removeTicket'], 6). ";";

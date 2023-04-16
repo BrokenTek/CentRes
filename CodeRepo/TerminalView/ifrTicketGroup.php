@@ -5,35 +5,24 @@
         <link rel="stylesheet" href="../Resources/CSS/atgStyle.css">
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
         <script>
-            
-            function toggleReadyListener(){
-                varSet("ticketItemNumber", this.id, "activeTicketGroupConnector", true);
-                event.stopPropagation();
-                
-            }
-           
             function allElementsLoaded(){
-                if(varExists('groupId')){
-                    varCpyRen("groupId", null,"activeGroupId","activeTicketGroupConnector");
-                    
-                    let ticketItemElements = document.getElementsByName("ticketItem");
-                    for(let i = 0; i < ticketItemElements.length; i++){
-                        let element = ticketItemElements[i];
-                        with(element.classList) {
-                            if(!(contains("removed") || contains("delivered"))){
-                                element.addEventListener('pointerdown',toggleReadyListener);
-                            }
+                let ticketItemElements = document.getElementsByName("ticketItem");
+                for(let i = 0; i < ticketItemElements.length; i++){
+                    let element = ticketItemElements[i];
+                    with(element.classList) {
+                        if(!(contains("removed") || contains("delivered"))){
+                            element.addEventListener('pointerdown',ticketItemPressed);
                         }
                     }
-                    //document.getElementById("btnClose").addEventListener("pointerdown", setClosed);
                 }
+                
                 let x = varGet("scrollX");
                 let y = varGet("scrollY");
                 if (x !== undefined) {
                     window.scroll({
-                    top: y,
-                    left: x,
-                    behavior: "smooth",
+                        top: y,
+                        left: x,
+                        behavior: "smooth",
                     });
                 }
 
@@ -43,41 +32,62 @@
                 }, true);
             }
 
+            document.configure = function(event) { 
+                if (varExists("ticketGroupId")) { return; }
+                varSet("route", this.route);
+                varSet("ticketGroupId", this.ticketGroupId);
+                updateDisplay();
+            }
+
+            document.activateTicketGroups = function(event) {
+                for(let i = 0; i < this.ticketGroupIds.length; i++){
+                    if (this.ticketGroupIds[i] == varGet("ticketGroupId")) {
+                        updateDisplay();
+                    }
+                }
+            }
+            document.updateTicketGroups = document.activateTicketGroups;
+            document.inactivateTicketGroups = document.activateTicketGroups;
+
+            function ticketItemPressed(){
+                dispatchJSONeventCall("toggleTicketItemStatus", {"ticketItemNumber": this.id});   
+            }
+
+            function closeButtonPressed(event) {
+                dispatchJSONeventCall("closeActiveTicketGroupIframe", {"ticketGroupId": varGet("ticketGroupId")});
+            }
+
             
 
-            function setClosed(event) {
-                varRen('completeAndCloseable', 'closeMe');
-            }
         </script>
     </head>
     <body id="sessionForm" onload="allElementsLoaded()">
         
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="frmATG">
-            <?php if(isset($_POST['groupId']) && isset($_POST['route'])): ?>
+            <?php if(isset($_POST['ticketGroupId']) && isset($_POST['route'])): ?>
                 <?php
-                    $sql = "SELECT tableid FROM tablelog WHERE ticketid = ".floor($_POST['groupId'])."
+                    $sql = "SELECT tableid FROM tablelog WHERE ticketid = ".floor($_POST['ticketGroupId'])."
                     ORDER BY timeStamp DESC;";
                     $currentTable = connection()->query($sql)->fetch_assoc()['tableid'];
 
                     $sql = "SELECT menuItems.title AS 'itemName', id, flag, modificationNotes AS 'mods' 
                         FROM (ticketItems LEFT JOIN menuItems ON menuItemQuickCode=quickCode) 
-                        WHERE groupid = ".$_POST['groupId']."
+                        WHERE groupid = ".$_POST['ticketGroupId']."
                         AND route='".$_POST['route']."';";
                     $itemList = connection()->query($sql);
+                    $sql = "SELECT timeCreated FROM ActiveTicketGroups WHERE id = ".$_POST['ticketGroupId'].";";
+                    $submitTimeResult = connection()->query($sql);
+                    if (mysqli_num_rows($submitTimeResult) == 1) {
+                        $timeSubmitted = $submitTimeResult->fetch_assoc()['timeCreated'];                         
+                    }
                 ?>
                 <div id='descriptors'>
-                    <?php if (isset($_POST['completeAndCloseable']) || isset($_POST['closeMe'])): ?>
-                        <button id="btnClose" type="button" onpointerdown="setClosed()">Close</button>
-                    <?php else: ?>
-                        <?php
-                            if (!(isset($_POST['completeAndCloseable']) || isset($_POST['closeMe']))) {
-                                $sql = "SELECT timecreated FROM activeticketgroups WHERE id = ".$_POST['groupId'].";";
-                                $timeSubmitted = connection()->query($sql)->fetch_assoc()['timecreated'];
-                            } 
-                        ?>
+                    <?php if (isset($timeSubmitted)): ?>
                         <div id="lblSubmitted">Submitted:</div><div id="valSubmitted"><?php echo substr($timeSubmitted,11,5)?></div>                                  
+                    <?php else: ?>
+                        <button id="btnClose" type="button" onpointerdown="closeButtonPressed()">Close</button>
                     <?php endif; ?>
-                    <div id="lblGroupId">Ticket-Group:</div><div id="valGroupId"><?php echo $_POST['groupId']; ?></div>
+                    <div id="lblGroupId">Ticket-Group:</div><div id="valGroupId"><?php echo $_POST['ticketGroupId']; ?></div>
                     <div id="lblRoute">Route:</div><div id="valRoute"><?php echo $_POST['route']; ?></div>
                     <div id="lblTableId">Table:</div><div id=valTableId><?php echo $currentTable; ?></div>
                 </div>

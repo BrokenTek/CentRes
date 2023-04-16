@@ -57,8 +57,7 @@
 
         
     </style>
-        <!-- gives you access to varSet, varGet, varRem, 
-        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
+        
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
         
 
@@ -293,11 +292,11 @@
         </script>
     </head>
     <body onload="allElementsLoaded()">
-        <!-- this form submits to itself -->
+        
         <form id="sessionForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <?php require_once "../Resources/php/sessionHeader.php"; ?>
             <div id="sessionBody">
-            <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
+            
             <?php            
                 if (isset($_POST['command'])) {
                     $inStr = isset($_POST['selectedItem']) ?
@@ -410,8 +409,7 @@
             </table>
 
 
-            <!-- retain any POST vars. When updateDisplay() is called or the form is submitted,
-            these variables will be carried over -->
+            
             <?php
                 unset($_POST['command'], $_POST['qtyTracked'], $_POST['qty']); 
                 require_once '../Resources/php/display.php'; 

@@ -1,6 +1,5 @@
 
-<!-- ensures you are logged in before rendering page.
-Otherwise will reroute to logon page -->
+
 <?php require_once 'sessionLogic.php'; restrictAccess(7, $GLOBALS['role']); ?>
 <?php require_once 'currencyPrinter.php'; ?>
 <!DOCTYPE html>
@@ -528,7 +527,7 @@ Otherwise will reroute to logon page -->
                     elseif ( $ticketItem['overridePrice'] >= 1 ) {
                          // price set to a value
                          //echo($ticketItem['overridePrice']);
-                         echo("Price Change");
+                         echo("price Change");
                     }
                     elseif ( $ticketItem['overridePrice'] == 0 ) {
                         // free
@@ -553,24 +552,24 @@ Otherwise will reroute to logon page -->
                         else {
                             $modItem = $modItemRows->fetch_assoc();
                             echo('<div class="modText">' .$modItem['title']. '</div>');
-                            if (!is_null($modItem['priceOrModificationValue'])) {
+                            if (!is_null($modItem['price'])) {
                                 echo('<div class="modPrice">');
                               
-                                if ($modItem['priceOrModificationValue'] < 0) {
+                                if ($modItem['price'] < 0) {
                                     // discount applied
-                                    echo(currencyPrint($modItem['priceOrModificationValue']));
+                                    echo(currencyPrint($modItem['price']));
                                 }
-                                elseif ( $modItem['priceOrModificationValue'] >= 1 ) {
+                                elseif ( $modItem['price'] >= 1 ) {
                                      // price set to a value
-                                     echo(currencyPrint($modItem['priceOrModificationValue']));
+                                     echo(currencyPrint($modItem['price']));
                                 }
-                                elseif ( $modItem['priceOrModificationValue'] == 0 ) {
+                                elseif ( $modItem['price'] == 0 ) {
                                     // free
                                     echo('FREE');
                                 }
                                 else {
                                     // percent discount applied
-                                   echo(((1 - $modItem['priceOrModificationValue']) * 100) ."% off");
+                                   echo(((1 - $modItem['price']) * 100) ."% off");
                                 }
                                 echo('</div>');
                             }

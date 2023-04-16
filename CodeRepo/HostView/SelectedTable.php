@@ -1,12 +1,3 @@
-<!-- DISPLAY TEMPLATE
-This template includes starter code that allows
-you to use display.php and displayInterface.js -->
-
-
-<!-- ensures you are logged in before rendering page, and are logged in under the correct role.
-If you aren't logged in, it will reroute to the login page.
-If you are logged in but don't have the correct role to view this page,
-you'll be routed to whatever the home page is for your specified role level -->
 <?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(4, $GLOBALS['role']);
       require_once '../Resources/php/connect_disconnect.php';
      //foreach($_POST as $key => $value) { echo "$key: $value<br>"; }
@@ -252,8 +243,7 @@ you'll be routed to whatever the home page is for your specified role level -->
           margin-inline: .25rem;
         }
       </style>
-        <!-- gives you access to varSet, varGet, varRem, 
-        varClr, updateDisplay, rememberScrollPosition, and forgetScrollPosition -->
+        
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         
         <script>
@@ -273,7 +263,7 @@ you'll be routed to whatever the home page is for your specified role level -->
         
     <body onload="allElementsLoaded()" class="intro">
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
-            <!-- PLACE YOUR PHP LAYOUT LOGIC CODE HERE -->
+            
           <?php
             if (!isset($tableId) || $tableId == "clear") {
               echo("<div id='lblNoTicket' class='bannerLabel'>No Table Selected</div>");

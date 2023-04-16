@@ -1,5 +1,4 @@
-<!-- ensures you are logged in before rendering page.
-Otherwise will reroute to logon page -->
+
 <?php
 foreach($_POST as $key => $value)
 {

@@ -13,8 +13,6 @@ DROP TABLE IF EXISTS MenuModificationItems;
 DROP TABLE IF EXISTS MenuModificationCategories;
 DROP TABLE IF EXISTS MenuItems;
 DROP TABLE IF EXISTS MenuCategories;
-DROP TABLE IF EXISTS ModActions;
-DROP TABLE IF EXISTS ModActionCategories;
 DROP TABLE IF EXISTS QuickCodes;
 DROP TABLE IF EXISTS ActiveEmployees;
 DROP TABLE IF EXISTS EmployeeLog;
@@ -27,7 +25,7 @@ CREATE TABLE Config (
 	sessionTimeoutInMins INT UNSIGNED NOT NULL DEFAULT 5
 );
 
-INSERT INTO Config (sessionTimeoutInMins) VALUES (3600);
+
 
 CREATE TABLE LoginRouteTable (
 		id SMALLINT UNSIGNED PRIMARY KEY,
@@ -35,28 +33,11 @@ CREATE TABLE LoginRouteTable (
 		route VARCHAR(200)
 );
 
-INSERT INTO LoginRouteTable VALUES
-	(1, 'Terminal Access', '../BackOfHouseView/BackOfHouseTest.php'),
-	(2, 'Server', '../ServerView/ServerView.php'),
-	(6, 'Host', '../HostView/HostView.php'),
-	(9, 'Back of House Manager', NULL),
-	(14, 'Front of House Manager', '../HostView/HostView.php'),
-	(15, 'General Manager', '../HostView/HostView.php'),
-	(65535, 'Admin', '../ManagerView/EmployeeRoster.php');
-
 CREATE TABLE EmployeeRoles (
 	id SMALLINT UNSIGNED PRIMARY KEY,
 	title VARCHAR(25)
 );
 
-INSERT INTO EmployeeRoles VALUES
-	(1, 'Terminal Access'),
-	(2, 'Server'),
-	(6, 'Host'),
-	(9, 'Back of House Manager'),
-	(14, 'Front of House Manager'),
-	(15, 'General Manager'),
-	(65535, 'Admin');
 	
 CREATE TABLE Employees(
 	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -86,14 +67,14 @@ CREATE TABLE ActiveEmployees (
 CREATE TABLE QuickCodes (
 	id VARCHAR(5) PRIMARY KEY
 );
-INSERT INTO QuickCodes VALUES('root');
 
 
 CREATE TABLE MenuCategories (
+	description VARCHAR(1),
+
 	quickCode VARCHAR(5) PRIMARY KEY,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
-	title VARCHAR(75) NOT NULL DEFAULT '',
-	description VARCHAR(1000),
+	title VARCHAR(75) NOT NULL UNIQUE,
 	route char(1),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
 	defaultPrice DECIMAL(6, 2) UNSIGNED,
@@ -102,10 +83,11 @@ CREATE TABLE MenuCategories (
 );
 
 CREATE TABLE MenuItems (
+	description VARCHAR(1),
+
 	quickCode VARCHAR(5) PRIMARY KEY,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
-	title VARCHAR(75) NOT NULL DEFAULT '',
-	description varchar(1000),
+	title VARCHAR(75) NOT NULL UNIQUE,
 	price DECIMAL(6, 2) UNSIGNED,
 	route char(1),
 	quantity SMALLINT UNSIGNED,
@@ -117,12 +99,11 @@ CREATE TABLE MenuItems (
 );
 
 CREATE TABLE MenuModificationCategories (
+	description VARCHAR(1),
+
 	quickCode VARCHAR(5) PRIMARY KEY,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
-	title VARCHAR(75) NOT NULL DEFAULT '',
-	description VARCHAR(1000),
-	defaultPrice DECIMAL(6, 2) UNSIGNED,
-	priceOrModificationValue DECIMAL(6, 2),
+	title VARCHAR(75) NOT NULL UNIQUE,
 	selfDescriptive BOOLEAN NOT NULL DEFAULT FALSE,
 	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
@@ -130,39 +111,17 @@ CREATE TABLE MenuModificationCategories (
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE ModActionCategories (
-	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
-	quickCode VARCHAR(5) PRIMARY KEY,
-	displayIndex SMALLINT UNSIGNED,	
-	title VARCHAR(75) NOT NULL DEFAULT '',
-	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
-	ON DELETE CASCADE ON UPDATE CASCADE
-);
-
--- null cost will not display.
--- cost of 0 displays (FREE)
--- see currencyPrinter.php
-CREATE TABLE ModActions (
-	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
-	quickCode VARCHAR(5) PRIMARY KEY,
-	title VARCHAR(75) NOT NULL DEFAULT '',
-	cost DECIMAL(4, 2),
-	modActionCategory VARCHAR(5) NOT NULL,
-	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
-	ON DELETE CASCADE ON UPDATE CASCADE,
-	FOREIGN KEY (modActionCategory) REFERENCES QuickCodes(id)
-	ON DELETE CASCADE ON UPDATE CASCADE
-);
-
 CREATE TABLE MenuModificationItems (
+	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),
+	selfDescriptive BOOLEAN NOT NULL DEFAULT FALSE,
+	description VARCHAR(1),
+	
+	price DECIMAL(6, 2),
 	quickCode VARCHAR(5) PRIMARY KEY,
 	displayIndex SMALLINT UNSIGNED,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
-	modActionCategory VARCHAR(5) NOT NULL,
-	title VARCHAR(75) NOT NULL DEFAULT '',
-	description varchar(1000),
-	priceOrModificationValue DECIMAL(6, 2),
-	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),
+	quantifierString VARCHAR(1000) NOT NULL DEFAULT ',',
+	title VARCHAR(75) NOT NULL UNIQUE,
 	visible BOOLEAN NOT NULL DEFAULT TRUE,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
 	ON DELETE CASCADE ON UPDATE CASCADE
@@ -190,12 +149,6 @@ CREATE TABLE TableStatuses (
 	id VARCHAR(30) PRIMARY KEY
 );
 
-INSERT INTO TableStatuses VALUES
-	('disabled'),
-	('unassigned'),
-	('open'),
-	('seated'),
-	('bussing');
 
 CREATE TABLE Tables (
 	id VARCHAR(3) PRIMARY KEY,
@@ -214,7 +167,9 @@ CREATE TABLE Tables (
 
 CREATE TABLE TableAssignments (
 	employeeId INT UNSIGNED NOT NULL,
-	tableId VARCHAR(3) NOT NULL
+	tableId VARCHAR(3) NOT NULL,
+	FOREIGN KEY (employeeId) REFERENCES Employees(id)
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE TableLog (
@@ -301,11 +256,37 @@ CREATE TABLE ActiveTicketGroups (
 	route char(1)
 );
 
---Data to prime the database to function correctly
-INSERT INTO quickCodes VALUES ('00000');
+-- Data to prime the database to function correctly
+INSERT INTO Config (sessionTimeoutInMins) VALUES (3600);
+
+INSERT INTO LoginRouteTable VALUES
+	(1, 'Terminal Access', '../TerminalView/TerminalView.php'),
+	(2, 'Server', '../ServerView/ServerView.php'),
+	(6, 'Host', '../HostView/HostView.php'),
+	(9, 'Back of House Manager', '../ManagerView/InventoryPopularityWindow.php'),
+	(14, 'Front of House Manager', '../HostView/HostView.php'),
+	(15, 'General Manager', '../HostView/HostView.php'),
+	(65535, 'Admin', '../ManagerView/EmployeeRoster.php');
+
+INSERT INTO EmployeeRoles VALUES
+	(1, 'Terminal Access'),
+	(2, 'Server'),
+	(6, 'Host'),
+	(9, 'Back of House Manager'),
+	(14, 'Front of House Manager'),
+	(15, 'General Manager'),
+	(65535, 'Admin');
+
+INSERT INTO TableStatuses VALUES
+	('disabled'),
+	('unassigned'),
+	('open'),
+	('seated'),
+	('bussing');
+	
+INSERT INTO QuickCodes VALUES('root');
+INSERT INTO QuickCodes (id) VALUES ('00000');
 INSERT INTO MenuCategories (quickCode) VALUES ('00000');
 INSERT INTO MenuItems (quickCode) VALUES ('00000');
 INSERT INTO MenuModificationCategories (quickCode) VALUES ('00000');
 INSERT INTO MenuModificationItems (quickCode) VALUES ('00000');
-INSERT INTO ModActionCategories (quickCode) VALUES ('00000');
-INSERT INTO ModActions (quickCode, modActionCategory) VALUES ('00000', '00000');
