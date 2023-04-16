@@ -285,8 +285,4 @@ INSERT INTO TableStatuses VALUES
 	('bussing');
 	
 INSERT INTO QuickCodes VALUES('root');
-INSERT INTO QuickCodes (id) VALUES ('00000');
-INSERT INTO MenuCategories (quickCode) VALUES ('00000');
-INSERT INTO MenuItems (quickCode) VALUES ('00000');
-INSERT INTO MenuModificationCategories (quickCode) VALUES ('00000');
-INSERT INTO MenuModificationItems (quickCode) VALUES ('00000');
+

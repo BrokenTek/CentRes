@@ -129,7 +129,8 @@ BEGIN
     	SET MESSAGE_TEXT = 'Menu Object Titles must be unique.';
 	ELSE 
 		IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-			SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuCategories;
+			-- SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuCategories;
+			SELECT IFNULL(MAX(counter), 0) + 1 INTO cnt FROM MenuCategories;
 			SET NEW.quickCode = CONCAT('C', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
 		END IF;
 		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
@@ -147,14 +148,15 @@ BEGIN
     	SET MESSAGE_TEXT = 'Menu Object Titles must be unique.';
 	ELSE 
 		IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-			SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuItems;
+			-- SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuItems;
+			SELECT IFNULL(MAX(counter), 0) + 1 INTO cnt FROM MenuItems;
 			SET NEW.quickCode = CONCAT('I', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
 		END IF;
 		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 	END IF;
 END;
 
-CREATE TRIGGER beforeAddMenuModificationcATEGORY
+CREATE TRIGGER beforeAddMenuModificationCategory
 BEFORE INSERT ON MenuModificationCategories FOR EACH ROW
 BEGIN
 	DECLARE cnt INTEGER UNSIGNED;
@@ -165,7 +167,8 @@ BEGIN
     	SET MESSAGE_TEXT = 'Menu Object Titles must be unique.';
 	ELSE 
 		IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-			SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationCategories;
+			-- SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationCategories;
+			SELECT IFNULL(MAX(counter), 0) + 1 INTO cnt FROM MenuModificationCategories;
 			SET NEW.quickCode = CONCAT('X', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
 		END IF;
 		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
@@ -183,7 +186,8 @@ BEGIN
     	SET MESSAGE_TEXT = 'Menu Object Titles must be unique.';
 	ELSE 
 		IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-			SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationItems;
+			-- SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationItems;
+			SELECT IFNULL(MAX(counter), 0) + 1 INTO cnt FROM MenuModificationItems;
 			SET NEW.quickCode = CONCAT('Y', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
 		END IF;
 		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
