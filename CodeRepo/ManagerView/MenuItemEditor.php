@@ -207,6 +207,7 @@
                         document.getElementById("btnDelete").remove();
                     }
                 }
+                dispatchJSONeventCall("selectMenuObject", {"menuObjectId": this.options[this.selectedIndex].value}, ["ifrMenu"]);
             }
 
             ///////////////////////////////////////////////////
