@@ -152,8 +152,12 @@
                          //===================================================================================================
                         
                         $sql = "CALL modifyTicketItem('" .$_POST['selectedItem']. "', '" .$_POST['newModValue']. "');";
-                        echo($sql);
-                        connection()->query($sql);
+                        try {
+                            connection()->query($sql);
+                        }
+                        catch (Exception $e) {
+                            echo "<h3 class='debug_statement'>Error: " . $e->getMessage() . "</h3>";
+                        }
                         echo("<script>signalStatus('await');</script>");
                         //echo("<H1>Waiting for Server Window to redirect back to ticket item</H1>");
                     }

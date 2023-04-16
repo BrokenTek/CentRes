@@ -22,7 +22,7 @@
                     window.scroll({
                         top: y,
                         left: x,
-                        behavior: "smooth",
+                        // behavior: "smooth"
                     });
                 }
 
