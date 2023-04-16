@@ -17,7 +17,62 @@
                 function() { location.replace("menuItemEditor.php") });
 
                 document.querySelector("#btnMenuModificationEditor").addEventListener("pointerdown", 
-                function() { location.replace("MenuModificationEditor.php") });
+                function() { location.replace("menuModificationCategoryEditor.php") });
+
+                document.querySelector("#sessionForm").addEventListener("keydown", keydown);
+                document.querySelector("#sessionForm").addEventListener("keyup", keyup);
+            }
+
+             ///////////////////////////////////////////////////
+            //           RAPID ENTRY KEYBOARD EVENTS
+            ///////////////////////////////////////////////////
+            
+            let ctrlDown = false;
+            let shiftDown = false;
+
+            function keydown(event) {
+                switch (event.keyCode) {
+                    case 16:
+                        shiftDown = true;
+                        break;
+                    case 17:
+                        ctrlDown = true;
+                        break;
+                    default:
+                        if (ctrlDown) {
+                            if (event.keyCode == 13) { 
+                                redirect("menuModificationCategoryEditor.php");
+                            }
+                            else if (event.keyCode == 77) { // CTRL + M >>>>> Go to mod editor window.
+                                redirect("menuCategoryEditor.php");
+                            }
+                        }
+
+                        
+                }       
+            }
+
+            function keyup(event) {
+                switch (event.keyCode) {
+                    case 16:
+                        shiftDown = false;
+                        break;
+                    case 17:
+                        ctrlDown = false;
+                        break;
+                }
+            }
+
+            ///////////////////////////////////////////////////
+            //             MENU REDIRECT FUNCTION
+            ///////////////////////////////////////////////////
+
+            function redirect(loc, parentCategory) {
+                with (document.querySelector("#frmRedirect")) {
+                    setAttribute("action", loc);
+                    submit();
+                }
+                
             }
 
 
@@ -31,7 +86,7 @@
                 <div id="menuEditorNavBar">
                     <button id="btnMenuCategoryEditor" type="button" class="button menuNavButton">New Category</button>
                     <button id="btnMenuItemEditor" type="button" class="button menuNavButton">New Item</button>
-                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton">Mods Editor</button>
+                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton">Edit Mod Cats</button>
                 </div>
                 <fieldset>
                     <legend>Menu&nbsp;Editor&nbsp;Home</legend>

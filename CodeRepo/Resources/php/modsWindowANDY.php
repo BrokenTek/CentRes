@@ -113,7 +113,7 @@
                                                         $modOptionTitle = $modOption['title'];
                                                         $modOptionprice = $modOption['price']; 
                                                         $mandatoryOneStr .= "\n\t\t<option value='$quickCode,$modOptionTitle,$modOptionprice'>
-                                                                                        <div class='modItemprice'>" .currencyPrint($modOptionprice). "</div>
+                                                                                        <div class='modItemprice'>" .currencyFormat($modOptionprice). "</div>
                                                                                         <div class='modItemTitle'>$modOptionTitle</div>
                                                                                     </option>";
                                                     }
@@ -144,7 +144,7 @@
                                                         $optionalAnyStr .= "<div class='checkAndLabel'>
                                                                                 <input type='checkbox' id='$modOptionQuickCode' name='$modOptionQuickCode' value='$modOptionQuickCode,$modOptionTitle,$modOptionprice'>
                                                                                 <label for='$modOptionQuickCode'>
-                                                                                    <div class='modItemprice'>" .currencyPrint($modOptionprice). "</div>
+                                                                                    <div class='modItemprice'>" .currencyFormat($modOptionprice). "</div>
                                                                                     <div class='modItemTitle'>$modOptionTitle</div>
                                                                                 </label>
                                                                             </div>";
@@ -175,7 +175,7 @@
                                                         $modOptionTitle = $modOption['title'];
                                                         $modOptionprice = $modOption['price']; 
                                                         $optionalOneStr .= "<option value='$quickCode,$modOptionTitle,$modOptionprice'>
-                                                                                        <div class='modItemprice'>" .currencyPrint($modOptionprice). "</div>
+                                                                                        <div class='modItemprice'>" .currencyFormat($modOptionprice). "</div>
                                                                                         <div class='modItemTitle'>$modOptionTitle</div>
                                                                                     </option>";
                                                     }
@@ -208,7 +208,7 @@
                                                         $optionalAnyStr .= "<div class='checkAndLabel'>
                                                                                 <input type='checkbox' id='$modOptionQuickCode' name='$modOptionQuickCode' value='$modOptionQuickCode,$modOptionTitle,$modOptionprice'>
                                                                                 <label for='$modOptionQuickCode'>
-                                                                                    <div class='modItemprice'>" .currencyPrint($modOptionprice). "</div>
+                                                                                    <div class='modItemprice'>" .currencyFormat($modOptionprice). "</div>
                                                                                     <div class='modItemTitle'>$modOptionTitle</div>
                                                                                 </label>
                                                                             </div>";

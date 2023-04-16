@@ -1,5 +1,5 @@
 <?php
-    function currencyPrint($value, $currencyCharacter = "$", $groupSeparator = ",", $decimalCharacter = ".") {
+    function currencyFormat($value, $currencyCharacter = "$", $groupSeparator = ",", $decimalCharacter = ".") {
         if (is_null($value)) {
             return "";
         }

@@ -191,7 +191,7 @@
                     varExists("lookAt") ? varGet("lookAt") : document.querySelector("#selParentCategory").value); });
 
                 document.querySelector("#btnMenuModificationEditor").addEventListener("pointerdown", 
-                function() {redirect("MenuModificationEditor.php");});
+                function() {redirect("menuModificationCategoryEditor.php");});
 
                 with (document.querySelector("#txtMenuTitle")) {
                     focus();
@@ -320,7 +320,7 @@
                 <div id="menuEditorNavBar">
                     <button id="btnMenuCategoryEditor" type="button" class="button menuNavButton">New Category</button>
                     <button id="btnMenuItemEditor" type="button" class="button menuNavButton">New Item</button>
-                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton">Mods Editor</button>
+                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton">Edit Mod Cats</button>
                 </div>
                 <fieldset>
                     <legend>Menu&nbsp;Category&nbsp;Editor</legend>
@@ -351,28 +351,30 @@
                     </select>
                     <label for="txtMenuTitle">Category Title</label>
                     <input id="txtMenuTitle" name="menuTitle" maxlength=75 <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
-                    <div class="buttonGroup">
-                        <?php if (isset($_POST['quickCode']) && strlen($_POST['quickCode']) > 0 &&
-                                (!isset($_POST['delete']) || isset($errorMessage))): ?>
+                    <?php if (isset($_POST['quickCode']) && 
+                            (!isset($_POST['delete']) || isset($errorMessage))): ?>
+                        <div class="buttonGroup3">
                             <input id="btnSubmit" type="submit" name="commit" value="Update" class="button">
-                            <button type="button" id="btnReset" class="button">Reset</Button>
-                            <button type="button" id="btnDelete" class="button">Delete</Button>
-                        <?php else: ?>
+                            <button id="btnReset" type="button" class="button" onpointerpown="clearVals()">Clear</button>
+                            <input id="btnDelete" type="submit" name="delete" value="Delete" class="button">
+                        </div>
+                    <?php else: ?>
+                        <div class="buttonGroup2">
                             <input id="btnSubmit" type="submit" name="commit" value="Create" class="button">
-                            <button type="button" id="btnReset" class="button">Reset</Button>
-                        <?php endif; ?>
-                    </div>
-                    
+                            <button id="btnReset" type="button" class="button" onpointerdown="clearVals()">Clear</button>
+                        </div>
+                    <?php endif; ?>
+                    <?php if (isset($errorMessage)): ?>
+                        <div class="errorMessage">
+                            <?php echo $errorMessage; ?>
+                        </div>
+                    <?php elseif (isset($message)): ?>
+                        <div class="message">
+                            <?php echo $message; ?>
+                        </div>
+                    <?php endif; ?>
                 </fieldset>
-                <?php if (isset($errorMessage)): ?>
-                    <div class="errorMessage">
-                        <?php echo $errorMessage; ?>
-                    </div>
-                <?php elseif (isset($message)): ?>
-                    <div class="message">
-                        <?php echo $message; ?>
-                    </div>
-                <?php endif; ?>
+                
             </div>
             
 

@@ -1,6 +1,6 @@
 
 <?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(255, $GLOBALS['role']); ?>
-<?php require_once '../Resources/php/currencyPrinter.php'; ?>
+<?php require_once '../Resources/php/currencyFormatter.php'; ?>
 
 <!DOCTYPE html>
 <html>
@@ -234,7 +234,7 @@ if ($result->num_rows > 0) {
 		if (isset($_POST['selected']) && $qc == $_POST['selected']) {
 			$classList .= " selected";
 		}
-		echo "<span id='".$qc."' class='$classList' data-text='".$title."' data-price='".$price."' data-mods='X'><span class='menuItemPrice'>". currencyPrint($price) ."</span><span class='menuItemTitle'>".$title."</span>";
+		echo "<span id='".$qc."' class='$classList' data-text='".$title."' data-price='".$price."' data-mods='X'><span class='menuItemPrice'>". currencyFormat($price) ."</span><span class='menuItemTitle'>".$title."</span>";
 		echo "</span>";
 
 	}

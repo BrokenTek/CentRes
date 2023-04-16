@@ -39,45 +39,99 @@
     }
     try {
         if(isset($_POST['quickCode'])&&!isset($_POST['menuTitle'])){
-            $sql = "SELECT * FROM MenuModificationItems WHERE quickCode = '" .$_POST['quickCode']. "';";
+            $sql = "SELECT * FROM MenuModificationCategories WHERE quickCode = '" .$_POST['quickCode']. "';";
             $fieldData = connection()->query($sql)->fetch_assoc();
             
             //just in case the quickCode persists after a deletion, these statements are wrapped in a condition
             //to prevent unwanted warnings from showing up. Note to self: unwrap this if you account for this.
             if(isset($fieldData)){
                 $_POST['menuTitle'] = $fieldData['title'];
-                $_POST['quantifierString'] = $fieldData['quantifierString'];
             }
         }
 
         if(isset($_POST['commit'])){
             if($_POST['commit'] == 'Update'){
-                //attempt to update the category to reflect the changes made in the form
-                $sql = "UPDATE MenuModificationItems SET title = ?, quantifierString = ? WHERE quickCode = ?;";      
+                //change the category's name
+                $sql = "UPDATE MenuModificationCategories SET title = ? WHERE quickCode = ?;";      
                 $sql = connection()->prepare($sql);
-                $sql->bind_param('sss', $_POST['menuTitle'], $_POST['quantifierString'], $_POST['quickCode']);
+                $sql->bind_param('ss', $_POST['menuTitle'], $_POST['quickCode']);
                 $sql->execute();
 
-                $message = "Menu Modification Item updated.";
+                // clear any associations with menu items and mod items
+                $sql = "DELETE FROM MenuAssociations WHERE parentQuickCode = ? OR childQuickCode = ?;";
+                $sql = connection()->prepare($sql);
+                $sql->bind_param('ss', $_POST['quickCode'], $_POST['quickCode']);
+                $sql->execute();
+
+                // associate with any menu items
+                if (isset($_POST['parentMenuItems'])) {
+                    for ($i = 0; $i < sizeof($_POST['parentMenuItems']); $i++) {
+                        if (!empty($_POST['parentMenuItems'][$i])) {
+                            $sql = "INSERT INTO MenuAssociations (parentQuickCode, childQuickCode) VALUES (?, ?)";
+                            $sql = connection()->prepare($sql);
+                            $sql->bind_param('ss', $_POST['parentMenuItems'][$i], $_POST['quickCode']);
+                            $sql->execute();
+                        }
+                    }
+                }
+
+                // associate mod items
+                if (isset($_POST['childMenuModItems'])) {
+                    for ($i = 0; $i < sizeof($_POST['childMenuModItems']); $i++) {
+                        if (!empty($_POST['childMenuModItems'][$i])) {
+                            $sql = "INSERT INTO MenuAssociations (parentQuickCode, childQuickCode) VALUES (?, ?)";
+                            $sql = connection()->prepare($sql);
+                            $sql->bind_param('ss', $_POST['quickCode'], $_POST['childMenuModItems'][$i]);
+                            $sql->execute();
+                        }
+                    }
+                }
+
+                $message = "Menu Modification Category updated.";
             }
             else{
                 //attempt to create the new modification item
-                $sql = "INSERT INTO MenuModificationItems (title, quantifierString) VALUES (?, ?);";
+                $sql = "INSERT INTO MenuModificationCategories (title) VALUES (?);";
                 $sql = connection()->prepare($sql);
-                $sql->bind_param('ss', $_POST['menuTitle'], $_POST['quantifierString']);
+                $sql->bind_param('s', $_POST['menuTitle']);
                 $sql->execute();
 
                 //get its new quick code and bind it to the $_POST variable.
-                $sql2 = "SELECT quickCode FROM MenuModificationItems WHERE title = ? ORDER BY counter DESC LIMIT 1;";
+                $sql2 = "SELECT quickCode FROM MenuModificationCategories WHERE title = ? ORDER BY counter DESC LIMIT 1;";
                 $sql2 = connection()->prepare($sql2);
                 $sql2->bind_param('s', $_POST['menuTitle']);
                 $sql2->execute();
                 $_POST['quickCode'] = $sql2->get_result()->fetch_assoc()['quickCode'];
+
+                // associate with any menu items
+                if (isset($_POST['parentMenuItems'])) {
+                    for ($i = 0; $i < sizeof($_POST['parentMenuItems']); $i++) {
+                        if (!empty($_POST['parentMenuItems'][$i])) {
+                            $sql = "INSERT INTO MenuAssociations (parentQuickCode, childQuickCode) VALUES (?, ?)";
+                            $sql = connection()->prepare($sql);
+                            $sql->bind_param('ss', $_POST['parentMenuItems'][$i], $_POST['quickCode']);
+                            $sql->execute();
+                        }
+                    }
+                }
+
+                // associate mod items
+                if (isset($_POST['childMenuModItems'])) {
+                    for ($i = 0; $i < sizeof($_POST['childMenuModItems']); $i++) {
+                        if (!empty($_POST['childMenuModItems'][$i])) {
+                            $sql = "INSERT INTO MenuAssociations (parentQuickCode, childQuickCode) VALUES (?, ?)";
+                            $sql = connection()->prepare($sql);
+                            $sql->bind_param('ss', $_POST['quickCode'], $_POST['childMenuModItems'][$i]);
+                            $sql->execute();
+                        }
+                    }
+                }
+
                 $message = "<b>" .$_POST['menuTitle']. "</b> created.";
             }
         }
         if(isset($_POST['delete'])){
-            $sql = "UPDATE MenuModificationItems SET visible = FALSE WHERE quickCode = '".$_POST['quickCode']."';";
+            $sql = "UPDATE MenuModificationCategories SET visible = FALSE WHERE quickCode = '".$_POST['quickCode']."';";
             connection()->query($sql);
             $message = "<b>" .$_POST['menuTitle']. "</b> deleted.";
             unset($_POST['quickCode'], $_POST['menuTitle']);
@@ -90,6 +144,7 @@
         $errorMessage = $_POST['errorMessage'];
         unset($_POST['errorMessage']);
     }
+    unset($_POST['childMenuModItems'], $_POST['parentMenuItems'])
 ?>
 
 <!DOCTYPE html>
@@ -98,8 +153,7 @@
     <head>
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/menuEditorStyle.css">
-        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
-        <script src="../Resources/JavaScript/modOptionGenerator.js" type="text/javascript"></script> 
+        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
         <script>
             function allElementsLoaded() {
                 window.addEventListener("message", window.processJSONeventCall);
@@ -107,11 +161,9 @@
 
                 document.querySelector("#selMenuTitle").addEventListener("change", selChanged);
 
-                document.querySelector("#txtQuantifierString").addEventListener("input", generateModOption);
-
-                document.querySelector("#txtMenuTitle").addEventListener("input", generateModOption);
-
                 document.querySelector("#btnReset").addEventListener("pointerdown", btnResetPressed);
+
+                document.querySelector("#selMenuTitle").addEventListener("change", selChanged);
 
                 document.querySelector("#sessionForm").addEventListener("keydown", keydown);
                 document.querySelector("#sessionForm").addEventListener("keyup", keyup);
@@ -123,26 +175,26 @@
                 function() { redirect("menuItemEditor.php"); });
 
                 document.querySelector("#btnMenuModificationEditor").addEventListener("pointerdown", 
-                function() {redirect("menuModificationCategoryEditor.php");});
+                function() {redirect("menuModificationItemEditor.php");});
 
                 with (document.querySelector("#txtMenuTitle")) {
                     focus();
                     setSelectionRange(0, value.length);
-                }
-
-                generateModOption();
+                } 
             }
 
             function btnResetPressed(event) {
                 varRem("quickCode");
                 document.getElementById("selMenuTitle").selectedIndex = 0;
                 document.getElementById("txtMenuTitle").removeAttribute("value");
-                document.getElementById("txtQuantifierString").removeAttribute("value");
                 document.getElementById("btnSubmit").setAttribute("value", "Create");
                 if (document.getElementById("btnDelete") != null) {    
                     document.getElementById("btnDelete").remove();
                 }
-                generateModOption();
+                let checks = document.querySelectorAll("input[type='checkbox']");
+                for (let i = 0; i < checks.length; i++) {
+                    checks[i].checked = false;
+                }
                 document.getElementById("selMenuTitle").focus();
             }
 
@@ -150,18 +202,7 @@
                 varRem("title");
                 varSet("quickCode", this.options[this.selectedIndex].value);
                 document.getElementById("txtMenuTitle").removeAttribute("value");
-                document.getElementById("txtQuantifierString").removeAttribute("value");
                 updateDisplay(null, true);
-            }
-
-            function generateModOption() {
-                let quickCode = varGet("quickCode");
-                if (quickCode === undefined) {
-                    quickCode = "X----";
-                }
-                let text = document.getElementById("txtMenuTitle").value;
-                let quantifierString = document.getElementById("txtQuantifierString").value;
-                document.getElementById("modPreview").innerHTML = generateModOptionDiv(quickCode, text, quantifierString, true);
             }
             
 
@@ -185,7 +226,7 @@
                         let parentRecall = varGet("recallParentCategory");
                         if (ctrlDown) {
                             if (event.keyCode == 13) { 
-                                redirect("menuModificationCategoryEditor.php");
+                                redirect("menuModificationItemEditor.php");
                             }
                             else if (event.keyCode == 46) { // CTRL + DELETE >>>>> Delete current record if one selected
                                 let btnDelete = document.querySelector("#btnDelete");
@@ -232,22 +273,20 @@
             }
         </script>
         <style>
-            #previewWrapper {
+            #modCatAssocDiv {
+                margin-top: 1.5rem;
                 grid-column: 1 / span 2;
-                display: grid;
-                grid template-columns; max-content;
-                border: .125rem solid white;
-                margin-top: 1rem;
-                margin-bottom: 1.5rem;
-                min-height: 3rem;
+                grid-template-columns: 1fr 1fr;
+            }
+            #menuItemList, #modItemList {
+                max-height: 8rem;
+                overflow: auto;
+                background-color: black;
+            }
+            .listHeader {
+                font-size: 1.5rem;
                 font-weight: bold;
-            }
-            #previewWrapper > * {
-                margin-inline: auto;
-            }
-            .modOptionDiv {
-                display: grid;
-                grid-template-columns: max-content max-content;
+                margin-top: .5rem;
             }
         </style>
     </head>
@@ -257,18 +296,18 @@
                 <div id="menuEditorNavBar">
                     <button id="btnMenuCategoryEditor" type="button" class="button menuNavButton">New Category</button>
                     <button id="btnMenuItemEditor" type="button" class="button menuNavButton">New Item</button>
-                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton">Edit Mod Cats</button>
+                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton">Edit Mod Items</button>
                 </div>
                 <fieldset>
-                    <legend>Menu&nbsp;Modification<br>Item&nbsp;Editor</legend>
+                    <legend>Menu&nbsp;Modification<br>Category&nbsp;Editor</legend>
                     <label for="selMenuTitle"></label>
                     <select id="selMenuTitle">
-                        <option value="">New Mod Item</option>
+                        <option value="">New Mod Category</option>
                         <?php
-                            $sql = "SELECT * FROM MenuModificationItems WHERE visible = 1 ORDER BY title";
+                            $sql = "SELECT * FROM MenuModificationCategories WHERE visible = 1 ORDER BY title";
                             $result = connection()->query($sql);
                             /////////////////////////////////////////////////////////
-                            // populate all MenuModificationItems from database.
+                            // populate all MenuModificationCategories from database.
                             // the values should be the quick quick code
                             /////////////////////////////////////////////////////////
                             while ($row = $result->fetch_assoc()) {
@@ -280,13 +319,67 @@
                             }
                         ?>
                     </select>
-                    <label for="txtMenuTitle">Mod Item Name</label>
+                    <label for="txtMenuTitle">Mod Category Name</label>
                     <input id="txtMenuTitle" name="menuTitle" required maxlength="75" <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
-                    <label for="txtQuantifierString">Quantifier&nbsp;String</label>
-                    <input id="txtQuantifierString" name="quantifierString" maxlength="1000" <?php if(isset($_POST['quantifierString'])) { echo(' value="' . $_POST['quantifierString'] . '"'); } ?>>
-                    <div id="previewWrapper">
-                        <div id=modPreviewHeader">Mod Control Preview</div>
-                        <div id="modPreview">
+                    <div id="modCatAssocDiv">
+                        <?php
+                            // Get all of the existing associations for this mod category.
+
+                             // if existing mod category, get all the menu items that have this mod category
+                             $associatedMenuItems = "";
+                             if (isset($_POST['quickCode'])) {
+                                 $sql = "SELECT parentQuickCode as quickCode FROM MenuAssociations WHERE childQuickCode = '" .$_POST['quickCode']. "';";
+                                 $result = connection()->query($sql);
+                                 while ($row = $result->fetch_assoc()) {
+                                     $associatedMenuItems .= "," . $row['quickCode'];
+                                 }
+                             }
+
+                             // if existing mod category, get all the mod items that are contained in this mod category
+                             $associatedModItems = "";
+                             if (isset($_POST['quickCode'])) {
+                                 $sql = "SELECT childQuickCode as quickCode FROM MenuAssociations WHERE parentQuickCode = '" .$_POST['quickCode']. "';";
+                                 $result = connection()->query($sql);
+                                 while ($row = $result->fetch_assoc()) {
+                                     $associatedModItems .= "," . $row['quickCode'];
+                                 }
+                             }
+                        ?>
+                        <div id="modMenuItemAssoc" class="listWithHeader">
+                            <div class="listHeader">Associated Menu Items</div>
+                            <div id="menuItemList">
+                                <?php
+                                    // populate the menu items list, and make items checked if menu item has this mod category
+                                    $sql = "SELECT title, quickCode FROM MenuItems WHERE visible = 1 ORDER BY title";
+                                    $result = connection()->query($sql);
+                                    while ($row = $result->fetch_assoc()) {
+                                        if (strpos($associatedMenuItems,$row['quickCode']) > 0) {
+                                            echo("<input type='checkbox' id='" .$row['quickCode'].  "' name='parentMenuItems[]' value='" .$row['quickCode'].  "' checked>");
+                                        }
+                                        else {
+                                            echo("<input type='checkbox' id='" .$row['quickCode']. "' name='parentMenuItems[]' value='" .$row['quickCode'].  "'>");
+                                        }
+                                        echo("<label for='" .$row['quickCode']. "'>" .$row['title']. "</label><br>");
+                                    }
+                                ?>
+                            </div>
+                            <div class="listHeader">Associated Mod Items</div>
+                            <div id="menuItemList">
+                                <?php
+                                    // populate the menu items list, and make items checked if menu item has this mod category
+                                    $sql = "SELECT title, quickCode FROM MenuModificationItems WHERE visible = 1 ORDER BY title";
+                                    $result = connection()->query($sql);
+                                    while ($row = $result->fetch_assoc()) {
+                                        if (strpos($associatedModItems,$row['quickCode']) > 0) {
+                                            echo("<input type='checkbox' id='" .$row['quickCode'].  "' name='childMenuModItems[]' value='" .$row['quickCode'].  "' checked>");
+                                        }
+                                        else {
+                                            echo("<input type='checkbox' id='" .$row['quickCode']. "' name='childMenuModItems[]' value='" .$row['quickCode'].  "'>");
+                                        }
+                                        echo("<label for='" .$row['quickCode']. "'>" .$row['title']. "</label><br>");
+                                    }
+                                ?>
+                            </div>
                         </div>
                     </div>
                     <?php if (isset($_POST['quickCode']) && 
@@ -302,18 +395,17 @@
                             <button id="btnReset" type="button" class="button" onpointerdown="clearVals()">Clear</button>
                         </div>
                     <?php endif; ?>
-                <?php if (isset($errorMessage)): ?>
-                    <div class="errorMessage">
-                        <?php echo $errorMessage; ?>
-                    </div>
-                <?php elseif (isset($message)): ?>
-                    <div class="message">
-                        <?php echo $message; ?>
-                    </div>
-                <?php endif; ?>
+                    <?php if (isset($errorMessage)): ?>
+                        <div class="errorMessage">
+                            <?php echo $errorMessage; ?>
+                        </div>
+                    <?php elseif (isset($message)): ?>
+                        <div class="message">
+                            <?php echo $message; ?>
+                        </div>
+                    <?php endif; ?>
+                </fieldset>
             </div>
-            
-
             <?php unset($_POST['delete'], 
                         $_POST['commit'],
                         $_POST['menuTitle'],

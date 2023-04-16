@@ -155,7 +155,7 @@
                 function() { redirect("menuItemEditor.php", document.querySelector("#selParentCategory").value); });
 
                 document.querySelector("#btnMenuModificationEditor").addEventListener("pointerdown", 
-                function() {redirect("MenuModificationEditor.php");});
+                function() {redirect("menuModificationCategoryEditor.php");});
 
                 with (document.querySelector("#txtMenuTitle")) {
                     focus();
@@ -291,7 +291,7 @@
                 <div id="menuEditorNavBar">
                     <button id="btnMenuCategoryEditor" type="button" class="button menuNavButton">New Category</button>
                     <button id="btnMenuItemEditor" type="button" class="button menuNavButton">New Item</button>
-                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton">Mods Editor</button>
+                    <button id="btnMenuModificationEditor" type="button" class="button menuNavButton">Edit Mod Cats</button>
                 </div>
                 <fieldset>
                     <legend>Menu&nbsp;Item&nbsp;Editor</legend>
@@ -325,29 +325,30 @@
                     <input id="txtPrice" name="price" pattern="^[0-9]*\.[0-9]{2}$" required <?php if(isset($_POST['price'])) { echo(' value="' . $_POST['price'] . '"'); } ?>>
                     <label for="txtRoute">Route</label>
                     <input id="txtRoute" name="route" maxlength="1" <?php if(isset($_POST['route'])) { echo(' value="' . $_POST['route'] . '"'); } ?>>
-                    <div class="buttonGroup">
-                        <?php if (isset($_POST['quickCode']) && 
-                                (!isset($_POST['delete']) || isset($errorMessage))): ?>
+                    <?php if (isset($_POST['quickCode']) && 
+                            (!isset($_POST['delete']) || isset($errorMessage))): ?>
+                        <div class="buttonGroup3">
                             <input id="btnSubmit" type="submit" name="commit" value="Update" class="button">
                             <button id="btnReset" type="button" class="button" onpointerpown="clearVals()">Clear</button>
                             <input id="btnDelete" type="submit" name="delete" value="Delete" class="button">
-                            
-                        <?php else: ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="buttonGroup2">
                             <input id="btnSubmit" type="submit" name="commit" value="Create" class="button">
                             <button id="btnReset" type="button" class="button" onpointerdown="clearVals()">Clear</button>
-                        <?php endif; ?>
-                    </div>
-                    
+                        </div>
+                    <?php endif; ?>
+                    <?php if (isset($errorMessage)): ?>
+                        <div class="errorMessage">
+                            <?php echo $errorMessage; ?>
+                        </div>
+                    <?php elseif (isset($message)): ?>
+                        <div class="message">
+                            <?php echo $message; ?>
+                        </div>
+                    <?php endif; ?>
                 </fieldset>
-                <?php if (isset($errorMessage)): ?>
-                    <div class="errorMessage">
-                        <?php echo $errorMessage; ?>
-                    </div>
-                <?php elseif (isset($message)): ?>
-                    <div class="message">
-                        <?php echo $message; ?>
-                    </div>
-                <?php endif; ?>
+                
             </div>
             
 

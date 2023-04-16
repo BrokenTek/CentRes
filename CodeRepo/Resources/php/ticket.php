@@ -1,7 +1,7 @@
 
 
 <?php require_once 'sessionLogic.php'; restrictAccess(7, $GLOBALS['role']); ?>
-<?php require_once 'currencyPrinter.php'; ?>
+<?php require_once 'currencyFormatter.php'; ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -513,10 +513,10 @@
                 echo('<div class="ticketItemNumber">' .$splitString. '</div>
                     <div class="ticketItemText">' .$menuItem['title']. "</div>");
                 if (is_null($ticketItem['overridePrice'])) {
-                    echo('<div class="ticketItemPrice">' .currencyPrint($ticketItem['calcTicketItemPrice']). '</div>');
+                    echo('<div class="ticketItemPrice">' .currencyFormat($ticketItem['calcTicketItemPrice']). '</div>');
                 }
                 else {
-                    echo('<div class="ticketItemPrice">' .currencyPrint($ticketItem['calcTicketItemPrice']). '</div>');
+                    echo('<div class="ticketItemPrice">' .currencyFormat($ticketItem['calcTicketItemPrice']). '</div>');
                     echo('<div class="ticketItemOverrideNote">' .$ticketItem['overrideNote']. '</div>');
                     echo('<div class="ticketItemOverridePrice">');
                     if ($ticketItem['overridePrice'] < 0) {
@@ -557,11 +557,11 @@
                               
                                 if ($modItem['price'] < 0) {
                                     // discount applied
-                                    echo(currencyPrint($modItem['price']));
+                                    echo(currencyFormat($modItem['price']));
                                 }
                                 elseif ( $modItem['price'] >= 1 ) {
                                      // price set to a value
-                                     echo(currencyPrint($modItem['price']));
+                                     echo(currencyFormat($modItem['price']));
                                 }
                                 elseif ( $modItem['price'] == 0 ) {
                                     // free
@@ -586,7 +586,7 @@
 
             // display the subtotal of all splits or a particular split
             if ($existingTicketItems > 0) {
-                echo("<h2 class='message' id='ticketSubtotal'>Ticket Subtotal: " . currencyPrint($ticketSubtotal) . "</h2>");    
+                echo("<h2 class='message' id='ticketSubtotal'>Ticket Subtotal: " . currencyFormat($ticketSubtotal) . "</h2>");    
             }
 
             
