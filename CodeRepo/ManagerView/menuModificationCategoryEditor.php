@@ -41,20 +41,20 @@
         if(isset($_POST['quickCode'])&&!isset($_POST['menuTitle'])){
             $sql = "SELECT * FROM MenuModificationCategories WHERE quickCode = '" .$_POST['quickCode']. "';";
             $fieldData = connection()->query($sql)->fetch_assoc();
-            
             //just in case the quickCode persists after a deletion, these statements are wrapped in a condition
             //to prevent unwanted warnings from showing up. Note to self: unwrap this if you account for this.
             if(isset($fieldData)){
                 $_POST['menuTitle'] = $fieldData['title'];
+                $_POST['categoryType'] = $fieldData['categoryType'];
             }
         }
 
         if(isset($_POST['commit'])){
             if($_POST['commit'] == 'Update'){
                 //change the category's name
-                $sql = "UPDATE MenuModificationCategories SET title = ? WHERE quickCode = ?;";      
+                $sql = "UPDATE MenuModificationCategories SET title = ?, categoryType = ? WHERE quickCode = ?;";      
                 $sql = connection()->prepare($sql);
-                $sql->bind_param('ss', $_POST['menuTitle'], $_POST['quickCode']);
+                $sql->bind_param('sss', $_POST['menuTitle'], $_POST['categoryType'], $_POST['quickCode']);
                 $sql->execute();
 
                 // clear any associations with menu items and mod items
@@ -91,9 +91,9 @@
             }
             else{
                 //attempt to create the new modification item
-                $sql = "INSERT INTO MenuModificationCategories (title) VALUES (?);";
+                $sql = "INSERT INTO MenuModificationCategories (title, categoryType) VALUES (?, ?);";
                 $sql = connection()->prepare($sql);
-                $sql->bind_param('s', $_POST['menuTitle']);
+                $sql->bind_param('ss', $_POST['menuTitle'], $_POST['categoryType'],);
                 $sql->execute();
 
                 //get its new quick code and bind it to the $_POST variable.
@@ -144,7 +144,7 @@
         $errorMessage = $_POST['errorMessage'];
         unset($_POST['errorMessage']);
     }
-    unset($_POST['childMenuModItems'], $_POST['parentMenuItems'])
+    unset($_POST['childMenuModItems'], $_POST['parentMenuItems']);
 ?>
 
 <!DOCTYPE html>
@@ -186,6 +186,7 @@
             function btnResetPressed(event) {
                 varRem("quickCode");
                 document.getElementById("selMenuTitle").selectedIndex = 0;
+                document.getElementById("selCategoryType").selectedIndex = 0;
                 document.getElementById("txtMenuTitle").removeAttribute("value");
                 document.getElementById("btnSubmit").setAttribute("value", "Create");
                 if (document.getElementById("btnDelete") != null) {    
@@ -321,6 +322,35 @@
                     </select>
                     <label for="txtMenuTitle">Mod Category Name</label>
                     <input id="txtMenuTitle" name="menuTitle" required maxlength="75" <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
+                    <label for="selCategoryType">Mod Category Type</label>
+                    <select id="selCategoryType" name="categoryType" required>
+                        <?php if (!isset($_POST['categoryType'])): ?>
+                            <option value='MandatoryOne'>MandatoryOne</option>
+                            <option value='MandatoryAny'>MandatoryAny</option>
+                            <option value='OptionalOne'>OptionalOne</option>
+                            <option value='OptionalAny'>OptionalAny</option>
+                        <?php elseif ($_POST['categoryType'] == 'MandatoryOne'): ?>
+                            <option value='MandatoryOne' selected>MandatoryOne</option>
+                            <option value='MandatoryAny'>MandatoryAny</option>
+                            <option value='OptionalOne'>OptionalOne</option>
+                            <option value='OptionalAny'>OptionalAny</option>
+                        <?php elseif ($_POST['categoryType'] == 'MandatoryAny'): ?>
+                            <option value='MandatoryOne'>MandatoryOne</option>
+                            <option value='MandatoryAny' selected>MandatoryAny</option>
+                            <option value='OptionalOne'>OptionalOne</option>
+                            <option value='OptionalAny'>OptionalAny</option>
+                        <?php elseif ($_POST['categoryType'] == 'OptionalOne'): ?>
+                            <option value='MandatoryOne'>MandatoryOne</option>
+                            <option value='MandatoryAny'>MandatoryAny</option>
+                            <option value='OptionalOne' selected>OptionalOne</option>
+                            <option value='OptionalAny'>OptionalAny</option>
+                        <?php elseif ($_POST['categoryType'] == 'OptionalAny'): ?>
+                            <option value='MandatoryOne'>MandatoryOne</option>
+                            <option value='MandatoryAny'>MandatoryAny</option>
+                            <option value='OptionalOne'>OptionalOne</option>
+                            <option value='OptionalAny' selected>OptionalAny</option>
+                        <?php endif; ?>
+                    </select>
                     <div id="modCatAssocDiv">
                         <?php
                             // Get all of the existing associations for this mod category.
@@ -409,7 +439,7 @@
             <?php unset($_POST['delete'], 
                         $_POST['commit'],
                         $_POST['menuTitle'],
-                        $_POST['quantifierString']);  
+                        $_POST['categoryType']);  
                      // $_POST['quickCode'] stays ?>
 
             <?php require_once '../Resources/php/display.php'; ?>

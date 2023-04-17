@@ -1,18 +1,25 @@
 // existingModString will configure the control (check/select appropriate values)
-function generateModOptionDiv(modQuickCode, modName, quantifierString = null, returnHTML = false) {
+function generateModOptionDiv(modQuickCode, modName, quantifierString = null, returnHTML = false, radioButton = false) {
     if (modName === undefined || modName === null || modName.length == 0) { return null; }
     let modOptionDivStr;
     let isSel = false;
+    let inputType = radioButton ? "radio" : "check";
     if (quantifierString == null || quantifierString == '') {
         // generate a checkbox. No price
-        modOptionDivStr = "<input type='checkbox' id='chk" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +
+        modOptionDivStr = "<input type='" + inputType + "' id='chk" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +
                           "<label class='checkLabel' for='chk" + modQuickCode + "' class='modOption chkModOption'>" + modName + "</label>";
     }
     else if (quantifierString.indexOf(",") == -1 && !isNaN(parseFloat(quantifierString))) {
         // quantifier string should be a price if defined.
         let val = parseFloat(quantifierString); 
-        modOptionDivStr = "<input type='checkbox' id='chk" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +
+        if (val == 0) {
+            modOptionDivStr = "<input type='" + inputType + "' id='chk" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +
+                 "<label class='checkLabel' for='chk" + modQuickCode + "' class='modOption chkModOption'>FREE - " + modName + "</div></label>";
+        }
+        else {
+            modOptionDivStr = "<input type='" + inputType + "' id='chk" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +
                  "<label class='checkLabel' for='chk" + modQuickCode + "' class='modOption chkModOption'>" + currencyFormatter.format(val) + " - " + modName + "</div></label>";
+        }
     }
     else {
         isSel = true;
