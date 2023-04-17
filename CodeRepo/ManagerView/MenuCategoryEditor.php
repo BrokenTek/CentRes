@@ -210,15 +210,11 @@
             }
 
             function btnResetPressed(event) {
-                varSet("lookAt", "root")
                 varRem("quickCode");
+                varRem("parentCategory");
                 document.getElementById("selParentCategory").selectedIndex = 0;
-                if (document.getElementById("btnDelete") != null) {    
-                    with (document.getElementById("btnDelete")) {
-                        setAttribute("disabled", "");
-                        classList.add("disabled");
-                    }
-                }
+                document.getElementById("txtMenuTitle").value = "";
+                updateDisplay(null, true);
             }
 
             function btnDeletePressed (event) {
@@ -227,7 +223,9 @@
             }
 
             function selChanged(event) {
-                dispatchJSONeventCall("selectMenuObject", {"menuObjectId": this.options[this.selectedIndex].value}, ["ifrMenu"]);
+                if (!varExists("quickCode")) {
+                    dispatchJSONeventCall("selectMenuObject", {"menuObjectId": this.options[this.selectedIndex].value}, ["ifrMenu"]);
+                }
             }
 
             ///////////////////////////////////////////////////
@@ -355,13 +353,13 @@
                             (!isset($_POST['delete']) || isset($errorMessage))): ?>
                         <div class="buttonGroup3">
                             <input id="btnSubmit" type="submit" name="commit" value="Update" class="button">
-                            <button id="btnReset" type="button" class="button" onpointerpown="clearVals()">Clear</button>
+                            <button id="btnReset" type="button" class="button">Clear</button>
                             <input id="btnDelete" type="submit" name="delete" value="Delete" class="button">
                         </div>
                     <?php else: ?>
                         <div class="buttonGroup2">
                             <input id="btnSubmit" type="submit" name="commit" value="Create" class="button">
-                            <button id="btnReset" type="button" class="button" onpointerdown="clearVals()">Clear</button>
+                            <button id="btnReset" type="button" class="button">Clear</button>
                         </div>
                     <?php endif; ?>
                     <?php if (isset($errorMessage)): ?>

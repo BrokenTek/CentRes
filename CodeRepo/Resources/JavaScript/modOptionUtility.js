@@ -106,3 +106,78 @@ const currFormatter = new Intl.NumberFormat('en-US', {
   });
 
 const currencyFormatter = currFormatter;
+
+function configureInputs(modNotesString) {
+    if (modNotesString == null || modNotesString.length == 0) {
+        return;
+    }
+    let data = modNotesString.split(",");
+    let checks = document.querySelectorAll("input[type='checkbox']");
+    let radios = document.querySelectorAll("input[type='radio']");
+    let selects = document.querySelectorAll("select");
+    let lastRecordedIndex = -1;
+    for (let i = 2; i < data.length; i += 3) {
+        for (let j = 0; j < checks.length; j++) {
+            if (checks[j].id ==  data[i-2]) {
+                checks[i].setAttribute("checked");
+            } 
+        }
+        for (let j = 0; j < radios.length; j++) {
+            if (radios[j].id ==  data[i-2]) {
+                radios[i].setAttribute("checked");
+            }
+        }
+        for (let j = 0; j < selects.length; j++) {
+            if (selects[j].id == data[i-2]) {
+                selects[j].value = data[i-2] + "," + data[i-1] + "," + data[i];
+            }
+        }
+        lastRecordedIndex = i;
+    }
+    if (lastRecordedIndex < data.length - 1) {
+        document.getElementsById("txtCustomModNote").innerText = data[lastRecordedIndex + 1];
+    }
+}
+
+function generateModString() {
+    let modString = "";
+    let checks = document.querySelectorAll("input[type='checkbox']");
+    let radios = document.querySelectorAll("input[type='radio']");
+    let selects = document.querySelectorAll("select");
+    for (let j = 0; j < checks.length; j++) {
+        if (checks[j].checked) {
+            modString += "," + checks[j].value;
+        } 
+    }
+    for (let j = 0; j < radios.length; j++) {
+        if (radios[j].checked) {
+            modString += "," + radios[j].value;
+        } 
+    }
+    for (let j = 0; j < selects.length; j++) {
+        if (selects[j].value.length > 0) {
+            modString += "," + selects[j].value;
+        }
+    }
+    with (document.getElementById("txtCustomModNote")) {
+        if (value.length > 0) {
+            modString += (modString.length == 0 ? "" : ",") + value;
+        }
+    }
+    return modString;
+}
+
+function calculateModsPrice(modString) {
+    if (modString == null || modString.length == 0 || modString.indexOf(",") == -1) {
+        return 0;
+    }
+    let data = modString.split(",");
+    let total = 0;
+    for (let i = 2; i < data.length; i += 3) {
+        let val = parseFloat(data[i-2]);
+        if (!isNaN(val)) {
+            total += val;
+        }
+    }
+    return total;
+}

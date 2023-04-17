@@ -187,7 +187,7 @@
                 varRem("quickCode");
                 document.getElementById("selMenuTitle").selectedIndex = 0;
                 document.getElementById("selCategoryType").selectedIndex = 0;
-                document.getElementById("txtMenuTitle").removeAttribute("value");
+                document.getElementById("txtMenuTitle").value = "";
                 document.getElementById("btnSubmit").setAttribute("value", "Create");
                 if (document.getElementById("btnDelete") != null) {    
                     document.getElementById("btnDelete").remove();
@@ -416,13 +416,13 @@
                             (!isset($_POST['delete']) || isset($errorMessage))): ?>
                         <div class="buttonGroup3">
                             <input id="btnSubmit" type="submit" name="commit" value="Update" class="button">
-                            <button id="btnReset" type="button" class="button" onpointerpown="clearVals()">Clear</button>
+                            <button id="btnReset" type="button" class="button">Clear</button>
                             <input id="btnDelete" type="submit" name="delete" value="Delete" class="button">
                         </div>
                     <?php else: ?>
                         <div class="buttonGroup2">
                             <input id="btnSubmit" type="submit" name="commit" value="Create" class="button">
-                            <button id="btnReset" type="button" class="button" onpointerdown="clearVals()">Clear</button>
+                            <button id="btnReset" type="button" class="button">Clear</button>
                         </div>
                     <?php endif; ?>
                     <?php if (isset($errorMessage)): ?>
