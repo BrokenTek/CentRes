@@ -110,6 +110,7 @@
             $sql = "UPDATE MenuItems SET visible = FALSE WHERE quickCode = '".$_POST['quickCode']."';";
             connection()->query($sql);
             $message = "<b>" .$_POST['menuTitle']. "</b> deleted.";
+            $_POST['lookAt'] = $_POST['parentCategory'];  
             unset($_POST['quickCode'], $_POST['menuTitle']);
 
             // menu editor has an event listener for this window to onload.
@@ -174,10 +175,9 @@
                 }
 
                 if (varExists("lookAt")) {
-       setTimeout(() => {
-        dispatchJSONeventCall("selectMenuObject", {"menuObjectId": varGet("lookAt")}, ["ifrMenu"]);
-       }, 1000);
-                    
+                    setTimeout(() => {
+                        dispatchJSONeventCall("selectMenuObject", {"menuObjectId": varGet("lookAt")}, ["ifrMenu"]);
+                    }, 1000);    
                 }
 
             }
