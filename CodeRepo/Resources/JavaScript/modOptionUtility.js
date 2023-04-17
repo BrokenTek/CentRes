@@ -159,7 +159,7 @@ function generateModString() {
             modString += "," + selects[j].value;
         }
     }
-    with (document.getElementById("txtCustomModNote")) {
+    with (document.getElementById("txtModString")) {
         if (value.length > 0) {
             modString += (modString.length == 0 ? "" : ",") + value;
         }

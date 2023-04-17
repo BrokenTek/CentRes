@@ -1,4 +1,10 @@
 
+<!-- TEMPORARY COMMENT!!!!!!!!!!!
+    THIS HAS A SYNTAX ERROR BUT SHOULD BE WORKING AT THIS POINT. THERE IS NOT MUCH DATA TO WORK WITH BUT THAT SCRIPT WILL COME TOMORROW LIKELY
+      THE CURRENT IMPLMEMENTATION DOES NOT WORK. THERE IS A SYNTAX ERROR. AROUND LINE 97 AS PER THE ERROR MSG IN CHROME. FIX SHOULD BE EASY TO
+      APPLY. FEATURE MISSING CURRENTLY: MANDATORY VS OPTIONAL DISTINCTION. EASY ADDITION WITH IF STATEMENT IF CURRENT VERSION WOULD WORK.
+-->
+
 <?php require_once './sessionLogic.php'; ?>
 <!DOCTYPE html>
 <html>
@@ -7,6 +13,7 @@
         <title>Modification Selection</title>
         <link rel="stylesheet" href="../CSS/baseStyle.css">
         <script src="../JavaScript/displayInterface.js"></script>
+        <script src="../JavaScript/modOptionUtility.js"></script>
 
 
         <!-- Keep checkboxes for mods in a line -->
@@ -27,86 +34,60 @@
 
         <script>
 
-            function addSuffixs() {    
+            function listenerFormCreator() {    
                 
                 // Get the form element
                 var form = document.getElementById("modWindowId");
 
-                // Listen for the selection of checkboxes. Append select element to parent 
-                //  container if checked. Remove select element if unchecked.
-                form.addEventListener('change', function(event) {
-                    if (event.target.type === 'checkbox') {
-                        const parentDiv = event.target.parentNode;
+                // New form input builder
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                        if (event.target.checked) {
-                          const select = document.createElement('select');
-                          select.name = 'newModSuffix[]';
-                        
-                          // add options to select element
-                          const option1 = document.createElement('option');
-                          option1.value = 'Add';
-                          option1.text = 'Add';
-                          select.add(option1);
-                        
-                          const option2 = document.createElement('option');
-                          option2.value = 'None';
-                          option2.text = 'None';
-                          select.add(option2);
 
-                          const option3 = document.createElement('option');
-                          option3.value = 'Xtra';
-                          option3.text = 'Xtra';
-                          select.add(option3);
 
-                          const option4 = document.createElement('option');
-                          option4.value = 'Lite';
-                          option4.text = 'Lite';
-                          select.add(option4);
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                          parentDiv.appendChild(select);
-                        }                    
-                        else {
-                          const select = parentDiv.querySelector('select');
-                          parentDiv.removeChild(select);
-                        }  
-                    }
-                });
+
+
+
+
 
                 // Create newModValue string
                 form.addEventListener("pointerdown", function(event) {
                     if (event.target.id === 'submitBtn') {
-                        var newModValue = "";
+                        // var newModValue = "";
 
-                        // Get all the checked checkboxes
-                        var checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+                        // // Get all the checked checkboxes
+                        // var checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
 
-                        // Loop through the checked checkboxes
-                        for (var i = 0; i < checkedBoxes.length; i++) {
-                            // Get the parent div of the checkbox
-                            var parentDiv = checkedBoxes[i].parentNode;
+                        // // Loop through the checked checkboxes
+                        // for (var i = 0; i < checkedBoxes.length; i++) {
+                        //     // Get the parent div of the checkbox
+                        //     var parentDiv = checkedBoxes[i].parentNode;
 
-                            // Get the select element
-                            var select = parentDiv.querySelector('select');
+                        //     // Get the select element
+                        //     var select = parentDiv.querySelector('select');
 
-                            // Get the value of the select element
-                            var selectValue = select.value;
+                        //     // Get the value of the select element
+                        //     var selectValue = select.value;
 
-                            // Get the value of the checkbox
-                            var checkboxValue = checkedBoxes[i].value;
+                        //     // Get the value of the checkbox
+                        //     var checkboxValue = checkedBoxes[i].value;
 
-                            // Append the checkbox value and select value to the newModValue string
-                            newModValue += checkboxValue + "," + selectValue + ",";
-                        }
+                        //     // Append the checkbox value and select value to the newModValue string
+                        //     newModValue += checkboxValue + "," + selectValue + ",";
+                        // }
 
-                        if (document.getElementById('txtModString').value != "") {
-                            var customModNote = document.getElementById('txtModString');
-                            customModNote = customModNote.value.replaceAll(',', '.');
-                            newModValue += customModNote;
-                        }
+                        // if (document.getElementById('txtModString').value != "") {
+                        //     var customModNote = document.getElementById('txtModString');
+                        //     customModNote = customModNote.value.replaceAll(',', '.');
+                        //     newModValue += customModNote;
+                        // }
 
-                        else {
-                            newModValue = newModValue.slice(0, -1);
-                        }
+                        // else {
+                        //     newModValue = newModValue.slice(0, -1);
+                        // }
+
+                        var newModValue = generateModString();
 
                         varSet("newModValue", newModValue);
 
@@ -118,7 +99,7 @@
             }
         </script>
     </head>
-    <body onload="addSuffixs()">
+    <body onload="listenerFormCreator()">
         <form id="modWindowId" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
             <?php
                 require_once 'connect_disconnect.php';
@@ -133,30 +114,13 @@
                 }
                 else {
                     if (isset($_POST['newModValue'])) {
-
-
-
-                        // // FOR IF ITEM IS MANDATORY OR DOES NOT NEED A SUFFIX
-                        // // else if (isset($_POST['newModChosen[]']) && !isset($_POST['newModSuffix[]'])) {
-                        // //     $newModChosenArray = $_POST['newModChosen[]'];
-                        // //     $newModValue = "";
-
-                        // //     for ($i = 0; $i < count($newModChosenArray); $i++) {
-                        // //         $newModValue .= strval($newModChosenArray[$i]) . ",";
-                        // //     }
-                        // //     if (isset($_POST['newModNote'])) {
-                        // //         // $newModValue .= str_replace(',', '_', $_POST['newModNote']);
-                        // //         $newModValue .= $_POST['newModNote'];
-                        // //     }
-
-                         //===================================================================================================
                         
                         $sql = "CALL modifyTicketItem('" .$_POST['selectedItem']. "', '" .$_POST['newModValue']. "');";
                         try {
                             connection()->query($sql);
                         }
                         catch (Exception $e) {
-                            echo "<h3 class='debug_statement'>Error: " . $e->getMessage() . "</h3>";
+                            echo "<(h3 class='debug_statement'>)Error: " . $e->getMessage() . "</h3>";
                         }
                         echo("<script>signalStatus('await');</script>");
                         //echo("<H1>Waiting for Server Window to redirect back to ticket item</H1>");
@@ -165,8 +129,10 @@
                         
                         //===================================================================================================
                         echo("<script>signalStatus('pending');</script>");
+// ERROR LIKELY         // Open script for populating form inputs
+                        echo("<script>");
 
-                        $newModValue = "";
+                        // POPULATE FORM INPUTS /////////////////////////////////////////////////////////////////////////////////////////////////////
 
                         // Get the menu item's quick code
                         $sql = "SELECT menuItemQuickCode FROM ticketitems WHERE id = '" . $selectedItem . "';";
@@ -175,124 +141,122 @@
                             $menuItemQuickCode = $result->fetch_assoc()['menuItemQuickCode'];
                         }
                         else {
-                            echo "<h3 class='debug_statement'>No Results1</h3>";
-                        }
-
-                        // Get the menu item's title
-                        $sql = "SELECT title FROM menuitems WHERE quickCode = '$menuItemQuickCode';";
-                        $result = connection()->query($sql);
-                        if($result->num_rows > 0) {
-                            $menuItemTitle = $result->fetch_assoc()['title'];
-                            echo("<h3>Available Modifications For <i> $menuItemTitle </i></h3>");
-                            echo("<hr>");
-                        }
-                        else {
-                            echo "<h3 class='debug_statement'>No Results2</h3>";
-                        }
-
-                        // Get the menu item's price
-                        $sql = "SELECT price FROM menuitems WHERE quickCode = '$menuItemQuickCode';";
-                        $result = connection()->query($sql);
-
-                        if($result->num_rows > 0) {
-                            $menuItemPrice = $result->fetch_assoc()['price'];
-                        }
-                        else {
-                            echo "<h3 class='debug_statement'>No Results3</h3>";
+                            echo ("<h3 class='debug_statement'>Not Able To Get </h3>");
                         }
 
                         // Initialize the mod quick code array
-                        $modQuickCodeArray = array();
-                        // Get the menumodificationitems data based on the mod quick code
+                        $modCatQuickCodeArray = array();
+                        // ^Get the menumodificationitems data based on the mod quick code
                         $sql = "SELECT childQuickCode FROM menuassociations WHERE parentQuickCode = '$menuItemQuickCode';";
                         $result = connection()->query($sql);
                         if($result->num_rows > 0) {
                             while($row = $result->fetch_assoc()) {
-                                $modQuickCode = $row['childQuickCode'];
-                                array_push($modQuickCodeArray, $modQuickCode);
+                                $modCatQuickCode = $row['childQuickCode'];
+                                array_push($modCatQuickCodeArray, $modCatQuickCode);
                             }
                         }
                         else {
-                            echo "<h3 class='debug_statement'>No Results4</h3>";
+                            echo("<h3 class='debug_statement'>No Results4</h3>");
                         }
                         
-                        // Initialize the mod title, price, and category type array
-                        $modAvailableArray = array();
-                        // Get the menumodificationitems data based on the array of mod quick codes
-                        for ($i = 0; $i<sizeof($modQuickCodeArray); $i++) {
-                            $sql = "SELECT title, price, categoryType FROM menumodificationitems WHERE quickCode = '$modQuickCodeArray[$i]';";
+                        // Initialize array of arrays that provice the arguments for generateModOptionDiv()
+                        $modTitleQuickCodeQuantifierArray = array();
+
+                        // Get the modCategory 'types' and title(s) and quickCode(s)
+                        for ($i = 0; $i < count($modCatQuickCodeArray); $i++) {
+                            // get the categoryType (mandatoryAny, mandatoryAll, optionalAny, optionalAll) and mod cat title
+                            $sql = "SELECT title, quickCode, categoryType FROM menumodificationcategories WHERE quickCode = '$modCatQuickCodeArray[$i]';";
                             $result = connection()->query($sql);
                             if($result->num_rows > 0) {
-                                while($row = $result->fetch_assoc()) {
-                                    $modTitle = $row['title'];
-                                    $modPriceOrModValue = $row['price'];
-                                    $modCategoryType = $row['categoryType'];
-                                    array_push($modAvailableArray, $modTitle .",". $modPriceOrModValue .",". $modCategoryType);
-                                    // echo("<input type='radio' name='newModValue' value='$modQuickCode,$modTitle,$modPriceOrModValue,$modCategoryType'>");
-                                    // echo($modTitle . " - $" . $modPriceOrModValue);
-                                    // echo("<br>");
+                                while ($row = $result->fetch_assoc()) {
+                                    $categoryTitle = $row['title'];
+                                    $categoryQuickCode = $row['quickCode'];
+                                    $categoryType = $row['categoryType'];
+
+                                    // Get modItem('s) quickCode(s), title(s) and quantifierString(s)
+                                    // for ($i = 0; $i < count($modCatQuickCodeArray); $i++) {
+                                    $sql = "SELECT quickCode, title, quantifierString FROM menumodificationitems WHERE quickCode = '$categoryQuickCode';";
+                                    $result = connection()->query($sql);
+                                    if($result->num_rows > 0) {
+                                        while ($row = $result->fetch_assoc()) {
+                                            $modItemTitle = $row['title'];
+                                            $modItemQuickCode = $row['quickCode'];
+                                            $modItemQuantifierString = $row['quantifierString'];
+
+                                            // Possible change here where the loop ends and items are appended to an array for each result that is appended to the array initialized above
+                                            array_push($modTitleQuickCodeQuantifierArray, array($modItemTitle, $modItemQuickCode, $modItemQuantifierString));
+
+                                        //     // Create the mod category div
+                                        //     echo("var newModValueGenerated = generateModOptionDiv('$modItemQuickCode', '$modItemTitle', '$modItemQuantifierString');");
+                                        //     echo("var form = document.getElementById('modWindowId');");
+                                        //     echo("form.appendChild(newModValueGenerated);");
+                                        // }
+                                        }
+                                    }
+                                    else {
+                                        echo("<h3 class='debug_statement'>Cannot Get modItem('s) quickCode(s), title(s) and quantifierString(s) - Mod Category: $categoryTitle</h3>");
+                                    }
                                 }
                             }
                             else {
-                                echo "<h3 class='debug_statement'>No Results5</h3>";
+                                echo("<h3 class='debug_statement'>Cannot Get CategoryType from menumoificationcategories</h3>");
                             }
+                        }
+
+                        for ($i = 0; $i < count($modTitleQuickCodeQuantifierArray); $i++) {
+                            $modItemTitle = $modTitleQuickCodeQuantifierArray[$i][0];
+                            $modItemQuickCode = $modTitleQuickCodeQuantifierArray[$i][1];
+                            $modItemQuantifierString = $modTitleQuickCodeQuantifierArray[$i][2];
+
+                            // Create the mod category div
+                            echo("var newModValueGenerated = generateModOptionDiv('$modItemQuickCode', '$modItemTitle', '$modItemQuantifierString');");
+                            echo("var form = document.getElementById('modWindowId');");
+                            echo("form.appendChild(newModValueGenerated);");
                         }
                         
 
-                        // Initialize the mod quickcodechosen array
-                        $modTupleChosenArray = array();
+// Error Likely 2       // Close script tag that populates form input elements
+                        echo("<br></script>");
 
-                        // Display choices for mods
-                        for ($i = 0; $i<sizeof($modAvailableArray); $i++) {
-                            $modAvailableArray[$i] = explode(",", $modAvailableArray[$i]);
+                        // POPULATE FORM INPUTS - END /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                            if ($modAvailableArray[$i] == "mandatoryAny") {
-                                
-                                echo("<div class='modOptionDiv'>");
-                                echo("<label for='newModChosen'>");
-                                echo($modAvailableArray[$i][0] . " - $" . $modAvailableArray[$i][1]);
-                                echo("</label>");
-                                echo("<input type='checkbox' name='newModChosen' value='$modQuickCodeArray[$i]' style='color: orange;>");
-                                echo("</div>");
-                                 
-                            }
+                        // // Get modItem('s) quickCode(s), title(s) and quantifierString(s)
+                        // for ($i = 0; $i < count($modCatQuickCodeArray); $i++) {
+                        //     $sql = "SELECT quickCode, title, quantifierString FROM menumodificationitems WHERE quickCode = '$modCatQuickCodeArray[$i]';";
+                        // }
 
-                            elseif ($modAvailableArray[$i] == "mandatoryOne") {
-                                
-                                echo("<div class='modOptionDiv'>");
-                                echo("<label for='newModChosen'>");
-                                echo($modAvailableArray[$i][0] . " - $" . $modAvailableArray[$i][1]);
-                                echo("</label>");
-                                echo("<input type='radio' name='newModChosen' value='$modQuickCodeArray[$i]' style='color: red;'>");
-                                echo("</div>");
-                                 
-                            }
 
-                            elseif ($modAvailableArray[$i] == "optionalOne") {
-                                
-                                echo("<div class='modOptionDiv'>");
-                                echo("<label for='newModChosen'>");
-                                echo($modAvailableArray[$i][0] . " - $" . $modAvailableArray[$i][1]);
-                                echo("</label>");
-                                echo("<input type='radio' name='newModChosen' value='$modQuickCodeArray[$i]' style='color: powderblue;'>");
-                                echo("</div>");
-                                 
 
-                            }
 
-                            else {
-                                
-                                echo("<div class='modOptionDiv'>");
-                                echo("<label for='newModChosen[]'>");
-                                echo($modAvailableArray[$i][0] . " - $" . $modAvailableArray[$i][1]);
-                                echo("</label>");
-                                echo("<input class='modChoice' type='checkbox' name='newModChosen[]' value='$modQuickCodeArray[$i]'>");
-                                echo("</div>");
-                                                               
-                            }
 
-                        }
 
+                        // $sql = "SELECT quantifierString FROM menumodificationitems WHERE quickCode = 'Y0060';";
+                        // $result = connection()->query($sql);
+
+                        // if($result->num_rows > 0) {
+                        //     while($row = $result->fetch_assoc()) {
+                        //         $quantifierString = $row['quantifierString'];
+                        //     }
+                        // }
+                        // else {
+                        //     echo("<h3 class='debug_statement'>No Results</h3>");
+                        // }
+
+
+                        // Start Of Script To Create Form!
+                        // echo("<script>");
+
+                        // $sql = "SELECT quickCode FROM menumodificationcategories WHERE quickCode = 'X0001';";
+
+                        // Add the input elements to the form
+                        // echo("var newModValueGenerated = generateModOptionDiv('Y0060', 'Gruyere', '$quantifierString');");
+                        // echo("var form = document.getElementById('modWindowId');");
+                        // echo("form.appendChild(newModValueGenerated);");
+
+                        // echo("</script>");
+
+
+                        /////////////////////////////////////////////////////////////////////////////////////////////////////
                             
                         echo("<hr>");
                         
