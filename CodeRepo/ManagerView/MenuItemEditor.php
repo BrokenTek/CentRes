@@ -79,7 +79,7 @@
                 $_POST['lookAt'] = $_POST['quickCode'];
             }
             else{
-                //attempt to create the new category
+                //attempt to create the new item
                 $sql = "INSERT INTO MenuItems (title, route, price) VALUES (?, ?, ?);";
                 $sql = connection()->prepare($sql);
                 $sql->bind_param('ssd', $_POST['menuTitle'], $_POST['route'], $_POST['price']);
@@ -172,6 +172,14 @@
                         }
                      });
                 }
+
+                if (varExists("lookAt")) {
+       setTimeout(() => {
+        dispatchJSONeventCall("selectMenuObject", {"menuObjectId": varGet("lookAt")}, ["ifrMenu"]);
+       }, 1000);
+                    
+                }
+
             }
 
             function btnResetPressed(event) {
