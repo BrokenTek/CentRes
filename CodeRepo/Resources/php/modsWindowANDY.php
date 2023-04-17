@@ -1,4 +1,4 @@
-
+zz
 <?php require_once './sessionLogic.php'; ?>
 <!DOCTYPE html>
 <html>
@@ -19,16 +19,16 @@
             <?php
                 require_once 'connect_disconnect.php';
 
-                if(!isset($_POST['selectedItem'])) {
+                if(!isset($_POST['selectedTicketId'])) {
                     //<script>signalStatus('await');</script>
                     $_POST['status'] = 'await';
-                    //echo("<H1>Waiting for <b>selectedItem</b> to be injected</H1>");
+                    //echo("<H1>Waiting for <b>selectedTicketId</b> to be injected</H1>");
                     
                 }
                 else {
-                    $selectedItem = $_POST['selectedItem'];
+                    $selectedTicketId = $_POST['selectedTicketId'];
                     if (isset($_POST['newModValue'])) {                        
-                        $sql = "CALL modifyTicketItem('" .$_POST['selectedItem']. "', '" .$_POST['newModValue']. "');";
+                        $sql = "CALL modifyTicketItem('" .$_POST['selectedTicketId']. "', '" .$_POST['newModValue']. "');";
                         connection()->query($sql);
 
                         //<script>signalStatus('await');
@@ -44,7 +44,7 @@
                         $newModValue = "";
 
                         // Get the menu item's quick code
-                        $sql = "SELECT menuItemQuickCode FROM ticketitems WHERE id = '" . $selectedItem . "';";
+                        $sql = "SELECT menuItemQuickCode FROM ticketitems WHERE id = '" . $selectedTicketId . "';";
                         $result = connection()->query($sql);
                         if($result->num_rows == 1) {
                             $menuItemQuickCode = $result->fetch_assoc()['menuItemQuickCode'];

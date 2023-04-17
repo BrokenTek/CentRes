@@ -1,28 +1,91 @@
 // existingModString will configure the control (check/select appropriate values)
-function generateModOptionDiv(modQuickCode, modName, quantifierString = null, returnHTML = false, radioButton = false) {
+function generateModOptionDiv(modQuickCode, modName, quantifierString = null, returnHTML = false, categoryType = "OptionalOne") {
     if (modName === undefined || modName === null || modName.length == 0) { return null; }
     let modOptionDivStr;
-    let isSel = false;
-    let inputType = radioButton ? "radio" : "checkbox";
+    let divPrefix;
+    let multiselect = categoryType.endsWith("Any");
+    let inputType = multiselect ? "checkbox" : "radio";
+    let allowBlanks = !categoryType.startsWith("Mandatory");
     if (quantifierString == null || quantifierString == '') {
-        // generate a checkbox. No price
-        modOptionDivStr = "<input type='" + inputType + "' id='chk" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +
-                          "<label class='checkLabel' for='chk" + modQuickCode + "' class='modOption chkModOption'>" + modName + "</label>";
+        if (multiselect) {
+            // generate a checkbox. No price
+            divPrefix = "chk";
+            modOptionDivStr = "<input type='" + inputType + "' id='chk" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +
+                              "<label class='checkLabel' for='chk" + modQuickCode + "' class='modOption chkModOption'>" + modName + "</label>";
+        }
+        else {
+            // generate a radio. No price
+            divPrefix = "rad";
+            modOptionDivStr = "<input type='" + inputType + "' id='rad" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +
+                              "<label class='radioLabel' for='rad" + modQuickCode + "' class='modOption radModOption'>" + modName + "</label>";
+        }
     }
     else if (quantifierString.indexOf(",") == -1 && !isNaN(parseFloat(quantifierString))) {
         // quantifier string should be a price if defined.
-        let val = parseFloat(quantifierString); 
-        if (val == 0) {
+        let val = parseFloat(quantifierString);
+        let valStr = (val == 0 ? "FREE" : currencyFormatter.format(val));
+        if (multiselect) {
+            divPrefix = "chk";
             modOptionDivStr = "<input type='" + inputType + "' id='chk" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +
-                 "<label class='checkLabel' for='chk" + modQuickCode + "' class='modOption chkModOption'>FREE - " + modName + "</div></label>";
+                              "<label class='checkLabel' for='chk" + modQuickCode + "' class='modOption chkModOption'>" + valStr + " - " + modName + "</div></label>";
         }
         else {
-            modOptionDivStr = "<input type='" + inputType + "' id='chk" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +
-                 "<label class='checkLabel' for='chk" + modQuickCode + "' class='modOption chkModOption'>" + currencyFormatter.format(val) + " - " + modName + "</div></label>";
+            modOptionDivStr = "<input type='" + inputType + "' id='rad" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +
+                              "<label class='radioLabel' for='rad" + modQuickCode + "' class='modOption radModOption'>" + valStr + " - " + modName + "</div></label>";
         }
     }
+    else if (multiselect) {
+        divPrefix = "fst";
+
+        // each value separated by , (COMMA) may contain a pipe, indicating a price is associated with this option.
+        modOptionDivStr = "<legend class='modOptionLegend' id = 'ldg" + modQuickCode + "'>" + modName + "</legend>";
+
+        let quantVals = quantifierString.split(",");
+        let hasBlank = false;
+        let storedStr = modOptionDivStr
+        modOptionDivStr = "";
+        for (let i = 0; i < quantVals.length; i++) {
+            if (quantVals[i] == "") {
+                hasBlank = true;
+                 continue; 
+                }
+            if (quantVals[i].indexOf("|") == -1) {
+                //<div class='currencyField selCurrencyField empty
+                // no price specified. Just text between <select></select>
+                modOptionDivStr += "<div class='modOptionDiv selModOptionDiv'>" +
+                                    "<input type='" + inputType + "' id='chk" + modQuickCode + "_" + (i + 1) + "' name='" + modQuickCode + "_" + (i + 1) + "' value='" + modQuickCode + "," + quantVals[i] + ",'>" +
+                                    "<label class='checkLabel' for='chk" + modQuickCode + "_" + (i + 1) + "' class='modOption chkModOption'>" + quantVals[i] + "</label>" + 
+                                    "</div>";
+            }
+            else {
+                // FORMAT: title|price
+                let parts = quantVals[i].split("|");
+                let orgVal = parts[1];
+                if (parts[1] == null || parts[1].length == 0) {
+                    parts[1] = "";
+                }
+                else {
+                    let val = parseFloat(parts[1]);
+                    if (isNaN(val)) {
+                        parts[1] = "⚠";
+                    }
+                    else if (val == 0) {
+                        parts[1] = "FREE";
+                    }
+                    else {
+                        parts[1] = currencyFormatter.format(parts[1]);
+                    }
+                }
+                modOptionDivStr +="<div class='modOptionDiv selModOptionDiv'>" +
+                                "<input type='" + inputType + "' id='chk" + modQuickCode + "_" + (i + 1) + "' name='" + modQuickCode + "_" + (i + 1) + "' value='" + modQuickCode + "," + parts[0] + "," + orgVal + "'>" +
+                                "<label class='checkLabel' for='chk" + modQuickCode + "_" + (i + 1) + "' class='modOption chkModOption'>" + parts[0] + " - " + parts[1] + "</label>" +
+                                "</div>";              
+            }
+        }
+        modOptionDivStr = storedStr + modOptionDivStr;
+    }
     else {
-        isSel = true;
+       divPrefix = "sel";
         // this will generate a list of options
         
         // each value separated by , (COMMA) may contain a pipe, indicating a price is associated with this option.
@@ -65,30 +128,24 @@ function generateModOptionDiv(modQuickCode, modName, quantifierString = null, re
                 modOptionDivStr += "<option value='" + modQuickCode + "," + parts[0] + "," + orgVal + "'>" + parts[1] + " - " + parts[0] + "</option>";
             }
         }
-        if (hasBlank) {
+        if (allowBlanks) {
             storedStr += "<option value=''></option>"
         }
         modOptionDivStr = storedStr + modOptionDivStr + "</select>";
     }
     if (returnHTML) {
-        if (isSel) {
-            return "<div class='modOptionDiv selModOptionDiv'>" + modOptionDivStr + "</div>";
+        if (divPrefix == "fst") {
+            return "<fieldset class='modOptionFieldset' id='fst" + modQuickCode + "'>" +  modOptionDivStr + "</fieldset>";
         }
         else {
-            return "<div class='modOptionDiv chkModOptionDiv'>" + modOptionDivStr + "</div>";
+            return "<div class='modOptionDiv " + divPrefix + "ModOptionDiv'>" + modOptionDivStr + "</div>";
         }
     }
     else {
-        let modOptionDiv = document.createElement("div");
-        modOptionDiv.classList.add("modOptionDiv");
-        if (isSel) {
-            modOptionDiv.classList.add("selModOptionDiv");
-        }
-        else {
-            modOptionDiv.classList.add("chkModOptionDiv");
-        }
+        let modOptionDiv = document.createElement( divPrefix == "fst" ? "fieldset" : "div");
+        modOptionDiv.classList.add("modOption" + divPrefix == "fst" ? "Fieldset" : "Div");
         modOptionDiv.innerHTML = modOptionDivStr;
-        return modOptionDiv;
+        return modOptionDiv;    
     }
    
 }
@@ -118,12 +175,12 @@ function configureInputs(modNotesString) {
     let lastRecordedIndex = -1;
     for (let i = 2; i < data.length; i += 3) {
         for (let j = 0; j < checks.length; j++) {
-            if (checks[j].id ==  data[i-2]) {
+            if (checks[j].value ==  data[i-2] + "," + data[i-1] + "," + data[i]) {
                 checks[i].setAttribute("checked");
             } 
         }
         for (let j = 0; j < radios.length; j++) {
-            if (radios[j].id ==  data[i-2]) {
+            if (radios[j].value ==  data[i-2] + "," + data[i-1] + "," + data[i]) {
                 radios[i].setAttribute("checked");
             }
         }
@@ -164,7 +221,7 @@ function generateModString() {
             modString += (modString.length == 0 ? "" : ",") + value;
         }
     }
-    return modString;
+    return modString.length > 0 ? modString.substring(1) : "";
 }
 
 function calculateModsPrice(modString) {

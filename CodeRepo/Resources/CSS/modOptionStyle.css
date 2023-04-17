@@ -1,0 +1,18 @@
+.modOptionFieldset {
+    font-size: 1rem;
+    font-weight: bold;
+    display: grid;
+    grid-template-columns: max-content max-content max-content max-content max-content;
+    grid-auto-rows: min-content;
+}
+
+.modOptionFieldset > .selModOptionDiv {
+    margin-inline: .5rem;
+}
+
+.modOptionLegend {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin: 0;
+}
+

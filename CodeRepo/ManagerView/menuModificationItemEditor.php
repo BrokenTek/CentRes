@@ -98,8 +98,9 @@
     <head>
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/menuEditorStyle.css">
+        <link rel="stylesheet" href="../Resources/CSS/modOptionStyle.css">
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
-        <script src="../Resources/JavaScript/modOptionUtility.js" type="text/javascript"></script> 
+        <script src="../Resources/JavaScript/modOptionUtility.js" type="text/javascript"></script>
         <script>
             function allElementsLoaded() {
                 window.addEventListener("message", window.processJSONeventCall);
@@ -108,6 +109,8 @@
                 document.querySelector("#selMenuTitle").addEventListener("change", selChanged);
 
                 document.querySelector("#txtQuantifierString").addEventListener("input", generateModOption);
+
+                document.querySelector("#selModPreviewCatType").addEventListener("change", generateModOption);
 
                 document.querySelector("#txtMenuTitle").addEventListener("input", generateModOption);
 
@@ -161,7 +164,8 @@
                 }
                 let text = document.getElementById("txtMenuTitle").value;
                 let quantifierString = document.getElementById("txtQuantifierString").value;
-                document.getElementById("modPreview").innerHTML = generateModOptionDiv(quickCode, text, quantifierString, true);
+                let categoryType = document.getElementById("selModPreviewCatType").value;
+                document.getElementById("modPreview").innerHTML = generateModOptionDiv(quickCode, text, quantifierString, true, categoryType);
             }
             
 
@@ -245,10 +249,7 @@
             #previewWrapper > * {
                 margin-inline: auto;
             }
-            .modOptionDiv {
-                display: grid;
-                grid-template-columns: max-content max-content;
-            }
+           
         </style>
     </head>
     <body id="sessionForm" onload="allElementsLoaded()" class="fadeIntro">
@@ -285,7 +286,16 @@
                     <label for="txtQuantifierString">Quantifier&nbsp;String</label>
                     <input id="txtQuantifierString" name="quantifierString" maxlength="1000" <?php if(isset($_POST['quantifierString'])) { echo(' value="' . $_POST['quantifierString'] . '"'); } ?>>
                     <div id="previewWrapper">
-                        <div id=modPreviewHeader">Mod Control Preview</div>
+                        <div id="modPreviewHeader">Mod Control Preview</div>
+                        <div>
+                            <label id="lblModPreviewCatType" for="selModPreviewCatType">Category Type</label>
+                        </div>
+                        <select id="selModPreviewCatType">
+                            <option value="MandatoryOne">Mandatory One</option>
+                            <option value="MandatoryAny">Mandatory Any</option>
+                            <option value="OptionalOne">Optional One</option>
+                            <option value="OptionalAny">Optional Any</option>
+                        </select>
                         <div id="modPreview">
                         </div>
                     </div>

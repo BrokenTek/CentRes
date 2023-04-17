@@ -12,6 +12,7 @@
         <meta charset="UTF-8">
         <title>Modification Selection</title>
         <link rel="stylesheet" href="../CSS/baseStyle.css">
+        <link rel="stylesheet" href="../CSS/modOptionStyle.css">
         <script src="../JavaScript/displayInterface.js"></script>
         <script src="../JavaScript/modOptionUtility.js"></script>
 
@@ -104,23 +105,23 @@
             <?php
                 require_once 'connect_disconnect.php';
 
-                if(isset($_POST['selectedItem'])) {
-                    $selectedItem = $_POST['selectedItem'];
+                if(isset($_POST['selectedTicketId'])) {
+                    $selectedTicketId = $_POST['selectedTicketId'];
                 }
 
-                if(!isset($_POST['selectedItem'])) {
+                if(!isset($_POST['selectedTicketId'])) {
                     echo("<script>signalStatus('await');</script>");
-                    //echo("<H1>Waiting for <b>selectedItem</b> to be injected</H1>");
+                    //echo("<H1>Waiting for <b>selectedTicketId</b> to be injected</H1>");
                 }
                 else {
                     if (isset($_POST['newModValue'])) {
                         
-                        $sql = "CALL modifyTicketItem('" .$_POST['selectedItem']. "', '" .$_POST['newModValue']. "');";
+                        $sql = "CALL modifyTicketItem('" .$_POST['selectedTicketId']. "', '" .$_POST['newModValue']. "');";
                         try {
                             connection()->query($sql);
                         }
                         catch (Exception $e) {
-                            echo "<(h3 class='debug_statement'>)Error: " . $e->getMessage() . "</h3>";
+                            echo("<h3 class='debug_statement'>Error: " . $e->getMessage() . "</h3>");
                         }
                         echo("<script>signalStatus('await');</script>");
                         //echo("<H1>Waiting for Server Window to redirect back to ticket item</H1>");
@@ -135,7 +136,7 @@
                         // POPULATE FORM INPUTS /////////////////////////////////////////////////////////////////////////////////////////////////////
 
                         // Get the menu item's quick code
-                        $sql = "SELECT menuItemQuickCode FROM ticketitems WHERE id = '" . $selectedItem . "';";
+                        $sql = "SELECT menuItemQuickCode FROM ticketitems WHERE id = '" . $selectedTicketId . "';";
                         $result = connection()->query($sql);
                         if($result->num_rows > 0) {
                             $menuItemQuickCode = $result->fetch_assoc()['menuItemQuickCode'];
@@ -216,7 +217,7 @@
                         
 
 // Error Likely 2       // Close script tag that populates form input elements
-                        echo("<br></script>");
+                        echo("</script><br>");
 
                         // POPULATE FORM INPUTS - END /////////////////////////////////////////////////////////////////////////////////////////////////////
 
