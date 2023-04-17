@@ -323,7 +323,7 @@
                     <label for="txtMenuTitle">Menu Item Name</label>
                     <input id="txtMenuTitle" name="menuTitle" required maxlength=75 <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
                     <label for="txtPrice">Price</label>
-                    <input id="txtPrice" name="price" pattern="^[0-9]*\.[0-9]{2}$" required <?php if(isset($_POST['price'])) { echo(' value="' . $_POST['price'] . '"'); } ?>>
+                    <input id="txtPrice" name="price" pattern="^(0|[1-9]\d*)?(\.\d{1,2})?$" required <?php if(isset($_POST['price'])) { echo(' value="' . $_POST['price'] . '"'); } ?>>
                     <label for="txtRoute">Route</label>
                     <input id="txtRoute" name="route" maxlength="1" <?php if(isset($_POST['route'])) { echo(' value="' . $_POST['route'] . '"'); } ?>>
                     <?php if (isset($_POST['quickCode']) && 
