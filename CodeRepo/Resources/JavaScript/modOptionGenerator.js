@@ -3,7 +3,7 @@ function generateModOptionDiv(modQuickCode, modName, quantifierString = null, re
     if (modName === undefined || modName === null || modName.length == 0) { return null; }
     let modOptionDivStr;
     let isSel = false;
-    let inputType = radioButton ? "radio" : "check";
+    let inputType = radioButton ? "radio" : "checkbox";
     if (quantifierString == null || quantifierString == '') {
         // generate a checkbox. No price
         modOptionDivStr = "<input type='" + inputType + "' id='chk" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +

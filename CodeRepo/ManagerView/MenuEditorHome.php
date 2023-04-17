@@ -41,10 +41,10 @@
                     default:
                         if (ctrlDown) {
                             if (event.keyCode == 13) { 
-                                redirect("menuModificationCategoryEditor.php");
+                                redirect("menuCategoryEditor.php");
                             }
                             else if (event.keyCode == 77) { // CTRL + M >>>>> Go to mod editor window.
-                                redirect("menuCategoryEditor.php");
+                                redirect("menuModificationCategoryEditor.php");
                             }
                         }
 

@@ -44,6 +44,7 @@
                 mnuEditor.addEventListener("load", editorRefreshed);
                 setTitle("CentRes POS: Management Tools - Menu Editor", "Management Tools");
                 //setup path for iframes to call this window's functions
+                document.getElementById("ifrMenuEditor").focus();
             }
 
             function editorRefreshed(event) {
