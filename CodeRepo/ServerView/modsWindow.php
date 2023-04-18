@@ -1,15 +1,15 @@
 <!-- ensures you are logged in before rendering page.
 Otherwise will reroute to logon page -->
-<?php require_once './sessionLogic.php'; ?>
+<?php require_once '../Resources/php/sessionLogic.php'; ?>
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
         <title>Modification Selection</title>
-        <link rel="stylesheet" href="../CSS/baseStyle.css">
-        <link rel="stylesheet" href="../CSS/modOptionStyle.css">
-        <script src="../JavaScript/displayInterface.js"></script>
-        <script src="../JavaScript/modOptionUtility.js"></script>
+        <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
+        <link rel="stylesheet" href="../Resources/CSS/modOptionStyle.css">
+        <script src="../Resources/JavaScript/displayInterface.js"></script>
+        <script src="../Resources/JavaScript/modOptionUtility.js"></script>
 
 
         <!-- Keep checkboxes for mods in a line -->
@@ -68,7 +68,7 @@ Otherwise will reroute to logon page -->
             function allElementsLoaded() {
                 document.getElementById("btnCommit").addEventListener("pointerdown", commitMods);
                 <?php
-                    require_once 'connect_disconnect.php';
+                    require_once '../Resources/php/connect_disconnect.php';
 
                     if(!isset($_POST['selectedTicketItemId'])) {
                         echo("signalStatus('await');");
@@ -174,13 +174,13 @@ Otherwise will reroute to logon page -->
     </head>
     <body onload="allElementsLoaded()">
         <form id="frmModWindow" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-            <button id='btnCommit' type='button'>Update Mods</button> 
-            <button type='button' onpointerdown='signalStatus("await")'>Cancel Update</button>
+            <button id='btnCommit' type='button'>Accept</button> 
+            <button type='button' onpointerdown='signalStatus("await")'>Cancel</button>
             <fieldset class='modOptionFieldset'>
             <label for='txtCustomModNote'>Custom Mod Note</label>
             <input type='text' id='txtCustomModNote'>
             </fieldset>    
-            <?php require_once 'display.php'; ?>
+            <?php require_once '../Resources/php/display.php'; ?>
         </form>
     </body>
 </html>

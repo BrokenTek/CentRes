@@ -41,3 +41,15 @@
     background-color: #F6941D;
 }
 
+.modOptionDiv {
+    margin-left: 2rem;
+}
+
+form {
+    width: 95%;
+}
+
+input[type="checkbox"][checked=""] + .checkLabel {
+    color: orange !important;
+}
+

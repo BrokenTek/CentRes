@@ -126,19 +126,21 @@
                             $modList = explode(",", $ticketItem['mods']);
                             $modLength = count($modList);
                             //iterate through each pair of modification values.
-                            for($i=0; ($i + 1)<$modLength; $i+=2){
+                            for($i=2; $i<$modLength; $i+=3){
                                 echo("<ul>");
-                                $sql = "SELECT title FROM MenuModificationItems WHERE quickCode = '".$modList[$i]."';";
+                                $sql = "SELECT title FROM MenuModificationItems WHERE quickCode = '".$modList[$i-2]."';";
                                 
                                 $result = connection()->query($sql);
                                 $mod = $result->fetch_assoc();
                                 echo($mod['title']);
-                                echo(": ");
-                                echo($modList[$i + 1]);
+                                if (isset($modList[$i-2]) && $modList[$i-2] != "") {
+                                    echo(": ");
+                                    echo($modList[$i -1]);
+                                }
                                 echo("</ul>");
                             }
                             //append the last odd note, which should be a custom one for instructions or whatever, to the list of modifications
-                            if($modLength % 2 == 1){
+                            if($modLength % 3 == 1){
                                 echo("<ul>".htmlspecialchars($modList[$modLength - 1])."</ul>");
                             }
                         }

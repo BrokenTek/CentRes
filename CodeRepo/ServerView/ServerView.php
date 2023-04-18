@@ -244,7 +244,7 @@
                         //varSet("recordedModificationTime", Date.now() + 6000, "ticketContainer");
                         setTimeout(() => { ticketContainer.classList.remove("clear")} ,750);
                         varSet("ignoreUpdate", "yes please", "ticketContainer", true);
-                        modEditorContainer.setAttribute("src", "../Resources/php/modsWindowANDY.php");
+                        modEditorContainer.setAttribute("src", "modsWindow.php");
                         cboTable.removeAttribute("disabled");
                         cboSeat.removeAttribute("disabled");
                         cboSplit.removeAttribute("disabled");
@@ -945,7 +945,7 @@
                     </select>
                 </div>
                 <iframe id="ticketContainer" frameborder='0' src="../Resources/php/ticket.php"></iframe>
-                <iframe id="modEditorContainer" frameborder='0' width="100%" height="100%" src="../Resources/php/modsWindowANDY.php"></iframe>
+                <iframe id="modEditorContainer" frameborder='0' width="100%" height="100%" src="modsWindow.php"></iframe>
                 <div id="ticketFlickerBackdrop"></div>
                 <div id="ticketFooter">
                     <div></div>

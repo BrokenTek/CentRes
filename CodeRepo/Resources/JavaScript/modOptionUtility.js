@@ -233,7 +233,7 @@ function calculateModsPrice(modString) {
     let data = modString.split(",");
     let total = 0;
     for (let i = 2; i < data.length; i += 3) {
-        let val = parseFloat(data[i-2]);
+        let val = parseFloat(data[i]);
         if (!isNaN(val)) {
             total += val;
         }

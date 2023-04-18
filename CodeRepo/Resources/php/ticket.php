@@ -389,13 +389,14 @@
             else {
                 $header = "<u>Seat</u>";
             }
+            $bitMask = "";
             if (isset($_POST['split'])) {
                 $bitMask = POW(2,$_POST['split']);
                 $sql .= " AND (splitFlag & " .$bitMask. ") = "  .$bitMask;
                 $sql = str_replace("specificSplitFlag", $bitMask, $sql);
             }
             else {
-                $bitmask = 1023;
+                $bitMask = 1023;
                 $sql = str_replace("specificSplitFlag", "0", $sql);
                 if ($header == "") {
                     $header = "<u>Split</u>";
@@ -563,22 +564,22 @@
                         else {
                             $modItem = $modItemRows->fetch_assoc();
                             echo('<div class="modText">' .$modItem['title']. $displayTextSuffix. '</div>');
-                            if (!is_null($modItem['price'])) {
+                            if (!is_null($mods[$i]) && $mods[$i] != "" ) {
                                 echo('<div class="modPrice">');
 
                                 //calculate the mod price
                                 $ticketId = $ticketItem['id'];
-                                $modPrice = $mods[i-1];
-                                $sql = "SELECT modItemSplit($ticketId, $modPrice, $bitMask) as modItemSplit";
-                                $modItemPrice = connection()->query($sql)->fetch_assoc()['modItemSplit'];
-                                echo('</div><div class="modPrice">');
-                                if (isset($modItem['price'])) {
-                                    if ( $modItem['price'] == 0 ) {
+                                $modPrice = $mods[$i];
+                                $sql = "SELECT modItemPrice($ticketId, $modPrice, $bitMask) as modItemPrice;";
+                      
+                                $modItemPrice = connection()->query($sql)->fetch_assoc()['modItemPrice'];
+                               
+                                if (isset($modItemPrice)) {
+                                    if ( $modItemPrice == 0 ) {
                                         // free
                                         echo('FREE');
                                     }
                                     else {
-                                        echo("!!!");
                                         echo(currencyFormat($modItemPrice));
                                     }
                                 }
@@ -587,9 +588,10 @@
                             }
 
                         }
+                        $currentModIndex = $i;
                     }
-                    if ($i < sizeof($mods) - 1) {
-                        echo('<div class="modCustom">' .$mods[$i+1]. '</div>');
+                    if ($currentModIndex < sizeof($mods) - 1) {
+                        echo('<div class="modCustom">' .($mods[$currentModIndex + 1]). '</div>');
                     }
                 }
 
