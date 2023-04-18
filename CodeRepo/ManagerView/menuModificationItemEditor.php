@@ -49,7 +49,9 @@
                 $_POST['quantifierString'] = $fieldData['quantifierString'];
             }
         }
-
+        if (!isset($_POST['quantifierString'])) {
+            $_POST['quantifierString'] = "";
+        }
         if(isset($_POST['commit'])){
             if($_POST['commit'] == 'Update'){
                 //attempt to update the category to reflect the changes made in the form
@@ -66,14 +68,9 @@
                 $sql = connection()->prepare($sql);
                 $sql->bind_param('ss', $_POST['menuTitle'], $_POST['quantifierString']);
                 $sql->execute();
-
-                //get its new quick code and bind it to the $_POST variable.
-                $sql2 = "SELECT quickCode FROM MenuModificationItems WHERE title = ? ORDER BY counter DESC LIMIT 1;";
-                $sql2 = connection()->prepare($sql2);
-                $sql2->bind_param('s', $_POST['menuTitle']);
-                $sql2->execute();
-                $_POST['quickCode'] = $sql2->get_result()->fetch_assoc()['quickCode'];
                 $message = "<b>" .$_POST['menuTitle']. "</b> created.";
+
+                unset($_POST['menuTitle']);
             }
         }
         if(isset($_POST['delete'])){

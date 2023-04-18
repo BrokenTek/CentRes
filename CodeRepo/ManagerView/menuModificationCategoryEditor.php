@@ -127,6 +127,8 @@
                     }
                 }
 
+                unset($_POST['quickCode']);
+
                 $message = "<b>" .$_POST['menuTitle']. "</b> created.";
             }
         }
