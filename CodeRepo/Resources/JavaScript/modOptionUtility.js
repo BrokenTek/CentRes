@@ -129,7 +129,7 @@ function generateModOptionDiv(modQuickCode, modName, quantifierString = null, re
             }
         }
         if (allowBlanks) {
-            storedStr += "<option value=''></option>"
+            storedStr += "<option value='/' blankValue></option>"
         }
         modOptionDivStr = storedStr + modOptionDivStr + "</select>";
     }
@@ -171,28 +171,29 @@ function configureInputs(modNotesString) {
     let data = modNotesString.split(",");
     let checks = document.querySelectorAll("input[type='checkbox']");
     let radios = document.querySelectorAll("input[type='radio']");
-    let selects = document.querySelectorAll("select");
+    let options = document.querySelectorAll("option");
     let lastRecordedIndex = -1;
     for (let i = 2; i < data.length; i += 3) {
         for (let j = 0; j < checks.length; j++) {
             if (checks[j].value ==  data[i-2] + "," + data[i-1] + "," + data[i]) {
-                checks[i].setAttribute("checked");
+                checks[j].setAttribute("checked", "");
             } 
         }
         for (let j = 0; j < radios.length; j++) {
             if (radios[j].value ==  data[i-2] + "," + data[i-1] + "," + data[i]) {
-                radios[i].setAttribute("checked");
+                radios[j].setAttribute("checked", "");
             }
         }
-        for (let j = 0; j < selects.length; j++) {
-            if (selects[j].id == data[i-2]) {
-                selects[j].value = data[i-2] + "," + data[i-1] + "," + data[i];
+        for (let j = 0; j < options.length; j++) {
+            if (options[j].value == data[i-2] + "," + data[i-1] + "," + data[i]) {
+                options[j].selected = true;
             }
         }
         lastRecordedIndex = i;
     }
     if (lastRecordedIndex < data.length - 1) {
-        document.getElementsById("txtCustomModNote").innerText = data[lastRecordedIndex + 1];
+        alert(data[lastRecordedIndex + 1]);
+        document.getElementById("txtCustomModNote").value = data[lastRecordedIndex + 1];
     }
 }
 
@@ -212,16 +213,17 @@ function generateModString() {
         } 
     }
     for (let j = 0; j < selects.length; j++) {
-        if (selects[j].value.length > 0) {
+        if (selects[j].value.length > 1) {
             modString += "," + selects[j].value;
         }
     }
-    with (document.getElementById("txtModString")) {
+    with (document.getElementById("txtCustomModNote")) {
         if (value.length > 0) {
-            modString += (modString.length == 0 ? "" : ",") + value;
+            modString += (modString.length == 0 ? "" : ",") + value.replace(",", ".");
         }
     }
     return modString.length > 0 ? modString.substring(1) : "";
+    alert("MOD STRR IS" + "\n" + modStr);
 }
 
 function calculateModsPrice(modString) {

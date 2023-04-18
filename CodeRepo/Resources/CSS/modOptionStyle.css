@@ -2,8 +2,12 @@
     font-size: 1rem;
     font-weight: bold;
     display: grid;
-    grid-template-columns: max-content max-content max-content max-content max-content;
+    grid-auto-rows: max-content;
     grid-auto-rows: min-content;
+    color: white;
+    background-color: black !important;
+    border: .25rem solid white;
+    border-radius: .25rem;
 }
 
 .modOptionFieldset > .selModOptionDiv {
@@ -14,5 +18,26 @@
     font-size: 1.25rem;
     font-weight: bold;
     margin: 0;
+}
+
+#frmModWindow {
+    background-color: #777;
+    padding: .5rem;
+}
+
+* {
+    font-size: 1.25rem;
+}
+
+.quantityLogo {
+    background-color: white;
+    color: black;
+    display:inline;
+    opacity: 75%;
+   margin-right: .5rem;
+}
+
+.quantityLogo.one, .quantityLogo.moreThanOne {
+    background-color: #F6941D;
 }
 

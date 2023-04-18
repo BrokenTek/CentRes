@@ -1,4 +1,5 @@
-zz
+<!-- ensures you are logged in before rendering page.
+Otherwise will reroute to logon page -->
 <?php require_once './sessionLogic.php'; ?>
 <!DOCTYPE html>
 <html>
@@ -6,264 +7,180 @@ zz
         <meta charset="UTF-8">
         <title>Modification Selection</title>
         <link rel="stylesheet" href="../CSS/baseStyle.css">
+        <link rel="stylesheet" href="../CSS/modOptionStyle.css">
         <script src="../JavaScript/displayInterface.js"></script>
+        <script src="../JavaScript/modOptionUtility.js"></script>
+
+
+        <!-- Keep checkboxes for mods in a line -->
+        <style>
+            .modOptionDiv {
+                display: inline-block;
+            }
+        </style>
+
+
 
         <script>
             function signalStatus(status) {
                 varSet("status", status);
             }
-        </script>
-    </head>
-    <body onload="addSuffixs()">
-        <form id="modWindowId" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-            <?php
-                require_once 'connect_disconnect.php';
 
-                if(!isset($_POST['selectedTicketId'])) {
-                    //<script>signalStatus('await');</script>
-                    $_POST['status'] = 'await';
-                    //echo("<H1>Waiting for <b>selectedTicketId</b> to be injected</H1>");
-                    
+            function createCategoryFieldset(categoryTitle, categoryId, categoryType) {
+                let newFst = document.createElement("fieldset");
+                with (newFst) {
+                    setAttribute("id", categoryId);
+                    classList.add("menuCategory");
+                    classList.add("modOptionFieldset");
+                    classList.add(categoryType);
+                    let suffix = "";
+                    let logoType = "";
+                    if (categoryType == "MandatoryOne") {
+                        suffix = "&nbsp;1&nbsp;";
+                        logoType = "one";
+                    }
+                    else if (categoryType == "MandatoryAny") {
+                        suffix = "1-∞";
+                        logoType = "moreThanZero";
+                    }
+                    else if (categoryType == "OptionalOne") {
+                        suffix = "0-1";
+                        logoType = "zeroOrOne";
+                    }
+                    else if (categoryType == "OptionalAny") {
+                        suffix = "0-∞";
+                        logoType = "noBounds";
+                    }
+                    innerHTML = "<legend class='menuCategoryTitle'><div class='quantityLogo " + logoType + "'>" + suffix + "</div>" + categoryTitle + "</legend>";
+                    document.getElementById('frmModWindow').appendChild(newFst);
                 }
-                else {
-                    $selectedTicketId = $_POST['selectedTicketId'];
-                    if (isset($_POST['newModValue'])) {                        
-                        $sql = "CALL modifyTicketItem('" .$_POST['selectedTicketId']. "', '" .$_POST['newModValue']. "');";
-                        connection()->query($sql);
+                
+            }
 
-                        //<script>signalStatus('await');
-                        $_POST['status'] = 'await';
-                        //echo("<H1>Waiting for Server Window to redirect back to ticket item</H1>");
+            function commitMods() {
+                let modStr = generateModString();
+                varSet("newModValue", modStr);
+                varSet("priceWithMods", calculateModsPrice(modStr));
+                updateDisplay();
+            }
+
+
+            function allElementsLoaded() {
+                document.getElementById("btnCommit").addEventListener("pointerdown", commitMods);
+                <?php
+                    require_once 'connect_disconnect.php';
+
+                    if(!isset($_POST['selectedTicketItemId'])) {
+                        echo("signalStatus('await');");
                     }
                     else {
-                        
-                        //===================================================================================================
-                        //<script>signalStatus('pending');</script>
-                        $_POST['status'] = 'pending';
+                        $selectedTicketItemId = $_POST['selectedTicketItemId'];
+                        if (isset($_POST['newModValue'])) {
+                            $sql = "CALL modifyTicketItem('" .$_POST['selectedTicketItemId']. "', '" .$_POST['newModValue']. "');";
+                            connection()->query($sql);
 
-                        $newModValue = "";
+                            $sql = "SELECT calculatedPrice FROM ticketItems WHERE id = " .$_POST['selectedTicketItemId']. ";";
+                            $basePrice = connection()->query($sql)->fetch_assoc()['calculatedPrice'];
 
-                        // Get the menu item's quick code
-                        $sql = "SELECT menuItemQuickCode FROM ticketitems WHERE id = '" . $selectedTicketId . "';";
-                        $result = connection()->query($sql);
-                        if($result->num_rows == 1) {
-                            $menuItemQuickCode = $result->fetch_assoc()['menuItemQuickCode'];
-
-                            // Get the menu item's title
-                            $sql = "SELECT title FROM menuitems WHERE quickCode = '$menuItemQuickCode';";
-                            $result = connection()->query($sql);
-                            
-                            if($result->num_rows == 1) {
-                                $menuItemTitle = $result->fetch_assoc()['title'];
-                                echo("<div id='lblDefinedMods'>Modifications For <i> $menuItemTitle </i></div>");
-
-                                // Initialize the mod quick code array
-                                $modQuickCodeArray = array();
-                                // Get the menumodificationitems data based on the mod quick code
-                                $sql = "SELECT childQuickCode FROM menuassociations INNER JOIN MenuModificationItems ON MenuAssociations.childQuickCode = MenuModificationItems.quickCode WHERE parentQuickCode = '$menuItemQuickCode' AND visible = 1 ORDER BY categoryType, modGroup, displayIndex;";
-                                $result = connection()->query($sql);
-                                if($result->num_rows > 0) {
-                                    $mandatoryOneStr = "";
-                                    $mandatoryAnyStr = "";
-                                    $optionalOneStr = "";
-                                    $optionalAnyStr = "";
-
-                                    // Get the menumodificationitems data based on the array of mod quick codes
-                                    for ($i = 0; $i<sizeof($modQuickCodeArray); $i++) {
-                                        $sql = "SELECT title, categoryType, modActionCategory, modGroup, quickCode FROM menumodificationitems WHERE quickCode = '$modQuickCodeArray[$i]';";
-                                        $applicableMods = connection()->query($sql);
-
-                                        $lastRecordedCatType = '';
-
-                                        while($row = $applicableMods->fetch_assoc()) {
-                                            $quickCode = $row['quickCode']; 
-                                            $modTitle = $row['title'];
-                                            $modCategoryType = $row['categoryType'];
-                                            $modCategory = $row['modActionCategory'];
-                                            $modGroup = $row['modActionCategory'];
-                                            if (!isset($modGroup)) {
-                                                $modGroup = '';
-                                            }
-
-                                            // get the options and prices associated with each mod item.
-                                            $sql = "SELECT title FROM ModActions ORDER BY title WHERE modActionCategory = '$modCategory';";
-                                            $modOptions = connection()->query($sql);
-                                            $modOptionCount = sqli_num_rows($modOptions);
-                                            
-                                            if ($modCategoryType == "MandatoryOne") {
-                                                if ($lastRecordedCatType != 'MandatoryOne') {
-                                                    $lastRecordedCatType = 'MandatoryOne';
-                                                    unset($lastRecordedGroup);
-                                                }
-                                                if (!isset($lastRecordedGroup) || $modGroup != $lastRecordedGroup) {
-                                                    if (isset($lastRecordedGroup)) {
-                                                        $mandatoryOneStr .= "</fieldset>";
-                                                    }
-                                                    $lastRecordedGroup = $modGroup;
-
-                                                    $mandatoryOneStr .= "<fieldset class='modGroup'>";
-                                                    if ($modGroup != '') {
-                                                        $mandatoryOneStr .= "<legend>$modGroup</legend>";
-                                                    }
-                                                }
-                                                $mandatoryOneStr .= "\n<label id='lbl$quickCode' for='sel$quickCode'>$modTitle</label>".
-                                                                    "\n\t<select id='sel$quickCode' name='$quickCode'>";
-                                                    for($j = 0; $j < sizeOf($modOptionCount); $j++ ) {
-                                                        $modOption = $modOptions->fetch_assoc();
-                                                        $modOptionTitle = $modOption['title'];
-                                                        $modOptionprice = $modOption['price']; 
-                                                        $mandatoryOneStr .= "\n\t\t<option value='$quickCode,$modOptionTitle,$modOptionprice'>
-                                                                                        <div class='modItemprice'>" .currencyFormat($modOptionprice). "</div>
-                                                                                        <div class='modItemTitle'>$modOptionTitle</div>
-                                                                                    </option>";
-                                                    }
-                                                $mandatoryOneStr .= "</select>";
-                                            }
-                                            else if ($modCategoryType == 'MandatoryAny') {
-                                                if ($lastRecordedCatType != 'MandatoryAny') {
-                                                    $lastRecordedCatType = 'MandatoryAny';
-                                                    unset($lastRecordedGroup);
-                                                }
-                                                if (!isset($lastRecordedGroup) || $modGroup != $lastRecordedGroup) {
-                                                    if (isset($lastRecordedGroup)) {
-                                                        $mandatoryAnyStr .= "</fieldset>";
-                                                    }
-                                                    $lastRecordedGroup = $modGroup;
-
-                                                    $mandatoryAnyStr .= "<fieldset class='modGroup'>";
-                                                    if ($modGroup != '') {
-                                                        $mandatoryAnyStr .= "<legend>$modGroup</legend>";
-                                                    }
-                                                }
-                                                $mandatoryAnyStr .= "<fieldset id='lbl$quickCode'><legend>$modTitle</legend>";
-                                                    for($j = 0; $j < sizeOf($modOptionCount); $j++ ) {
-                                                        $modOption = $modOptions->fetch_assoc();
-                                                        $modOptionQuickCode = $modOption['quickCode'];
-                                                        $modOptionTitle = $modOption['title'];
-                                                        $modOptionprice = $modOption['price']; 
-                                                        $optionalAnyStr .= "<div class='checkAndLabel'>
-                                                                                <input type='checkbox' id='$modOptionQuickCode' name='$modOptionQuickCode' value='$modOptionQuickCode,$modOptionTitle,$modOptionprice'>
-                                                                                <label for='$modOptionQuickCode'>
-                                                                                    <div class='modItemprice'>" .currencyFormat($modOptionprice). "</div>
-                                                                                    <div class='modItemTitle'>$modOptionTitle</div>
-                                                                                </label>
-                                                                            </div>";
-                                                    }
-                                                $mandatoryAnyStr .= "</fieldset>";
-                                            }
-                                            else if ($modCategoryType == 'OptionalOne') {
-                                                if ($lastRecordedCatType != 'OptionalOne') {
-                                                    $lastRecordedCatType = 'OptionalOne';
-                                                    unset($lastRecordedGroup);
-                                                }
-                                                if (!isset($lastRecordedGroup) || $modGroup != $lastRecordedGroup) {
-                                                    if (isset($lastRecordedGroup)) {
-                                                        $optionalOneStr .= "</fieldset>";
-                                                    }
-                                                    $lastRecordedGroup = $modGroup;
-
-                                                    $optionalOneStr .= "<fieldset class='modGroup'>";
-                                                    if ($modGroup != '') {
-                                                        $optionalOneStr .= "<legend>$modGroup</legend>";
-                                                    }
-                                                }
-                                                $optionalOneStr .= "<label id='lbl$quickCode' for='sel$quickCode'>$modTitle</label>".
-                                                                    "<select id='sel$quickCode' name='$quickCode'>".
-                                                                    "<option valvue=''>Select One</option>";
-                                                    for($j = 0; $j < sizeOf($modOptionCount); $j++ ) {
-                                                        $modOption = $modOptions->fetch_assoc();
-                                                        $modOptionTitle = $modOption['title'];
-                                                        $modOptionprice = $modOption['price']; 
-                                                        $optionalOneStr .= "<option value='$quickCode,$modOptionTitle,$modOptionprice'>
-                                                                                        <div class='modItemprice'>" .currencyFormat($modOptionprice). "</div>
-                                                                                        <div class='modItemTitle'>$modOptionTitle</div>
-                                                                                    </option>";
-                                                    }
-                                                $optionalOneStr .= "</select>";
-                                            }
-                                            else if ($modCategoryType == 'OptionalAny') {
-                                                //OUT OF THE BOX HTML CANNOT ENFORCE THIS.
-                                                //CODE HAS TO BE CREATED TO MAKE SURE AT LEAST 1 ITEM IS CHECKED.
-                                                if ($lastRecordedCatType != 'OptionalAny') {
-                                                    $lastRecordedCatType = 'OptionalAny';
-                                                    unset($lastRecordedGroup);
-                                                }
-                                                if (!isset($lastRecordedGroup) || $modGroup != $lastRecordedGroup) {
-                                                    if (isset($lastRecordedGroup)) {
-                                                        $optionalAnyStr .= "</fieldset>";
-                                                    }
-                                                    $lastRecordedGroup = $modGroup;
-
-                                                    $optionalAnyStr .= "<fieldset class='modGroup'>";
-                                                    if ($modGroup != '') {
-                                                        $optionalAnyStr .= "<legend>$modGroup</legend>";
-                                                    }
-                                                }
-                                                $optionalAnyStr .= "<fieldset id='lbl$quickCode'><legend>$modTitle</legend>";
-                                                    for($j = 0; $j < sizeOf($modOptionCount); $j++ ) {
-                                                        $modOption = $modOptions->fetch_assoc();
-                                                        $modOptionQuickCode = $modOption['quickCode'];
-                                                        $modOptionTitle = $modOption['title'];
-                                                        $modOptionprice = $modOption['price']; 
-                                                        $optionalAnyStr .= "<div class='checkAndLabel'>
-                                                                                <input type='checkbox' id='$modOptionQuickCode' name='$modOptionQuickCode' value='$modOptionQuickCode,$modOptionTitle,$modOptionprice'>
-                                                                                <label for='$modOptionQuickCode'>
-                                                                                    <div class='modItemprice'>" .currencyFormat($modOptionprice). "</div>
-                                                                                    <div class='modItemTitle'>$modOptionTitle</div>
-                                                                                </label>
-                                                                            </div>";
-                                                    }
-                                                $optionalAnyStr .= "</fieldset>";
-                                            }   
-                                        }
-                                    }
-                                    if ($mandatoryOneStr != "") {
-                                        echo("<fieldset id='fstMandatoryOne' class='predefinedMods'><legend>Must Select 1 for Each of the Following Categories</legend>
-                                            $mandatoryOneStr
-                                            </fieldset></fieldset>");
-                                    }
-                                    if ($mandatoryAnyStr != "") {
-                                        echo("<fieldset id='fstMandatoryAny' class='predefinedMods'><legend>Must Select Any for Each of the Following Categories</legend>
-                                            $mandatoryAnyStr
-                                            </fieldset></fieldset>");
-                                    }
-                                    if ($optionalOneStr != "") {
-                                        echo("<fieldset id='fstOptionalOne' class='predefinedMods'><legend>Select 1 for Each of the Following Categories</legend>
-                                            $optionalOneStr
-                                            </fieldset></fieldset>");
-                                    }
-                                    if ($optionalAnyStr != "") {
-                                        echo("<fieldset id='fstOptionalAny' class='predefinedMods'><legend>Select Any for Each of the Following Categories</legend>
-                                            $optionalAnyStr
-                                            </fieldset></fieldset>");
-                                    }
-                                }
-                                else {
-                                    //echo "<h3 class='debug_statement'>No Predefined Mods Found for this item</h3>";
-                                }
-                                echo("<fieldset id='fstCustomMod'>
-                                        <label for='txtModString'>Custom Mod Note</label>
-                                        <input type='text' id='txtModString' name='newModNote'>
-                                      </fieldset>");
-                            }
-                            else {
-                                // debug, should be unrechable code
-                                echo("<div id='lblDefinedMods' class='debug_statement'>Menu Item Not Found</div>");
-                            }
+                            $priceWithMods = $_POST['priceWithMods'];
+                            $sql = "UPDATE ticketItems SET calculatedPriceWithMods = " .($basePrice +  $priceWithMods)." WHERE id = " .$_POST['selectedTicketItemId'].";";
+                            connection()->query($sql);
+                            echo("signalStatus('await');");
+                           
                         }
                         else {
-                            echo "<h3 class='debug_statement'>Ticket Item Not Found</h3>";
+                            echo("signalStatus('pending');");
+                            //echo("signalStatus('pending');");
+                          
+                            /////////////////////////////////////////////////////////////////////////////////////////
+                            // GET THE MENU ITEM AND IT'S PRICE
+                            /////////////////////////////////////////////////////////////////////////////////////////
+
+                            // Get the menu item's quick code
+                            $sql = "SELECT menuItemQuickCode FROM ticketitems WHERE id = '" . $selectedTicketItemId . "';";
+                            $result = connection()->query($sql);
+                            if($result->num_rows > 0) {
+                                $menuItemQuickCode = $result->fetch_assoc()['menuItemQuickCode'];
+                            }
+
+                            // Get the menu item's title and price
+                            $sql = "SELECT title, price FROM menuitems WHERE quickCode = '$menuItemQuickCode';";
+                            $result = connection()->query($sql);
+                            if($result->num_rows > 0) {
+                                $record = $result->fetch_assoc();
+                                $menuItemTitle = $record['title'];
+                                $menuItemPrice = $record['price'];
+                            }
+
+                            /////////////////////////////////////////////////////////////////////////////////////////
+                            // GET AND ITERATE THROUGH THE MENU CATEGORIES ASSOCIATED WITH THIS MENU ITEM
+                            /////////////////////////////////////////////////////////////////////////////////////////
+                            
+                            $sql = "SELECT childQuickCode FROM menuassociations WHERE parentQuickCode = '$menuItemQuickCode';";
+                            $modCategories = connection()->query($sql);
+                            while($modCategory = $modCategories->fetch_assoc()) {
+                                $modCategoryQuickCode = $modCategory['childQuickCode'];
+                                $sql = "SELECT * FROM MenuModificationCategories WHERE quickCode = '$modCategoryQuickCode';";
+                                $modCategoryDetails = connection()->query($sql)->fetch_assoc();
+                               
+                                /////////////////////////////////////////////////////////////////////////////////////
+                                // CREATE EACH OF THE MENU CATEGORY FIELDSETS
+                                /////////////////////////////////////////////////////////////////////////////////////
+                                
+                                echo("createCategoryFieldset('" .$modCategoryDetails['title']. "', '$modCategoryQuickCode', '" .$modCategoryDetails['categoryType']. "');");
+
+
+                                /////////////////////////////////////////////////////////////////////////////////////
+                                // GET AND ITERATE THROUGH ALL OF THE MOD ITEMS ASSOCIATED WITH THIS MOD CATEGORY
+                                /////////////////////////////////////////////////////////////////////////////////////
+
+                                $sql = "SELECT childQuickCode FROM menuassociations WHERE parentQuickCode = '$modCategoryQuickCode';";
+                                $modItems = connection()->query($sql);
+                                while($modItem = $modItems->fetch_assoc()) {
+                                    $modItemQuickCode = $modItem['childQuickCode'];
+                                    $sql = "SELECT * FROM MenuModificationItems WHERE quickCode = '$modItemQuickCode';";
+                                    $modItemDetails = connection()->query($sql)->fetch_assoc();
+                                    $title = $modItemDetails['title'];
+                                    $quantifierString = $modItemDetails['quantifierString'];
+                                    $categoryType = $modCategoryDetails['categoryType'];
+                                    echo ("document.getElementById('$modCategoryQuickCode').appendChild(");
+                                    echo("generateModOptionDiv('$modItemQuickCode','$title','$quantifierString', false, '$categoryType')"); 
+                                    echo(");");
+                                }
+
+                            }
+
+                            /////////////////////////////////////////////////////////////////////////////////////////
+                            // GET THE EXISTING MOD STRING FOR THE TICKET ITEM
+                            /////////////////////////////////////////////////////////////////////////////////////////
+
+                            $sql = "SELECT modificationNotes FROM TicketItems WHERE id = '" . $selectedTicketItemId . "';";
+                            $recordedModNotes = connection()->query($sql)->fetch_assoc()['modificationNotes'];
+
+                            /////////////////////////////////////////////////////////////////////////////////////////
+                            // CONFIGURE THE MODS TO MATCH WHAT WAS ALREADY RECORDED
+                            /////////////////////////////////////////////////////////////////////////////////////////
+
+                            if (isset($recordedModNotes)) {
+                                echo("configureInputs('$recordedModNotes');");
+                            }
                         }
-                                                    
-                        echo("<button id='submitBtn' type='button'>Update Mods</button> 
-                        <input id='postSubmitBtn' type='submit' value='Update Mods' style='display: none;' >
-                        <button type='button' onpointerdown='signalStatus(" .'"await"'. ")'>Cancel Update</button>");
-                        //===================================================================================================
+                        unset($_POST['newModValue'], $_POST['priceWithMods']);
                     }
-                                 
-                }
-                require_once 'display.php';
-            ?>
+                ?>  
+            }
+   
+        </script>
+    </head>
+    <body onload="allElementsLoaded()">
+        <form id="frmModWindow" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+            <button id='btnCommit' type='button'>Update Mods</button> 
+            <button type='button' onpointerdown='signalStatus("await")'>Cancel Update</button>
+            <fieldset class='modOptionFieldset'>
+            <label for='txtCustomModNote'>Custom Mod Note</label>
+            <input type='text' id='txtCustomModNote'>
+            </fieldset>    
+            <?php require_once 'display.php'; ?>
         </form>
     </body>
 </html>

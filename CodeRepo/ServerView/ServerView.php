@@ -212,7 +212,8 @@
                     stopUpdateLoopTimer();
                     ticketContainer.classList.add("clear");
                     selTicket = varGet("selectedTicketItem", "ticketContainer");
-                    varSet("selectedItem",selTicket.replace("ticketItem",""), "modEditorContainer", true);
+                    varSet("selectedTicketItemId",selTicket.replace("ticketItem",""), "modEditorContainer", true);
+                    updateDisplay("modEditorContainer", true);
                     modEditorContainer.classList.add("active");
                     ticketContainer.classList.add("hidden");
                     cboTable.disabled = true;
@@ -243,7 +244,7 @@
                         //varSet("recordedModificationTime", Date.now() + 6000, "ticketContainer");
                         setTimeout(() => { ticketContainer.classList.remove("clear")} ,750);
                         varSet("ignoreUpdate", "yes please", "ticketContainer", true);
-                        modEditorContainer.setAttribute("src", "../Resources/php/modsWindowCARSON.php");
+                        modEditorContainer.setAttribute("src", "../Resources/php/modsWindowANDY.php");
                         cboTable.removeAttribute("disabled");
                         cboSeat.removeAttribute("disabled");
                         cboSplit.removeAttribute("disabled");
@@ -944,7 +945,7 @@
                     </select>
                 </div>
                 <iframe id="ticketContainer" frameborder='0' src="../Resources/php/ticket.php"></iframe>
-                <iframe id="modEditorContainer" frameborder='0' width="100%" height="100%" src="../Resources/php/modsWindowCARSON.php"></iframe>
+                <iframe id="modEditorContainer" frameborder='0' width="100%" height="100%" src="../Resources/php/modsWindowANDY.php"></iframe>
                 <div id="ticketFlickerBackdrop"></div>
                 <div id="ticketFooter">
                     <div></div>

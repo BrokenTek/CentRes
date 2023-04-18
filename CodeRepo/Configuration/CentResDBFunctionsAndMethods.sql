@@ -17,6 +17,8 @@ DROP FUNCTION IF EXISTS usernameFromId;
 DROP FUNCTION IF EXISTS idFromUsername;
 
 DROP FUNCTION IF EXISTS ticketItemPrice;
+DROP FUNCTION IF EXISTS ticketItemPriceWithMods;
+DROP FUNCTION IF EXISTS modItemPrice;
 DROP FUNCTION IF EXISTS splitCount;
 DROP FUNCTION IF EXISTS lowestSplitFlag;
 DROP FUNCTION IF EXISTS ticketSubtotal;
@@ -442,6 +444,41 @@ BEGIN
 	END IF;
 END;
 
+-- calculates a mod item price, taking into account it's split.
+-- If a split flag of 0 or 1023 is supplied, the associated mod price is returned as-is. 
+-- mod prices are taken as-is. They are not percent off or discounts
+CREATE FUNCTION modItemPrice(ticketItemId INT UNSIGNED, prcTot DECIMAL(6,2), splitFlg SMALLINT UNSIGNED) RETURNS DECIMAL(6, 2)
+BEGIN
+	DECLARE spltCount SMALLINT UNSIGNED;
+	DECLARE spltLow SMALLINT UNSIGNED;
+	DECLARE prcTot DECIMAL(6, 2);
+	DECLARE prcAdj DECIMAL(6, 2);
+	DECLARE prcRem DECIMAL(6, 2);
+	DECLARE prcDiv DECIMAL(6, 2);
+
+	IF (prcTot IS NULL) THEN
+		RETURN NULL;
+	ELSEIF (prcTot = 0) THEN
+		RETURN prcTot;
+	END IF;
+	SELECT overridePrice, splitCount(splitFlag), lowestSplitFlag(splitflag) INTO prcAdj, spltCount, spltLow FROM TicketItems WHERE id = ticketItemId;
+	
+	SELECT TRUNCATE(prcTot / spltCount, 2) INTO prcDiv;
+	SELECT (prcTot - prcDiv * spltCount) INTO prcRem; 
+
+	IF (splitFlg IN (0, 1023) OR spltCount = 1) THEN
+		-- if you want to get the price irrespective of split, or there isn't a split
+		RETURN prcTot;
+	ELSEIF (splitFlg & spltLow <> 0) THEN
+		-- if there is a split and you specified the lowest split.
+		RETURN prcDiv + prcRem;
+	ELSE
+		-- if there is a split and the split you specifed is not the lowest split.
+		RETURN prcDiv;
+	END IF;
+
+END;
+
 -- calculates the ticket item price, taking into account it's split.
 -- If a split flag of 0 or 1023 is supplied, the associated menu item price is returned as-is. 
 CREATE FUNCTION ticketItemPrice(ticketItemId INT UNSIGNED, splitFlg SMALLINT UNSIGNED) RETURNS DECIMAL(6, 2)
@@ -454,6 +491,47 @@ BEGIN
 	DECLARE prcDiv DECIMAL(6, 2);
 
 	SELECT calculatedPrice, overridePrice, splitCount(splitFlag), lowestSplitFlag(splitflag) INTO prcTot, prcAdj, spltCount, spltLow FROM TicketItems WHERE id = ticketItemId;
+	IF (prcAdj IS NOT NULL) THEN
+		IF (prcAdj < 0) THEN
+			SET prcTot = prcTot + prcAdj;
+		ELSEIF (prcAdj = 0) THEN
+			SET prcTot = 0;
+		ELSEIF (prcAdj >= 1) THEN
+			SET prcTot = prcAdj;
+		ELSE
+			SET prcTot = prcTot * (1 - prcAdj);
+		END IF;
+	END IF;
+
+	
+	SELECT TRUNCATE(prcTot / spltCount, 2) INTO prcDiv;
+	SELECT (prcTot - prcDiv * spltCount) INTO prcRem; 
+
+	IF (splitFlg IN (0, 1023) OR spltCount = 1) THEN
+		-- if you want to get the price irrespective of split, or there isn't a split
+		RETURN prcTot;
+	ELSEIF (splitFlg & spltLow <> 0) THEN
+		-- if there is a split and you specified the lowest split.
+		RETURN prcDiv + prcRem;
+	ELSE
+		-- if there is a split and the split you specifed is not the lowest split.
+		RETURN prcDiv;
+	END IF;
+
+END;
+
+-- calculates the ticket item price with mods, taking into account it's split.
+-- If a split flag of 0 or 1023 is supplied, the associated menu item price is returned as-is. 
+CREATE FUNCTION ticketItemPriceWithMods(ticketItemId INT UNSIGNED, splitFlg SMALLINT UNSIGNED) RETURNS DECIMAL(6, 2)
+BEGIN
+	DECLARE spltCount SMALLINT UNSIGNED;
+	DECLARE spltLow SMALLINT UNSIGNED;
+	DECLARE prcTot DECIMAL(6, 2);
+	DECLARE prcAdj DECIMAL(6, 2);
+	DECLARE prcRem DECIMAL(6, 2);
+	DECLARE prcDiv DECIMAL(6, 2);
+
+	SELECT calculatedPriceWithMods, overridePrice, splitCount(splitFlag), lowestSplitFlag(splitflag) INTO prcTot, prcAdj, spltCount, spltLow FROM TicketItems WHERE id = ticketItemId;
 	IF (prcAdj IS NOT NULL) THEN
 		IF (prcAdj < 0) THEN
 			SET prcTot = prcTot + prcAdj;

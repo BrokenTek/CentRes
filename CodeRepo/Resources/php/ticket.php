@@ -380,7 +380,7 @@
             }
 
             $sql = "SELECT *, ticketItemStatus(TicketItems.id) as status, ticketItemPayStatus(TicketItems.id) as splitPayStatus,
-                    ticketItemPrice(TicketItems.id, specificSplitFlag) as calcTicketItemPrice 
+                    ticketItemPrice(TicketItems.id, specificSplitFlag) as calcTicketItemPrice, ticketItemPriceWithMods(TicketItems.id, specificSplitFlag) as calcTicketItemPriceWithMods 
                     FROM ticketItems WHERE TicketItems.ticketId = " .$_POST['ticket'];
 
             if (isset($_POST['seat'])) {
@@ -395,6 +395,7 @@
                 $sql = str_replace("specificSplitFlag", $bitMask, $sql);
             }
             else {
+                $bitmask = 1023;
                 $sql = str_replace("specificSplitFlag", "0", $sql);
                 if ($header == "") {
                     $header = "<u>Split</u>";
@@ -518,6 +519,7 @@
                 else {
                     echo('<div class="ticketItemPrice">' .currencyFormat($ticketItem['calcTicketItemPrice']). '</div>');
                     echo('<div class="ticketItemOverrideNote">' .$ticketItem['overrideNote']. '</div>');
+                    /*
                     echo('<div class="ticketItemOverridePrice">');
                     if ($ticketItem['overridePrice'] < 0) {
                         // discount applied
@@ -538,48 +540,61 @@
                        echo(($ticketItem['overridePrice'] * 100) ."% off");
                     }
                     echo('</div>');
+                    */
                 }
                 if (!is_null($ticketItem['modificationNotes'])) {
                     $mods = explode(",", $ticketItem['modificationNotes']);
-
-                    foreach ($mods as $modQuickCode) {
+                    $currentModIndex = -1;
+                    $i = 2;
+                    for ($i = 2; $i < sizeof($mods); $i+=3) {
+                        $modQuickCode = $mods[$i-2];
                         $sql = "SELECT * FROM MenuModificationItems WHERE quickCode = '" .str_replace("'", "''",$modQuickCode). "'";
                         $modItemRows = connection()->query($sql);
+                        if (!isset($mods[$i-1]) || $mods[$i-1] == "") {
+                            $displayTextSuffix = "";
+                        }
+                        else {
+                            $displayTextSuffix = ": " . $mods[$i-1];
+                        }
                         if (mysqli_num_rows($modItemRows) == 0) {
-                            // custom mod, deleted mod. Treat as custom mod.
-                            echo('<div class="modCustom">' .$modQuickCode. '</div>');
+                            // deleted mod. Treat as custom mod.
+                            echo('<div class="modCustom">' .$modQuickCode. $displayTextSuffix. '</div>');
                         }
                         else {
                             $modItem = $modItemRows->fetch_assoc();
-                            echo('<div class="modText">' .$modItem['title']. '</div>');
+                            echo('<div class="modText">' .$modItem['title']. $displayTextSuffix. '</div>');
                             if (!is_null($modItem['price'])) {
                                 echo('<div class="modPrice">');
-                              
-                                if ($modItem['price'] < 0) {
-                                    // discount applied
-                                    echo(currencyFormat($modItem['price']));
+
+                                //calculate the mod price
+                                $ticketId = $ticketItem['id'];
+                                $modPrice = $mods[i-1];
+                                $sql = "SELECT modItemSplit($ticketId, $modPrice, $bitMask) as modItemSplit";
+                                $modItemPrice = connection()->query($sql)->fetch_assoc()['modItemSplit'];
+                                echo('</div><div class="modPrice">');
+                                if (isset($modItem['price'])) {
+                                    if ( $modItem['price'] == 0 ) {
+                                        // free
+                                        echo('FREE');
+                                    }
+                                    else {
+                                        echo("!!!");
+                                        echo(currencyFormat($modItemPrice));
+                                    }
                                 }
-                                elseif ( $modItem['price'] >= 1 ) {
-                                     // price set to a value
-                                     echo(currencyFormat($modItem['price']));
-                                }
-                                elseif ( $modItem['price'] == 0 ) {
-                                    // free
-                                    echo('FREE');
-                                }
-                                else {
-                                    // percent discount applied
-                                   echo(((1 - $modItem['price']) * 100) ."% off");
-                                }
-                                echo('</div>');
+                                echo("</div>");
+                                
                             }
 
                         }
                     }
+                    if ($i < sizeof($mods) - 1) {
+                        echo('<div class="modCustom">' .$mods[$i+1]. '</div>');
+                    }
                 }
 
-                //added the value of calcTicketItemPrice for each ticket item to $ticketSubtotal:
-                $ticketSubtotal += $ticketItem['calcTicketItemPrice'];
+                //added the value of calcTicketItemPriceWithMods for each ticket item to $ticketSubtotal:
+                $ticketSubtotal += $ticketItem['calcTicketItemPriceWithMods'];
                 echo("</div>");
 
             }
