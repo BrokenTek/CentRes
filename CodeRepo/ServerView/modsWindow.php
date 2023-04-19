@@ -5,7 +5,6 @@ Otherwise will reroute to logon page -->
 <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Modification Selection</title>
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/modOptionStyle.css">
@@ -119,20 +118,31 @@ Otherwise will reroute to logon page -->
                             
                             $sql = "SELECT childQuickCode FROM menuassociations WHERE parentQuickCode = '$menuItemQuickCode';";
                             $modCategories = connection()->query($sql);
+                            $defered = false;
+                            $deferedStr = "";
                             while($modCategory = $modCategories->fetch_assoc()) {
                                 $modCategoryQuickCode = $modCategory['childQuickCode'];
                                 $sql = "SELECT * FROM MenuModificationCategories WHERE quickCode = '$modCategoryQuickCode';";
                                 $modCategoryDetails = connection()->query($sql)->fetch_assoc();
-                               
+                                                              
                                 /////////////////////////////////////////////////////////////////////////////////////
                                 // CREATE EACH OF THE MENU CATEGORY FIELDSETS
                                 /////////////////////////////////////////////////////////////////////////////////////
                                 
-                                echo("createCategoryFieldset('" .$modCategoryDetails['title']. "', '$modCategoryQuickCode', '" .$modCategoryDetails['categoryType']. "');");
+                                if (str_starts_with($modCategoryDetails['categoryType'] , "Optional")) {
+                                    $defered = true;
+                                    $deferedStr .= "createCategoryFieldset('" .$modCategoryDetails['title']. "', '$modCategoryQuickCode', '" .$modCategoryDetails['categoryType']. "');\n";
+                                }
+                                else {
+                                    $defered = false;
+                                    echo("createCategoryFieldset('" .$modCategoryDetails['title']. "', '$modCategoryQuickCode', '" .$modCategoryDetails['categoryType']. "');\n");
+                                }
+
 
 
                                 /////////////////////////////////////////////////////////////////////////////////////
-                                // GET AND ITERATE THROUGH ALL OF THE MOD ITEMS ASSOCIATED WITH THIS MOD CATEGORY
+                                // GET AND ITERATE THROUGH ALL OF THE MOD ITEMS ASSOCIATED WITH THIS MOD CATEGORY.
+                                // DEFER GENERATING OPTIONAL CATEGORIES UNTIL LATER
                                 /////////////////////////////////////////////////////////////////////////////////////
 
                                 $sql = "SELECT childQuickCode FROM menuassociations WHERE parentQuickCode = '$modCategoryQuickCode';";
@@ -141,15 +151,27 @@ Otherwise will reroute to logon page -->
                                     $modItemQuickCode = $modItem['childQuickCode'];
                                     $sql = "SELECT * FROM MenuModificationItems WHERE quickCode = '$modItemQuickCode';";
                                     $modItemDetails = connection()->query($sql)->fetch_assoc();
-                                    $title = str_replace("'", "\\'", $modItemDetails['title']);
-                                    $quantifierString = str_replace("'", "\\'",$modItemDetails['quantifierString']); ;
+                                    $title = $modItemDetails['title'];
+                                    $quantifierString = $modItemDetails['quantifierString'];
                                     $categoryType = $modCategoryDetails['categoryType'];
-                                    echo ("document.getElementById('$modCategoryQuickCode').appendChild(");
-                                    echo("generateModOptionDiv('$modItemQuickCode','$title','$quantifierString', false, '$categoryType')"); 
-                                    echo(");");
+                                    if ($defered) {
+                                        echo("//defered\n");
+                                        $deferedStr .= "document.getElementById('$modCategoryQuickCode').appendChild(" .
+                                        "generateModOptionDiv('$modItemQuickCode','$title','$quantifierString', false, '$categoryType'));\n";
+                                    }
+                                    else {
+                                        echo ("document.getElementById('$modCategoryQuickCode').appendChild(");
+                                        echo("generateModOptionDiv('$modItemQuickCode','$title','$quantifierString', false, '$categoryType')"); 
+                                        echo(");\n");
+                                    }
                                 }
-
                             }
+
+                            /////////////////////////////////////////////////////////////////////////////////////////
+                            // ECHO ANY OPTIONAL MOD CATEGORES THAT WERE DEFERED
+                            /////////////////////////////////////////////////////////////////////////////////////////
+                            
+                            echo($deferedStr);
 
                             /////////////////////////////////////////////////////////////////////////////////////////
                             // GET THE EXISTING MOD STRING FOR THE TICKET ITEM
@@ -170,7 +192,6 @@ Otherwise will reroute to logon page -->
                     }
                 ?>  
             }
-   
         </script>
     </head>
     <body onload="allElementsLoaded()">
