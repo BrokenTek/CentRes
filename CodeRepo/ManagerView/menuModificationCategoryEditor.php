@@ -179,6 +179,8 @@
                 document.querySelector("#btnMenuItemEditor").addEventListener("pointerdown", 
                 function() { redirect("menuItemEditor.php"); });
 
+                document.querySelector("#" + "txtModItemFilter").addEventListener("input", filterModItems);
+
                 document.querySelector("#btnMenuModificationEditor").addEventListener("pointerdown", 
                 function() {redirect("menuModificationItemEditor.php");});
 
@@ -186,6 +188,8 @@
                     focus();
                     setSelectionRange(0, value.length);
                 } 
+
+                filterModItems();
             }
 
             function btnResetPressed(event) {
@@ -217,6 +221,39 @@
                     toggleAttribute("checked");
                 }
 
+            }
+
+            function filterModItems() {
+                let ops = document.querySelector("#" + "modItemList").getElementsByTagName("label");
+                if (this.value == undefined || this.value == "") {
+                    for (let i = 0; i < ops.length; i++) {
+                        ops[i].classList.remove("hidden");
+                        ops[i].nextSibling.classList.remove("hidden");
+                        document.querySelector("#" + ops[i].getAttribute("for")).classList.remove("hidden");
+                    }
+                }
+                else {
+                    filters = this.value.toUpperCase().split("`");
+                    for (let i = 0; i < ops.length; i++) {
+                        let hide = true;
+                        for (let j = 0; j < filters.length; j ++) {
+                            if (ops[i].innerHTML.toUpperCase().startsWith(filters[j])) {
+                               hide = false;
+                            }
+                        }
+                        if (hide) {
+                                ops[i].classList.add("hidden");
+                                ops[i].nextSibling.classList.add("hidden");
+                                document.querySelector("#" + ops[i].getAttribute("for")).classList.add("hidden");
+                        }
+                        else {
+                            ops[i].classList.remove("hidden");
+                            ops[i].nextSibling.classList.remove("hidden");
+                            document.querySelector("#" + ops[i].getAttribute("for")).classList.remove("hidden");
+                        }
+                            
+                    }
+                }
             }
             
 
@@ -294,6 +331,7 @@
             }
             #menuItemList, #modItemList {
                 max-height: 8rem;
+                min-height: 8rem;
                 overflow: auto;
                 background-color: black;
             }
@@ -301,6 +339,14 @@
                 font-size: 1.5rem;
                 font-weight: bold;
                 margin-top: .5rem;
+            }
+            #txtModItemFilter {
+                width: 100%;
+            }
+            .hidden {
+                display: none;
+                height: 0;
+                max-height: 0;
             }
         </style>
     </head>
@@ -407,7 +453,8 @@
                                 ?>
                             </div>
                             <div class="listHeader">Associated Mod Items</div>
-                            <div id="menuItemList">
+                            <input type="text" id="txtModItemFilter" placeholder="Filter: delimeter `" name="filterString" <?php if (isset($_POST['filterString'])) {echo(" value='" .$_POST['filterString']. "'");} ?>>
+                            <div id="modItemList">
                                 <?php
                                     // populate the menu items list, and make items checked if menu item has this mod category
                                     $sql = "SELECT title, quickCode FROM MenuModificationItems WHERE visible = 1 ORDER BY title";
@@ -452,7 +499,8 @@
             <?php unset($_POST['delete'], 
                         $_POST['commit'],
                         $_POST['menuTitle'],
-                        $_POST['categoryType']);  
+                        $_POST['categoryType'],
+                        $_POST['filterString']);  
                      // $_POST['quickCode'] stays ?>
 
             <?php require_once '../Resources/PHP/display.php'; ?>
