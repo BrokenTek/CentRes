@@ -416,6 +416,7 @@ window.addEventListener("message", window.processJSONeventCall);
 window.processJSONeventCall = function(messageObject) {
     try {
         let message = JSON.parse(messageObject.data);
+       
         if (message.sessionToken === SESSION_TOKEN) {
             if (message.targetIframeIds.length > 0) {
                 for (let i = 0; i < message.targetIframeIds.length; i++) {

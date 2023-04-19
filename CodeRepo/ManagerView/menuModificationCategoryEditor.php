@@ -38,6 +38,7 @@
         }
     }
     try {
+        $_POST['ignoreRedirect'] = "yes";
         if(isset($_POST['quickCode'])&&!isset($_POST['menuTitle'])){
             $sql = "SELECT * FROM MenuModificationCategories WHERE quickCode = '" .$_POST['quickCode']. "';";
             $fieldData = connection()->query($sql)->fetch_assoc();
@@ -208,6 +209,14 @@
                 varSet("quickCode", this.options[this.selectedIndex].value);
                 document.getElementById("txtMenuTitle").removeAttribute("value");
                 updateDisplay(null, true);
+            }
+
+            document.selectMenuItemCheck = function(event) {
+                with (document.getElementById(this.menuItemId)) {
+                    scrollIntoView();
+                    toggleAttribute("checked");
+                }
+
             }
             
 

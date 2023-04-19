@@ -58,34 +58,41 @@
             }
 
             document.menuItemSelected = function() {
-                with (document.getElementById("ifrMenuEditor").contentDocument) {
-                    getElementById("txtQC").setAttribute("value", this.menuItemId);
-                    getElementById("txtLookAt").setAttribute("value", this.menuItemId);
-                    if (this.parentCategoryId != null) {
-                        getElementById("txtParentCategory").setAttribute("value", this.parentCategoryId);
-                        getElementById("txtRecallParentCategory").setAttribute("value", this.parentCategoryId);
-                    }
-                    with (getElementById("frmRedirect")) {
-                        setAttribute("action", "menuItemEditor.php");
-                        submit();
-                    }
+                if (!varExists("ignoreRedirect","ifrMenuEditor")) {
+                    with (document.getElementById("ifrMenuEditor").contentDocument) {
+                        getElementById("txtQC").setAttribute("value", this.menuItemId);
+                        getElementById("txtLookAt").setAttribute("value", this.menuItemId);
+                        if (this.parentCategoryId != null) {
+                            getElementById("txtParentCategory").setAttribute("value", this.parentCategoryId);
+                            getElementById("txtRecallParentCategory").setAttribute("value", this.parentCategoryId);
+                        }
+                        with (getElementById("frmRedirect")) {
+                            setAttribute("action", "menuItemEditor.php");
+                            submit();
+                        }
 
+                    }
+                }
+                else {
+                    dispatchJSONeventCall("selectMenuItemCheck", {"menuItemId": this.menuItemId}, ["ifrMenuEditor"]);
                 }
             }
 
             document.menuCategorySelected = function() {
-                with (document.getElementById("ifrMenuEditor").contentDocument) {
-                    getElementById("txtQC").setAttribute("value", this.menuCategoryId);
-                    getElementById("txtLookAt").setAttribute("value", this.menuCategoryId);
-                    if (this.parentCategoryId != null) {
-                        getElementById("txtParentCategory").setAttribute("value", this.menuCategoryId);
-                        getElementById("txtRecallParentCategory").setAttribute("value", this.menuCategoryId);
-                    }
-                    with (getElementById("frmRedirect")) {
-                        setAttribute("action", "menuCategoryEditor.php");
-                        submit();
-                    }
+                if (!varExists("ignoreRedirect","ifrMenuEditor")) {
+                    with (document.getElementById("ifrMenuEditor").contentDocument) {
+                        getElementById("txtQC").setAttribute("value", this.menuCategoryId);
+                        getElementById("txtLookAt").setAttribute("value", this.menuCategoryId);
+                        if (this.parentCategoryId != null) {
+                            getElementById("txtParentCategory").setAttribute("value", this.menuCategoryId);
+                            getElementById("txtRecallParentCategory").setAttribute("value", this.menuCategoryId);
+                        }
+                        with (getElementById("frmRedirect")) {
+                            setAttribute("action", "menuCategoryEditor.php");
+                            submit();
+                        }
 
+                    }
                 }
             }
 
