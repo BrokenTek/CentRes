@@ -3,6 +3,7 @@
 <html>
     <head>
         <title>Active Servers</title>
+        <meta charset="UTF-8">
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/waitListStructure.css">
         <script src= '../Resources/JavaScript/displayInterface.js'></script>

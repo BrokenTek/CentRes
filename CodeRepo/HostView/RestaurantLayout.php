@@ -2,9 +2,9 @@
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <html lang='en'>
 <head>
-    <meta charset='utf-8' />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="stylesheet" href="../Resources/CSS/tableStyles.css" />
+    <meta charset='UTF-8'>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="../Resources/CSS/tableStyles.css">
     <style>
         .multiselect {
             animation: goDark .25s 0s ease forwards;

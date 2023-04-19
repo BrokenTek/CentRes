@@ -223,7 +223,6 @@ function generateModString() {
         }
     }
     return modString.length > 0 ? modString.substring(1) : "";
-    alert("MOD STRR IS" + "\n" + modStr);
 }
 
 function calculateModsPrice(modString) {

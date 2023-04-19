@@ -4,59 +4,60 @@
 <?php require_once '../Resources/php/connect_disconnect.php'; ?>
 <html>
     <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
-    <link rel="stylesheet" href="../Resources/CSS/ticketStyle.css">
-    <style>
-        #sessionForm {
-            height: 95%;
-            width: 100%;
-		}
-        #sessionBody {
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
+        <link rel="stylesheet" href="../Resources/CSS/ticketStyle.css">
+        <style>
+            #sessionForm {
+                height: 95%;
+                width: 100%;
+            }
+            #sessionBody {
+                
+                display: grid;
+                grid-template-areas: ". tabHeader    tabHeader             ."
+                                    ". masterResets selectedMnuItmOptions ."
+                                    ". tblInventory tblInventory          .";
+                grid-template-columns: 1fr min-content max-content 1fr;
+                grid-template-rows: min-content min-content min-content;
+                background-color: black;
+                color: white;
+                padding-bottom: 1rem;
+            }
+            #tabHeader {
+                grid-area: tabHeader;
+                font-size: 1.5rem;
+                font-weight: bold;
+                margin: 1rem auto 3rem auto;
+                border-bottom: .25rem solid white;
+            }
+            #fstMasterResets {
+                grid-area: masterResets;
+                display: grid;
+                grid-template-columns: min-content;
+                grid-auto-rows: min-content;
+                border: .125rem solid white;
+            }
+            #fstSelMenuItmOptions {
+                grid-area: selectedMnuItmOptions;
+                
+                border: .125rem solid white;
+            }
+            #tblInventory {
+                margin-top: 2rem;
+                grid-area: tblInventory;
+            }
+            .conflict{
+                background-color:yellow;
+            }
             
-            display: grid;
-            grid-template-areas: ". tabHeader    tabHeader             ."
-                                 ". masterResets selectedMnuItmOptions ."
-                                 ". tblInventory tblInventory          .";
-            grid-template-columns: 1fr min-content max-content 1fr;
-            grid-template-rows: min-content min-content min-content;
-            background-color: black;
-            color: white;
-            padding-bottom: 1rem;
-        }
-        #tabHeader {
-            grid-area: tabHeader;
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin: 1rem auto 3rem auto;
-            border-bottom: .25rem solid white;
-        }
-        #fstMasterResets {
-            grid-area: masterResets;
-            display: grid;
-            grid-template-columns: min-content;
-            grid-auto-rows: min-content;
-            border: .125rem solid white;
-        }
-        #fstSelMenuItmOptions {
-            grid-area: selectedMnuItmOptions;
-            
-            border: .125rem solid white;
-        }
-        #tblInventory {
-            margin-top: 2rem;
-            grid-area: tblInventory;
-        }
-        .conflict{
-            background-color:yellow;
-        }
-        
-        #numQty {
-            max-width: 7rem;
-        }
+            #numQty {
+                max-width: 7rem;
+            }
 
-        
-    </style>
+            
+        </style>
         
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
         

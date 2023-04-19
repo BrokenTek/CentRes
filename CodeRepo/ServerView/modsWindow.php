@@ -5,6 +5,7 @@ Otherwise will reroute to logon page -->
 <html>
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Modification Selection</title>
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/modOptionStyle.css">
@@ -140,8 +141,8 @@ Otherwise will reroute to logon page -->
                                     $modItemQuickCode = $modItem['childQuickCode'];
                                     $sql = "SELECT * FROM MenuModificationItems WHERE quickCode = '$modItemQuickCode';";
                                     $modItemDetails = connection()->query($sql)->fetch_assoc();
-                                    $title = $modItemDetails['title'];
-                                    $quantifierString = $modItemDetails['quantifierString'];
+                                    $title = str_replace("'", "\\'", $modItemDetails['title']);
+                                    $quantifierString = str_replace("'", "\\'",$modItemDetails['quantifierString']); ;
                                     $categoryType = $modCategoryDetails['categoryType'];
                                     echo ("document.getElementById('$modCategoryQuickCode').appendChild(");
                                     echo("generateModOptionDiv('$modItemQuickCode','$title','$quantifierString', false, '$categoryType')"); 

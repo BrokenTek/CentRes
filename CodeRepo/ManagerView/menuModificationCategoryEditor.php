@@ -153,6 +153,8 @@
 
 <html>
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/menuEditorStyle.css">
         <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 

@@ -5,6 +5,8 @@
 <!DOCTYPE html>
 <html>
     <head>
+		<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 		<script src="../Resources/JavaScript/displayInterface.js"></script>
         <link rel="stylesheet" href="../Resources/CSS/menuStyle.css">
 		<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
