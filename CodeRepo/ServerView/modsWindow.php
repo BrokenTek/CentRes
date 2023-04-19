@@ -1,6 +1,6 @@
 <!-- ensures you are logged in before rendering page.
 Otherwise will reroute to logon page -->
-<?php require_once '../Resources/php/sessionLogic.php'; ?>
+<?php require_once '../Resources/PHP/sessionLogic.php'; ?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -8,7 +8,7 @@ Otherwise will reroute to logon page -->
         <title>Modification Selection</title>
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/modOptionStyle.css">
-        <script src="../Resources/JavaScript/displayInterface.js"></script>
+        <script src="../Resources/JavaScript/display.js"></script>
         <script src="../Resources/JavaScript/modOptionUtility.js"></script>
 
 
@@ -68,7 +68,7 @@ Otherwise will reroute to logon page -->
             function allElementsLoaded() {
                 document.getElementById("btnCommit").addEventListener("pointerdown", commitMods);
                 <?php
-                    require_once '../Resources/php/connect_disconnect.php';
+                    require_once '../Resources/PHP/dbConnection.php';
 
                     if(!isset($_POST['selectedTicketItemId'])) {
                         echo("signalStatus('await');");
@@ -202,7 +202,7 @@ Otherwise will reroute to logon page -->
             <label for='txtCustomModNote'>Custom Mod Note</label>
             <input type='text' id='txtCustomModNote'>
             </fieldset>    
-            <?php require_once '../Resources/php/display.php'; ?>
+            <?php require_once '../Resources/PHP/display.php'; ?>
         </form>
     </body>
 </html>

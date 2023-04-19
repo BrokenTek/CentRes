@@ -2,15 +2,15 @@
 
 
 
-<?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(8, $GLOBALS['role']); ?>
+<?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(8, $GLOBALS['role']); ?>
 
 
 <!DOCTYPE html>
-<?php require_once '../Resources/php/connect_disconnect.php'; ?>
+<?php require_once '../Resources/PHP/dbConnection.php'; ?>
 <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <style>
             #sessionForm {
@@ -87,7 +87,7 @@
             
         </style>
         
-        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+        <script src="../Resources/JavaScript/display.js" type="text/javascript"></script> 
         
 
         <script>
@@ -119,7 +119,7 @@
     <body onload="allElementsLoaded()">
         
         <form id="sessionForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
-            <?php require_once "../Resources/php/sessionHeader.php"; ?>
+            <?php require_once "../Resources/PHP/sessionHeader.php"; ?>
             
             <div id="sessionBody">
             <?php
@@ -251,7 +251,7 @@
             </div>
 
             
-            <?php require_once '../Resources/php/display.php'; ?>
+            <?php require_once '../Resources/PHP/display.php'; ?>
            
         </form>
     </body>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<?php require_once '../Resources/php/connect_disconnect.php'; ?>
+<?php require_once '../Resources/PHP/dbConnection.php'; ?>
 <html lang='en'>
 <head>
     <meta charset='UTF-8'>
@@ -25,7 +25,7 @@
         100% { background-color: #333;}
     }
     </style>
-    <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
+    <script src="../Resources/JavaScript/display.js" type="text/javascript"></script>
     <script src="../Resources/JavaScript/SvgManipulation.js"></script>
 
     <script>

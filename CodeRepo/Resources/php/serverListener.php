@@ -11,7 +11,7 @@
     <body>
         <form id="tableSelectorForm" method="POST">
             <?php
-                require_once 'connect_disconnect.php';
+                require_once 'dbConnection.php';
                 $_POST['tableList'] = "";
                 if (isset($_POST['staticTableId'])) { 
                     $sql = "SELECT id FROM Tickets WHERE tableId = '" .$_POST['staticTableId']. "';";

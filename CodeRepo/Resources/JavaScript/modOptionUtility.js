@@ -26,11 +26,11 @@ function generateModOptionDiv(modQuickCode, modName, quantifierString = null, re
         let valStr = (val == 0 ? "FREE" : currencyFormatter.format(val));
         if (multiselect) {
             divPrefix = "chk";
-            modOptionDivStr = "<input type='" + inputType + "' id='chk" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +
+            modOptionDivStr = "<input type='" + inputType + "' id='chk" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",," + quantifierString + "'>" +
                               "<label class='checkLabel' for='chk" + modQuickCode + "' class='modOption chkModOption'>" + valStr + " - " + modName + "</div></label>";
         }
         else {
-            modOptionDivStr = "<input type='" + inputType + "' id='rad" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +
+            modOptionDivStr = "<input type='" + inputType + "' id='rad" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",," + quantifierString + "'>" +
                               "<label class='radioLabel' for='rad" + modQuickCode + "' class='modOption radModOption'>" + valStr + " - " + modName + "</div></label>";
         }
     }
@@ -192,7 +192,6 @@ function configureInputs(modNotesString) {
         lastRecordedIndex = i;
     }
     if (lastRecordedIndex < data.length - 1) {
-        alert(data[lastRecordedIndex + 1]);
         document.getElementById("txtCustomModNote").value = data[lastRecordedIndex + 1];
     }
 }

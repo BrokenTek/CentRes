@@ -1,9 +1,9 @@
-<?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(4, $GLOBALS['role']); ?>
+<?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(4, $GLOBALS['role']); ?>
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
 		<style>
 			iframe {
@@ -58,7 +58,7 @@
 
 			}
 		</style>
-		<script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+		<script src="../Resources/JavaScript/display.js" type="text/javascript"></script> 
 		<script>
 			function allElementsLoaded() {
 				varSet("tableIdOnly", "Yes", "serverListener");
@@ -141,14 +141,14 @@
 	</head>
 	<body onload="allElementsLoaded()" class="intro">
 		<form id="sessionForm" action="../ServerView/ServerView.php" method="POST">
-			<?php require_once "../Resources/php/sessionHeader.php"; ?>
+			<?php require_once "../Resources/PHP/sessionHeader.php"; ?>
 			<div id="sessionBody">
 				<iframe id="ifrServerList" src="serverList.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="ifrWaitList" src="waitList.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="ifrWaitTimes" src="waitTimes.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="ifrSelectedTable" src="selectedTable.php" frameborder='0' width="100%" height="100%"></iframe>
 				<iframe id="ifrRestaurantLayout" src="restaurantLayout.php" frameborder='0' width="100%" height="100%"></iframe>
-				<iframe id="serverListener" src="../Resources/php/serverListener.php" style="display: none;"></iframe>
+				<iframe id="serverListener" src="../Resources/PHP/serverListener.php" style="display: none;"></iframe>
 			</div>
 		</form>
 	</body>

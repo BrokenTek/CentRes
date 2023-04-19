@@ -1,7 +1,7 @@
 
 <?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(4, $GLOBALS['role']); ?>
 <!DOCTYPE html>
-<?php require_once '../Resources/php/connect_disconnect.php'; ?>
+<?php require_once '../Resources/PHP/dbConnection.php'; ?>
 <?php
     if (isset($_POST['removeTicket'])) {
         unset($_POST['selectedTicket']);
@@ -12,11 +12,11 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/waitListStructure.css">
         
-        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>  
+        <script src="../Resources/JavaScript/display.js" type="text/javascript"></script>  
         <script>
             function createEventHandlers() {
                 let selectedTicket = varGet("selectedTicket");

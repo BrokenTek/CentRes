@@ -6,7 +6,7 @@
         <meta charset="UTF-8">
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/waitListStructure.css">
-        <script src= '../Resources/JavaScript/displayInterface.js'></script>
+        <script src= '../Resources/JavaScript/display.js'></script>
         <script>
             function allElementsLoaded() {
                 let selectedServer = varGet("selectedServer");
@@ -85,7 +85,7 @@
 
                 ?>
             </table>
-            <?php require_once '../Resources/php/display.php'; ?>
+            <?php require_once '../Resources/PHP/display.php'; ?>
         </form>
     </body>
 </html>

@@ -2,9 +2,9 @@
     // makes sure the reset script is accessible if there is an error with the database,
     // there are no employees in the database, or a manager is logged in and wants to reset.
     try {
-        //require_once '../Resources/php/connect_disconnect.php';
-        //require_once '../Resources/php/sessionLogic.php';
-        //restrictAccess(8, $GLOBALS['role']);
+        require_once '../Resources/php/dbConnection.php';
+        require_once '../Resources/php/sessionLogic.php';
+        restrictAccess(8, $GLOBALS['role']);
     }
     catch (Exception $e) {
         die($e);
@@ -13,8 +13,8 @@
 ?>
 <html>
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script>
             var resetSuccessful = false;
             function allElementsLoaded() {
@@ -59,10 +59,9 @@
                 print("<h1>☑ Loaded 3 Stooges as Employees</h1>");
 
                 // Populate Menu
-                // $query = file_get_contents("CentResMenuPopStable.sql"); 
                 $query = file_get_contents("CentResPopulateMenuWithAssociations.sql"); // Populate not Popuolate
                 $dbh->exec($query);
-                //include 'menuPop.php';
+                
                 print("<h1>☑ Loaded Menu as to Database</h1>");
 
                 // Message to verify the success of all queries in the block
@@ -72,7 +71,7 @@
 
             // If one of the queries in the try block fail, the rest are not run. Message below will appear
             } catch(Exception $e) {
-                print("<h1>☒ " .$e->getMessage(). "</h1>"); // (to be removed) Remove or change message in production code
+                print("<h1>☒ " .$e->getMessage(). "</h1>");
             }
     ?>
     </body>

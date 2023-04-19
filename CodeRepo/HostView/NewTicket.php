@@ -5,7 +5,7 @@
 <head>
     <title>Create a Ticket</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
     <style>
         body > * {
@@ -87,7 +87,7 @@
 </head>
 <body onload="declareReservationCheck()">
     <?php
-    require_once '../Resources/php/connect_disconnect.php';
+    require_once '../Resources/PHP/dbConnection.php';
     date_default_timezone_set('America/New_York');
     $message = "";
     if (isset($_POST["createTicket"])) {

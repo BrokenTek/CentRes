@@ -1,13 +1,13 @@
 
-<?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(255, $GLOBALS['role']); ?>
-<?php require_once '../Resources/php/currencyFormatter.php'; ?>
+<?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(255, $GLOBALS['role']); ?>
+<?php require_once '../Resources/PHP/currencyFormatter.php'; ?>
 
 <!DOCTYPE html>
 <html>
     <head>
 		<meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-		<script src="../Resources/JavaScript/displayInterface.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script src="../Resources/JavaScript/display.js"></script>
         <link rel="stylesheet" href="../Resources/CSS/menuStyle.css">
 		<link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
 		<script>
@@ -153,7 +153,7 @@
 	<body>
 		<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
 <?php 
-require_once '../Resources/php/connect_disconnect.php';
+require_once '../Resources/PHP/dbConnection.php';
 
 //To prevent infinite recursion produced by manager adding a parent menu object to a child, each printed
 //menu item/category will increment a value by 1. If the value exceeds $menuObjectCount, execution will stop.
@@ -240,7 +240,7 @@ if ($result->num_rows > 0) {
 		echo "</span>";
 
 	}
-	require_once "../Resources/php/display.php";
+	require_once "../Resources/PHP/display.php";
 ?>
 </form>
 </body>

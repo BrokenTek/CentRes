@@ -32,7 +32,7 @@
 <link rel="stylesheet" href="../CSS/baseStyle.css">
 <link rel="stylesheet" href="../CSS/ticketStructure.css">
 <link rel="stylesheet" href="../CSS/ticketStyle.css">
-<script src="../JavaScript/displayInterface.js"></script>
+<script src="../JavaScript/display.js"></script>
 <script>
     var addError = false;
     // ========================= TASKS WHEN TICKET IS LOADED ==============================
@@ -287,7 +287,7 @@
 <form id="ticketForm" action="ticket.php" method="post" class= "ticketForm">
 
     <?php
-        require_once 'connect_disconnect.php';
+        require_once 'dbConnection.php';
         $header = "";
         $footer = "";
 		if (isset($_POST['command'])) {

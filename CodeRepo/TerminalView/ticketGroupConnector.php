@@ -1,4 +1,4 @@
-<?php require_once '../Resources/php/connect_disconnect.php'; ?>
+<?php require_once '../Resources/PHP/dbConnection.php'; ?>
 <?php
     if (isset($_POST['route'])) {
         $sql = "SELECT * FROM ActiveTicketGroups WHERE route = '" .$_POST['route']. "' ORDER BY TimeCreated";
@@ -68,8 +68,8 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script src="../Resources/JavaScript/display.js" type="text/javascript"></script> 
         
         <script>
             function allElementsLoaded() {
@@ -97,7 +97,7 @@
     <body id="sessionForm" onload="allElementsLoaded()">
         
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="frmTGC">
-            <?php require_once '../Resources/php/display.php'; ?>
+            <?php require_once '../Resources/PHP/display.php'; ?>
         </form>
     </body>
 </html>

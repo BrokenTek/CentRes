@@ -1,6 +1,6 @@
 
 
-<?php require_once '../Resources/php/connect_disconnect.php'; ?>
+<?php require_once '../Resources/PHP/dbConnection.php'; ?>
 <?php
     $sql = "SELECT * FROM Employees WHERE (roleLevel & 8) <> 0";
     $result = connection()->query($sql);
@@ -12,10 +12,10 @@
 <html>
     <head>
         <meta charset="UTF-8"><meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         
-        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+        <script src="../Resources/JavaScript/display.js" type="text/javascript"></script> 
         <script>
             function allElementsLoaded() {
                 

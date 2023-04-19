@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script>
             function reload() {
                 document.getElementById("ticketSelectorForm").submit();
@@ -22,7 +22,7 @@
     <body>
         <form id="ticketSelectorForm"  action="ticketListener.php" method="POST">
             <?php
-                require_once '../Resources/php/connect_disconnect.php';
+                require_once '../Resources/PHP/dbConnection.php';
 
                 // if the ticket number has been injected, get the timestamp.
                 if (isset($_POST['ticketNumber'])) {
@@ -52,7 +52,7 @@
                     else {
                         $_POST['paidStatuses'] = "No Splits";
                     }
-                    require_once '../Resources/php/display.php';
+                    require_once '../Resources/PHP/display.php';
                 } 
                 else {
                     unset($_POST['modificationTime']);

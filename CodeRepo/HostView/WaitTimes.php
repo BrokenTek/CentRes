@@ -1,9 +1,9 @@
 
-<?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(255, $GLOBALS['role']); ?>
+<?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(255, $GLOBALS['role']); ?>
 
 
 <!DOCTYPE html>
-<?php require_once '../Resources/php/connect_disconnect.php'; ?>
+<?php require_once '../Resources/PHP/dbConnection.php'; ?>
 <?php
     $sql = "SELECT IFNULL(MAX(partySize), 1) AS maxPartySize FROM Tickets;";
     $maxPartySize = connection()->query($sql)->fetch_assoc()['maxPartySize'];
@@ -35,7 +35,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <style>
             fieldset {
                 display: grid;
@@ -43,7 +43,7 @@
             }
         </style>
         
-        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+        <script src="../Resources/JavaScript/display.js" type="text/javascript"></script> 
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/waitListStructure.css">
 
@@ -161,7 +161,7 @@
             <?php unset($_POST['lowerPartySize'], $_POST['upperPartySize'], $_POST['timeSpan']); ?>
 
             
-            <?php require_once '../Resources/php/display.php'; ?>
+            <?php require_once '../Resources/PHP/display.php'; ?>
            
         </form>
     </body>

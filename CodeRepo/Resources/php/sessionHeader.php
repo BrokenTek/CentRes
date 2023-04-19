@@ -29,7 +29,7 @@
 
 
     echo('
-        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script>
+        <script src="../Resources/JavaScript/display.js" type="text/javascript"></script>
         <script>
             const USERNAME = "' .$GLOBALS['username']. '";
             const USER_ID = "' .$GLOBALS['userId']. '";
@@ -110,7 +110,7 @@
                     <option id='mgrNavIPW' value = '../ManagerView/InventoryPopularityWindow.php'>Inventory/Popularity&nbsp;Window</option>
                     <option id='mgrNavEmpRoster' value='../ManagerView/EmployeeRoster.php'>Employee&nbsp;Roster</option>
                     <option id='mgrNavMenuEditor' value='../ManagerView/MenuEditor.php'>Menu&nbsp;Editor</option>
-                    <option id='mgrNavResetDB' value='../Configuration/resetDB.php'>DEBUG:&nbsp;Reset&nbsp;DB</option>
+                    <option id='mgrNavResetDB' value='../Configuration/ResetDB.php'>DEBUG:&nbsp;Reset&nbsp;DB</option>
                 </select>
             </div>
         ");
@@ -118,7 +118,7 @@
     if (!$transient) {
         echo('<input type="button" class="button" id="btnLogout" onpointerdown="logout()" value="Logout">
         </div>');
-    echo("<iframe id='ifrSessionInfo' src='../Resources/php/sessionInfo.php' style='display: none;'></iframe>");
+    echo("<iframe id='ifrSessionInfo' src='../Resources/PHP/sessionInfo.php' style='display: none;'></iframe>");
     }
     else {
         echo('<input type="button" class="button" id="btnLogout" onpointerdown="logout()" value="Log In">

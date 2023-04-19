@@ -1,5 +1,5 @@
-<?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(8, $GLOBALS['role']); ?>
-<?php require_once '../Resources/php/connect_disconnect.php'; ?>
+<?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(8, $GLOBALS['role']); ?>
+<?php require_once '../Resources/PHP/dbConnection.php'; ?>
 <?php
 
     /////////////////////////////////////////////////////////
@@ -135,10 +135,10 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/menuEditorStyle.css">
-        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+        <script src="../Resources/JavaScript/display.js" type="text/javascript"></script> 
         <script>
             function allElementsLoaded() {
                 window.addEventListener("message", window.processJSONeventCall);
@@ -363,7 +363,7 @@
                         $_POST['parentCategory']);  
                      // $_POST['quickCode'] stays ?>
 
-            <?php require_once '../Resources/php/display.php'; ?>
+            <?php require_once '../Resources/PHP/display.php'; ?>
            
         </form>
         <form id="frmRedirect" style="display: none;" method="POST">

@@ -3,7 +3,7 @@
         ============================================================
         DISPLAY TEMPLATE
         This template includes starter code that allows
-        you to use display.php and displayInterface.js
+        you to use display.php and display.js
         ============================================================
 
         ensures you are logged in before rendering page, and are logged in under the correct role.
@@ -13,16 +13,16 @@
     */
 
     // CHANGE 255 TO THE ALLOWED ROLE LEVEL FOR THE PAGE
-    require_once '../Resources/php/sessionLogic.php'; restrictAccess(255, $GLOBALS['role']); 
+    require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(255, $GLOBALS['role']); 
 ?>
 
 <!DOCTYPE html>
-<?php require_once '../Resources/php/connect_disconnect.php'; ?>
+<?php require_once '../Resources/PHP/dbConnection.php'; ?>
 <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script src="../Resources/JavaScript/display.js" type="text/javascript"></script> 
         
         <script>
             function allElementsLoaded() { }
@@ -41,7 +41,7 @@
                 // ================================================================================
                 //      retain any POST vars. When updateDisplay() is called or the form is submitted,
                 //      these variables will be carried over
-                        require_once '../Resources/php/display.php';
+                        require_once '../Resources/PHP/display.php';
                 // ================================================================================
             ?>
         </form>

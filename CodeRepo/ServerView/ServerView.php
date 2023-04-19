@@ -1,14 +1,14 @@
-<?php require_once "../Resources/php/sessionLogic.php"; restrictAccess(2, $GLOBALS['role']); ?>
+<?php require_once "../Resources/PHP/sessionLogic.php"; restrictAccess(2, $GLOBALS['role']); ?>
 <!DOCTYPE html>
 <html>
     <head>
         <title>CentRes: Host View</title>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/serverStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/serverStructure.css">
-        <script src="../Resources/JavaScript/displayInterface.js"></script>
+        <script src="../Resources/JavaScript/display.js"></script>
         <script type="text/javascript">
             var cboTable;
             var cboSeat;
@@ -915,7 +915,7 @@
     <body class="alertWrapper">
         <form id="sessionForm" action="ServerView.php" method="POST">
             
-            <?php require_once "../Resources/php/sessionHeader.php"; ?>
+            <?php require_once "../Resources/PHP/sessionHeader.php"; ?>
             <div id="sessionBody">
                 <div id="serverViewHeader">
                     <select name="table" id="cboTable" onchange="tableSelectionChanged()">
@@ -946,7 +946,7 @@
                         <!-- options are dynamically added and removed here with JavaScript -->
                     </select>
                 </div>
-                <iframe id="ticketContainer" frameborder='0' src="../Resources/php/ticket.php"></iframe>
+                <iframe id="ticketContainer" frameborder='0' src="../Resources/PHP/ticket.php"></iframe>
                 <iframe id="modEditorContainer" frameborder='0' width="100%" height="100%" src="modsWindow.php"></iframe>
                 <div id="ticketFlickerBackdrop"></div>
                 <div id="ticketFooter">
@@ -959,7 +959,7 @@
                 </div>
                 
             </div>
-            <?php require_once '../Resources/php/display.php'; ?>
+            <?php require_once '../Resources/PHP/display.php'; ?>
            
             
         </form>
@@ -973,6 +973,6 @@
                 </div>
             </div>
         </div>
-        <iframe id="serverListener" src="../Resources/php/serverListener.php" style="display: none;">
+        <iframe id="serverListener" src="../Resources/PHP/serverListener.php" style="display: none;">
     </body>
 </html>

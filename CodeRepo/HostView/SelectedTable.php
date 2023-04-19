@@ -1,5 +1,5 @@
-<?php require_once '../Resources/php/sessionLogic.php'; restrictAccess(4, $GLOBALS['role']);
-      require_once '../Resources/php/connect_disconnect.php';
+<?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(4, $GLOBALS['role']);
+      require_once '../Resources/PHP/dbConnection.php';
      //foreach($_POST as $key => $value) { echo "$key: $value<br>"; }
 
   $authorizationId = @$_POST['authorizationId'];
@@ -154,7 +154,7 @@
 <html>
     <head>
       <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
       <link rel="stylesheet" href="../Resources/CSS/tableStyles.css">
       <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
       <style>
@@ -246,7 +246,7 @@
         }
       </style>
         
-        <script src="../Resources/JavaScript/displayInterface.js" type="text/javascript"></script> 
+        <script src="../Resources/JavaScript/display.js" type="text/javascript"></script> 
         
         <script>
             function allElementsLoaded() {
@@ -388,7 +388,7 @@
             }
             //retain any POST vars. When updateDisplay() is called or the form is submitted,
             //these variables will be carried over -->
-            require_once '../Resources/php/display.php'; 
+            require_once '../Resources/PHP/display.php'; 
           ?>
            
         </form>

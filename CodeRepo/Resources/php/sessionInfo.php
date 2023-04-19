@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<?php require_once 'connect_disconnect.php'; ?>
+<?php require_once 'dbConnection.php'; ?>
 <html>
     <head>
     </head>
