@@ -151,8 +151,8 @@ Otherwise will reroute to logon page -->
                                     $modItemQuickCode = $modItem['childQuickCode'];
                                     $sql = "SELECT * FROM MenuModificationItems WHERE quickCode = '$modItemQuickCode';";
                                     $modItemDetails = connection()->query($sql)->fetch_assoc();
-                                    $title = $modItemDetails['title'];
-                                    $quantifierString = $modItemDetails['quantifierString'];
+                                    $title = str_replace("'", "\\'", $modItemDetails['title']);
+                                    $quantifierString = str_replace("'", "\\'",$modItemDetails['quantifierString']);
                                     $categoryType = $modCategoryDetails['categoryType'];
                                     if ($defered) {
                                         echo("//defered\n");
