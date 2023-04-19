@@ -38,6 +38,9 @@
         }
     }
     try {
+        if (isset($_POST['menuTitle'])) {
+            $_POST['menuTitle'] = str_replace("`", "", $_POST['menuTitle']);
+        }
         if(isset($_POST['quickCode'])&&!isset($_POST['menuTitle'])){
             $sql = "SELECT * FROM MenuModificationItems WHERE quickCode = '" .$_POST['quickCode']. "';";
             $fieldData = connection()->query($sql)->fetch_assoc();
