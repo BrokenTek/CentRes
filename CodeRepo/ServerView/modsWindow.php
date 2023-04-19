@@ -36,19 +36,19 @@ Otherwise will reroute to logon page -->
                     let suffix = "";
                     let logoType = "";
                     if (categoryType == "MandatoryOne") {
-                        suffix = "&nbsp;1&nbsp;";
+                        suffix = "&nbsp;Required&nbsp;Mods&nbsp;";
                         logoType = "one";
                     }
                     else if (categoryType == "MandatoryAny") {
-                        suffix = "1-∞";
+                        suffix = "&nbsp;Required&nbsp;Mods&nbsp;";
                         logoType = "moreThanZero";
                     }
                     else if (categoryType == "OptionalOne") {
-                        suffix = "0-1";
+                        suffix = "&nbsp;Optional&nbsp;Mods&nbsp;";
                         logoType = "zeroOrOne";
                     }
                     else if (categoryType == "OptionalAny") {
-                        suffix = "0-∞";
+                        suffix = "&nbsp;Optional&nbsp;Mods&nbsp;";
                         logoType = "noBounds";
                     }
                     innerHTML = "<legend class='menuCategoryTitle'><div class='quantityLogo " + logoType + "'>" + suffix + "</div>" + categoryTitle + "</legend>";

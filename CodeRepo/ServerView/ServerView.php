@@ -946,7 +946,7 @@
                         <!-- options are dynamically added and removed here with JavaScript -->
                     </select>
                 </div>
-                <iframe id="ticketContainer" frameborder='0' src="../Resources/PHP/ticket.php"></iframe>
+                <iframe id="ticketContainer" frameborder='0' src="ticket.php"></iframe>
                 <iframe id="modEditorContainer" frameborder='0' width="100%" height="100%" src="modsWindow.php"></iframe>
                 <div id="ticketFlickerBackdrop"></div>
                 <div id="ticketFooter">

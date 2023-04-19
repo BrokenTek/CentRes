@@ -37,3 +37,7 @@
     border: 2px solid white;
 }
 
+.overlined {
+   border-top: 1px solid white;
+}
+

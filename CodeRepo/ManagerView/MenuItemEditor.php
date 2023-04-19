@@ -144,8 +144,6 @@
                 window.addEventListener("message", window.processJSONeventCall);
                 // any startup tasks go here after page has fully loaded.
 
-                document.querySelector("#selParentCategory").addEventListener("change", selParentChanged);
-
                 document.querySelector("#btnReset").addEventListener("pointerdown", btnResetPressed);
 
                 document.querySelector("#sessionForm").addEventListener("keydown", keydown);
@@ -195,22 +193,6 @@
                 document.getElementById("txtMenuTitle").value = "";
                 document.getElementById("txtPrice").value = "";
                 document.getElementById("txtRoute").value = "";
-            }
-
-            function selParentChanged(event) {
-                with (this.options[this.selectedIndex]) {
-                    varRem("quickCode");
-                    varSet("parentCategory", value);
-                    varSet("recallParentCategory", value);
-                    varSet("lookAt", value);
-                    document.getElementById("txtMenuTitle").removeAttribute("value");
-                    document.getElementById("txtMenuTitle").removeAttribute("value");
-                    document.getElementById("btnSubmit").setAttribute("value", "Create");
-                    if (document.getElementById("btnDelete") != null) {    
-                        document.getElementById("btnDelete").remove();
-                    }
-                }
-                dispatchJSONeventCall("selectMenuObject", {"menuObjectId": this.options[this.selectedIndex].value}, ["ifrMenu"]);
             }
 
             ///////////////////////////////////////////////////
