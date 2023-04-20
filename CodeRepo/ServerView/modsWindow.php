@@ -170,11 +170,11 @@ Otherwise will reroute to logon page -->
                                     if ($defered) {
                                         echo("//defered\n");
                                         $deferedStr .= "document.getElementById('$modCategoryQuickCode').appendChild(" .
-                                        "generateModOptionDiv('$modItemQuickCode','$title','$quantifierString', false, '$categoryType'));\n";
+                                        "generateModOptionDiv('$modItemQuickCode','$title','$quantifierString', false, '$categoryType', '$modCategoryQuickCode'));\n";
                                     }
                                     else {
                                         echo ("document.getElementById('$modCategoryQuickCode').appendChild(");
-                                        echo("generateModOptionDiv('$modItemQuickCode','$title','$quantifierString', false, '$categoryType')"); 
+                                        echo("generateModOptionDiv('$modItemQuickCode','$title','$quantifierString', false, '$categoryType','$modCategoryQuickCode')"); 
                                         echo(");\n");
                                     }
                                 }

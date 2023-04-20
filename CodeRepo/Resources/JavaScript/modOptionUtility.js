@@ -1,5 +1,5 @@
 // existingModString will configure the control (check/select appropriate values)
-function generateModOptionDiv(modQuickCode, modName, quantifierString = null, returnHTML = false, categoryType = "OptionalOne") {
+function generateModOptionDiv(modQuickCode, modName, quantifierString = null, returnHTML = false, categoryType = "OptionalOne", parentQuickCode = null) {
     if (modName === undefined || modName === null || modName.length == 0) { return null; }
     let modOptionDivStr;
     let divPrefix;
@@ -16,7 +16,7 @@ function generateModOptionDiv(modQuickCode, modName, quantifierString = null, re
         else {
             // generate a radio. No price
             divPrefix = "rad";
-            modOptionDivStr = "<input type='" + inputType + "' id='rad" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",,'>" +
+            modOptionDivStr = "<input type='" + inputType + "' id='rad" + modQuickCode + "' name='" + parentQuickCode + "' value='" + modQuickCode + ",,'>" +
                               "<label class='radioLabel' for='rad" + modQuickCode + "' class='modOption radModOption'>" + modName + "</label>";
         }
     }
@@ -30,7 +30,7 @@ function generateModOptionDiv(modQuickCode, modName, quantifierString = null, re
                               "<label class='checkLabel' for='chk" + modQuickCode + "' class='modOption chkModOption'>" + valStr + " - " + modName + "</div></label>";
         }
         else {
-            modOptionDivStr = "<input type='" + inputType + "' id='rad" + modQuickCode + "' name='" + modQuickCode + "' value='" + modQuickCode + ",," + quantifierString + "'>" +
+            modOptionDivStr = "<input type='" + inputType + "' id='rad" + modQuickCode + "' name='" + parentQuickCode + "' value='" + modQuickCode + ",," + quantifierString + "'>" +
                               "<label class='radioLabel' for='rad" + modQuickCode + "' class='modOption radModOption'>" + valStr + " - " + modName + "</div></label>";
         }
     }
