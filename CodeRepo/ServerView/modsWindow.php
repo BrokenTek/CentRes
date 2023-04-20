@@ -17,6 +17,19 @@ Otherwise will reroute to logon page -->
             .modOptionDiv {
                 display: inline-block;
             }
+            #headerRow {
+                display: grid;
+                grid-template-columns: min-content min-content 1fr;
+            }
+            #menuItemName {
+                grid-column: 4;
+                margin: auto;
+                font-weight: bold;
+                color: #F6941D;
+                background-color: black;
+                padding-inline: 1rem;
+                border-radius: .5rem;
+            }
         </style>
 
 
@@ -36,19 +49,19 @@ Otherwise will reroute to logon page -->
                     let suffix = "";
                     let logoType = "";
                     if (categoryType == "MandatoryOne") {
-                        suffix = "&nbsp;Required&nbsp;Mods&nbsp;";
+                        suffix = "&nbsp;Required&nbsp;";
                         logoType = "one";
                     }
                     else if (categoryType == "MandatoryAny") {
-                        suffix = "&nbsp;Required&nbsp;Mods&nbsp;";
+                        suffix = "&nbsp;Required&nbsp;";
                         logoType = "moreThanZero";
                     }
                     else if (categoryType == "OptionalOne") {
-                        suffix = "&nbsp;Optional&nbsp;Mods&nbsp;";
+                        suffix = "&nbsp;Optional&nbsp;";
                         logoType = "zeroOrOne";
                     }
                     else if (categoryType == "OptionalAny") {
-                        suffix = "&nbsp;Optional&nbsp;Mods&nbsp;";
+                        suffix = "&nbsp;Optional&nbsp;";
                         logoType = "noBounds";
                     }
                     innerHTML = "<legend class='menuCategoryTitle'><div class='quantityLogo " + logoType + "'>" + suffix + "</div>" + categoryTitle + "</legend>";
@@ -196,11 +209,14 @@ Otherwise will reroute to logon page -->
     </head>
     <body onload="allElementsLoaded()">
         <form id="frmModWindow" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-            <button id='btnCommit' type='button'>Accept</button> 
-            <button type='button' onpointerdown='signalStatus("await")'>Cancel</button>
+            <div id='headerRow'>
+                <button id='btnCommit' type='button'>Accept</button> 
+                <button type='button' onpointerdown='signalStatus("await")'>Cancel</button>
+                <div id='menuItemName'><?php if (isset($menuItemTitle)) { echo($menuItemTitle); } ?></div>
+            </div>
             <fieldset class='modOptionFieldset'>
-            <label for='txtCustomModNote'>Custom Mod Note</label>
-            <input type='text' id='txtCustomModNote'>
+                <label for='txtCustomModNote'>Custom Mod Note</label>
+                <input type='text' id='txtCustomModNote'>
             </fieldset>    
             <?php require_once '../Resources/PHP/display.php'; ?>
         </form>

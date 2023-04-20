@@ -2,8 +2,8 @@
     // makes sure the reset script is accessible if there is an error with the database,
     // there are no employees in the database, or a manager is logged in and wants to reset.
     try {
-        require_once '../Resources/php/dbConnection.php';
-        require_once '../Resources/php/sessionLogic.php';
+        require_once '../Resources/PHP/dbConnection.php';
+        require_once '../Resources/PHP/sessionLogic.php';
         restrictAccess(8, $GLOBALS['role']);
     }
     catch (Exception $e) {
@@ -13,7 +13,7 @@
 ?>
 <html>
     <head>
-        <meta charset="utf-8">
+        <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script>
             var resetSuccessful = false;

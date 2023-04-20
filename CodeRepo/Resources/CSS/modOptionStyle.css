@@ -1,9 +1,8 @@
 .modOptionFieldset {
     font-size: 1rem;
     font-weight: bold;
-    display: grid;
-    grid-auto-rows: max-content;
-    grid-auto-rows: min-content;
+    display: flex;
+    flex-wrap: wrap;
     color: white;
     background-color: black !important;
     border: .25rem solid white;
@@ -37,7 +36,7 @@
    margin-right: .5rem;
 }
 
-.quantityLogo.one, .quantityLogo.moreThanOne {
+.quantityLogo.one, .quantityLogo.moreThanZero {
     background-color: #F6941D;
 }
 
