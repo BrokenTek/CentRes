@@ -191,9 +191,11 @@
                         let parentRecall = varGet("recallParentCategory");
                         if (ctrlDown) {
                             if (event.keyCode == 13) { 
+                                event.preventDefault();
                                 redirect("menuModificationCategoryEditor.php");
                             }
                             else if (event.keyCode == 46) { // CTRL + DELETE >>>>> Delete current record if one selected
+                                event.preventDefault();
                                 let btnDelete = document.querySelector("#btnDelete");
                                 if (btnDelete != null) {
                                     btnDelete.click(); 
@@ -203,10 +205,17 @@
                                 }
                             }
                             else if (event.keyCode == 8) { // CTRL + BACKSPACE >>>>> Reset form
+                                event.preventDefault();
                                 document.querySelector("#btnReset").click();
                             }
                             else if (event.keyCode == 77) { // CTRL + M >>>>> Go to mod editor window.
-                                redirect("menuCategoryEditor.php");
+                                event.preventDefault();
+                                if (shiftDown) {
+                                    redirect("menuCategoryEditor.php");
+                                }
+                                else {
+                                    redirect("menuItemEditor.php");
+                                }
                             }
                         }
 

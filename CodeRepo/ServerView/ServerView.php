@@ -93,7 +93,7 @@
                 stopUpdateLoopTimer();
 
                 if (varExists("staticTableId") && varGetOnce("ticketRemoved","ticketContainer") !== undefined) {
-                    showAlertDiv("Ticket " + varGet("ticket", "ticketContainer") + " is not longer assigned to this table!\nRedirecting back to Host View.");
+                    alert("Ticket " + varGet("ticket", "ticketContainer") + " is not longer assigned to this table!\nRedirecting back to Host View.");
                     location.replace(document.getElementById("mgrNavHostView").getAttribute("value"));
                 }
             

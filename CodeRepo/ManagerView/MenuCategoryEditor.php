@@ -249,6 +249,7 @@
                     default:
                         if (ctrlDown) {
                             if (event.keyCode == 13 && varExists("lookAt")) { 
+                                event.preventDefault();
                                 if (shiftDown) { //  CTRL + SHIFT + ENTER >>>>> Navigate to MenuCategory 1 Level Up
                                     redirect("menuCategoryEditor.php", "!" + document.querySelector("#selParentCategory").value);
                                 }
@@ -258,6 +259,7 @@
                                 }
                             }
                             else if (event.keyCode == 46) { // CTRL + DELETE >>>>> Delete current record if one selected
+                                event.preventDefault();
                                 let btnDelete = document.querySelector("#btnDelete");
                                 if (btnDelete != null) {
                                     btnDelete.click(); 
@@ -267,16 +269,24 @@
                                 }
                             }
                             else if (event.keyCode == 8) { // CTRL + BACKSPACE >>>>> Reset form
+                                event.preventDefault();
                                 document.querySelector("#btnReset").click();
                             }
                             else if (event.keyCode >= 48 && event.keyCode <= 57 && shiftDown) {
+                                event.preventDefault();
                                 // CTRL + SHIFT + [0-9] Quick Access to Sub Menu Category. Hopefully Sub Menu Categories won't exceed 10
                                 // per parent category.
                                 selStr = str_pad(event.keyCode - 48,2,"0", STR_PAD_LEFT) + document.querySelector("#selParentCategory").value;
                                 redirect("menuCategoryEditor.php", "!" + document.querySelector("#selParentCategory").value);
                             }
                             else if (event.keyCode == 77) { // CTRL + M >>>>> Go to mod editor window.
-                                redirect("menuModificationCategoryEditor.php");
+                                event.preventDefault();
+                                if (shiftDown) {
+                                    redirect("menuModificationItemEditor.php");  
+                                }
+                                else {
+                                    redirect("menuModificationCategoryEditor.php");
+                                }
                             }
                             
                         }
