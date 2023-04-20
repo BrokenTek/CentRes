@@ -40,6 +40,8 @@
             var mnu;
             var mnuEditor;
             function allElementsLoaded() {
+                varSet("showDetachedMenuObjects","yes", "ifrMenu", true);
+                
                 mnu = document.getElementById("ifrMenu");
                 mnuEditor = document.getElementById("ifrMenuEditor");
 

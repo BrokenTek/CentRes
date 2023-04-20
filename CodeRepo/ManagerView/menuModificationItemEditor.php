@@ -77,8 +77,12 @@
             }
         }
         if(isset($_POST['delete'])){
-            $sql = "UPDATE MenuModificationItems SET visible = FALSE WHERE quickCode = '".$_POST['quickCode']."';";
+            $sql = "DELETE FROM MenuModificationItems WHERE quickCode = '".$_POST['quickCode']."';";
             connection()->query($sql);
+
+            $sql = "DELETE FROM MenuAssociations WHERE childQuickCode = '".$_POST['quickCode']."';";
+            connection()->query($sql);
+
             $message = "<b>" .$_POST['menuTitle']. "</b> deleted.";
             unset($_POST['quickCode'], $_POST['menuTitle']);
         }
@@ -250,12 +254,13 @@
             #previewWrapper {
                 grid-column: 1 / span 2;
                 display: grid;
-                grid template-columns; max-content;
+                grid-template-columns: max-content;
                 border: .125rem solid white;
                 margin-top: 1rem;
                 margin-bottom: 1.5rem;
                 min-height: 3rem;
                 font-weight: bold;
+                margin-inline: auto;
             }
             #previewWrapper > * {
                 margin-inline: auto;

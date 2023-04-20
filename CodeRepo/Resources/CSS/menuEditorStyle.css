@@ -66,16 +66,20 @@ legend {
 select {
     margin: 0;
 }
-.buttonGroup2, .buttonGroup3 {
+.buttonGroup2, .buttonGroup3, .buttonGroup4 {
     display: grid;
     grid-template-rows: min-content;
     margin-inline: auto;
+    grid-column: 1 / span 2;
 }
 .buttonGroup2 {
     grid-template-columns: 1fr min-content min-content 1fr;
 }
 .buttonGroup3 {
     grid-template-columns: 1fr min-content min-content min-content 1fr;
+}
+.buttonGroup4 {
+    grid-template-columns: 1fr min-content min-content min-content min-content 1fr;
 }
 
 #btnSubmit {

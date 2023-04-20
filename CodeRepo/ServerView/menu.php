@@ -172,8 +172,22 @@ if ($result->num_rows > 0) {
 	}
 }
 
+if (isset($_POST['showDetachedMenuObjects'])) {
+	$sql = "SELECT childQuickCode, title, visible
+		FROM MenuAssociations 
+		INNER JOIN MenuCategories ON MenuCategories.quickCode = MenuAssociations.childQuickCode 
+		WHERE MenuAssociations.parentQuickCode = 'dtchd' AND visible = true;";
+		$result = connection()->query($sql);
 
-	function printMenuCategory(string $qc, string $title) {
+		if ($result->num_rows > 0) {
+			printMenuCategory("dtchd", "Inactive Menu Objects", true);
+		}
+}
+
+
+
+
+	function printMenuCategory(string $qc, string $title, $detached = false) {
 		if ($GLOBALS['menuObjectCount'] == 0) {
 			die("Menu Recursion Detected!");
 		}
@@ -185,8 +199,13 @@ if ($result->num_rows > 0) {
 		if (isset($_POST['selected']) && $qc == $_POST['selected']) {
 			$classList .= " selected";
 		}
-		echo "<details id='". $qc ."' class='$classList'>
-			<summary>". $title ."</summary>";
+		echo "<details id='". $qc ."' class='$classList'>";
+		if ($detached) {
+			echo("<summary class='detached'>". $title ."</summary>");
+		}
+		else {
+			echo("<summary>". $title ."</summary>");
+		}
 
 		$sql = "SELECT childQuickCode, title, visible 
 		FROM MenuAssociations 
@@ -197,7 +216,7 @@ if ($result->num_rows > 0) {
 		if ($result->num_rows > 0) {
 			while($row = $result->fetch_assoc()) {
 				if ($row['visible'] == true) {
-					printMenuCategory($row['childQuickCode'], $row['title']);
+					printMenuCategory($row['childQuickCode'], $row['title'], $detached);
 				}
 			}
 		}
@@ -213,7 +232,7 @@ if ($result->num_rows > 0) {
 			while($row = $result->fetch_assoc()) {
 				// ** NEEDS TO PASS IN CALCULATED price AND THE CALCULATED MODS STR (COMMA DELIMINATED) **
 				if ($row['visible'] == true) {
-					printMenuItem($row['childQuickCode'], $row['title'], $row['price']);
+					printMenuItem($row['childQuickCode'], $row['title'], $row['price'], $detached);
 				}
 			}
 			echo "</div>";
@@ -223,13 +242,13 @@ if ($result->num_rows > 0) {
 
 		return;		
 	}
-	function printMenuItem(string $qc, string $title, float $price) {
+	function printMenuItem(string $qc, string $title, float $price, $detached) {
 		if ($GLOBALS['menuObjectCount'] == 0) {
 			die("Menu Recursion Detected!");
 		}
 		$GLOBALS['menuObjectCount'] -= 1;
 
-		$classList = "menuItem menuTitleItem";
+		$classList = "menuItem menuTitleItem". ($detached == true ? " detached" : "");
 		if (isset($_POST['updated']) && $qc == $_POST['updated']) {
 			$classList .= " updated";
 		}

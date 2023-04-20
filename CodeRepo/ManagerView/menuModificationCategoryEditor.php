@@ -134,7 +134,11 @@
             }
         }
         if(isset($_POST['delete'])){
-            $sql = "UPDATE MenuModificationCategories SET visible = FALSE WHERE quickCode = '".$_POST['quickCode']."';";
+            echo("DELETE");
+            $sql = "DELETE FROM MenuModificationCategories WHERE quickCode = '".$_POST['quickCode']."';";
+            connection()->query($sql);
+
+            $sql = "DELETE FROM MenuAssociations WHERE childQuickCode = '".$_POST['quickCode']."' OR parentQuickCode = '" .$_POST['quickCode']."';";
             connection()->query($sql);
             $message = "<b>" .$_POST['menuTitle']. "</b> deleted.";
             unset($_POST['quickCode'], $_POST['menuTitle']);

@@ -39,15 +39,20 @@
 
     try {
         if(isset($_POST['quickCode'])&&!isset($_POST['menuTitle'])){
-            $sql = "SELECT MenuCategories.title AS 'categoryTitle', MenuAssociations.parentQuickCode AS 'parent'
+            if ($_POST['quickCode'] != 'dtchd') {
+                $sql = "SELECT MenuCategories.title AS 'categoryTitle', MenuAssociations.parentQuickCode AS 'parent'
                     FROM (MenuCategories LEFT JOIN MenuAssociations ON MenuCategories.quickCode = MenuAssociations.childQuickCode)
                     WHERE quickCode = '".$_POST['quickCode']."' ORDER BY counter DESC LIMIT 1;";
-            $fieldData = connection()->query($sql)->fetch_assoc();
-            //just in case the quickCode persists after a deletion, these statements are wrapped in a condition
-            //to prevent unwanted warnings from showing up. Note to self: unwrap this if you account for this.
-            if(isset($fieldData)){
-            $_POST['menuTitle'] = $fieldData['categoryTitle'];
-            $_POST['parentCategory'] = $fieldData['parent'];
+                $fieldData = connection()->query($sql)->fetch_assoc();
+                //just in case the quickCode persists after a deletion, these statements are wrapped in a condition
+                //to prevent unwanted warnings from showing up. Note to self: unwrap this if you account for this.
+                if(isset($fieldData)){
+                    $_POST['menuTitle'] = $fieldData['categoryTitle'];
+                    $_POST['parentCategory'] = $fieldData['parent'];
+                }
+            }
+            else {
+                unset($_POST['quickCode']);
             }
         }
 
@@ -98,11 +103,38 @@
         else if(isset($_POST['delete'])){
             // get parent to change lookAt value
             $sql = "SELECT parentQuickCode AS 'parent' FROM MenuAssociations WHERE childQuickCode = '".$_POST['quickCode']."';";
-            $_POST['lookAt'] = connection()->query($sql)->fetch_assoc()['parent'];
+            $result = connection()->query($sql);
 
-            $sql = "UPDATE MenuCategories SET visible = FALSE WHERE quickCode = '".$_POST['quickCode']."';";
+            if (mysqli_num_rows($result) == 0) {
+                unset($_POST['lookAt']);
+            }
+            else {
+                $_POST['lookAt'] = $result->fetch_assoc()['parent'];
+            }
+
+            $sql = "UPDATE MenuAssociations SET parentQuickCode = 'dtchd' WHERE parentQuickCode = '".$_POST['quickCode']."';";
             connection()->query($sql);
+
+            $sql = "DELETE FROM MenuCategories WHERE quickCode = '".$_POST['quickCode']."';";
+            connection()->query($sql);
+
+           
+
             $message = "<b>" .$_POST['menuTitle']. "</b> deleted.";
+            unset($_POST['quickCode'], $_POST['menuTitle'], $_POST['parentCategory']);
+
+            // menu editor has an event listener for this window to onload.
+            // It checks varGet('updated', [ifrActiveWindow]) to see if menu needs to be reloaded. 
+            $_POST['updated'] = "true";
+        }
+        else if (isset($_POST['inactivate'])){
+            // get parent to change lookAt value
+            $_POST['lookAt'] = $_POST['quickCode'];
+
+            $sql = "UPDATE MenuAssociations SET parentQuickCode = 'dtchd' WHERE childQuickCode = '".$_POST['quickCode']."';";
+            connection()->query($sql);           
+
+            $message = "<b>" .$_POST['menuTitle']. "</b> inactivated.";
             unset($_POST['quickCode'], $_POST['menuTitle'], $_POST['parentCategory']);
 
             // menu editor has an event listener for this window to onload.
@@ -338,6 +370,7 @@
                     <label for="selParentCategory">Parent Category</label>
                     <select id="selParentCategory" name="parentCategory" required>
                         <option value="root">None</option>
+                        <option value="dtchd">Inactive</option>
                         <?php
                             $sql = "SELECT * FROM MenuCategories WHERE visible = 1 ORDER BY title";
                             $result = connection()->query($sql);
@@ -363,11 +396,20 @@
                     <input id="txtMenuTitle" name="menuTitle" maxlength=75 <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
                     <?php if (isset($_POST['quickCode']) && 
                             (!isset($_POST['delete']) || isset($errorMessage))): ?>
-                        <div class="buttonGroup3">
-                            <input id="btnSubmit" type="submit" name="commit" value="Update" class="button">
-                            <button id="btnReset" type="button" class="button">Clear</button>
-                            <input id="btnDelete" type="submit" name="delete" value="Delete" class="button">
-                        </div>
+                        <?php if (isset($_POST['parentCategory']) && $_POST['parentCategory'] == 'dtchd'): ?> 
+                            <div class="buttonGroup3">
+                                <input id="btnSubmit" type="submit" name="commit" value="Update" class="button">
+                                <button id="btnReset" type="button" class="button">Clear</button>
+                                <input id="btnDelete" type="submit" name="delete" value="Delete" class="button">
+                            </div>
+                        <?php else: ?>
+                            <div class="buttonGroup4">
+                                <input id="btnSubmit" type="submit" name="commit" value="Update" class="button">
+                                <button id="btnReset" type="button" class="button">Clear</button>
+                                <input id="btnDelete" type="submit" name="delete" value="Delete" class="button">
+                                <input id="btnInactivate" type="submit" name="inactivate" value="Inactivate" class="button">
+                            </div>
+                        <?php endif; ?>
                     <?php else: ?>
                         <div class="buttonGroup2">
                             <input id="btnSubmit" type="submit" name="commit" value="Create" class="button">
