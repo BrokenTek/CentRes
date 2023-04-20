@@ -107,9 +107,9 @@
             $_POST['updated'] = "true";
         }
         if(isset($_POST['delete'])){
-            $sql = "UPDATE MenuItems SET visible = FALSE WHERE quickCode = '".$_POST['quickCode']."';";
+            $sql = "UPDATE MenuAssociations SET parentQuickCode = 'dtchd' WHERE childQuickCode = '".$_POST['quickCode']."';";
             connection()->query($sql);
-            $message = "<b>" .$_POST['menuTitle']. "</b> deleted.";
+            $message = "<b>" .$_POST['menuTitle']. "</b> inactivated.";
             $_POST['lookAt'] = $_POST['parentCategory'];  
             unset($_POST['quickCode'], $_POST['menuTitle']);
 
@@ -128,6 +128,7 @@
         $errorMessage = $_POST['errorMessage'];
         unset($_POST['errorMessage']);
     }
+    echo("<h1>" .$_POST['parentCategory'] ."</h1>");
 ?>
 
 <!DOCTYPE html>
@@ -222,6 +223,9 @@
                                 else { // CTRL ENTER >>>>> Navigate to MenuCategory at Current Level
                                     redirect("menuCategoryEditor.php", parentRecall);
                                 }
+                            }
+                            else if (event.keyCode == 13) {
+                                redirect("menuCategoryEditor.php", "root");
                             }
                             else if (event.keyCode == 46) { // CTRL + DELETE >>>>> Delete current record if one selected
                                 event.preventDefault();
@@ -324,7 +328,7 @@
                         <div class="buttonGroup3">
                             <input id="btnSubmit" type="submit" name="commit" value="Update" class="button">
                             <button id="btnReset" type="button" class="button">Clear</button>
-                            <input id="btnDelete" type="submit" name="delete" value="Delete" class="button">
+                            <input id="btnDelete" type="submit" name="delete" value="Inactivate" class="button">
                         </div>
                     <?php else: ?>
                         <div class="buttonGroup2">

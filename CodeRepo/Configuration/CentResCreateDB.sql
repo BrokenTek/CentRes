@@ -285,4 +285,6 @@ INSERT INTO TableStatuses VALUES
 	('bussing');
 	
 INSERT INTO QuickCodes VALUES('root');
+INSERT INTO QuickCodes VALUES('dtchd');
+
 
