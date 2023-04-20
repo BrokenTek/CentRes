@@ -444,10 +444,12 @@
                 }
                 if ($ticketItem['splitPayStatus'] == "Paid") {
                     echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem paid' .$selectedFlag. '">');
+                    echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                     echo('<div class="ticketItemStatus">$</div>');
                 }
                 elseif ($ticketItem['splitPayStatus'] == "Partial") {
                     echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem partialPay' .$selectedFlag. '">');
+                    echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                     echo('<div class="ticketItemStatus">$*</div>');
                 }
                 else {
@@ -459,40 +461,48 @@
                     switch($ticketItem['status']) {
                         case "n/a":
                             echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removable' .$moveable. ' untracked' .$selectedFlag. '">');
+                            echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                             echo('<div class="ticketItemStatus"></div>');
                             break;
                         case "Delivered":
                             echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' delivered' .$selectedFlag. '">');
+                            echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                             echo('<div class="ticketItemStatus">✔✔</div>');
                             break;
                         case "Ready":
                             echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' ready' .$selectedFlag. '">');
+                            echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                             echo('<div class="ticketItemStatus">✔</div>');
                             break;
                         case "Pending":
                             // if item has mods
                             if ($hasMods) {
                                 echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid editable removable' .$moveable. ' pending' .$selectedFlag. '">');
+                                echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                                 echo('<div class="ticketItemStatus">✎</div>');
                             }
                             else {
                                 echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removable' .$moveable. ' pending' .$selectedFlag. '">');
+                                echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                                 echo('<div class="ticketItemStatus"></div>');
                             }
                             break;
                         case "Preparing":
                             if ($hasMods) {
                                 echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid editable removable' .$moveable. ' preparing' .$selectedFlag. '">');
+                                echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                                 echo('<div class="ticketItemStatus">✎⧖</div>');
                             }
                             else {
                                 echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removable' .$moveable. ' preparing' .$selectedFlag. '">');
+                                echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                                 echo('<div class="ticketItemStatus">⧖</div>');
                             }
                             break;
                         case "Updated":
                             if ($hasMods) {
                                 echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid editable removable' .$moveable. ' updated' .$selectedFlag. '">');
+                                echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                                 echo('<div class="ticketItemStatus">✎⧖⚠</div>');
                             }
                             else {
@@ -503,17 +513,18 @@
                             break;
                         case "Removed":
                             echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem disabled unpaid removed' .$selectedFlag. '" disabled>');
+                            echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                             echo('<div class="ticketItemStatus">🞮</div>');
                             break;
                         case "Hidden":
                             echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem disabled unpaid removed hidden' .$selectedFlag. '" disabled>');
+                            echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                             echo('<div class="ticketItemStatus">🞮</div>');
                             break;
                     }
                 }
 
-                echo('<div class="ticketItemNumber">' .$splitString. '</div>
-                    <div class="ticketItemText">' .$menuItem['title']. "</div>");
+                echo('<div class="ticketItemNumber">' .$splitString. '</div>');
                 if (is_null($ticketItem['overridePrice'])) {
                     echo('<div class="ticketItemPrice">' .currencyFormat($ticketItem['calcTicketItemPrice']). '</div>');
                 }
@@ -600,6 +611,9 @@
                     }
                     if ($currentModIndex < sizeof($mods) - 1) {
                         echo('<div class="modCustom overlined">' .($mods[$currentModIndex + 1]). '</div>');
+                        echo('<div class="ticketItemStatus overlined"></div>');
+                        echo('<div class="ticketItemNumber overlined"></div>');
+                        echo('<div class="modPrice overlined"></div>');
                     }
                 }
 

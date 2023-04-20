@@ -23,9 +23,11 @@
          grid-column: 4;
       }
 
-      .ticketItemText, .ticketItemStatus, .ticketItemNumber, .ticketItemPrice {
-         grid-row: 1;
-      }
+      .ticketItem > * {
+         width: 100%;
+      } 
+
+      
 
       body {
          margin: 0;
