@@ -58,6 +58,12 @@
 
         if(isset($_POST['commit'])){
             if($_POST['commit'] == 'Update'){
+                //attempt to get the original title. This will be displayed in the message to user.
+                $sql = "SELECT title FROM MenuCategories WHERE quickCode = '" .$_POST['quickCode']. "';";
+                $result = connection()->query($sql);
+                $title = $result->fetch_assoc()['title'];
+                
+
                 //attempt to update the category to reflect the changes made in the form
                 $sql = "UPDATE MenuCategories SET title = ? WHERE quickCode = ?;";      
                 $sql = connection()->prepare($sql);
@@ -69,7 +75,7 @@
                 $sql->bind_param('ss', $_POST['parentCategory'], $_POST['quickCode']);
                 $sql->execute();
 
-                $message = "Menu Category updated.";
+                $message = "<b>$title</b> updated.";
                 $_POST['lookAt'] = $_POST['quickCode'];
             }
             else{
@@ -182,8 +188,12 @@
         }
     }
     catch (Exception $e) {
-        $errorMessage = "An unexpected error occurred, please contact your system administrator or developer(s). ".$e->getMessage();
-
+        if (strpos(" " . $e->getMessage(), "Duplicate entry") > 0) {
+            $errorMessage = "<b>" .$_POST['menuTitle']. "</b> already exists in the menu. Choose another name.";   
+        }
+        else {
+            $errorMessage = "An unexpected error occurred, please contact your system administrator or developer(s). ".$e->getMessage();
+        }
     }
     if (!isset($errorMessage) && isset($_POST['errorMessage'])) {
         $errorMessage = $_POST['errorMessage'];
@@ -241,6 +251,20 @@
                         }
                      });
                 }
+
+                setTimeout(function() { 
+                    let msgs = document.getElementsByClassName("message");
+                    if (msgs.length == 1) {
+                        msgs[0].classList.add("disappear");
+                    } 
+                }, 1500);
+
+                setTimeout(function() { 
+                    let errs = document.getElementsByClassName("errorMessage");
+                    if (errs.length == 1) {
+                        errs[0].classList.add("disappear");
+                    } 
+                }, 5000);
             }
 
             function btnResetPressed(event) {
@@ -369,7 +393,7 @@
                 
                     <label for="selParentCategory">Parent Category</label>
                     <select id="selParentCategory" name="parentCategory" required>
-                        <option value="root">None</option>
+                        <option value="root">Main Menu</option>
                         <option value="dtchd">Inactive</option>
                         <?php
                             $sql = "SELECT * FROM MenuCategories WHERE visible = 1 ORDER BY title";
@@ -406,8 +430,8 @@
                             <div class="buttonGroup4">
                                 <input id="btnSubmit" type="submit" name="commit" value="Update" class="button">
                                 <button id="btnReset" type="button" class="button">Clear</button>
-                                <input id="btnDelete" type="submit" name="delete" value="Delete" class="button">
                                 <input id="btnInactivate" type="submit" name="inactivate" value="Inactivate" class="button">
+                                <input id="btnDelete" type="submit" name="delete" value="Delete" class="button">
                             </div>
                         <?php endif; ?>
                     <?php else: ?>

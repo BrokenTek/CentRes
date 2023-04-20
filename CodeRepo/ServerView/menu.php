@@ -178,10 +178,18 @@ if (isset($_POST['showDetachedMenuObjects'])) {
 		INNER JOIN MenuCategories ON MenuCategories.quickCode = MenuAssociations.childQuickCode 
 		WHERE MenuAssociations.parentQuickCode = 'dtchd' AND visible = true;";
 		$result = connection()->query($sql);
+		$count = $result->num_rows;
 
-		if ($result->num_rows > 0) {
-			printMenuCategory("dtchd", "Inactive Menu Objects", true);
-		}
+	$sql = "SELECT childQuickCode, title, visible
+		FROM MenuAssociations 
+		INNER JOIN MenuItems ON MenuItems.quickCode = MenuAssociations.childQuickCode 
+		WHERE MenuAssociations.parentQuickCode = 'dtchd' AND visible = true;";
+		$result = connection()->query($sql);
+		$count += $result->num_rows;
+
+	if ($count > 0) {
+		printMenuCategory("dtchd", "Inactive Menu Objects", true);
+	}
 }
 
 

@@ -227,19 +227,19 @@ END;
 CREATE TRIGGER beforeUpdateMenuCategory
 BEFORE UPDATE ON MenuCategories FOR EACH ROW
 BEGIN
-	IF (OLD.quickCode <> NEW.quickCode) THEN
-		IF ((SELECT COUNT(*) FROM menuCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+	IF (OLD.quickCode <> NEW.quickCode OR OLD.title <> NEW.title) THEN
+		IF ((SELECT COUNT(*) FROM menuCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SET MESSAGE_TEXT = 'Duplicate entry';
+		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SET MESSAGE_TEXT = 'Duplicate entry';
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SET MESSAGE_TEXT = 'Duplicate entry';
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+			SET MESSAGE_TEXT = 'Duplicate entry';
 		END IF; 
 	END IF;
 END;
@@ -247,39 +247,39 @@ END;
 CREATE TRIGGER beforeUpdateMenuItem
 BEFORE UPDATE ON MenuItems FOR EACH ROW
 BEGIN
-	IF (OLD.quickCode <> NEW.quickCode) THEN
-		IF ((SELECT COUNT(*) FROM menuCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+	IF (OLD.quickCode <> NEW.quickCode OR OLD.title <> NEW.title) THEN
+		IF ((SELECT COUNT(*) FROM menuCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SET MESSAGE_TEXT = 'Duplicate entry';
+		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE quickCode = NEW.quickCode) = 1 ) THEN
+			SET MESSAGE_TEXT = 'Duplicate entry';
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode) = 1 ) THEN
+			SET MESSAGE_TEXT = 'Duplicate entry';
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		END IF; 
+			SET MESSAGE_TEXT = 'Duplicate entry';
+		END IF;  
 	END IF;
 END;
 
 CREATE TRIGGER beforeUpdateMenuModificationCategory
 BEFORE UPDATE ON MenuModificationCategories FOR EACH ROW
 BEGIN
-	IF (OLD.quickCode <> NEW.quickCode) THEN
-		IF ((SELECT COUNT(*) FROM menuCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+	IF (OLD.quickCode <> NEW.quickCode OR OLD.title <> NEW.title) THEN
+		IF ((SELECT COUNT(*) FROM menuCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SET MESSAGE_TEXT = 'Duplicate entry';
+		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SET MESSAGE_TEXT = 'Duplicate entry';
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SET MESSAGE_TEXT = 'Duplicate entry';
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
+			SET MESSAGE_TEXT = 'Duplicate entry';
 		END IF; 
 	END IF;
 END;
@@ -287,20 +287,20 @@ END;
 CREATE TRIGGER beforeUpdateMenuModificationItem
 BEFORE UPDATE ON MenuModificationItems FOR EACH ROW
 BEGIN
-	IF (OLD.quickCode <> NEW.quickCode) THEN
-		IF ((SELECT COUNT(*) FROM menuCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+	IF (OLD.quickCode <> NEW.quickCode OR OLD.title <> NEW.title) THEN
+		IF ((SELECT COUNT(*) FROM menuCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SET MESSAGE_TEXT = 'Duplicate entry';
+		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SET MESSAGE_TEXT = 'Duplicate entry';
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE quickCode = NEW.quickCode LIMIT 2) = 1 ) THEN
+			SET MESSAGE_TEXT = 'Duplicate entry';
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Quick Codes can only be associated with 1 item.';
-		END IF; 
+			SET MESSAGE_TEXT = 'Duplicate entry';
+		END IF;   
 	END IF;
 END;
 

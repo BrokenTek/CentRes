@@ -52,6 +52,12 @@
 
         if(isset($_POST['commit'])){
             if($_POST['commit'] == 'Update'){
+                //attempt to get the original title. This will be displayed in the message to user.
+                $sql = "SELECT title FROM MenuModificationItems WHERE quickCode = '" .$_POST['quickCode']. "';";
+                $result = connection()->query($sql);
+                $title = $result->fetch_assoc()['title'];
+
+
                 //change the category's name
                 $sql = "UPDATE MenuModificationCategories SET title = ?, categoryType = ? WHERE quickCode = ?;";      
                 $sql = connection()->prepare($sql);
@@ -88,7 +94,7 @@
                     }
                 }
 
-                $message = "Menu Modification Category updated.";
+                $message = "<b>$title</b> updated.";
             }
             else{
                 //attempt to create the new modification item
@@ -145,7 +151,12 @@
         }
     }
     catch (Exception $e) {
-        $errorMessage = "An unexpected error occurred, please contact your system administrator or developer(s). ".$e->getMessage();
+        if (strpos(" " . $e->getMessage(), "Duplicate entry") > 0) {
+            $errorMessage = "<b>" .$_POST['menuTitle']. "</b> already exists in the menu. Choose another name.";   
+        }
+        else {
+            $errorMessage = "An unexpected error occurred, please contact your system administrator or developer(s). ".$e->getMessage();
+        }
     }
     if (!isset($errorMessage) && isset($_POST['errorMessage'])) {
         $errorMessage = $_POST['errorMessage'];
@@ -194,6 +205,20 @@
                 } 
 
                 filterModItems();
+
+                setTimeout(function() { 
+                    let msgs = document.getElementsByClassName("message");
+                    if (msgs.length == 1) {
+                        msgs[0].classList.add("disappear");
+                    } 
+                }, 1500);
+
+                setTimeout(function() { 
+                    let errs = document.getElementsByClassName("errorMessage");
+                    if (errs.length == 1) {
+                        errs[0].classList.add("disappear");
+                    } 
+                }, 5000);
             }
 
             function btnResetPressed(event) {

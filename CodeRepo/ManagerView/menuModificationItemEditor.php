@@ -57,13 +57,19 @@
         }
         if(isset($_POST['commit'])){
             if($_POST['commit'] == 'Update'){
+                //attempt to get the original title. This will be displayed in the message to user.
+                $sql = "SELECT title FROM MenuModificationItems WHERE quickCode = '" .$_POST['quickCode']. "';";
+                $result = connection()->query($sql);
+                $title = $result->fetch_assoc()['title'];
+
                 //attempt to update the category to reflect the changes made in the form
+                
                 $sql = "UPDATE MenuModificationItems SET title = ?, quantifierString = ? WHERE quickCode = ?;";      
                 $sql = connection()->prepare($sql);
                 $sql->bind_param('sss', $_POST['menuTitle'], $_POST['quantifierString'], $_POST['quickCode']);
                 $sql->execute();
 
-                $message = "Menu Modification Item updated.";
+                $message = "<b>$title</b> updated.";
             }
             else{
                 //attempt to create the new modification item
@@ -88,7 +94,12 @@
         }
     }
     catch (Exception $e) {
-        $errorMessage = "An unexpected error occurred, please contact your system administrator or developer(s). ".$e->getMessage();
+        if (strpos(" " . $e->getMessage(), "Duplicate entry") > 0) {
+            $errorMessage = "<b>" .$_POST['menuTitle']. "</b> already exists in the menu. Choose another name.";   
+        }
+        else {
+            $errorMessage = "An unexpected error occurred, please contact your system administrator or developer(s). ".$e->getMessage();
+        }
     }
     if (!isset($errorMessage) && isset($_POST['errorMessage'])) {
         $errorMessage = $_POST['errorMessage'];
@@ -140,6 +151,20 @@
                 }
 
                 generateModOption();
+
+                setTimeout(function() { 
+                    let msgs = document.getElementsByClassName("message");
+                    if (msgs.length == 1) {
+                        msgs[0].classList.add("disappear");
+                    } 
+                }, 5000);
+
+                setTimeout(function() { 
+                    let errs = document.getElementsByClassName("errorMessage");
+                    if (errs.length == 1) {
+                        errs[0].classList.add("disappear");
+                    } 
+                }, 5000);
             }
 
             function btnResetPressed(event) {

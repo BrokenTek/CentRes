@@ -59,6 +59,12 @@
 
         if(isset($_POST['commit'])){
             if($_POST['commit'] == 'Update'){
+                //attempt to get the original title. This will be displayed in the message to user.
+                $sql = "SELECT title FROM MenuItems WHERE quickCode = '" .$_POST['quickCode']. "';";
+                $result = connection()->query($sql);
+                $title = $result->fetch_assoc()['title'];
+                
+
                 //attempt to update the category to reflect the changes made in the form
                 $sql = "UPDATE MenuItems SET title = ?, route = ?, price = ? WHERE quickCode = ?;";      
                 $sql = connection()->prepare($sql);
@@ -75,7 +81,7 @@
                     
                 }
 
-                $message = "Menu Item updated.";
+                $message = "<b>$title</b> updated.";
                 $_POST['lookAt'] = $_POST['quickCode'];
             }
             else{
@@ -106,7 +112,7 @@
             // It checks varGet('updated', [ifrActiveWindow]) to see if menu needs to be reloaded. 
             $_POST['updated'] = "true";
         }
-        if(isset($_POST['delete'])){
+        if(isset($_POST['inactivate'])){
             $sql = "UPDATE MenuAssociations SET parentQuickCode = 'dtchd' WHERE childQuickCode = '".$_POST['quickCode']."';";
             connection()->query($sql);
             $message = "<b>" .$_POST['menuTitle']. "</b> inactivated.";
@@ -117,18 +123,45 @@
             // It checks varGet('updated', [ifrActiveWindow]) to see if menu needs to be reloaded. 
             $_POST['updated'] = "true";
         }
+        else if(isset($_POST['delete'])){
+            $sql = "SELECT COUNT(*) AS cnt FROM TicketItems WHERE menuItemQuickCode = '".$_POST['quickCode']."';";
+            $count = connection()->query($sql)->fetch_assoc()['cnt'];
+            if ($count > 0) {
+                $errorMessage = "<b>" .$_POST['menuTitle']. "</b> has already been ordered at least once. Make sure this menu item is inactive and archived before deleting.";
+            }
+            else {
+                // permenantly delete the menu item
+                $sql = "DELETE FROM MenuAssociations WHERE childQuickCode = '".$_POST['quickCode']."' OR parentQuickCode = '" .$_POST['quickCode']. "';";
+                connection()->query($sql);
+
+                $sql = "DELETE FROM MenuItems WHERE quickCode = '".$_POST['quickCode']."';";
+                connection()->query($sql);
+
+                $message = "<b>" .$_POST['menuTitle']. "</b> deleted.";
+                $_POST['lookAt'] = $_POST['parentCategory'];  
+                unset($_POST['quickCode'], $_POST['menuTitle']);
+
+                // menu editor has an event listener for this window to onload.
+                // It checks varGet('updated', [ifrActiveWindow]) to see if menu needs to be reloaded. 
+                $_POST['updated'] = "true";
+            }
+        }
         else if (isset($_POST['parentCategory']) && !isset($_POST['quickCode']) && !isset($_POST['lookAt'])) {
             $_POST['lookAt'] = $_POST['parentCategory'];
         }
     }
     catch (Exception $e) {
-        $errorMessage = "An unexpected error occurred, please contact your system administrator or developer(s). ".$e->getMessage();
+        if (strpos(" " . $e->getMessage(), "Duplicate entry") > 0) {
+            $errorMessage = "<b>" .$_POST['menuTitle']. "</b> already exists in the menu. Choose another name.";   
+        }
+        else {
+            $errorMessage = "An unexpected error occurred, please contact your system administrator or developer(s). ".$e->getMessage();
+        }
     }
     if (!isset($errorMessage) && isset($_POST['errorMessage'])) {
         $errorMessage = $_POST['errorMessage'];
         unset($_POST['errorMessage']);
     }
-    echo("<h1>" .$_POST['parentCategory'] ."</h1>");
 ?>
 
 <!DOCTYPE html>
@@ -180,6 +213,20 @@
                         dispatchJSONeventCall("selectMenuObject", {"menuObjectId": varGet("lookAt")}, ["ifrMenu"]);
                     }, 1000);    
                 }
+
+                setTimeout(function() { 
+                    let msgs = document.getElementsByClassName("message");
+                    if (msgs.length == 1) {
+                        msgs[0].classList.add("disappear");
+                    } 
+                }, 1500);
+
+                setTimeout(function() { 
+                    let errs = document.getElementsByClassName("errorMessage");
+                    if (errs.length == 1) {
+                        errs[0].classList.add("disappear");
+                    } 
+                }, 5000);
 
             }
 
@@ -296,6 +343,7 @@
                 
                     <label for="selParentCategory">Parent Category</label>
                     <select id="selParentCategory" name="parentCategory" required>
+                        <option value="dtchd">Inactive</option>
                         <?php
                             $sql = "SELECT * FROM MenuCategories WHERE visible = 1 ORDER BY title;";
                             $result = connection()->query($sql);
@@ -325,10 +373,11 @@
                     <input id="txtRoute" name="route" maxlength="1" <?php if(isset($_POST['route'])) { echo(' value="' . $_POST['route'] . '"'); } ?>>
                     <?php if (isset($_POST['quickCode']) && 
                             (!isset($_POST['delete']) || isset($errorMessage))): ?>
-                        <div class="buttonGroup3">
+                        <div class="buttonGroup4">
                             <input id="btnSubmit" type="submit" name="commit" value="Update" class="button">
                             <button id="btnReset" type="button" class="button">Clear</button>
-                            <input id="btnDelete" type="submit" name="delete" value="Inactivate" class="button">
+                            <input id="btnInactivate" type="submit" name="inactivate" value="Inactivate" class="button">
+                            <input id="btnDelete" type="submit" name="delete" value="Delete" class="button">
                         </div>
                     <?php else: ?>
                         <div class="buttonGroup2">
