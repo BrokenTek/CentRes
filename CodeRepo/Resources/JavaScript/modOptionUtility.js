@@ -1,6 +1,7 @@
 // existingModString will configure the control (check/select appropriate values)
 function generateModOptionDiv(modQuickCode, modName, quantifierString = null, returnHTML = false, categoryType = "OptionalOne", parentQuickCode = null) {
     if (modName === undefined || modName === null || modName.length == 0) { return null; }
+    if (modName.startsWith(".")) { modName = modName.substring(modName.indexOf(" ") + 1); }
     let modOptionDivStr;
     let divPrefix;
     let multiselect = categoryType.endsWith("Any");

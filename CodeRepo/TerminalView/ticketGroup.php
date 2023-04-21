@@ -122,6 +122,7 @@
                         if($ticketItem['flag'] == "updated"){
                             $itemClass.=" updated";
                         }
+                        
                         echo("<div name='ticketItem' id='".$ticketItem['id']."' class ='".$itemClass."'><p>".$readyChar.$ticketItem['itemName']."</p>");
 
                         if($ticketItem['mods']!=""){
@@ -134,10 +135,20 @@
                                 
                                 $result = connection()->query($sql);
                                 $mod = $result->fetch_assoc();
-                                echo($mod['title']);
-                                if (isset($modList[$i-2]) && $modList[$i-2] != "") {
+
+                                if (strpos(' ' . $mod['title'], '.') == 1) {
+                                    echo(substr($mod['title'],  strpos($mod['title'], ' ') + 1));
+                                }
+                                else {
+                                    echo($mod['title']);
+                                }
+
+                                // TEMP
+                                // echo("DEBUG TITS " . );
+
+                                if (isset($modList[$i-1]) && strlen($modList[$i-1]) != 0) {
                                     echo(": ");
-                                    echo($modList[$i -1]);
+                                    echo($modList[$i-1]);
                                 }
                                 echo("</ul>");
                             }

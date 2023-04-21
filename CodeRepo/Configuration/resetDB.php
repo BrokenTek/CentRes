@@ -53,11 +53,6 @@
                 $dbh->exec($query);
                 print("<h1>☑ Populated Tables</h1>");
 
-                // Recreate/Update employees and related records
-                $query = file_get_contents("LoadThreeStooges.sql");
-                $dbh->exec($query);
-                print("<h1>☑ Loaded 3 Stooges as Employees</h1>");
-
                 // Populate Menu
                 $query = file_get_contents("CentResPopulateMenuWithAssociations.sql"); // Populate not Popuolate
                 $dbh->exec($query);

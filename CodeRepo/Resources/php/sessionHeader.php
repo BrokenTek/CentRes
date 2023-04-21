@@ -110,7 +110,6 @@
                     <option id='mgrNavIPW' value = '../ManagerView/InventoryPopularityWindow.php'>Inventory/Popularity&nbsp;Window</option>
                     <option id='mgrNavEmpRoster' value='../ManagerView/EmployeeRoster.php'>Employee&nbsp;Roster</option>
                     <option id='mgrNavMenuEditor' value='../ManagerView/MenuEditor.php'>Menu&nbsp;Editor</option>
-                    <option id='mgrNavResetDB' value='../Configuration/ResetDB.php'>DEBUG:&nbsp;Reset&nbsp;DB</option>
                 </select>
             </div>
         ");

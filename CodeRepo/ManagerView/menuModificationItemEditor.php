@@ -1,5 +1,5 @@
-<?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(8, $GLOBALS['role']); ?>
 <?php require_once '../Resources/PHP/dbConnection.php'; ?>
+<?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(8, $GLOBALS['role']); ?>
 <?php
 
     /////////////////////////////////////////////////////////

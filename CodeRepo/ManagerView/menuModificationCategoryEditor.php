@@ -53,7 +53,7 @@
         if(isset($_POST['commit'])){
             if($_POST['commit'] == 'Update'){
                 //attempt to get the original title. This will be displayed in the message to user.
-                $sql = "SELECT title FROM MenuModificationItems WHERE quickCode = '" .$_POST['quickCode']. "';";
+                $sql = "SELECT title FROM MenuModificationCategories WHERE quickCode = '" .$_POST['quickCode']. "';";
                 $result = connection()->query($sql);
                 $title = $result->fetch_assoc()['title'];
 

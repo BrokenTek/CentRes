@@ -1,5 +1,3 @@
-
-
 <?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(7, $GLOBALS['role']); ?>
 <?php require_once '../Resources/PHP/currencyFormatter.php'; ?>
 <!DOCTYPE html>
@@ -444,65 +442,54 @@
                 }
                 if ($ticketItem['splitPayStatus'] == "Paid") {
                     echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem paid' .$selectedFlag. '">');
-                    echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                     echo('<div class="ticketItemStatus">$</div>');
                 }
                 elseif ($ticketItem['splitPayStatus'] == "Partial") {
                     echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem partialPay' .$selectedFlag. '">');
-                    echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                     echo('<div class="ticketItemStatus">$*</div>');
                 }
                 else {
 
-                    // when implementation is defined, calculate this value.
                     $hasMods = true;
-                    //
+                    
                     $moveable = " moveable splittable";
                     switch($ticketItem['status']) {
                         case "n/a":
                             echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removable' .$moveable. ' untracked' .$selectedFlag. '">');
-                            echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                             echo('<div class="ticketItemStatus"></div>');
                             break;
                         case "Delivered":
                             echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' delivered' .$selectedFlag. '">');
-                            echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                             echo('<div class="ticketItemStatus">✔✔</div>');
                             break;
                         case "Ready":
                             echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' ready' .$selectedFlag. '">');
-                            echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                             echo('<div class="ticketItemStatus">✔</div>');
                             break;
                         case "Pending":
                             // if item has mods
                             if ($hasMods) {
                                 echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid editable removable' .$moveable. ' pending' .$selectedFlag. '">');
-                                echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                                 echo('<div class="ticketItemStatus">✎</div>');
                             }
                             else {
                                 echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removable' .$moveable. ' pending' .$selectedFlag. '">');
-                                echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                                 echo('<div class="ticketItemStatus"></div>');
                             }
                             break;
                         case "Preparing":
                             if ($hasMods) {
                                 echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid editable removable' .$moveable. ' preparing' .$selectedFlag. '">');
-                                echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                                 echo('<div class="ticketItemStatus">✎⧖</div>');
                             }
                             else {
                                 echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid removable' .$moveable. ' preparing' .$selectedFlag. '">');
-                                echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                                 echo('<div class="ticketItemStatus">⧖</div>');
                             }
                             break;
                         case "Updated":
                             if ($hasMods) {
                                 echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid editable removable' .$moveable. ' updated' .$selectedFlag. '">');
-                                echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                                 echo('<div class="ticketItemStatus">✎⧖⚠</div>');
                             }
                             else {
@@ -513,50 +500,27 @@
                             break;
                         case "Removed":
                             echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem disabled unpaid removed' .$selectedFlag. '" disabled>');
-                            echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                             echo('<div class="ticketItemStatus">🞮</div>');
                             break;
                         case "Hidden":
                             echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem disabled unpaid removed hidden' .$selectedFlag. '" disabled>');
-                            echo('<div class="ticketItemText">' .$menuItem['title']. "</div>");
                             echo('<div class="ticketItemStatus">🞮</div>');
                             break;
                     }
                 }
 
-                echo('<div class="ticketItemNumber">' .$splitString. '</div>');
+                echo('<div class="ticketItemNumber">' .$splitString. '</div>
+                    <div class="ticketItemText">' .$menuItem['title']. "</div>");
                 if (is_null($ticketItem['overridePrice'])) {
                     echo('<div class="ticketItemPrice">' .currencyFormat($ticketItem['calcTicketItemPrice']). '</div>');
                 }
                 else {
                     echo('<div class="ticketItemPrice">' .currencyFormat($ticketItem['calcTicketItemPrice']). '</div>');
                     echo('<div class="ticketItemOverrideNote">' .$ticketItem['overrideNote']. '</div>');
-                    /*
-                    echo('<div class="ticketItemOverridePrice">');
-                    if ($ticketItem['overridePrice'] < 0) {
-                        // discount applied
-                        //echo("$ticketItem['overridePrice']");
-                        echo("Discount");
-                    }
-                    elseif ( $ticketItem['overridePrice'] >= 1 ) {
-                         // price set to a value
-                         //echo($ticketItem['overridePrice']);
-                         echo("price Change");
-                    }
-                    elseif ( $ticketItem['overridePrice'] == 0 ) {
-                        // free
-                        echo('Free');
-                    }
-                    else {
-                        // percent discount applied
-                       echo(($ticketItem['overridePrice'] * 100) ."% off");
-                    }
-                    echo('</div>');
-                    */
                 }
                 if (!is_null($ticketItem['modificationNotes'])) {
                     $mods = explode(",", $ticketItem['modificationNotes']);
-                    $currentModIndex = -1;
+                    $currentModIndex = - 1;
                     $i = 2;
                     for ($i = 2; $i < sizeof($mods); $i+=3) {
                         $modQuickCode = $mods[$i-2];
@@ -570,18 +534,20 @@
                         }
                         if (mysqli_num_rows($modItemRecord) == 0) {
                             // deleted mod. Treat as custom mod.
-                            echo('<div class="modCustom overlined">DELETED MOD: ID=' .$modQuickCode. $displayTextSuffix. '</div>');
-                            echo('<div class="ticketItemStatus overlined"></div>');
-                            echo('<div class="ticketItemNumber overlined"></div>');
-                            echo('<div class="modPrice overlined"></div>');
+                            echo('<div class="modCustom">DELETED MOD: ID=' .$modQuickCode. $displayTextSuffix. '</div>');
                         }
                         else {
                             $modItem = $modItemRecord->fetch_assoc();
-                            echo('<div class="modText overlined">' .$modItem['title']. $displayTextSuffix. '</div>');
-                            echo('<div class="ticketItemStatus overlined"></div>');
-                            echo('<div class="ticketItemNumber overlined"></div>');
+                            
+                            if (strpos(' ' . $modItem['title'], '.') == 1) {
+                                echo("<div class='modText'>" . substr($modItem['title'],  strpos($modItem['title'], ' ') + 1) . "</div>");
+                            }
+                            else {
+                                echo('<div class="modText">' .$modItem['title']. $displayTextSuffix. '</div>');
+                            }
+
                             if (!is_null($mods[$i]) && $mods[$i] != "" ) {
-                                echo('<div class="modPrice overlined">');
+                                echo('<div class="modPrice">');
 
                                 //calculate the mod price
                                 $ticketId = $ticketItem['id'];
@@ -601,19 +567,13 @@
                                 }
                                 echo("</div>");   
                             }
-                            else {
-                                echo('<div class="modPrice overlined"></div>');
-                            }
 
                         }
                         $currentModIndex = $i;
                         $applyTopBorder = true;
                     }
                     if ($currentModIndex < sizeof($mods) - 1) {
-                        echo('<div class="modCustom overlined">' .($mods[$currentModIndex + 1]). '</div>');
-                        echo('<div class="ticketItemStatus overlined"></div>');
-                        echo('<div class="ticketItemNumber overlined"></div>');
-                        echo('<div class="modPrice overlined"></div>');
+                        echo('<div class="modCustom">' .($mods[$currentModIndex + 1]). '</div>');
                     }
                 }
 

@@ -13,6 +13,10 @@
     margin-inline: .5rem;
 }
 
+.menuCategory > .Div {
+    margin-right: 2rem;
+}
+
 .modOptionLegend {
     font-size: 1.25rem;
     font-weight: bold;
@@ -43,6 +47,8 @@
 .modOptionDiv {
     margin-left: 2rem;
 }
+
+
 
 form {
     width: 95%;
