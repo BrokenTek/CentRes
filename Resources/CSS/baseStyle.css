@@ -1,0 +1,299 @@
+html {
+	font-family: Helvetica;
+  user-select: none;
+  background-color: black;
+}
+
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+
+
+  #sessionHeader {
+    display: grid;
+    background-image: linear-gradient(black, #333, black);
+    
+    color: white;
+    grid-template-areas: "logo title viewText cboViewer . sessionDetails managementNavigation btnLogout";
+    grid-template-columns: min-content 1fr min-content min-content 1fr min-content min-content min-content;
+    grid-template-rows: min-content;
+    font-weight: bold;
+    /*position: fixed;
+    top: 0;
+    width: 100%;
+    */
+  }
+
+  #sessionBarTitle {
+    grid-area: title;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-block: auto;
+    margin-left: 1.5rem;
+    color: white;
+  }
+
+  #sessionForm {
+    max-height: 100vh;
+    overflow: auto;
+  }
+
+  #lgoSession {
+    grid-area: logo;
+    margin: .25rem .25rem .25rem .25rem;
+  }
+
+  #sessionDetails {
+    grid-area: sessionDetails;
+    margin: auto;
+    padding-right: .25rem;
+  }
+
+  #managementNavigation {
+    grid-area: managementNavigation;
+    padding-right: .25rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: min-content;
+    margin-block: auto;
+  }
+
+  
+
+  #btnLogout {
+    grid-area: btnLogout;
+    min-width: 5rem;
+    
+    
+  }
+
+  select {
+    margin: .25rem .25rem .25rem .25rem;
+  }
+
+  #managementNavigationSelector {
+    font-weight: bold;
+    margin: .25rem .25rem .25rem .25rem;
+    min-width: 15rem;
+    min-height: 2rem;
+
+    
+  }
+
+  button, .button, #submitBtn {
+    background-color: #F6941D;
+    color: white;
+    font-weight: bold;
+    margin: .25rem .25rem .25rem .25rem;
+    min-width: 5rem;
+    min-height: 2rem;
+  }
+
+  *:disabled{
+    background-color: #777;
+    color: white;
+  }
+
+  *:hover:disabled, *:hover:disabled {
+    background-color: black;
+    color: white;
+  }
+
+  button:hover, .button:hover {
+    background-color: #bf1e2e;
+  }
+
+  #sessionBody {
+    background-color: black;
+    opacity: .9;
+   
+  
+  }
+
+
+
+  #loginBody{
+    display: grid;
+    grid-template-areas: ". .     ."
+                         ". login ."
+                         ". .     .";
+    grid-template-columns: 1fr 80% 1fr;
+    grid-template-rows: 1fr 80% 1fr;
+    background-color: #777;
+    background-image: url("../Images/centres-background.jpg");
+
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  
+
+  #loginContainer {
+    grid-area: login;
+    margin: auto auto auto auto;
+    background-color: #FFE699;
+    transform: scale(1.5);
+    opacity: .9;
+    box-shadow: 5px 10px 8px #444;
+    animation: fadeIn .3s;
+    animation: blur .3s;
+   
+  }
+
+  .intro {
+    animation: fadeIn .3s;
+    animation: blur .3s;
+  }
+
+  form {
+    background-color: #FFE699;
+  }
+
+  @keyframes fadeIn {
+    0% { opacity: 0; scale: .7; }
+    80% { opacity: .25; scale: .9;}
+    90% { opacity: .5; scale: .95; }
+    100% { opacity: .75; scale: 1;}
+  }
+
+  
+
+  @keyframes blur {
+    0% { filter: blur(.75rem); }
+    50% { filter: blur(.25rem); }
+    90% { filter: blur(.125rem); }
+    100% { filter: blur(0);}
+  }
+
+  #sessionForm {
+    display: grid;
+    
+    
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content 1fr;
+    
+    margin: auto;
+    animation: blur .4s;
+    background-color: #777;
+    background-image: url("../Images/centres-background.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  
+ 
+
+#loginForm {
+  margin: 1rem 1rem 1rem 1rem;
+}
+  
+  #loginHeader {
+    display: grid;
+    background-color: #333;
+    color: white;
+    grid-template-areas: "logo title";
+    grid-template-columns: min-content min-content;
+    grid-template-rows: min-content;
+    font-weight: bold;
+    padding: .25rem .25rem .25rem .25rem;
+  }
+
+  #loginTitle {
+    margin-block: auto;
+  }
+
+
+  legend {
+    color: white;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+fieldset {
+  border: none;
+}
+table {
+    border: 2px solid white;
+    border-collapse: collapse;
+    color: white;
+}
+th {
+  border-bottom: .0625rem solid white;
+}
+ td, th {
+    border-left: .0625rem solid white;
+    border-right: .0625rem solid white;
+ }
+  tr.selected {
+    background-color: #bf1e2e;
+    color: white;
+  }
+
+  #modEditorContainer.active {
+    animation: fadeIn 1s 0s backwards;
+    }
+
+  .apperaing {
+    animation: fadeIn 2s 0s forwards;
+  }
+
+    #modEditorContainer > form {
+    background-color: transparent;
+    }
+
+    .toggled {
+      animation: toggleAnimate 1.5s 0s ease forwards;
+    }
+
+    
+
+    @keyframes fadeOut {
+    0% { opacity: 1; z-index: 2;}
+    100% { opacity: 0; z-index: -1;}
+    }
+
+    @keyframes fadeIn {
+    0% { opacity: 0;}
+    100% { opacity: 1;}
+    }
+
+    @keyframes highlightFlash {
+      0% { background-color: revert; transform: scale(1);}
+      50% { background-color: #bf1e2e; transform: scale(.9); }
+      100% { background-color: revert; transform: scale(1);}
+    }
+
+      @keyframes toggleAnimate {
+        0% { background-color: #F6941D; transform: scale(1); border-radius: 0;}
+        50% { background-color: #42280e; transform: scale(.9); border-radius: 1rem; }
+        100% { background-color: #42280e; transform: scale(1); border-radius: 0;}
+        }
+
+    .message {
+      background-color: black;
+      color: white;
+      border: 3px solid white;
+      padding: .5rem .5rem .5rem .5rem;
+    }
+
+    .ticketForm {
+      background-color: black;
+    }
+
+    .ticketItem {
+      background-color: #FFE699;
+    }
+
+    .highlighted {
+      animation: highlightFlash .5s ease-in-out 2 backwards;
+    }
+
+
+
+
+  
+  

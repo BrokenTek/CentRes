@@ -1,0 +1,171 @@
+
+		
+		/* =============================================
+		    REQUIRED CSS TO PROPERLY LAYOUT SERVER VIEW
+			============================================= */
+		
+
+		#sessionBody {
+			display: grid;
+			grid-template-areas: "serverViewHeader serverViewHeader serverViewHeader"
+								 "menuTitle        blank            ticketHeader"
+		                         "menu             blank            ticketAndOptions"
+							     "empty            blank            ticketFooter";
+			grid-template-columns: 40fr 1rem 60fr;
+			grid-template-rows: min-content min-content 1fr min-content;
+			grid-auto-rows: min-content;
+         }
+
+		 #alertWrapper {
+			position: absolute;
+		 }
+
+		 #alertDiv.visible {
+			position: absolute;
+			display: grid;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			grid-template-rows: 1fr max-content 1fr;
+			grid-template-columns: 1fr max-content 1fr;
+			background-color: black;
+			opacity: 90%;
+			z-index: 1;
+		 }
+		 #alertDiv {
+			display: none;
+		 }
+
+		 #alertBox {
+			font-size: 24px; /* Increase the font size */
+			font-weight: bold; /* Make the text bold */
+			grid-row: 2;
+			grid-column: 2;
+			background-color: black;
+			color: white;
+			border: .125rem solid #777;
+			padding: 1rem;
+		}
+
+		#alertDiv.visible > #alertBox {
+			animation: alertAppear .5s ease-in-out 1 backwards;
+			display: grid;
+			grid-auto-rows: min-content;
+			grid-template-columns: max-content;
+		}
+
+		#alertDiv.visible > #alertBox > div {
+			margin-inline: auto;
+			padding-bottom: 2rem;
+		}
+
+		#alertMessage {
+			margin-inline: auto;
+		}
+
+		@keyframes alertAppear {
+			0% { transform: scale(.9);}
+			50% { transform: scale(1.1); }
+			100% { transform: scale(1);}
+		}
+
+		 .button-container {
+			margin-top: auto;
+			margin-right: 10px;
+			display: flex;
+			justify-content: flex-end;
+			align-items: flex-end;
+		  }
+		  
+		  .button {
+			margin-top: 10px;
+			margin-right: 10px;
+		  }
+
+		 #sessionForm {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+		 }
+		 
+
+		 #serverViewHeader {
+			 grid-area: serverViewHeader;
+			 display: grid;
+			 grid-template-columns: min-content 1fr min-content 1fr min-content;
+			 grid-template-rows: min-content;
+			grid-template-areas: "cboTable . cboSeat . headerButtonGroup";
+		 }
+		 
+		 #cboTable { 
+			grid-area: cboTable;
+		 }
+		 #cboSeat { 
+			grid-area: cboSeat;	
+		 }
+		 #headerButtonGroup {
+			 grid-area: headerButtonGroup;
+			 display: grid;
+			 grid-template-columns: 1fr 1fr 1fr 1fr;
+			 grid-template-rows: min-content;
+		 }
+
+		 #ticketContainer {
+			 grid-area: ticketAndOptions;
+			 overflow-y: auto;
+			 display: grid;
+			 grid-template-columns: 1fr;
+			 grid-auto-rows: min-content;
+			height: 100%;
+			min-height: 70vh;
+			width: 100%;	 
+		 }
+		 #menuContainer {
+			grid-area: menu;
+			 overflow-y: auto;
+			 display: grid;
+			 grid-template-columns: 1fr;
+			 grid-auto-rows: min-content;
+			height: 100%;
+			min-height: 70vh;
+			width: 100%;
+		 }
+		 #modEditorContainer {
+			 grid-area: ticketAndOptions;
+			 overflow: auto;
+			 display: grid;
+			 grid-template-columns: 1fr;
+			 grid-auto-rows: min-content;
+			 display: none;	
+		 }
+		 #modEditorContainer.active {
+			display: initial;
+			z-index: 2;
+		 }
+
+		 #menuTitle {
+			 grid-area: menuTitle;
+			 font-size: 2rem;
+			font-weight: bold;
+		 }
+	
+		 #ticketHeader {
+			 grid-area: ticketHeader;
+			 display: grid;
+			 grid-template-areas: "ticketHeaderText . cboSeat cboSplit";
+			 grid-template-columns: min-content 1fr min-content min-content;
+		 }
+		 #ticketHeaderText {
+			 grid-area: ticketHeaderText;
+		 }
+		 #cboSplit {
+			 grid-area: cboSplit;
+		 }
+		 #ticketFooter {
+			 grid-area: ticketFooter;
+			 display: grid;
+			 grid-template-columns:  1fr min-content min-content min-content min-content min-content;
+		 }

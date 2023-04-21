@@ -1,0 +1,63 @@
+ .menuItem:hover {
+	font-weight: bold;
+	font-size: 1.125rem;
+	background-image: linear-gradient(to right, #F6941D , transparent);
+	line-height: 2rem;
+}
+summary {
+	background-color: #bf1e2e;
+	color: white;
+	border: 2px solid white;
+	min-height: 2rem;
+	margin-block: auto;
+}
+
+details > details {
+	padding-left: 2rem;
+}
+
+details > .menuItem {
+	margin-left: 2rem;
+}
+
+
+.selected {
+	background-color: #8EA9DB;
+}
+
+summary {
+	
+	font-weight: bold;
+}
+
+.menuItem {
+	display: grid;
+	background-color: transparent;
+	grid-template-columns: 5rem 1fr;	
+}
+
+.detached {
+	background-color: #777;
+	color: white;
+}
+
+
+* {
+	
+    
+    font-size: 1.25rem;
+}
+
+details > summary > details {
+	border-top: 3px solid black;
+}
+
+.updated, updated * {
+	animation: updateFlash .5s ease-in-out 2 backwards;
+}
+
+@keyframes updateFlash {
+	0% { background-color: revert; color: revert;}
+	50% { background-color: #000; color: #fff;}
+	100% { background-color: revert; color: revert;}
+  }

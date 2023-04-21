@@ -1,0 +1,50 @@
+.table {
+    opacity: .4;
+}
+
+.highlighted{
+    stroke:#bf1e2e;
+    animation: highlighted_animation 3s linear infinite;
+}
+.selected{
+    opacity: 1;
+    stroke-width: 5px;
+}
+
+
+.multiSelect{
+    stroke-width: 12px;
+}
+.unassigned{
+    fill: beige;
+    color: beige;
+}
+.open{
+    /* can't think of a better ready-to-go color than a shade of green, notify Donovan if it clashes too much*/
+    fill:yellowgreen;
+    color: yellowgreen;
+}
+.seated{
+    fill: #F6941D;
+    color: #F6941D
+}
+.bussing{
+    fill: #FFE699;
+    color: #FFE699;
+}
+.disabled{
+    fill: gray;
+    color: gray;
+}
+
+
+
+@keyframes highlighted_animation {
+    0%, 100% {
+        stroke-width: 0px; 
+    }
+    
+    30%, 70% {
+        stroke-width: 5px;
+    }
+}
