@@ -52,7 +52,7 @@
             document.inactivateTicketGroups = document.activateTicketGroups;
 
             function ticketItemPressed(){
-                dispatchJSONeventCall("toggleTicketItemStatus", {"ticketItemNumber": this.id});   
+                varSet("ticketItemNumber", this.id, "activeTicketGroupConnector", true)   
             }
 
             function closeButtonPressed(event) {

@@ -10,10 +10,6 @@
     
         <script>
             function allElementsLoaded () { }
-
-            document.toggleTicketItemStatus = function(event) {
-                varSet("ticketItemNumber",this.ticketItemNumber, null, true);
-            }
         </script>
     </head>
     <body id="sessionForm" onload="allElementsLoaded()">

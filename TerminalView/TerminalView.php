@@ -14,12 +14,8 @@
                 background-image: none;
             }
             #frmBOH {
-                postion: absolute;
+                position: absolute;
                 inset: 0;
-                display-grid:
-                grid-auto-columns: min-content;
-                grid-template-rows: min-content;
-                grid-gap: 4rem;
                 background-color: transparent;
                 height: 100%;
             }
