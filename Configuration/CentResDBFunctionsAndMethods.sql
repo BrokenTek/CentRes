@@ -103,6 +103,7 @@ BEGIN
 	TRUNCATE TABLE Splits;
 	TRUNCATE TABLE TicketItems;
 	TRUNCATE TABLE TableAssignments;
+	TRUNCATE TABLE TableLog;
 
 	UPDATE Config set businessDay = NOW();
 END;
