@@ -37,7 +37,9 @@
     border: 2px solid white;
 }
 
-/* .overlined {
-   border-top: 1px solid white;
-} */
-
+.removed.selected {
+   background-color: #bf1e2e;
+}
+.removed.selected.multiselect {
+   background-color: #73121c;
+}

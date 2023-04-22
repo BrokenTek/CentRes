@@ -28,6 +28,12 @@
 
             // ================ ON LOAD FUNCTIONS =========================
             function loaded() {
+                // if a manager is logged in here, allow them to select/remove items in the ticket
+                if (ROLE & 8) {
+                    varSet("isManager", "true","ticketContainer");
+                    updateDisplay("ticketContainer");
+                }
+                
                 cboTable = document.getElementById("cboTable");
                 cboSeat = document.getElementById("cboSeat");
                 cboSplit = document.getElementById("cboSplit");
@@ -68,16 +74,18 @@
 
                 ignoreUpdates = false;
 
-                document.querySelector("#btnHideMessage").addEventListener('click', function() {
-                    document.querySelector("#alertDiv").classList.remove('visible');
-                    recAddedTables = [];
-                    recRemovedTables = [];
-                }); 
+                document.querySelector("#btnHideMessage").addEventListener('click', hideAlertMsg);
                 
                 setTitle("CentRes POS: Server Window", "Server Window");
 
             }
             addEventListener("load", loaded);
+
+            function hideAlertMsg() {
+                document.querySelector("#alertDiv").classList.remove('visible');
+                recAddedTables = [];
+                recRemovedTables = [];
+            }
             
             // ================ MAIN EVENT LOOP =========================
             var updateLoopTimer;
@@ -92,9 +100,20 @@
             function updateLoop() {
                 stopUpdateLoopTimer();
 
-                if (varExists("staticTableId") && varGetOnce("ticketRemoved","ticketContainer") !== undefined) {
-                    alert("Ticket " + varGet("ticket", "ticketContainer") + " is not longer assigned to this table!\nRedirecting back to Host View.");
-                    location.replace(document.getElementById("mgrNavHostView").getAttribute("value"));
+                try {
+                    if (varExists("staticTableId") && varGetOnce("ticketRemoved","ticketContainer") !== undefined) {
+                        with (document.querySelector("#btnHideMessage")) {
+                            removeEventListener('click', hideAlertMsg);
+                            addEventListener('click', function() {
+                                location.replace(document.getElementById("mgrNavHostView").getAttribute("value"));
+                            });  
+                        } 
+                        showAlertDiv("Ticket " + varGet("ticket", "ticketContainer") + " is no longer assigned to this table!<br>Redirecting back to Host View.");
+                        return;
+                    }
+                }
+                catch (err) {  
+                    startUpdateLoopTimer();
                 }
             
                

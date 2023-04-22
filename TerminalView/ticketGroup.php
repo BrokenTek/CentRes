@@ -52,6 +52,9 @@
             document.inactivateTicketGroups = document.activateTicketGroups;
 
             function ticketItemPressed(){
+                if (this.classList.contains("removed") || this.classList.contains("hidden")) {
+                    return;
+                }
                 varSet("ticketItemNumber", this.id, "activeTicketGroupConnector", true)   
             }
 
@@ -84,17 +87,15 @@
                     }
                 ?>
                 <div id='descriptors'>
-                    <?php if (isset($timeSubmitted)): ?>
-                        <div id="lblSubmitted">Submitted:</div><div id="valSubmitted"><?php echo substr($timeSubmitted,11,5)?></div>                                  
-                    <?php else: ?>
-                        <button id="btnClose" type="button" onpointerdown="closeButtonPressed()">Close</button>
-                    <?php endif; ?>
+                    <div id="lblSubmitted">Submitted:</div><div id="valSubmitted"><?php echo substr($timeSubmitted,11,5)?></div>
+                    <button id="btnClose" type="button" onpointerdown="closeButtonPressed()" style="display: none;">Close</button> 
                     <div id="lblGroupId">Ticket-Group:</div><div id="valGroupId"><?php echo $_POST['ticketGroupId']; ?></div>
                     <div id="lblRoute">Route:</div><div id="valRoute"><?php echo $_POST['route']; ?></div>
                     <div id="lblTableId">Table:</div><div id=valTableId><?php echo $currentTable; ?></div>
                 </div>
                 <div class='ticketItems'>
                 <?php
+                    $closeable = true;
                     while($ticketItem = $itemList->fetch_assoc()){
                         $itemState = connection()->query("SELECT ticketItemStatus(".$ticketItem['id'].") AS status;")->fetch_assoc()['status'];
                         $itemClass = 'ticketItem';
@@ -108,19 +109,17 @@
                                 $itemClass.=" ready";
                                 $readyChar = '✔';
                                 break;
-
-                            case "Removed":
-                                $itemClass.=" removed";
-                                break;
                             case "Updated":
                                 $itemClass.=" updated";
+                            case "Preparing":
+                                $closeable = false;
+                                break;
+                            case "Removed":
+                                $itemClass.=" removed";
                                 break;
                             case "Hidden":
                                 $itemClass.=" hidden";
                                 break;
-                        }
-                        if($ticketItem['flag'] == "updated"){
-                            $itemClass.=" updated";
                         }
                         
                         echo("<div name='ticketItem' id='".$ticketItem['id']."' class ='".$itemClass."'><p>".$readyChar.$ticketItem['itemName']."</p>");
@@ -159,6 +158,15 @@
                         }
                         echo("</div>");
                     } 
+                    if ($closeable) {
+                        echo("
+                            <script>
+                                document.querySelector('#btnClose').removeAttribute('style');
+                                document.querySelector('#lblSubmitted').setAttribute('style', 'display: none;');
+                                document.querySelector('#valSubmitted').setAttribute('style', 'display: none;');
+                            </script>
+                        ");
+                    }
                 ?>
                 </div>
             <?php endif; ?>

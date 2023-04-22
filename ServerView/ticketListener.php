@@ -34,9 +34,7 @@
                         $_POST['tableId'] = $result['tableId'];
                     }
                     else {
-                        if (isset($_POST['tableId'])) {
-                            $_POST['ticketRemoved'] = "yes";
-                        }
+                        $_POST['ticketRemoved'] = "yes";
                         unset($_POST['tableId']);
                     }
                      

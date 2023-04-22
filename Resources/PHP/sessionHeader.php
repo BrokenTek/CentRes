@@ -106,11 +106,11 @@
         echo("<div id='managementNavigation'>
                 <select name='mgrNavDest' id='managementNavigationSelector' onchange='navigateAway()'>
                     <option value=''>Navigate To</option>
-                    <option name='mgrNavHostView' value='../HostView/HostView.php'>Host&nbsp;View</option>
-                    <option name='mgrNavIPW' value = '../ManagerView/InventoryPopularityWindow.php'>Inventory/Popularity&nbsp;Window</option>
-                    <option name='mgrNavEmpRoster' value='../ManagerView/EmployeeRoster.php'>Employee&nbsp;Roster</option>
-                    <option name='mgrNavMenuEditor' value='../ManagerView/MenuEditor.php'>Menu&nbsp;Editor</option>
-                    <option name='mgrNavMenuEditor' class='critical' value='../ManagerView/CloseBusinessDay.php'>Close&nbsp;Business&nbsp;Day</option>
+                    <option id='mgrNavHostView' value='../HostView/HostView.php'>Host&nbsp;View</option>
+                    <option id='mgrNavIPW' value = '../ManagerView/InventoryPopularityWindow.php'>Inventory/Popularity&nbsp;Window</option>
+                    <option id='mgrNavEmpRoster' value='../ManagerView/EmployeeRoster.php'>Employee&nbsp;Roster</option>
+                    <option id='mgrNavMenuEditor' value='../ManagerView/MenuEditor.php'>Menu&nbsp;Editor</option>
+                    <option id='mgrNavMenuEditor' class='critical' value='../ManagerView/CloseBusinessDay.php'>Close&nbsp;Business&nbsp;Day</option>
                 </select>
             </div>
         ");

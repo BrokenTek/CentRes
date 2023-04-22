@@ -43,6 +43,10 @@
             .error {
                 color: #F6941D;
             }
+            fieldset {
+                margin-inline: auto;
+                margin-block: 1rem;
+            }
         </style>
     </head>
     <body id="sessionForm" onload="allElementsLoaded()">
@@ -50,38 +54,52 @@
         <form id="frmCloseBusinessDay" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <?php require_once "../Resources/PHP/sessionHeader.php"; ?>
             <div id="content">
-            <?php if (isset($_POST['confirmClose'])): ?>
-                <?php
-                    $loc = realpath('../BusinessDays');
-                    if (strpos($loc, "//") > 0) {
-                        $loc .= "/";
-                    }
-                    else {
-                        $loc .= "\\\\";
-                    }
-                    $loc = str_replace($loc, "\\", "\\\\");
-                    $sql = "CALL closeBusinessDay('$loc');";
-                    try {
-                        $result = connection()->query($sql);
-                        echo("<h1>The business day has been closed</h1>");
-                        echo("<h2>Ticket information with financial data<br>saved to file.</h2>");
-                    }
-                    catch (Exception $e) {
-                        echo("<h1 class='error'>An error has occured closing the business day!</h1>");
-                        echo("<h1 class='error'>" .$e->getMessage(). "</h1>");
-                        echo("<h2>Has this operation already been performed today?</h2>");
-                    }
-                ?>
-            <?php else: ?>
                 <fieldset>
-                    <legend>
-                    Are you sure you want to close this business day?
-                    <br>
-                    This action can only be performed once per day!
-                    </legend>
-                    <input type="submit" class="button" name="confirmClose" value="Close Business Day">
-                </fieldset>
-            <?php endif; ?>
+                    <?php
+                        $sql = "SELECT businessDay FROM Config;";
+                        $businessDay = connection()->query($sql)->fetch_assoc()['businessDay'];
+                    ?>
+                    <?php if (isset($_POST['confirmClose'])): ?>
+                        <?php
+                            $loc = realpath('../BusinessDays');
+                            if (strpos($loc, "//") > 0) {
+                                $loc .= "/";
+                            }
+                            else {
+                                $loc .= "\\\\";
+                            }
+                            $loc = str_replace($loc, "\\", "\\\\");
+                            $sql = "CALL closeBusinessDay('$loc');";
+                            try {
+                                $result = connection()->query($sql);
+
+                                // log all employees out except for yourself if you were successfully able to close
+                                // the business day.
+                                $sql = "UPDATE Employees SET accessToken = NULL, accessTokenExpiration  = NULL WHERE id <> " .$GLOBALS['userId']. ";";
+                                $result = connection()->query($sql);
+                                $sql = "DELETE FROM ActiveEmployees WHERE employeeId <> " .$GLOBALS['userId']. ";";
+                                $result = connection()->query($sql);
+
+                                echo("<h1>The business day for $businessDay been closed</h1>");
+                                echo("<hr><h2>Ticket information with financial data<br>saved to file.</h2>");
+                                echo("<h2>Any active employees have been logged out.</h2>");
+                            }
+                            catch (Exception $e) {
+                                echo("<h1 class='error'>An error has occured closing the business day for $businessDay!</h1>");
+                                echo("<h1 class='error'>" .$e->getMessage(). "</h1>");
+                                echo("<h2>Has this operation already been performed today?</h2>");
+                            }
+                        ?>
+                    <?php else: ?>
+                        <fieldset>
+                            <legend>
+                            Are you sure you want to close the business day for <?php echo($businessDay); ?>?
+                            <br>
+                            This action can only be performed once per calendar date!
+                            </legend>
+                            <input type="submit" class="button" name="confirmClose" value="Close Business Day">
+                    <?php endif; ?>
+                </fieldset>    
             </div>
         </form>
     </body>

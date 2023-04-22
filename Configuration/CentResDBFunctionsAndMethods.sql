@@ -774,6 +774,10 @@ BEGIN
 		SELECT route into rte FROM MenuItems WHERE quickCode = menItm;
 		IF (rte IS NULL) THEN
 			RETURN 'n/a';
+		ELSEIF (flg = 'Removed') THEN
+			RETURN 'Removed';
+		ELSEIF (flg = 'Hidden') THEN
+			RETURN 'Hidden';
 		ELSEIF (del IS NOT NULL) THEN
 			RETURN 'Delivered';
 		ELSEIF (red IS NOT NULL) THEN
@@ -941,7 +945,7 @@ BEGIN
 		VALUES (targetTableID, 'remove', ticketNumber);
 END;
 
-CREATE PROCEDURE removeTicketItem(IN ticketItemNumber INT UNSIGNED)
+CREATE PROCEDURE removeTicketItem(IN ticketItemNumber INT UNSIGNED, IN skipRemovedState BOOLEAN)
 BEGIN
 	DECLARE stat VARCHAR(20);
 	DECLARE qc VARCHAR(40);
@@ -955,13 +959,22 @@ BEGIN
 	SELECT menuItemQuickCode, ticketId, splitFlag, groupId INTO qc, tickNum, splitFlg, tickGrp FROM TicketItems WHERE id = ticketItemNumber;
 	SELECT LOG(2, splitFlg) INTO split;
 	SELECT quantity INTO qty FROM MenuItems WHERE quickCode = qc;
-	IF (stat IN ('Ready', 'Delivered', 'Hidden')) THEN
+	IF (stat IN ('Hidden')) THEN
 		-- Hidden is a subcategory of Delivered. The manager hides the item from the ticket and price ignored.
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'Ready/Delivered Ticket Items Cannot Be Removed!';
-	ELSEIF (stat IN ('Updated', 'Preparing', 'Removed')) THEN
-		UPDATE TicketItems SET flag = 'Removed' WHERE id = ticketItemNumber;
+		SET MESSAGE_TEXT = 'Item Has Already Been Removed!';
+	ELSEIF (stat IN ('Updated', 'Preparing')) THEN
+		IF (skipRemovedState = 1) THEN
+			UPDATE TicketItems SET flag = 'Hidden' WHERE id = ticketItemNumber;
+		ELSE
+			UPDATE TicketItems SET flag = 'Removed' WHERE id = ticketItemNumber;
+		END IF;
 		CALL updateTicketGroup(tickGrp, 2);
+		CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
+	ELSEIF (stat IN ('Removed', 'Ready', 'Delivered')) THEN
+		UPDATE TicketItems SET flag = 'Hidden' WHERE id = ticketItemNumber;
+		CALL updateTicketGroup(tickGrp, 2);
+		CALL updateTicketSplitsTimeStamp(tickNum, splitFlg);
 	ELSE		
 		-- delete the actual ticket item
 		DELETE FROM TicketItems WHERE id = ticketItemNumber;

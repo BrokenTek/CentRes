@@ -63,22 +63,17 @@
 				varSet("showAllTables", "Yes", "serverListener");
 				varSet("authorizationId", USER_ID, "ifrSelectedTable");
 				if ((ROLE & 8) == 8) {
-                	varSet("authorizationId", USER_ID, "ifrRestaurantLayout");
-					verifyAuthProcessed = true;
+					authorizationId = USER_ID;
             	}
 				setTitle("CentRes POS: Host Station", "Host Station");
 				startEventLoopTimer();
 			}
 			
-			var verifyAuthProcessed = false;
+			var authorizationId = undefined;
 			var eventLoopTimer;
 			function eventLoop() {
 				try {
-					if (verifyAuthProcessed && !varExists("authorizationId", "ifrRestaurantLayout")) {
-						setTimeout(eventLoop, 250);
-					}
-					verifyAuthProcessed = false;
-					
+					varSet("authorizationId", authorizationId, "ifrRestaurantLayout");	
 					varCpyRen("goToTable", "ifrRestaurantLayout", "staticTableId", null, true);
 					
 					if (varCpy("employeeId", "ifrServerList", "serverListener", true, true));

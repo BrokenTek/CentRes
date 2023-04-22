@@ -128,9 +128,7 @@
     function setState() {
         // this will set variables to control the state of the buttons on the serverView
         var enabledButtons = "";
-        //DEBUG: add any other non-closeable ticket item states to this if statement.
-        //can't check for a null delivery time as some items may be removed during preparation
-        //which would prevent the ticket from closing in that case.
+
         if(varGet('ticket')&&document.querySelectorAll(".pending").length == 0 && document.querySelectorAll(".ready").length == 0 
            && document.querySelectorAll(".updated").length == 0 && document.querySelectorAll(".preparing").length == 0){
             enabledButtons += ",Close";
@@ -168,7 +166,8 @@
     var longTouchEnabled = false;
     var longTouchTimer = null;
 	function pointerDown() {
-        if (this === undefined || this.classList.contains('disabled')) { return; }
+        if (this === undefined || (this.classList.contains('disabled')) && !varExists("isManager")) { return; }
+        
         if (this.classList.contains("selected")) {
             this.classList.remove("selected", "multiselect");
             let items = document.getElementsByClassName("ticketItem");
@@ -330,7 +329,12 @@
                                                                    .$_POST['authorizationUsername']. "');";
                         }
                         elseif ($_POST['command'] == 'remove') {
-                            $sql = "CALL removeTicketItem(" .$ticketItem. ");";
+                            if (isset($_POST['isManager'])) {
+                                $sql = "CALL removeTicketItem(" .$ticketItem. ", 1);";
+                            }
+                            else {
+                                $sql = "CALL removeTicketItem(" .$ticketItem. ", 0);";
+                            }
                             
                         }
                         elseif ($_POST['command'] == 'moveToSeat') {
@@ -422,6 +426,10 @@
             while($ticketItem = $ticketItems->fetch_assoc()) {
                 $sql = "SELECT ticketItemStatus(" .$ticketItem['id']. ") as status;";
                 $status = connection()->query($sql)->fetch_assoc()['status'];
+
+                if ($status == "Hidden") {
+                    continue;
+                }
                 
                 $sql = "SELECT * FROM menuItems WHERE quickCode = '" .$ticketItem['menuItemQuickCode']. "'";
                 $menuItem = connection()->query($sql)->fetch_assoc();
@@ -459,11 +467,21 @@
                             echo('<div class="ticketItemStatus"></div>');
                             break;
                         case "Delivered":
-                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' delivered' .$selectedFlag. '">');
+                            if (isset($_POST['isManager'])) {
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' delivered removable' .$selectedFlag. '">');
+                            }
+                            else {
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' delivered' .$selectedFlag. '">');
+                            }
                             echo('<div class="ticketItemStatus">✔✔</div>');
                             break;
                         case "Ready":
-                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' ready' .$selectedFlag. '">');
+                            if (isset($_POST['isManager'])) {
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' ready removable' .$selectedFlag. '">');
+                            }
+                            else {
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem unpaid' .$moveable. ' ready' .$selectedFlag. '">');
+                            }
                             echo('<div class="ticketItemStatus">✔</div>');
                             break;
                         case "Pending":
@@ -499,7 +517,12 @@
                             }
                             break;
                         case "Removed":
-                            echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem disabled unpaid removed' .$selectedFlag. '" disabled>');
+                            if (isset($_POST['isManager'])) {
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem disabled unpaid removed removable' .$selectedFlag. '" disabled>');
+                            }
+                            else {
+                                echo('<div id="ticketItem' .$ticketItem['id']. '" class="ticketItem disabled unpaid removed' .$selectedFlag. '" disabled>');
+                            }
                             echo('<div class="ticketItemStatus">🞮</div>');
                             break;
                         case "Hidden":
