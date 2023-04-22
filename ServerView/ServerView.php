@@ -110,11 +110,14 @@
                     try {
                         if (varExists("selectedMenuItem", "menuContainer")) {
                             if (cboSeat.selectedIndex == 0 || cboSplit.selectedIndex == 0) {
-                                ticketContainer.contentWindow.document.getElementById("ticketHeader").classList.add("highlighted");
-                                setTimeout(() => {
-                                ticketContainer.contentWindow.document.getElementById("ticketHeader").classList.remove("highlighted");
-                            }, 1100);
-                            varRem("selectedMenuItem", "menuContainer");
+                                varRem("selectedMenuItem", "menuContainer");
+                                with ( ticketContainer.contentWindow.document.getElementById("ticketHeader")) {
+                                    classList.add("highlighted");
+                                    scrollIntoView(true)
+;                                    setTimeout(() => {
+                                        classList.remove("highlighted");
+                                    }, 1100);
+                                }                            
                             }
                         }
                     }

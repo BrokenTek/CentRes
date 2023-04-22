@@ -26,7 +26,7 @@
     }
     </style>
     <script src="../Resources/JavaScript/display.js" type="text/javascript"></script>
-    <script src="../Resources/JavaScript/SvgManipulation.js"></script>
+    <script src="../Resources/JavaScript/svgManipulation.js"></script>
 
     <script>
         function allElementsLoaded() {

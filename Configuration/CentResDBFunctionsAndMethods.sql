@@ -103,6 +103,8 @@ BEGIN
 	TRUNCATE TABLE Splits;
 	TRUNCATE TABLE TicketItems;
 	TRUNCATE TABLE TableAssignments;
+
+	UPDATE Config set businessDay = NOW();
 END;
 
 CREATE FUNCTION menuObjectTitleUnique(objTitle VARCHAR(75)) RETURNS BOOLEAN
