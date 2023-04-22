@@ -3,7 +3,7 @@
 <html lang='en'>
 <head>
     <meta charset='UTF-8'>
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=200">
     <link rel="stylesheet" href="../Resources/CSS/tableStyles.css">
     <style>
         .multiselect {
@@ -19,6 +19,9 @@
         .tabletest {
             opacity: 20%;
         }
+        html {
+            overflow: hidden;
+        }
 
     @keyframes goDark {
         0% {background-color: initial;}
@@ -30,7 +33,18 @@
 
     <script>
         function allElementsLoaded() {
-             //create table select listeners
+            if (!varExists("scale")) {
+                varSet("scale", window.innerWidth / 1350);
+                updateDisplay();
+            }
+            else {
+                
+            }
+
+            window.addEventListener('resize', function(event) {
+                varRem("scale");
+                updateDisplay();
+            }, true);
              var elements = document.getElementsByClassName('table');
             if (elements != null) {
                 for (var i = 0; i < elements.length; i++) {
@@ -44,8 +58,7 @@
             updateDisplay("tableStatusListener");
             updateTableStatuses();
             startListenerLoop();
-
-           
+                      
         }
 
         function highlightTables() {
@@ -246,9 +259,22 @@
 </head>
 
 <body onload="allElementsLoaded()">
-    <form>
-        
-    <svg id='parentSvg' xmlns="http://www.w3.org/2000/svg" height="100vh" width="100vw" onpointerdown="pointerDownOnNothing()">
+    <form method="POST">
+    
+    <!--
+        target dimensions 
+        min-width: 1300px;
+		min-height: 754px;
+    -->
+    <svg id='parentSvg' xmlns="http://www.w3.org/2000/svg" width="1300px" height="900px" onpointerdown="pointerDownOnNothing()"
+        <?php 
+            if (isset($_POST['scale'])) {
+                $xOffset = -(1350 - $_POST['scale'] * 1350) / (2 * $_POST['scale']);
+                $yOffset = -(754 - $_POST['scale'] * 754) / (2 * $_POST['scale']);
+                echo('transform="scale(' .$_POST['scale']. ') translate(' .$xOffset. ',' .$yOffset. ')"'); 
+            } 
+        ?> 
+    >
         <defs>
             <linearGradient id="GradientStructure">
                 <stop class="stop1" offset="0%" />
@@ -262,12 +288,10 @@
             </linearGradient>
 
             <style>
-            <![CDATA[
                 .structure { fill: url(#GradientStructure); fill-opacity: 0.20; }
                 .stop1 { stop-color: #D2D2D2; }
                 .stop2 { stop-color: #ADADAD; stop-opacity: 0; }
                 .stop3 { stop-color: #E7E7E7; }
-            ]]>
             </style>
         </defs>    
 
@@ -333,6 +357,7 @@
         
         // window.addEventListener('DOMContentLoaded', setDimensions);
     </script>
+        <?php require_once '../Resources/PHP/display.php';  ?>
     </form>
     <iframe id="tableStatusListener" src="tableStatusListener.php" style="display: none;"></iframe>
 </body>

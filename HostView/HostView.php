@@ -53,8 +53,6 @@
 
 			#ifrRestaurantLayout {
 				grid-area: ifrRestaurantLayout;
-				min-width: 1300px;
-				min-height: 754px;
 
 			}
 		</style>
