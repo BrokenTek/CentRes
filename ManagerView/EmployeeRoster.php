@@ -12,9 +12,35 @@
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/ticketStyle.css">
         <style>
+             * {
+                color: white;
+            }
+            fieldset {
+                border-radius: 1rem;
+            }
+            table {
+                margin-bottom: 2rem;
+                margin-inline: auto;
+                border-collapse: collapse;
+            }
+            th {
+                background: rgb(68,68,68);
+                background: linear-gradient(0deg, rgba(68,68,68,1) 0%, rgba(102,102,102,1) 100%);
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+            td, th {
+                padding-inline: 1rem;
+            }
+            tr + tr {
+                border-top: .125rem solid #333;
+            }
+            td {
+                padding-block: .5rem;
+            }
             #sessionForm {
-            height: 95%;
-            width: 100%;
+                height: 95%;
+                width: 100%;
 		    }
             #sessionBody {
             
@@ -30,10 +56,9 @@
             }
             #tabHeader {
                 grid-area: tabHeader;
-                font-size: 1.5rem;
+                font-size: 2rem;
                 font-weight: bold;
                 margin: 1rem auto 3rem auto;
-                border-bottom: .25rem solid white;
             }
             #employeeRoster {
                 grid-area:rosterTable;
@@ -41,6 +66,7 @@
             #modifyButtons{
                 grid-area:modifyButtons;
                 border:none;
+                margin-inline: auto;
             }
             .hidden {
                 display: none;
@@ -248,7 +274,7 @@
                     }
                 }
 
-                setTitle("CentRes POS: Management Tools - Employee Roster", "Management Tools");
+                setTitle("CentRes POS: Management Tools - Employee Account Management", "Management Tools");
             }
 
             //Place your other JavaScript Code here
@@ -259,7 +285,7 @@
         <form  id="sessionForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <?php require_once "../Resources/PHP/sessionHeader.php"; ?>
             <div id="sessionBody">
-                <div id="tabHeader">Employee Roster</div>
+                <div id="tabHeader">Employee Account Management</div>
                 <br>
                 <div id="employeeRoster">
 

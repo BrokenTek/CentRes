@@ -986,7 +986,7 @@
             
         </form>
         <div id="alertDiv">
-            <div id="alertBox">
+            <div id="alertBox" style="border-radius: 1rem;">
                 <div id="alertMessage">
                     <!-- content dynamically inserted and removed here -->
                 </div>

@@ -4,12 +4,27 @@
 	background-image: linear-gradient(to right, #F6941D , transparent);
 	line-height: 2rem;
 }
+
 summary {
 	background-color: #bf1e2e;
 	color: white;
 	border: 2px solid white;
 	min-height: 2rem;
 	margin-block: auto;
+	border-radius: 1rem;
+	padding-left: 1rem;
+	width: 90%;
+}
+.menuItem {
+	background-color: transparent !important;
+	color: white;
+	border-radius: 1rem;
+}
+form, html {
+	background-color: transparent !important;
+}
+html {
+	overflow-x: clip;
 }
 
 details > details {
@@ -19,6 +34,10 @@ details > details {
 details > .menuItem {
 	margin-left: 2rem;
 }
+
+.menuItemPrice, .menuItemTitle {
+	margin-left: 2rem;
+ }
 
 
 .selected {

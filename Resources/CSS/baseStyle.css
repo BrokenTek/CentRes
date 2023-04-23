@@ -85,11 +85,16 @@ body {
 
   button, .button, #submitBtn {
     background-color: #F6941D;
-    color: white;
+    color: white !important;
     font-weight: bold;
     margin: .25rem .25rem .25rem .25rem;
     min-width: 5rem;
     min-height: 2rem;
+  }
+
+  #managementNavigationSelector {
+    color: white !important;
+    background-color: #777 !important;
   }
 
   *:disabled{

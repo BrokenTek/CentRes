@@ -378,6 +378,19 @@
             }
 
         </script>
+        <style>
+            html, #sessionForm {
+                    background-color: transparent !important;
+                    background-image: none;
+                }
+                form {
+                    background: rgb(119,119,119);
+                    background: radial-gradient(circle, rgba(119,119,119,1) 0%, rgba(68,68,68,1) 100%);
+                    border-radius: 1rem;
+                    border: .25rem solid white;
+                    margin: auto;
+                }
+        </style>
         
     </head>
     <body id="sessionForm" onload="allElementsLoaded()" class="fadeIntro">

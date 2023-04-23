@@ -133,3 +133,10 @@ select {
     0% { opacity: 100%; }
     100% { opacity: 0%;}
 }
+
+input[type="checkbox"]:checked + label {
+    color: orange !important;
+}
+input[type="radio"]:checked + label {
+    color: orange !important;
+}

@@ -9,6 +9,24 @@
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <link rel="stylesheet" href="../Resources/CSS/ticketStyle.css">
         <style>
+            * {
+                color: white;
+            }
+            fieldset {
+                border-radius: 1rem;
+            }
+            table {
+                border-collapse: collapse;
+            }
+            th {
+                background: rgb(68,68,68);
+                background: linear-gradient(0deg, rgba(68,68,68,1) 0%, rgba(102,102,102,1) 100%);
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+            tr + tr {
+                border-top: .125rem solid #333;
+            }
             #sessionForm {
                 height: 95%;
                 width: 100%;
@@ -27,10 +45,9 @@
             }
             #tabHeader {
                 grid-area: tabHeader;
-                font-size: 1.5rem;
+                font-size: 2rem;
                 font-weight: bold;
                 margin: 1rem auto 3rem auto;
-                border-bottom: .25rem solid white;
             }
             #fstMasterResets {
                 grid-area: masterResets;
@@ -49,7 +66,7 @@
                 grid-area: tblInventory;
             }
             .conflict{
-                background-color:yellow;
+                background-color: #bf1e2e;
             }
             
             #numQty {
@@ -131,52 +148,63 @@
             function setQtyBoxState(){
                 let sameQuantity = true;
                 let anyUntracked = false;
-                let anyTracked = false;
-                let quantityToCompare = -1;
-                let itemsToCheck = varGet("selectedItem");
-                let updateInput = document.getElementById("numQty")
-                let checkBox = document.getElementById("chkQtyTracked");
-                if(itemsToCheck == null){
+                let numQtyVal = undefined;
+                let selMenuItems = document.getElementsByClassName("selected");
+                let numQty = document.getElementById("numQty");
+                let chkQtyTracked = document.getElementById("chkQtyTracked");
+                
+                if(selMenuItems.length == 0){
                     document.getElementById("chkQtyTracked").checked = false;
-                    updateInput.disabled = true;
-                    updateInput.placeholder = "None";
+                    numQty.disabled = true;
+                    numQty.placeholder = "";
                     return;
                 }
-                itemsToCheck = itemsToCheck.split(',');
-                for(let i= 0; i < itemsToCheck.length; i++){
-                    let theItem = document.getElementById(itemsToCheck[i]);
-                    if(theItem.getElementsByClassName("qty")[0].innerText==""){
-                        anyUntracked = true;
-                    }
-                    else{
-                        anyTracked = true;
-                        if(quantityToCompare == -1){
-                            quantityToCompare = parseInt(theItem.getElementsByClassName("qty")[0].innerText);
+                for(let i= 0; i < selMenuItems.length; i++){
+                    with (selMenuItems[i]) {
+                        if(getElementsByClassName("qty")[0].innerText==""){
+                            anyUntracked = true;
                         }
-                        else if(quantityToCompare != parseInt(theItem.getElementsByClassName("qty")[0].innerText)) {sameQuantity = false;}
+                        else{
+                            var thisVal = parseInt(getElementsByClassName("qty")[0].innerText);
+                            if(numQtyVal === undefined){
+                                numQtyVal = thisVal;
+                            }
+                            else if(numQtyVal != thisVal) {
+                                numQtyVal = null;
+                            }
+                        }
                     }
                 }
                 
-                document.getElementById("chkQtyTracked").checked = anyTracked;
-                if(checkBox.checked != anyTracked){
-                    checkbox.change();
+                numQty.classList.remove("conflict");
+                if (numQtyVal === undefined) {
+                    // only untracked exists
+                    chkQtyTracked.checked = false;
+                    numQty.value = null;
+                    numQty.disabled = true;
+                    numQty.placeholder = "";  
                 }
-                updateInput.disabled = !anyTracked;
-
-                if(sameQuantity&&quantityToCompare != -1){
-                    updateInput.placeholder = "qty";
-                    updateInput.value = quantityToCompare;
+                else if (numQtyVal !== undefined && anyUntracked) {
+                    // conflict
+                    chkQtyTracked.checked = true;
+                    numQty.classList.add("conflict");
+                    numQty.value = null;
+                    numQty.disabled = false;
+                    numQty.placeholder = "Tracking Conflict";
                 }
-                else{
-                    updateInput.placeholder = "Multiple";
-                }
-                if(anyUntracked){
-                    updateInput.placeholder = "Untracked";
-                    updateInput.value=null;
-                }
-                if(anyUntracked && anyTracked){
-                    updateInput.classList.add("conflict");
-                    updateInput.placeholder = "Multiple";
+                else if (numQtyVal == null) {
+                    // all tracked, multiple quantities
+                    chkQtyTracked.checked = true;
+                    numQty.value = null;
+                    numQty.disabled = false;
+                    numQty.placeholder = "Multiple Qtys";
+                } 
+                else {
+                    // all tracked with same quantities
+                    chkQtyTracked.checked = true;
+                    numQty.value = numQtyVal;
+                    numQty.disabled = false;
+                    numQty.placeholder = "";
                 }
 
             }
@@ -192,7 +220,7 @@
                         let keyToScan = varGet(keyPrefix + keyIndex);
                         for(let i = 0; i < tableHeaders.length; i++){
                             if(keyToScan.indexOf(tableHeaders[i].getAttribute("sqlColumnId"))!= -1){
-                                tableHeaders[i].innerText = String.fromCharCode(unicodeBase + keyIndex) +tableHeaders[i].innerText;
+                                tableHeaders[i].innerText = keyIndex + "\xa0" +tableHeaders[i].innerText;
                                 if(varGet(keyPrefix + keyIndex).indexOf("ASC")!=-1){
                                     tableHeaders[i].innerText = tableHeaders[i].innerText +"\u25B2";
                                 }
@@ -203,7 +231,6 @@
                         }
                         keyIndex++;
                     }
-
                 }
                               
                 
@@ -238,16 +265,16 @@
                         var numQty = document.getElementById("numQty");
                         var qtyBtn = document.getElementById("btnUpdateQty");
                         if (this.checked) {
-                            numQty.classList.remove("disabled");
+                            //numQty.classList.remove("disabled");
                             numQty.removeAttribute("disabled");   
                             if(document.getElementById("numQty").value == ''){
-                                qtyBtn.classList.add("disabled");
+                                //qtyBtn.classList.add("disabled");
                                 qtyBtn.setAttribute("disabled", true);
                             }        
                         } else {
-                            numQty.classList.add("disabled");
+                            //numQty.classList.add("disabled");
                             numQty.setAttribute("disabled", true);
-                            qtyBtn.classList.remove("disabled");
+                            //qtyBtn.classList.remove("disabled");
                             qtyBtn.removeAttribute("disabled");  
                         }
                     });
@@ -392,7 +419,7 @@
 
                     
                     
-                    $sql = "SELECT menuitems.quickCode AS id, menuitems.title AS Item, IFNULL(menucategories.title, 'None') AS Category, IFNULL(menuitems.quantity, '') AS Quantity, menuitems.requests AS Requests
+                    $sql = "SELECT menuitems.quickCode AS id, menuitems.title AS Item, menucategories.title AS Category, menuitems.quantity AS Quantity, menuitems.requests AS Requests
                     FROM ((menuitems LEFT JOIN menuassociations ON menuitems.quickCode = menuassociations.childQuickCode)
                         LEFT JOIN menucategories ON menuassociations.parentQuickCode = menucategories.quickCode)".
                     $orderKey.";";

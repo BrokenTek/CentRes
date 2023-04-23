@@ -108,9 +108,9 @@
                     <option value=''>Navigate To</option>
                     <option id='mgrNavHostView' value='../HostView/HostView.php'>Host&nbsp;View</option>
                     <option id='mgrNavIPW' value = '../ManagerView/InventoryPopularityWindow.php'>Inventory/Popularity&nbsp;Window</option>
-                    <option id='mgrNavEmpRoster' value='../ManagerView/EmployeeRoster.php'>Employee&nbsp;Roster</option>
+                    <option id='mgrNavEmpRoster' value='../ManagerView/EmployeeRoster.php'>Employee&nbsp;Account&nbsp;Management</option>
                     <option id='mgrNavMenuEditor' value='../ManagerView/MenuEditor.php'>Menu&nbsp;Editor</option>
-                    <option id='mgrNavMenuEditor' class='critical' value='../ManagerView/CloseBusinessDay.php'>Close&nbsp;Business&nbsp;Day</option>
+                    <option id='mgrNavMenuEditor' class='critical' value='../ManagerView/CloseBusinessDay.php' style='background-color: #fff !important; color: #777 !important;'>Close&nbsp;Business&nbsp;Day</option>
                 </select>
             </div>
         ");

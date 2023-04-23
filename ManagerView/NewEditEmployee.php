@@ -37,10 +37,13 @@
             }
             #tabHeader {
                 grid-area: tabHeader;
-                font-size: 1.5rem;
+                font-size: 2rem;
                 font-weight: bold;
                 margin: 1rem auto 3rem auto;
-                border-bottom: .25rem solid white;
+            }
+            input[type='text'] {
+                background-color: #777 !important;
+                background-image: none !important;
             }
             #employeeRoster {
                 grid-area:rosterTable;
@@ -108,7 +111,7 @@
                     window.location.href="EmployeeRoster.php";
                 });
 
-                setTitle("CentRes POS: Management Tools - Employee Roster Editor", "Management Tools");
+                setTitle("CentRes POS: Management Tools - Employee Account Management", "Management Tools");
             }
 
 
@@ -195,7 +198,7 @@
                 $sql = "SELECT lastname, firstname, username, rolelevel FROM employees WHERE id = ".$_POST['selectedEmp'].";";
                 $theEmployee = connection()->query($sql)->fetch_assoc();
                 $_POST['defaultRole'] = $theEmployee['rolelevel'];
-                echo("<div id='tabHeader'>Edit Employee</div>
+                echo("<div id='tabHeader'>Edit Employee Account</div>
                     <fieldset>
                     <label for='firstNameField'>First&nbsp;Name</label><input name='firstNameField' id='firstNameField' value='".$theEmployee['firstname']."' required></input>
                     <label for='lastNameField'>Last&nbsp;Name</label><input name='lastNameField' id='lastNameField' value='".$theEmployee['lastname']."' required></input>
@@ -213,11 +216,11 @@
                 );
             }
             else{
-                echo("<div id='tabHeader'>New Employee</div>
+                echo("<div id='tabHeader'>New Employee Account</div>
                     <fieldset>
-                    <label for='firstNameField'>First&nbsp;Name</label><input name='firstNameField' id='firstNameField' required></input>
-                    <label for='lastNameField'>Last&nbsp;Name</label><input name='lastNameField' id='lastNameField' required></input>
-                    <label for='usernameField'>Username</label><input name='usernameField' id='usernameField' required></input>
+                    <label for='firstNameField'>First&nbsp;Name</label><input name='firstNameField' id='firstNameField' required>
+                    <label for='lastNameField'>Last&nbsp;Name</label><input name='lastNameField' id='lastNameField' required>
+                    <label for='usernameField'>Username</label><input name='usernameField' id='usernameField' required>
                     <label for='roleField'>Role</label><select name='roleField' id='roleField' required>
                     <option value='' selected disabled hidden>Select a Role</option>");
                 $sql = "SELECT id, title FROM loginroutetable;";
@@ -234,9 +237,10 @@
             disconnect();
             ?>
             <div id="buttonSet">
-                <button id="btnBack">Back</button>
-                <input type="reset" id="btnReset" class="button" value="<?php echo $revertButtonText; ?>">
                 <input type="submit" id="btnFinish" class="button" name="finished" value="<?php echo $commitButtonText; ?>">
+                <input type="reset" id="btnReset" class="button" value="<?php echo $revertButtonText; ?>">
+                <button id="btnBack">Back</button>
+                
             </div>
             <?php
                 if(isset($_POST['errorState'])){

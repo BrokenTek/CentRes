@@ -2,6 +2,14 @@
     min-height: 1.25em;
 }
 
+html *, .ticketItem {
+   background-color: transparent;
+}
+
+.ticketItem {
+   color: white;
+}
+
 .ticketItem {
     margin: auto auto auto auto;
     font-size: 1.25rem;
@@ -28,6 +36,7 @@
  .selected {
     background-color: #F6941D;
     border: 2px solid white;
+    color: black;
    
 }
 
@@ -42,4 +51,18 @@
 }
 .removed.selected.multiselect {
    background-color: #73121c;
+}
+
+.message {
+   border-radius: 1rem;
+}
+
+.ticketItem:first-of-type {
+   border-top-left-radius: 1rem;
+   border-top-right-radius: 1rem;
+}
+
+.ticketItem:last-of-type {
+   border-bottom-left-radius: 1rem;
+   border-bottom-right-radius: 1rem;
 }

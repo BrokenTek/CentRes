@@ -17,6 +17,7 @@
                 margin-inline: auto;
                 margin-block: auto;
                 opacity: 90%;
+                background-color: red;
             }
             iframe {
                 width: 95%;
@@ -46,7 +47,7 @@
                 mnuEditor = document.getElementById("ifrMenuEditor");
 
                 mnuEditor.addEventListener("load", editorRefreshed);
-                setTitle("CentRes POS: Management Tools - Menu Editor", "Management Tools");
+                setTitle("CentRes POS: Management Tools - Menu Editor", "Management Tools - Menu Editor");
                 //setup path for iframes to call this window's functions
                 document.getElementById("ifrMenuEditor").focus();
             }

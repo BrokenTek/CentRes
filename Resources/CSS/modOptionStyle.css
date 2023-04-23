@@ -54,7 +54,16 @@ form {
     width: 95%;
 }
 
-input[type="checkbox"][checked=""] + .checkLabel {
+input[type="checkbox"]:checked + .checkLabel {
     color: orange !important;
+}
+input[type="radio"]:checked + .radioLabel {
+    color: orange !important;
+}
+
+#frmModWindow {
+    background-image: linear-gradient(to right, black , #777);
+    border: .125rem solid white;
+    border-radius: 1rem;
 }
 

@@ -1,6 +1,6 @@
 <?php
     function formatMenuTitle($title1, $title2 = null) {
-        if (isset($title1)) {
+        if (isset($title1) && $title1 != "") {
             if (strpos('! ' . $title1, ' .') == 0) {
                 $formattedTitle1 = " " . $title1;
             }
@@ -21,7 +21,7 @@
             $formattedTitle1 = "";
         }
 
-        if (isset($title2)) {
+        if (isset($title2) && $title2 != "") {
             if (strpos('! ' . $title2, ' .') == 0) {
                 $formattedTitle2 = " " . $title2;
             }
