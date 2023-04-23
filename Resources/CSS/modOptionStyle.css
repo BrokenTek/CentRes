@@ -7,6 +7,7 @@
     background-color: black !important;
     border: .25rem solid white;
     border-radius: .25rem;
+    flex-direction: column;
 }
 
 .modOptionFieldset > .selModOptionDiv {

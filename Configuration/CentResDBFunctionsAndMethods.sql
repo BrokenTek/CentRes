@@ -81,6 +81,11 @@ BEGIN
 	DECLARE bDay DATE;
 	SELECT businessDay INTO bDay FROM Config;
 
+	/*
+	SELECT DAYOFMONTH(DATE(DATE_SUB(NOW(), INTERVAL -1 DAY)));
+	https://dev.mysql.com/doc/refman/8.0/en/date-and-time-functions.html#function_datediff
+	*/
+		
 	SET @sql_text = CONCAT('SELECT id, businessDay, QUOTE(nickname), partySize, timeRequested, timeReserved, timeSeated, timeClosed
 	INTO OUTFILE "', serverPath , bDay, ' - Tickets.dat" FROM Tickets;');
 	PREPARE s1 FROM @sql_text;
