@@ -81,11 +81,6 @@ BEGIN
 	DECLARE bDay DATE;
 	SELECT businessDay INTO bDay FROM Config;
 
-	/*
-	SELECT DAYOFMONTH(DATE(DATE_SUB(NOW(), INTERVAL -1 DAY)));
-	https://dev.mysql.com/doc/refman/8.0/en/date-and-time-functions.html#function_datediff
-	*/
-		
 	SET @sql_text = CONCAT('SELECT id, businessDay, QUOTE(nickname), partySize, timeRequested, timeReserved, timeSeated, timeClosed
 	INTO OUTFILE "', serverPath , bDay, ' - Tickets.dat" FROM Tickets;');
 	PREPARE s1 FROM @sql_text;
@@ -706,6 +701,11 @@ END;
 CREATE PROCEDURE transientLogin(IN requestedUsername VARCHAR(25), IN requestedRoles SMALLINT UNSIGNED, IN newAccessToken varchar(60))
 BEGIN
 	DECLARE timeoutMins INT UNSIGNED;
+	DECLARE cnt INT UNSIGNED;
+	SELECT COUNT(*) INTO cnt FROM TicketItems;
+	IF (cnt = 0) THEN
+		UPDATE Config SET businessDay = NOW();
+	END IF;
 	SELECT (sessionTimeoutInMins * 100) INTO timeoutMins FROM Config;
 	INSERT INTO Employees (lastName, firstName, userName, passwordBCrypt, roleLevel)
 	VALUES ('Doe', 'John', requestedUsername, newAccessToken, requestedRoles);
@@ -717,6 +717,11 @@ BEGIN
 	DECLARE allowedRoles SMALLINT UNSIGNED;
 	DECLARE empId INT UNSIGNED;
 	DECLARE timeoutMins INT UNSIGNED;
+	DECLARE cnt INT UNSIGNED;
+	SELECT COUNT(*) INTO cnt FROM TicketItems;
+	IF (cnt = 0) THEN
+		UPDATE Config SET businessDay = NOW();
+	END IF;
 	IF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername) = 0) THEN
 		-- Invalid Employee Id
 		SIGNAL SQLSTATE '45000'
