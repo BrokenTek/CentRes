@@ -270,6 +270,7 @@
                         let hide = true;
                         for (let j = 0; j < filters.length; j ++) {
                             if (filters[j].length == 0) { continue; }
+                            filters[j] = filters[j].trim();
                             if (ops[i].innerHTML.toUpperCase().startsWith(filters[j])) {
                                hide = false;
                             }
