@@ -36,6 +36,26 @@
                     rows[i].addEventListener("pointerdown" , pressTicket);
                 }
 
+                // code that allows retention of scrollbar location between refreshes
+                let x = varGet("scrollX");
+                let y = varGet("scrollY");
+                if (x !== undefined) {
+                    window.scroll({
+                        top: y,
+                        left: x,
+                        behavior: "smooth",
+                    });
+                }
+
+                window.addEventListener('scroll', function(event) {
+                    varSet("scrollX", window.scrollX);
+                    varSet("scrollY", window.scrollY);
+                }, true);
+
+                setTimeout(() => {
+                    updateDisplay();
+                }, 60000);
+
             }
 
             function removeSelectedTicket() {

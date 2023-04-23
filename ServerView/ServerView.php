@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>CentRes: Host View</title>
+        <title>CentRes: Host Station</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
@@ -108,7 +108,7 @@
                                 location.replace(document.getElementById("mgrNavHostView").getAttribute("value"));
                             });  
                         } 
-                        showAlertDiv("Ticket " + varGet("ticket", "ticketContainer") + " is no longer assigned to this table!<br>Redirecting back to Host View.");
+                        showAlertDiv("Ticket " + varGet("ticket", "ticketContainer") + " is no longer assigned to this table!<br>Redirecting back to Host Station.");
                         return;
                     }
                 }

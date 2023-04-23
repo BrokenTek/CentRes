@@ -1,7 +1,7 @@
 // existingModString will configure the control (check/select appropriate values)
 function generateModOptionDiv(modQuickCode, modName, quantifierString = null, returnHTML = false, categoryType = "OptionalOne", parentQuickCode = null) {
-    if (modName === undefined || modName === null || modName.length == 0) { return null; }
-    if (modName.startsWith(".")) { modName = modName.substring(modName.indexOf(" ") + 1); }
+    modName = formatMenuTitle(modName);
+    if (!notBlank(modName)) { return null; }
     let modOptionDivStr;
     let divPrefix;
     let multiselect = categoryType.endsWith("Any");
@@ -238,4 +238,67 @@ function calculateModsPrice(modString) {
         }
     }
     return total;
+}
+
+
+function formatMenuTitle(title1 = null, title2 = null) {
+    let formattedTitle1 = "";
+    let formattedTitle2 = "";
+    let titleParts;
+    if (notBlank(title1)) {
+        if ((' ' + title1).indexOf(' .') == -1) {
+            formattedTitle1 = title1;
+        }
+        else {
+            titleParts = title1.split(' ');
+            for (let i = 0; i < titleParts.length; i++) {
+                if (titleParts[i].indexOf("..") == 0) {
+                    formattedTitle1 += " " + titleParts[i].substring(1);
+                }
+                else if (titleParts[i].indexOf('.') != 0) {
+                    formattedTitle1 += " " + titleParts[i];
+                }
+            }
+            if (notBlank(formattedTitle1)) {
+                formattedTitle1 = formattedTitle1.substring(1);
+            } 
+        } 
+    }
+
+    if (notBlank(title2)) {
+        if ((' ' + title2).indexOf(' .') == -1) {
+            formattedTitle2 = title2;
+        }
+        else {
+            titleParts = title2.split(' ');
+            for (let i = 0; i < titleParts.length; i++) {
+                if (titleParts[i].indexOf("..") == 0) {
+                    formattedTitle2 += " " + titleParts[i].substring(1);
+                }
+                else if (titleParts[i].indexOf('.') != 0) {
+                    formattedTitle2 += " " + titleParts[i];
+                }
+            }
+            if (notBlank(formattedTitle2)) {
+                formattedTitle2 = formattedTitle2.substring(1);
+            }
+        }    
+    }
+
+    if (notBlank(formattedTitle1) && notBlank(formattedTitle2)) {
+        return formattedTitle1 + ": " + formattedTitle2;
+    }
+    else if (notBlank(formattedTitle1)) {
+        return formattedTitle1;
+    }
+    else if (notBlank(formattedTitle2)) {
+        return formattedTitle2;
+    }
+    else {
+        return "";
+    }
+}
+
+function notBlank(str) {
+    return str !== undefined && str !== null && str !== "";
 }

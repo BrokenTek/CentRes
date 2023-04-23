@@ -105,12 +105,12 @@
     if (($GLOBALS['role'] & 8) == 8) {
         echo("<div id='managementNavigation'>
                 <select name='mgrNavDest' id='managementNavigationSelector' onchange='navigateAway()'>
-                    <option value=''>Navigate To</option>
-                    <option id='mgrNavHostView' value='../HostView/HostView.php'>Host&nbsp;View</option>
+                    <option id='mgrNavNull'style='background-color: #444 !important; color: white !important; font-size: 1.125rem; !important;'>Management Navigation</option>
+                    <option id='mgrNavHostView' value='../HostView/HostView.php'>Host&nbsp;Station</option>
                     <option id='mgrNavIPW' value = '../ManagerView/InventoryPopularityWindow.php'>Inventory/Popularity&nbsp;Window</option>
                     <option id='mgrNavEmpRoster' value='../ManagerView/EmployeeRoster.php'>Employee&nbsp;Account&nbsp;Management</option>
                     <option id='mgrNavMenuEditor' value='../ManagerView/MenuEditor.php'>Menu&nbsp;Editor</option>
-                    <option id='mgrNavMenuEditor' class='critical' value='../ManagerView/CloseBusinessDay.php' style='background-color: #fff !important; color: #777 !important;'>Close&nbsp;Business&nbsp;Day</option>
+                    <option id='mgrNavMenuEditor' value='../ManagerView/CloseBusinessDay.php' style='background-color: #fff !important; color: #777 !important;'>Close&nbsp;Business&nbsp;Day</option>
                 </select>
             </div>
         ");

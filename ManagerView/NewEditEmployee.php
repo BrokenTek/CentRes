@@ -229,7 +229,7 @@
                     echo("<option value='".$roleOption['id']."'>".$roleOption['title']."</option>");
                 }
                 echo("</select>
-                    <label for='passphraseField'>Passphrase</label><input name='passphraseField' id='passphraseField'  placeholder='Temporary Password' required></input>
+                    <label for='passphraseField'>Passphrase</label><input type='password' name='passphraseField' id='passphraseField'  placeholder='Temporary Password' required></input>
                     </fieldset>"
                 );
             }

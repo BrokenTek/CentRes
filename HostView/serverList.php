@@ -23,7 +23,23 @@
                 for (var i = 0; i < activeServers.length; i++) {
                     activeServers[i].addEventListener("pointerdown", serverClicked);
                 }
-                rememberScrollPosition();
+                
+                // code that allows retention of scrollbar location between refreshes
+                let x = varGet("scrollX");
+                let y = varGet("scrollY");
+                if (x !== undefined) {
+                    window.scroll({
+                        top: y,
+                        left: x,
+                        behavior: "smooth",
+                    });
+                }
+
+                window.addEventListener('scroll', function(event) {
+                    varSet("scrollX", window.scrollX);
+                    varSet("scrollY", window.scrollY);
+                }, true);
+
                 setTimeout(() => {
                     updateDisplay();
                 }, 60000);
@@ -78,9 +94,9 @@
                     //fetches each record and prints it as a table row in HTML. 
                     while($activeServer = $result->fetch_assoc() ){
                         echo ("<tr class='activeServer' id='server" .$activeServer['serverid']. "'>
-                                <td>".$activeServer['servername']."</td>
-                                <td class= \"numberCell\">".$activeServer['pplcount']."</td>
-                                <td class= \"numberCell\">".$activeServer['tblcount']."</td></tr>");
+                               <td>".$activeServer['servername']."</td>
+                               <td class= \"numberCell\">".$activeServer['pplcount']."</td>
+                               <td class= \"numberCell\">".$activeServer['tblcount']."</td></tr>");
                     }
 
                 ?>

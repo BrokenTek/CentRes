@@ -191,9 +191,14 @@
             function generateModOption() {
                 let quickCode = varGet("quickCode");
                 if (quickCode === undefined) {
-                    quickCode = "X----";
+                    quickCode = "Y----";
                 }
                 let text = document.getElementById("txtMenuTitle").value;
+                with (document.getElementById("txtQuantifierString")) {
+                    if (value.length > 0) {
+                        value = value.replaceAll("  ", "|");
+                    }
+                }
                 let quantifierString = document.getElementById("txtQuantifierString").value;
                 let categoryType = document.getElementById("selModPreviewCatType").value;
                 document.getElementById("modPreview").innerHTML = generateModOptionDiv(quickCode, text, quantifierString, true, categoryType);

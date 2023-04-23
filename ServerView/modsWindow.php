@@ -64,7 +64,7 @@ Otherwise will reroute to logon page -->
                         suffix = "&nbsp;Optional&nbsp;";
                         logoType = "noBounds";
                     }
-                    innerHTML = "<legend class='menuCategoryTitle'><div class='quantityLogo " + logoType + "'>" + suffix + "</div>" + categoryTitle + "</legend>";
+                    innerHTML = "<legend class='menuCategoryTitle'><div class='quantityLogo " + logoType + "'>" + suffix + "</div>" + formatMenuTitle(categoryTitle) + "</legend>";
                     document.getElementById('frmModWindow').appendChild(newFst);
                 }
                 
@@ -158,17 +158,17 @@ Otherwise will reroute to logon page -->
                                 // DEFER GENERATING OPTIONAL CATEGORIES UNTIL LATER
                                 /////////////////////////////////////////////////////////////////////////////////////
 
-                                $sql = "SELECT childQuickCode FROM menuassociations WHERE parentQuickCode = '$modCategoryQuickCode';";
+                                $sql = "SELECT childQuickCode FROM menuassociations JOIN MenuModificationItems ON childQuickCode = quickCode WHERE parentQuickCode = '$modCategoryQuickCode' ORDER BY title;";
                                 $modItems = connection()->query($sql);
                                 while($modItem = $modItems->fetch_assoc()) {
                                     $modItemQuickCode = $modItem['childQuickCode'];
                                     $sql = "SELECT * FROM MenuModificationItems WHERE quickCode = '$modItemQuickCode';";
+                                    
                                     $modItemDetails = connection()->query($sql)->fetch_assoc();
                                     $title = str_replace("'", "\\'", $modItemDetails['title']);
                                     $quantifierString = str_replace("'", "\\'",$modItemDetails['quantifierString']);
                                     $categoryType = $modCategoryDetails['categoryType'];
                                     if ($defered) {
-                                        echo("//defered\n");
                                         $deferedStr .= "document.getElementById('$modCategoryQuickCode').appendChild(" .
                                         "generateModOptionDiv('$modItemQuickCode','$title','$quantifierString', false, '$categoryType', '$modCategoryQuickCode'));\n";
                                     }

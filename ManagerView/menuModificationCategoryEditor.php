@@ -254,6 +254,9 @@
 
             function filterModItems() {
                 let ops = document.querySelector("#" + "modItemList").getElementsByTagName("label");
+                if (this.value !== null && this.value !== undefined) {
+                    this.value = this.value.replaceAll("  ", "|");
+                }
                 if (this.value == undefined || this.value == "") {
                     for (let i = 0; i < ops.length; i++) {
                         ops[i].classList.remove("hidden");
@@ -262,12 +265,17 @@
                     }
                 }
                 else {
-                    filters = this.value.toUpperCase().split("`");
+                    filters = this.value.toUpperCase().split("|");
                     for (let i = 0; i < ops.length; i++) {
                         let hide = true;
                         for (let j = 0; j < filters.length; j ++) {
                             if (ops[i].innerHTML.toUpperCase().startsWith(filters[j])) {
                                hide = false;
+                            }
+                            if (ops[i].innerHTML.startsWith(".")) {
+                                if (ops[i].innerHTML.substring(1).toUpperCase().startsWith(filters[j])) {
+                                    hide = false;
+                                }   
                             }
                         }
                         if (hide) {
@@ -502,7 +510,7 @@
                                 ?>
                             </div>
                             <div class="listHeader">Associated Mod Items</div>
-                            <input type="text" id="txtModItemFilter" placeholder="Filter: delimeter `" name="filterString" <?php if (isset($_POST['filterString'])) {echo(" value='" .$_POST['filterString']. "'");} ?>>
+                            <input type="text" id="txtModItemFilter" placeholder="Filter: delimeter | (or double space)" name="filterString" <?php if (isset($_POST['filterString'])) {echo(" value='" .$_POST['filterString']. "'");} ?>>
                             <div id="modItemList">
                                 <?php
                                     // populate the menu items list, and make items checked if menu item has this mod category
