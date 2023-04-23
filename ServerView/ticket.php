@@ -1,5 +1,6 @@
 <?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(7, $GLOBALS['role']); ?>
 <?php require_once '../Resources/PHP/currencyFormatter.php'; ?>
+<?php require_once '../Resources/PHP/menuObjectTitleFormatter.php'; ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -533,7 +534,7 @@
                 }
 
                 echo('<div class="ticketItemNumber">' .$splitString. '</div>
-                    <div class="ticketItemText">' .$menuItem['title']. "</div>");
+                    <div class="ticketItemText">' .formatMenuTitle($menuItem['title']). "</div>");
                 if (is_null($ticketItem['overridePrice'])) {
                     echo('<div class="ticketItemPrice">' .currencyFormat($ticketItem['calcTicketItemPrice']). '</div>');
                 }
@@ -549,25 +550,13 @@
                         $modQuickCode = $mods[$i-2];
                         $sql = "SELECT * FROM MenuModificationItems WHERE quickCode = '" .str_replace("'", "''",$modQuickCode). "'";
                         $modItemRecord = connection()->query($sql);
-                        if (!isset($mods[$i-1]) || $mods[$i-1] == "") {
-                            $displayTextSuffix = "";
-                        }
-                        else {
-                            $displayTextSuffix = ": " . $mods[$i-1];
-                        }
                         if (mysqli_num_rows($modItemRecord) == 0) {
                             // deleted mod. Treat as custom mod.
-                            echo('<div class="modCustom">DELETED MOD: ID=' .$modQuickCode. $displayTextSuffix. '</div>');
+                            echo('<div class="modCustom">' .formatMenuTitle("DELETED MOD: ID=" . $modQuickCode, $mods[$i-1]). '</div>');
                         }
                         else {
                             $modItem = $modItemRecord->fetch_assoc();
-                            
-                            if (strpos(' ' . $modItem['title'], '.') == 1) {
-                                echo("<div class='modText'>" . substr($modItem['title'],  strpos($modItem['title'], ' ') + 1) . "</div>");
-                            }
-                            else {
-                                echo('<div class="modText">' .$modItem['title']. $displayTextSuffix. '</div>');
-                            }
+                            echo('<div class="modText">' .formatMenuTitle($modItem['title'], $mods[$i-1]). '</div>');
 
                             if (!is_null($mods[$i]) && $mods[$i] != "" ) {
                                 echo('<div class="modPrice">');

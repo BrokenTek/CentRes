@@ -1,6 +1,7 @@
 
 <?php require_once '../Resources/PHP/sessionLogic.php'; restrictAccess(255, $GLOBALS['role']); ?>
 <?php require_once '../Resources/PHP/currencyFormatter.php'; ?>
+<?php require_once '../Resources/PHP/menuObjectTitleFormatter.php'; ?>
 
 <!DOCTYPE html>
 <html>
@@ -168,7 +169,7 @@ $result = connection()->query($sql);
 
 if ($result->num_rows > 0) {
 	while($row = $result->fetch_assoc()) {
-		printMenuCategory($row['childQuickCode'], $row['title']);
+		printMenuCategory($row['childQuickCode'], formatMenuTitle($row['title']));
 	}
 }
 
@@ -224,7 +225,7 @@ if (isset($_POST['showDetachedMenuObjects'])) {
 		if ($result->num_rows > 0) {
 			while($row = $result->fetch_assoc()) {
 				if ($row['visible'] == true) {
-					printMenuCategory($row['childQuickCode'], $row['title'], $detached);
+					printMenuCategory($row['childQuickCode'], formatMenuTitle($row['title']), $detached);
 				}
 			}
 		}
@@ -240,7 +241,7 @@ if (isset($_POST['showDetachedMenuObjects'])) {
 			while($row = $result->fetch_assoc()) {
 				// ** NEEDS TO PASS IN CALCULATED price AND THE CALCULATED MODS STR (COMMA DELIMINATED) **
 				if ($row['visible'] == true) {
-					printMenuItem($row['childQuickCode'], $row['title'], $row['price'], $detached);
+					printMenuItem($row['childQuickCode'], formatMenuTitle($row['title']), $row['price'], $detached);
 				}
 			}
 			echo "</div>";

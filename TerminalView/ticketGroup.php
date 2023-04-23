@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <?php require_once '../Resources/PHP/dbConnection.php'; ?>
+<?php require_once '../Resources/PHP/menuObjectTitleFormatter.php'; ?>
 <html>
     <head>
         <meta charset="UTF-8">
@@ -122,33 +123,20 @@
                                 break;
                         }
                         
-                        echo("<div name='ticketItem' id='".$ticketItem['id']."' class ='".$itemClass."'><p>".$readyChar.$ticketItem['itemName']."</p>");
+                        echo("<div name='ticketItem' id='".$ticketItem['id']."' class ='".$itemClass."'><p>".$readyChar.formatMenuTitle($ticketItem['itemName'])."</p>");
 
                         if($ticketItem['mods']!=""){
                             $modList = explode(",", $ticketItem['mods']);
                             $modLength = count($modList);
                             //iterate through each pair of modification values.
                             for($i=2; $i<$modLength; $i+=3){
-                                echo("<ul>");
                                 $sql = "SELECT title FROM MenuModificationItems WHERE quickCode = '".$modList[$i-2]."';";
                                 
                                 $result = connection()->query($sql);
                                 $mod = $result->fetch_assoc();
 
-                                if (strpos(' ' . $mod['title'], '.') == 1) {
-                                    echo(substr($mod['title'],  strpos($mod['title'], ' ') + 1));
-                                }
-                                else {
-                                    echo($mod['title']);
-                                }
-
-                                // TEMP
-                                // echo("DEBUG TITS " . );
-
-                                if (isset($modList[$i-1]) && strlen($modList[$i-1]) != 0) {
-                                    echo(": ");
-                                    echo($modList[$i-1]);
-                                }
+                                echo("<ul>");
+                                echo(formatMenuTitle($mod['title'], $modList[$i-1]));
                                 echo("</ul>");
                             }
                             //append the last odd note, which should be a custom one for instructions or whatever, to the list of modifications
