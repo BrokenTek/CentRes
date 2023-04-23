@@ -12,9 +12,6 @@
             * {
                 color: white;
             }
-            fieldset {
-                border-radius: 1rem;
-            }
             table {
                 border-collapse: collapse;
             }
@@ -71,6 +68,13 @@
             
             #numQty {
                 max-width: 7rem;
+            }
+
+            fieldset {
+                background: rgb(119,119,119);
+                background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(0,0,0,1) 100%);
+                color: white;
+                border-radius: .5rem;
             }
 
             
