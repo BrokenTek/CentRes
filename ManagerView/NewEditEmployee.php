@@ -223,7 +223,7 @@
                 $sql = "SELECT lastname, firstname, username, rolelevel FROM employees WHERE id = ".$_POST['selectedEmp'].";";
                 $theEmployee = connection()->query($sql)->fetch_assoc();
                 $_POST['defaultRole'] = $theEmployee['rolelevel'];
-                echo("<div id='tabHeader'>Edit Employee Account</div>
+                echo("<div id='tabHeader'>Edit&nbsp;Employee&nbsp;Account</div>
                     <fieldset>
                     <label for='firstNameField'>First&nbsp;Name</label><input type='text' name='firstNameField' id='firstNameField' value='".$theEmployee['firstname']."' required></input>
                     <label for='lastNameField'>Last&nbsp;Name</label><input type='text' name='lastNameField' id='lastNameField' value='".$theEmployee['lastname']."' required></input>
