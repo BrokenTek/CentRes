@@ -423,7 +423,7 @@
             }
 
             $ticketSubtotal = 0;
-
+            $hasVisible = false;
             while($ticketItem = $ticketItems->fetch_assoc()) {
                 $sql = "SELECT ticketItemStatus(" .$ticketItem['id']. ") as status;";
                 $status = connection()->query($sql)->fetch_assoc()['status'];
@@ -431,6 +431,7 @@
                 if ($status == "Hidden") {
                     continue;
                 }
+                $hasVisible = true;
                 
                 $sql = "SELECT * FROM menuItems WHERE quickCode = '" .$ticketItem['menuItemQuickCode']. "'";
                 $menuItem = connection()->query($sql)->fetch_assoc();
@@ -598,6 +599,10 @@
             // display the subtotal of all splits or a particular split
             if ($existingTicketItems > 0 && $ticketSubtotal > 0) {
                 echo("<h2 class='message' id='ticketSubtotal'>Ticket Subtotal: " . currencyFormat($ticketSubtotal) . "</h2>");    
+            }
+
+            if (!$hasVisible && $header == "") {
+                echo("<h1 class='message' id='ticketHeader'>Select a Menu Item to Get Started</h1>");
             }
 
             
