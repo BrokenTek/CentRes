@@ -134,6 +134,8 @@
                 });
 
                 setTitle("CentRes POS: Management Tools - Employee Account Management", "Management Tools");
+
+                document.getElementById("firstNameField").focus();
             }
 
 
