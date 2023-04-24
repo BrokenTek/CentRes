@@ -105,8 +105,8 @@
     if (($GLOBALS['role'] & 8) == 8) {
         echo("<div id='managementNavigation'>
                 <select name='mgrNavDest' id='managementNavigationSelector' onchange='navigateAway()'>
-                    <option id='mgrNavNull'style='background-color: #444 !important; color: white !important; font-size: 1.125rem; !important;'>Management Navigation</option>
-                    <option id='mgrNavHostView' value='../HostView/HostView.php'>Host&nbsp;Station</option>
+                    <option id='mgrNavNull'style='background-color: #444 !important; color: white !important; font-size: 1.125rem; !important;'>Management Tools</option>
+                    <option id='mgrNavHostView' value='../HostView/HostView.php'>View&nbsp;Host&nbsp;Station</option>
                     <option id='mgrNavIPW' value = '../ManagerView/InventoryPopularityWindow.php'>Inventory/Popularity&nbsp;Window</option>
                     <option id='mgrNavEmpRoster' value='../ManagerView/EmployeeRoster.php'>Employee&nbsp;Account&nbsp;Management</option>
                     <option id='mgrNavMenuEditor' value='../ManagerView/MenuEditor.php'>Menu&nbsp;Editor</option>
