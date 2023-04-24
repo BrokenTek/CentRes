@@ -33,7 +33,6 @@
             }
             #sessionBody * {
                 font-weight: bold;
-                font-size: 1.25rem;
             }
             #tabHeader {
                 grid-area: tabHeader;
@@ -41,20 +40,38 @@
                 font-weight: bold;
                 margin: 1rem auto 3rem auto;
             }
-            input[type='text'] {
-                background-color: #777 !important;
-                background-image: none !important;
+            input[type="text"], select, input[type="password"] {
+                margin-block: .25rem;
+                height: 1.5rem;
+                background: rgb(0,0,0);
+                background: linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(119,119,119,1) 100%);
+                color: white;
+
+            }
+            option {
+                background-color: #444;
+                color: white;
+            }
+            label {
+                margin-block: auto;
+                grid-column: 2;
             }
             #employeeRoster {
                 grid-area:rosterTable;
             }
+            #buttonSetWrapper {
+                margin-inline: auto;
+            }
             #buttonSet{
                 display:grid;
-                grid-template-columns: min-content min-content min-content;
+                grid-template-columns: 1fr min-content min-content min-content 1fr;
                 
                 grid-area:buttons;
                 border:none;
                 margin-inline: auto;
+            }
+            #btnFinish {
+                grid-column: 2;
             }
             .hidden {
                 display: none;
@@ -68,9 +85,10 @@
                 grid-area:fields;
                 align-content:end;
                 display: grid;
-                grid-template-columns: min-content min-content;
+                grid-template-columns: 1fr min-content min-content 1fr;
                 grid-auto-rows: min-content;
                 grid-gap: .25rem;
+                margin-inline: auto;
             }
 
             #roleField {
@@ -82,6 +100,10 @@
             button, .button {
                 max-width: 6rem;
                 margin: auto auto auto auto;
+            }
+            #divContent {
+                margin-inline: auto;
+                grid-column: 2;
             }
 
 
@@ -125,6 +147,7 @@
             <?php require_once "../Resources/PHP/sessionHeader.php"; ?>
             
             <div id="sessionBody">
+                <div id="divContent">
             <?php
                 if($_POST['mode'] == "Edit"){
                     $revertButtonText = 'Reset';
@@ -200,9 +223,9 @@
                 $_POST['defaultRole'] = $theEmployee['rolelevel'];
                 echo("<div id='tabHeader'>Edit Employee Account</div>
                     <fieldset>
-                    <label for='firstNameField'>First&nbsp;Name</label><input name='firstNameField' id='firstNameField' value='".$theEmployee['firstname']."' required></input>
-                    <label for='lastNameField'>Last&nbsp;Name</label><input name='lastNameField' id='lastNameField' value='".$theEmployee['lastname']."' required></input>
-                    <label for='usernameField'>Username</label><input name='usernameField' id='usernameField' value='".$theEmployee['username']."' required></input>
+                    <label for='firstNameField'>First&nbsp;Name</label><input type='text' name='firstNameField' id='firstNameField' value='".$theEmployee['firstname']."' required></input>
+                    <label for='lastNameField'>Last&nbsp;Name</label><input type='text' name='lastNameField' id='lastNameField' value='".$theEmployee['lastname']."' required></input>
+                    <label for='usernameField'>Username</label><input type='text' name='usernameField' id='usernameField' value='".$theEmployee['username']."' required></input>
                     <label for='roleField'>Role</label><select name='roleField' id='roleField' value='".$theEmployee['rolelevel']."' required>");
                 //generalize the list to an arbitrary number of role options
                 $sql = "SELECT id, title FROM loginroutetable;";
@@ -216,11 +239,11 @@
                 );
             }
             else{
-                echo("<div id='tabHeader'>New Employee Account</div>
+                echo("<div id='tabHeader'>New&nbsp;Employee&nbsp;Account</div>
                     <fieldset>
-                    <label for='firstNameField'>First&nbsp;Name</label><input name='firstNameField' id='firstNameField' required>
-                    <label for='lastNameField'>Last&nbsp;Name</label><input name='lastNameField' id='lastNameField' required>
-                    <label for='usernameField'>Username</label><input name='usernameField' id='usernameField' required>
+                    <label for='firstNameField'>First&nbsp;Name</label><input type='text' name='firstNameField' id='firstNameField' required>
+                    <label for='lastNameField'>Last&nbsp;Name</label><input type='text' name='lastNameField' id='lastNameField' required>
+                    <label for='usernameField'>Username</label><input type='text' name='usernameField' id='usernameField' required>
                     <label for='roleField'>Role</label><select name='roleField' id='roleField' required>
                     <option value='' selected disabled hidden>Select a Role</option>");
                 $sql = "SELECT id, title FROM loginroutetable;";
@@ -229,19 +252,21 @@
                     echo("<option value='".$roleOption['id']."'>".$roleOption['title']."</option>");
                 }
                 echo("</select>
-                    <label for='passphraseField'>Passphrase</label><input type='password' name='passphraseField' id='passphraseField'  placeholder='Temporary Password' required></input>
+                    <label for='passphraseField'>Passphrase</label><input type='password' name='passphraseField' id='passphraseField'  placeholder='Temporary Password' type='password' required></input>
                     </fieldset>"
                 );
             }
             
             disconnect();
             ?>
+            <div id="buttonSetWrapper">
             <div id="buttonSet">
                 <input type="submit" id="btnFinish" class="button" name="finished" value="<?php echo $commitButtonText; ?>">
                 <input type="reset" id="btnReset" class="button" value="<?php echo $revertButtonText; ?>">
-                <button id="btnBack">Back</button>
-                
+                <button id="btnBack">Back</button> 
             </div>
+            </div>
+        </div>
             <?php
                 if(isset($_POST['errorState'])){
                     echo('<div class="highlighted">'.$_POST['errorState']."</div>");
