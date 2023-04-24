@@ -59,6 +59,12 @@ body {
     grid-template-columns: 1fr;
     grid-auto-rows: min-content;
     margin-block: auto;
+    
+  }
+
+  #managementNavigation > * {
+    background: rgb(0,0,0) !important;
+    background: linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(119,119,119,1) 100%) !important;
   }
 
   
