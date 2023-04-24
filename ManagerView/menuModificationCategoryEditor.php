@@ -381,7 +381,8 @@
                 max-height: 8rem;
                 min-height: 8rem;
                 overflow: auto;
-                background-color: black;
+                background: rgb(0,0,0) !important;
+                background: linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(40,40,40,1) 100%) !important;
             }
             .listHeader {
                 font-size: 1.5rem;

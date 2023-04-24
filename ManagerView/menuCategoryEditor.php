@@ -390,6 +390,13 @@
                     border: .25rem solid white;
                     margin: auto;
                 }
+                label {
+                    margin-left: auto;
+                }
+                .errorMessage {
+                    margin-inline: auto;
+                    width: 100%;
+                }
         </style>
         
     </head>
