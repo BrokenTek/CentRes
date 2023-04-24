@@ -409,7 +409,7 @@
                         <option value="root">Main Menu</option>
                         <option value="dtchd">Inactive</option>
                         <?php
-                            $sql = "SELECT * FROM MenuCategories WHERE visible = 1 ORDER BY title";
+                            $sql = "SELECT * FROM MenuCategories ORDER BY title";
                             $result = connection()->query($sql);
                             if (mysqli_num_rows($result) == 0) {
                                 $errorMessage = "Create a Menu Category Please!";
@@ -430,7 +430,7 @@
                         ?>
                     </select>
                     <label for="txtMenuTitle">Category Title</label>
-                    <input id="txtMenuTitle" name="menuTitle" maxlength=75 <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
+                    <input id="txtMenuTitle" name="menuTitle" maxlength=75 spellcheck="false"<?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
                     <?php if (isset($_POST['quickCode']) && 
                             (!isset($_POST['delete']) || isset($errorMessage))): ?>
                         <?php if (isset($_POST['parentCategory']) && $_POST['parentCategory'] == 'dtchd'): ?> 

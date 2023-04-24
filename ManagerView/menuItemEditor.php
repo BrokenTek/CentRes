@@ -358,7 +358,7 @@
                     <select id="selParentCategory" name="parentCategory" required>
                         <option value="dtchd">Inactive</option>
                         <?php
-                            $sql = "SELECT * FROM MenuCategories WHERE visible = 1 ORDER BY title;";
+                            $sql = "SELECT * FROM MenuCategories ORDER BY title;";
                             $result = connection()->query($sql);
                             if (mysqli_num_rows($result) == 0) {
                                 $errorMessage = "Create a Menu Category Please!";
@@ -379,7 +379,7 @@
                         ?>
                     </select>
                     <label for="txtMenuTitle">Menu Item Name</label>
-                    <input id="txtMenuTitle" name="menuTitle" required maxlength=75 <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
+                    <input id="txtMenuTitle" name="menuTitle" required maxlength=75 spellcheck="false" <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
                     <label for="txtPrice">Price</label>
                     <input id="txtPrice" name="price" pattern="^(0|[1-9]\d*)?(\.\d{1,2})?$" required <?php if(isset($_POST['price'])) { echo(' value="' . $_POST['price'] . '"'); } ?>>
                     <label for="txtRoute">Route</label>

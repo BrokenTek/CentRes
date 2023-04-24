@@ -69,21 +69,15 @@ CREATE TABLE QuickCodes (
 
 
 CREATE TABLE MenuCategories (
-	description VARCHAR(1),
-
 	quickCode VARCHAR(5) PRIMARY KEY,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	title VARCHAR(75) NOT NULL UNIQUE,
 	route char(1),
-	visible BOOLEAN NOT NULL DEFAULT TRUE,
-	defaultPrice DECIMAL(6, 2) UNSIGNED,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE MenuItems (
-	description VARCHAR(1),
-
 	quickCode VARCHAR(5) PRIMARY KEY,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	title VARCHAR(75) NOT NULL UNIQUE,
@@ -91,37 +85,24 @@ CREATE TABLE MenuItems (
 	route char(1),
 	quantity SMALLINT UNSIGNED,
 	requests SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-	prepTimeInSecs SMALLINT UNSIGNED,
-	visible BOOLEAN NOT NULL DEFAULT TRUE,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE MenuModificationCategories (
-	description VARCHAR(1),
-
 	quickCode VARCHAR(5) PRIMARY KEY,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	title VARCHAR(75) NOT NULL UNIQUE,
-	selfDescriptive BOOLEAN NOT NULL DEFAULT FALSE,
 	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),
-	visible BOOLEAN NOT NULL DEFAULT TRUE,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE MenuModificationItems (
-	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),
-	selfDescriptive BOOLEAN NOT NULL DEFAULT FALSE,
-	description VARCHAR(1),
-	price DECIMAL(6, 2),
-	
 	quickCode VARCHAR(5) PRIMARY KEY,
-	displayIndex SMALLINT UNSIGNED,
 	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	quantifierString VARCHAR(1000) NOT NULL DEFAULT '',
 	title VARCHAR(75) NOT NULL UNIQUE,
-	visible BOOLEAN NOT NULL DEFAULT TRUE,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -129,7 +110,6 @@ CREATE TABLE MenuModificationItems (
 CREATE TABLE MenuAssociations (
 	parentQuickCode VARCHAR(5),
 	childQuickCode VARCHAR(5),
-	displayIndex SMALLINT UNSIGNED,
 	UNIQUE(parentQuickCode, childQuickCode)
 );
 

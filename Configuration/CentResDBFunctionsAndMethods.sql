@@ -205,7 +205,7 @@ BEGIN
 		IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
 			-- SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationCategories;
 			SELECT IFNULL(MAX(counter), 0) + 1 INTO cnt FROM MenuModificationCategories;
-			SET NEW.quickCode = CONCAT('X', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
+			SET NEW.quickCode = CONCAT('M', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
 		END IF;
 		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 	END IF;
@@ -224,7 +224,7 @@ BEGIN
 		IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
 			-- SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationItems;
 			SELECT IFNULL(MAX(counter), 0) + 1 INTO cnt FROM MenuModificationItems;
-			SET NEW.quickCode = CONCAT('Y', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
+			SET NEW.quickCode = CONCAT('N', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
 		END IF;
 		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 	END IF;

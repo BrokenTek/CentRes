@@ -191,7 +191,7 @@
             function generateModOption() {
                 let quickCode = varGet("quickCode");
                 if (quickCode === undefined) {
-                    quickCode = "Y----";
+                    quickCode = "N----";
                 }
                 let text = document.getElementById("txtMenuTitle").value;
                 with (document.getElementById("txtQuantifierString")) {
@@ -327,7 +327,7 @@
                     <select id="selMenuTitle">
                         <option value="">New Mod Item</option>
                         <?php
-                            $sql = "SELECT * FROM MenuModificationItems WHERE visible = 1 ORDER BY title";
+                            $sql = "SELECT * FROM MenuModificationItems ORDER BY title";
                             $result = connection()->query($sql);
                             /////////////////////////////////////////////////////////
                             // populate all MenuModificationItems from database.
@@ -343,9 +343,9 @@
                         ?>
                     </select>
                     <label for="txtMenuTitle">Mod Item Name</label>
-                    <input id="txtMenuTitle" name="menuTitle" required maxlength="75" <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
+                    <input id="txtMenuTitle" name="menuTitle" required maxlength="75" spellcheck="false" <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
                     <label for="txtQuantifierString">Quantifier&nbsp;String</label>
-                    <input id="txtQuantifierString" name="quantifierString" maxlength="1000" <?php if(isset($_POST['quantifierString'])) { echo(' value="' . $_POST['quantifierString'] . '"'); } ?>>
+                    <input id="txtQuantifierString" name="quantifierString" maxlength="1000" spellcheck="false" <?php if(isset($_POST['quantifierString'])) { echo(' value="' . $_POST['quantifierString'] . '"'); } ?>>
                     <div id="previewWrapper">
                         <div id="modPreviewHeader">Mod Control Preview</div>
                         <div>

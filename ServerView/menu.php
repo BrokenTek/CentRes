@@ -161,10 +161,10 @@ require_once '../Resources/PHP/dbConnection.php';
 $sql = "SELECT COUNT(*) as menuObjectCount FROM MenuAssociations";
 $menuObjectCount = connection()->query($sql)->fetch_assoc()['menuObjectCount'];
 
-$sql = "SELECT childQuickCode, title, visible
+$sql = "SELECT childQuickCode, title
 		FROM MenuAssociations 
 		INNER JOIN MenuCategories ON MenuCategories.quickCode = MenuAssociations.childQuickCode 
-		WHERE MenuAssociations.parentQuickCode = 'root' AND visible = true;";
+		WHERE MenuAssociations.parentQuickCode = 'root';";
 $result = connection()->query($sql);
 
 if ($result->num_rows > 0) {
@@ -174,17 +174,17 @@ if ($result->num_rows > 0) {
 }
 
 if (isset($_POST['showDetachedMenuObjects'])) {
-	$sql = "SELECT childQuickCode, title, visible
+	$sql = "SELECT childQuickCode, title
 		FROM MenuAssociations 
 		INNER JOIN MenuCategories ON MenuCategories.quickCode = MenuAssociations.childQuickCode 
-		WHERE MenuAssociations.parentQuickCode = 'dtchd' AND visible = true;";
+		WHERE MenuAssociations.parentQuickCode = 'dtchd';";
 		$result = connection()->query($sql);
 		$count = $result->num_rows;
 
-	$sql = "SELECT childQuickCode, title, visible
+	$sql = "SELECT childQuickCode, title
 		FROM MenuAssociations 
 		INNER JOIN MenuItems ON MenuItems.quickCode = MenuAssociations.childQuickCode 
-		WHERE MenuAssociations.parentQuickCode = 'dtchd' AND visible = true;";
+		WHERE MenuAssociations.parentQuickCode = 'dtchd';";
 		$result = connection()->query($sql);
 		$count += $result->num_rows;
 
@@ -216,7 +216,7 @@ if (isset($_POST['showDetachedMenuObjects'])) {
 			echo("<summary>". $title ."</summary>");
 		}
 
-		$sql = "SELECT childQuickCode, title, visible 
+		$sql = "SELECT childQuickCode, title
 		FROM MenuAssociations 
 		INNER JOIN MenuCategories ON MenuCategories.quickCode = MenuAssociations.childQuickCode 
 		WHERE MenuAssociations.parentQuickCode = '$qc';";
@@ -224,25 +224,20 @@ if (isset($_POST['showDetachedMenuObjects'])) {
 
 		if ($result->num_rows > 0) {
 			while($row = $result->fetch_assoc()) {
-				if ($row['visible'] == true) {
-					printMenuCategory($row['childQuickCode'], formatMenuTitle($row['title']), $detached);
-				}
+				printMenuCategory($row['childQuickCode'], formatMenuTitle($row['title']), $detached);
 			}
 		}
 
-		$sql = "SELECT childQuickCode, title, price, visible 
+		$sql = "SELECT childQuickCode, title, price
 		FROM MenuAssociations 
 		INNER JOIN MenuItems ON MenuItems.quickCode = MenuAssociations.childQuickCode 
-		WHERE MenuAssociations.parentQuickCode = '$qc' AND visible = true;";
+		WHERE MenuAssociations.parentQuickCode = '$qc';";
 		$result = connection()->query($sql);
 
 		if ($result->num_rows > 0) {
 			echo "<div>";
 			while($row = $result->fetch_assoc()) {
-				// ** NEEDS TO PASS IN CALCULATED price AND THE CALCULATED MODS STR (COMMA DELIMINATED) **
-				if ($row['visible'] == true) {
-					printMenuItem($row['childQuickCode'], formatMenuTitle($row['title']), $row['price'], $detached);
-				}
+				printMenuItem($row['childQuickCode'], formatMenuTitle($row['title']), $row['price'], $detached);
 			}
 			echo "</div>";
 		}		
@@ -264,7 +259,7 @@ if (isset($_POST['showDetachedMenuObjects'])) {
 		if (isset($_POST['selected']) && $qc == $_POST['selected']) {
 			$classList .= " selected";
 		}
-		echo "<span id='".$qc."' class='$classList' data-text='".$title."' data-price='".$price."' data-mods='X'><span class='menuItemPrice'>". currencyFormat($price) ."</span><span class='menuItemTitle'>".$title."</span>";
+		echo "<span id='".$qc."' class='$classList'><span class='menuItemPrice'>". currencyFormat($price) ."</span><span class='menuItemTitle'>".$title."</span>";
 		echo "</span>";
 
 	}

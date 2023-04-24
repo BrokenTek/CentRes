@@ -423,7 +423,7 @@
                     <select id="selMenuTitle">
                         <option value="">New Mod Category</option>
                         <?php
-                            $sql = "SELECT * FROM MenuModificationCategories WHERE visible = 1 ORDER BY title";
+                            $sql = "SELECT * FROM MenuModificationCategories ORDER BY title";
                             $result = connection()->query($sql);
                             /////////////////////////////////////////////////////////
                             // populate all MenuModificationCategories from database.
@@ -439,7 +439,7 @@
                         ?>
                     </select>
                     <label for="txtMenuTitle">Mod Category Name</label>
-                    <input id="txtMenuTitle" name="menuTitle" required maxlength="75" <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
+                    <input id="txtMenuTitle" name="menuTitle" required maxlength="75" spellcheck="false" <?php if(isset($_POST['menuTitle'])) { echo(' value="' . $_POST['menuTitle'] . '"'); } ?>>
                     <label for="selCategoryType">Mod Category Type</label>
                     <select id="selCategoryType" name="categoryType" required>
                         <?php if (!isset($_POST['categoryType'])): ?>
@@ -498,7 +498,7 @@
                             <div id="menuItemList">
                                 <?php
                                     // populate the menu items list, and make items checked if menu item has this mod category
-                                    $sql = "SELECT title, quickCode FROM MenuItems WHERE visible = 1 ORDER BY title";
+                                    $sql = "SELECT title, quickCode FROM MenuItems ORDER BY title";
                                     $result = connection()->query($sql);
                                     while ($row = $result->fetch_assoc()) {
                                         if (strpos($associatedMenuItems,$row['quickCode']) > 0) {
@@ -512,11 +512,11 @@
                                 ?>
                             </div>
                             <div class="listHeader">Associated Mod Items</div>
-                            <input type="text" id="txtModItemFilter" placeholder="Filter: delimeter | (or double space)" name="filterString" <?php if (isset($_POST['filterString'])) {echo(" value='" .$_POST['filterString']. "'");} ?>>
+                            <input type="text" id="txtModItemFilter" placeholder="Filter: delimeter | (or double space)" name="filterString" spellcheck="false" <?php if (isset($_POST['filterString'])) {echo(" value='" .$_POST['filterString']. "'");} ?>>
                             <div id="modItemList">
                                 <?php
                                     // populate the menu items list, and make items checked if menu item has this mod category
-                                    $sql = "SELECT title, quickCode FROM MenuModificationItems WHERE visible = 1 ORDER BY title";
+                                    $sql = "SELECT title, quickCode FROM MenuModificationItems ORDER BY title";
                                     $result = connection()->query($sql);
                                     while ($row = $result->fetch_assoc()) {
                                         if (strpos($associatedModItems,$row['quickCode']) > 0) {
