@@ -14,7 +14,7 @@
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
         <style>
             #sessionForm {
-            height: 95%;
+            height: 100%;
             width: 100%;
 		    }
             #sessionBody {

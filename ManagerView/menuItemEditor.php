@@ -44,7 +44,7 @@
                             MenuItems.route AS 'route',
                             MenuAssociations.parentQuickCode AS 'parent'
                     FROM (MenuItems LEFT JOIN MenuAssociations ON MenuItems.quickCode = MenuAssociations.childQuickCode)
-                    WHERE quickCode = '".$_POST['quickCode']."' ORDER BY counter DESC LIMIT 1;";
+                    WHERE quickCode = '".$_POST['quickCode']."' ORDER BY quickCode DESC LIMIT 1;";
             $fieldData = connection()->query($sql)->fetch_assoc();
             
             //just in case the quickCode persists after a deletion, these statements are wrapped in a condition
@@ -92,7 +92,7 @@
                 $sql->execute();
 
                 //get its new quick code and bind it to the $_POST variable.
-                $sql2 = "SELECT quickCode FROM MenuItems WHERE title = ? ORDER BY counter DESC LIMIT 1;";
+                $sql2 = "SELECT quickCode FROM MenuItems WHERE title = ? ORDER BY quickCode DESC LIMIT 1;";
                 $sql2 = connection()->prepare($sql2);
                 $sql2->bind_param('s', $_POST['menuTitle']);
                 $sql2->execute();

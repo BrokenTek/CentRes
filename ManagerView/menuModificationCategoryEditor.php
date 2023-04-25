@@ -104,7 +104,7 @@
                 $sql->execute();
 
                 //get its new quick code and bind it to the $_POST variable.
-                $sql2 = "SELECT quickCode FROM MenuModificationCategories WHERE title = ? ORDER BY counter DESC LIMIT 1;";
+                $sql2 = "SELECT quickCode FROM MenuModificationCategories WHERE title = ? ORDER BY quickCode DESC LIMIT 1;";
                 $sql2 = connection()->prepare($sql2);
                 $sql2->bind_param('s', $_POST['menuTitle']);
                 $sql2->execute();

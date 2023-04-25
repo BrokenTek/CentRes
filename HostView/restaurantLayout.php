@@ -45,7 +45,7 @@
                 varRem("scale");
                 updateDisplay();
             }, true);
-             var elements = document.getElementsByClassName('table');
+            var elements = document.getElementsByClassName('table');
             if (elements != null) {
                 for (var i = 0; i < elements.length; i++) {
                     elements[i].addEventListener('pointerdown',pointerDown);

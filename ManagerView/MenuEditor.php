@@ -21,8 +21,9 @@
             }
             iframe {
                 width: 95%;
-                height: 95%;
+                height: calc(100% - 2rem);
                 margin: auto auto auto auto;
+                margin-top: 2rem;
                 grid-row: 2;
                 border: none;
 

@@ -25,7 +25,7 @@
                 border-top: .125rem solid #333;
             }
             #sessionForm {
-                height: 95%;
+                height: 100%;
                 width: 100%;
             }
             #sessionBody {
@@ -84,6 +84,132 @@
         
 
         <script>
+
+            /////////////////////////////////////////////////////////////////////
+            // TASKS WHEN PAGE IS COMPLETELY LOADED
+            /////////////////////////////////////////////////////////////////////
+
+            function allElementsLoaded(){
+                //add the unicode characters to table headers with sort keys.
+                let tableHeaders = document.getElementsByTagName("th");
+                if(varGet('tblInventory_SortKey1')!=null){
+                    let keyIndex = 1;
+                    let unicodeBase = 9311;
+                    let keyPrefix = 'tblInventory_SortKey';
+                    while(varGet(keyPrefix + keyIndex)!= null){
+                        let keyToScan = varGet(keyPrefix + keyIndex);
+                        for(let i = 0; i < tableHeaders.length; i++){
+                            if(keyToScan.indexOf(tableHeaders[i].getAttribute("sqlColumnId"))!= -1){
+                                tableHeaders[i].innerText = keyIndex + "\xa0" +tableHeaders[i].innerText;
+                                if(varGet(keyPrefix + keyIndex).indexOf("ASC")!=-1){
+                                    tableHeaders[i].innerText = tableHeaders[i].innerText +"\u25B2";
+                                }
+                                else{
+                                    tableHeaders[i].innerText = tableHeaders[i].innerText +"\u25BC";
+                                }
+                            }
+                        }
+                        keyIndex++;
+                    }
+                }
+                              
+                
+                //select any items that were selected before refresh
+                let selItems = varGet("selectedItem");
+                if (varGet("selectedItem") !== undefined) {
+                    selItems = selItems.split(",");
+                    for( let i = 0; i < selItems.length; i++) {
+                        document.getElementById(selItems[i]).classList.add("selected");
+                    }
+                    setQtyBoxState();
+                }
+
+                //add all the event listeners
+                for(let i = 0; i < tableHeaders.length; i++){
+                    tableHeaders[i].addEventListener('pointerdown', tableHeaderClicked);
+                    }
+                let buttons = document.getElementsByTagName("button")
+                for(let i = 0; i < buttons.length; i++){
+                    buttons[i].addEventListener('pointerdown', buttonClicked);
+                }
+                let elements = document.getElementsByClassName('menuItem');
+                if (elements != null) {
+                    for (let i = 0; i < elements.length; i++) {
+                        elements[i].addEventListener('pointerdown',pointerDown);
+                        elements[i].addEventListener('pointerenter', pointerEnter);
+                    }
+                }
+                
+                document.getElementsByTagName("body")[0].addEventListener('pointerup', disengageMultiselect);
+
+                document.querySelector("#keyCatcher").addEventListener("keydown", keydown);
+                document.querySelector("#keyCatcher").addEventListener("pointerdown", deselectAllMenuItems);
+                document.querySelector("#keyCatcher").addEventListener("keyup", keyup);
+
+                document.querySelector("#btnUpdateQty").addEventListener("click", updateQty);
+
+                document.querySelector("#chkQtyTracked").addEventListener("pointerdown", ignorePointerDown);
+                document.querySelector("#numQty").addEventListener("pointerdown", ignorePointerDown);
+
+                with (document.getElementById("chkQtyTracked")) {
+                    addEventListener('change', function() {
+                        var numQty = document.getElementById("numQty");
+                        var qtyBtn = document.getElementById("btnUpdateQty");
+                        if (this.checked) {
+                            //numQty.classList.remove("disabled");
+                            numQty.removeAttribute("disabled");   
+                            if(document.getElementById("numQty").value == ''){
+                                //qtyBtn.classList.add("disabled");
+                                qtyBtn.setAttribute("disabled", true);
+                            }        
+                        } else {
+                            //numQty.classList.add("disabled");
+                            numQty.setAttribute("disabled", true);
+                            //qtyBtn.classList.remove("disabled");
+                            qtyBtn.removeAttribute("disabled");  
+                        }
+                    });
+                }
+                with (document.getElementById("numQty")){
+                    addEventListener('input', function(){
+                        var qtyBtn = document.getElementById("btnUpdateQty");
+                        if(this.value == '' &&document.getElementById("chkQtyTracked").checked){
+                            qtyBtn.classList.add("disabled");
+                            qtyBtn.setAttribute("disabled", true);
+                        }
+                        else{
+                            qtyBtn.classList.remove("disabled");
+                            qtyBtn.removeAttribute("disabled");  
+                        }
+                    });
+
+                }
+                
+
+                // code that allows retention of scrollbar location between refreshes
+                with (document.getElementById("sessionForm")) {
+                    let x = varGet(id + "_scrollLeft");
+                    let y = varGet(id + "_scrollTop");
+                    if (x !== undefined) {
+                        scrollLeft = x;
+                        scrollTop = y;
+                    }
+
+                    window.addEventListener('scroll', function(event) {
+                        varSet(id + "_scrollLeft", scrollLeft);
+                        varSet(id + "_scrollTop", scrollTop);
+                    }, true);   
+                }
+
+                setTitle("CentRes POS: Management Tools - Inventory / Popularity Window", "Management Tools");
+
+                //setTimeout(updateDisplay, 30000);
+            }
+
+            /////////////////////////////////////////////////////////////////////
+            // All other functions
+            /////////////////////////////////////////////////////////////////////
+
             function tableHeaderClicked() {
                 let tableId = document.getElementsByTagName("table")[0].id;
                 toggleSortKey(tableId, this.getAttribute("sqlColumnId"));
@@ -94,61 +220,107 @@
             }
 
             //=========================FUNCTIONS INVOLVING MENU ITEM SELECTION============================
-            const LONG_TIME_TOUCH_LENGTH = 250;
-            var targetMenuItem = null;
-            var longTouchEnabled = false;
-            var longTouchTimer = null;
+            var multiselectEngaged = false;
 	        function pointerDown() {
-                if (this === undefined || this.classList.contains('disabled')) { return; }
-                targetMenuItem = this;
-                targetMenuItem.classList.add("selected");
-                if (varGet("selectedItem") != null && varGet("selectedItem") != this.id) {
-                    longTouchTimer = setTimeout(longTouch, LONG_TIME_TOUCH_LENGTH);
+                event.stopPropagation();
+                multiselectEngaged = true;
+                if (ctrlDown) {
+                    toggleSelection(this);
                 }
+                else {
+                    var oldSelectedItems = document.getElementsByClassName("menuItem");
+                    for(let i = 0; i < oldSelectedItems.length; i++){
+        	            oldSelectedItems[i].classList.remove("selected");
+    	            }
+                    varSet("selectedItem", this.id);
+                    this.classList.add("selected");
+
+                }
+                setQtyBoxState();
 	        }
 
-            // if you pressed on a menu item, you already have another one selected, and the minimum required time
-            // for multiselect has elapsed, change the selected item to "multiselect" 
-            function longTouch() {
-                longTouchEnabled = true;
-                targetMenuItem.classList.add("multiselect");
-
-                // if there is exactly 1 other item selected, make it multi-select as well.
-                var alreadySelected = varGet("selectedItem");
-                if (alreadySelected != null && alreadySelected.indexOf(",") == -1) {
-                    document.getElementById(alreadySelected).classList.add("multiselect");
+            function pointerEnter() {
+                if (multiselectEngaged) {
+                    toggleSelection(this);
                 }
+                setQtyBoxState();               
             }
 
-            function pointerUp() {
-                if (targetMenuItem == null) { return; }
-        
-                    if (longTouchTimer != null) {
-                        clearTimeout(longTouchTimer);
+            function toggleSelection(target) {
+                if (ctrlDown) {
+                    if (shiftDown) {
+                        target.classList.toggle("selected");
                     }
-
-                var oldSelectedItems = document.getElementsByClassName("menuItem");
-                // if you only have 1 item selected, adjust the state of applicable menu items to reflect that.
-                if (!longTouchEnabled) {
-    	            /*this iterates through the list returned, if there is no case where multiple items are selected concurrently,
-    	            you can just use oldSelectedItems[0].classList.remove("selected"); instead*/
-    	            for(let i = 0; i < oldSelectedItems.length; i++){
-        	            oldSelectedItems[i].classList.remove("selected");
-                        oldSelectedItems[i].classList.remove("multiselect");
-    	            }
-    	            targetMenuItem.classList.add("selected");
-                    targetMenuItem.classList.remove("multiselect");
-                    varSet("selectedItem", targetMenuItem.id);
+                    else {
+                        target.classList.add("selected");
+                    }
                 }
-                // or you have multiple items selected
                 else {
-                    varSet("selectedItem", varGet("selectedItem") + "," + targetMenuItem.id); 
+                    target.classList.toggle("selected");
                 }
-
-                targetMenuItem = null;
-                longTouchEnabled = false;
-                setQtyBoxState();
+                let selMenuItems = document.querySelectorAll(".selected");
+                let selStr = "";
+                for (let i = 0; i < selMenuItems.length; i++) {
+                    selStr += "," + selMenuItems[i].id;
+                }
+                if (selStr.length > 0) {
+                    selStr = selStr.substring(1);
+                }
+                varSet("selectedItem", selStr);
             }
+
+            function disengageMultiselect() {
+                multiselectEngaged = false;
+            }
+
+            function deselectAllMenuItems() {
+                let selItems = document.querySelectorAll(".selected");
+                for (let i = 0; i < selItems.length; i++) {
+                    selItems[i].classList.remove("selected");
+                }
+                varRem("selectedItem");
+            }
+
+            function ignorePointerDown() {
+                event.stopPropagation();
+            }
+
+            var shiftDown = false;
+            var ctrlDown = false;
+            function keydown(event) {
+                //alert(event.keyCode);
+                switch (event.keyCode) {
+                    case 16:
+                        shiftDown = true;
+                        break;
+                    case 17:
+                        ctrlDown = true;
+                        break;
+                    case 13:
+                        event.preventDefault();   
+                        if (document.activeElement != null && document.activeElement.id == "numQty") {
+                            document.querySelector("#btnUpdateQty").click();
+                        }
+                            
+                }       
+            }
+
+            function keyup(event) {
+                switch (event.keyCode) {
+                    case 16:
+                        shiftDown = false;
+                        break;
+                    case 17:
+                        ctrlDown = false;
+                        break;
+                }
+            }
+
+            function updateQty() {
+                varSet("command", "updateQty");
+                updateDisplay();
+            }
+
             function setQtyBoxState(){
                 let sameQuantity = true;
                 let anyUntracked = false;
@@ -212,118 +384,13 @@
                 }
 
             }
-            //functions to execute once the body has loaded
-            function allElementsLoaded(){
-                //add the unicode characters to table headers with sort keys.
-                let tableHeaders = document.getElementsByTagName("th");
-                if(varGet('tblInventory_SortKey1')!=null){
-                    let keyIndex = 1;
-                    let unicodeBase = 9311;
-                    let keyPrefix = 'tblInventory_SortKey';
-                    while(varGet(keyPrefix + keyIndex)!= null){
-                        let keyToScan = varGet(keyPrefix + keyIndex);
-                        for(let i = 0; i < tableHeaders.length; i++){
-                            if(keyToScan.indexOf(tableHeaders[i].getAttribute("sqlColumnId"))!= -1){
-                                tableHeaders[i].innerText = keyIndex + "\xa0" +tableHeaders[i].innerText;
-                                if(varGet(keyPrefix + keyIndex).indexOf("ASC")!=-1){
-                                    tableHeaders[i].innerText = tableHeaders[i].innerText +"\u25B2";
-                                }
-                                else{
-                                    tableHeaders[i].innerText = tableHeaders[i].innerText +"\u25BC";
-                                }
-                            }
-                        }
-                        keyIndex++;
-                    }
-                }
-                              
-                
-                //select any items that were selected before refresh
-                let selItems = varGet("selectedItem");
-                if (varGet("selectedItem") !== undefined) {
-                    selItems = selItems.split(",");
-                    for( let i = 0; i < selItems.length; i++) {
-                        document.getElementById(selItems[i]).classList.add("selected");
-                    }
-                    setQtyBoxState();
-                }
-
-                //add all the event listeners
-                for(let i = 0; i < tableHeaders.length; i++){
-                    tableHeaders[i].addEventListener('pointerdown', tableHeaderClicked);
-                    }
-                let buttons = document.getElementsByTagName("button")
-                for(let i = 0; i < buttons.length; i++){
-                    buttons[i].addEventListener('pointerdown', buttonClicked);
-                }
-                let elements = document.getElementsByClassName('menuItem');
-                if (elements != null) {
-                    for (let i = 0; i < elements.length; i++) {
-                        elements[i].addEventListener('pointerdown',pointerDown);
-                        elements[i].addEventListener('pointerup', pointerUp);
-                    }
-                }
-
-                with (document.getElementById("chkQtyTracked")) {
-                    addEventListener('change', function() {
-                        var numQty = document.getElementById("numQty");
-                        var qtyBtn = document.getElementById("btnUpdateQty");
-                        if (this.checked) {
-                            //numQty.classList.remove("disabled");
-                            numQty.removeAttribute("disabled");   
-                            if(document.getElementById("numQty").value == ''){
-                                //qtyBtn.classList.add("disabled");
-                                qtyBtn.setAttribute("disabled", true);
-                            }        
-                        } else {
-                            //numQty.classList.add("disabled");
-                            numQty.setAttribute("disabled", true);
-                            //qtyBtn.classList.remove("disabled");
-                            qtyBtn.removeAttribute("disabled");  
-                        }
-                    });
-                }
-                with (document.getElementById("numQty")){
-                    addEventListener('input', function(){
-                        var qtyBtn = document.getElementById("btnUpdateQty");
-                        if(this.value == '' &&document.getElementById("chkQtyTracked").checked){
-                            qtyBtn.classList.add("disabled");
-                            qtyBtn.setAttribute("disabled", true);
-                        }
-                        else{
-                            qtyBtn.classList.remove("disabled");
-                            qtyBtn.removeAttribute("disabled");  
-                        }
-                    })
-
-                }
-                
-
-                // code that allows retention of scrollbar location between refreshes
-                with (document.getElementById("sessionForm")) {
-                    let x = varGet(id + "_scrollLeft");
-                    let y = varGet(id + "_scrollTop");
-                    if (x !== undefined) {
-                        scrollLeft = x;
-                        scrollTop = y;
-                    }
-
-                    window.addEventListener('scroll', function(event) {
-                        varSet(id + "_scrollLeft", scrollLeft);
-                        varSet(id + "_scrollTop", scrollTop);
-                    }, true);   
-                }
-
-                setTitle("CentRes POS: Management Tools - Inventory and Popularity Window", "Management Tools");
-
-                setTimeout(updateDisplay, 30000);
-            }
+            
 
             
             
         </script>
     </head>
-    <body onload="allElementsLoaded()">
+    <body onload="allElementsLoaded()" id="keyCatcher">
         
         <form id="sessionForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <?php require_once "../Resources/PHP/sessionHeader.php"; ?>

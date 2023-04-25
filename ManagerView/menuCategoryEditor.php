@@ -42,7 +42,7 @@
             if ($_POST['quickCode'] != 'dtchd') {
                 $sql = "SELECT MenuCategories.title AS 'categoryTitle', MenuAssociations.parentQuickCode AS 'parent'
                     FROM (MenuCategories LEFT JOIN MenuAssociations ON MenuCategories.quickCode = MenuAssociations.childQuickCode)
-                    WHERE quickCode = '".$_POST['quickCode']."' ORDER BY counter DESC LIMIT 1;";
+                    WHERE quickCode = '".$_POST['quickCode']."' ORDER BY quickCode DESC LIMIT 1;";
                 $fieldData = connection()->query($sql)->fetch_assoc();
                 //just in case the quickCode persists after a deletion, these statements are wrapped in a condition
                 //to prevent unwanted warnings from showing up. Note to self: unwrap this if you account for this.
@@ -86,7 +86,7 @@
                 $sql->execute();
 
                 //get its new quick code and bind it to the $_POST variable.
-                $sql2 = "SELECT quickCode FROM MenuCategories WHERE title = ? ORDER BY counter DESC LIMIT 1;";
+                $sql2 = "SELECT quickCode FROM MenuCategories WHERE title = ? ORDER BY quickCode DESC LIMIT 1;";
                 $sql2 = connection()->prepare($sql2);
                 $sql2->bind_param('s', $_POST['menuTitle']);
                 $sql2->execute();
