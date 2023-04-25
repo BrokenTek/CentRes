@@ -140,7 +140,6 @@
             }
         }
         if(isset($_POST['delete'])){
-            echo("DELETE");
             $sql = "DELETE FROM MenuModificationCategories WHERE quickCode = '".$_POST['quickCode']."';";
             connection()->query($sql);
 
