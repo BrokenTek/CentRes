@@ -23,7 +23,11 @@ DROP TABLE IF EXISTS Config;
 
 CREATE TABLE Config (
 	sessionTimeoutInMins INT UNSIGNED NOT NULL DEFAULT 5,
-	businessDay DATE NOT NULL DEFAULT NOW()
+	businessDay DATE NOT NULL DEFAULT NOW(),
+	cCounter INT UNSIGNED NOT NULL DEFAULT 0,
+	iCounter INT UNSIGNED NOT NULL DEFAULT 0,
+	mCounter INT UNSIGNED NOT NULL DEFAULT 0,
+	nCounter INT UNSIGNED NOT NULL DEFAULT 0
 );
 
 CREATE TABLE LoginRouteTable (
@@ -70,7 +74,6 @@ CREATE TABLE QuickCodes (
 
 CREATE TABLE MenuCategories (
 	quickCode VARCHAR(5) PRIMARY KEY,
-	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	title VARCHAR(75) NOT NULL UNIQUE,
 	route char(1),
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
@@ -79,7 +82,6 @@ CREATE TABLE MenuCategories (
 
 CREATE TABLE MenuItems (
 	quickCode VARCHAR(5) PRIMARY KEY,
-	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	title VARCHAR(75) NOT NULL UNIQUE,
 	price DECIMAL(6, 2) UNSIGNED,
 	route char(1),
@@ -91,7 +93,6 @@ CREATE TABLE MenuItems (
 
 CREATE TABLE MenuModificationCategories (
 	quickCode VARCHAR(5) PRIMARY KEY,
-	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	title VARCHAR(75) NOT NULL UNIQUE,
 	categoryType ENUM('MandatoryOne','MandatoryAny','OptionalOne','OptionalAny'),
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)
@@ -100,7 +101,6 @@ CREATE TABLE MenuModificationCategories (
 
 CREATE TABLE MenuModificationItems (
 	quickCode VARCHAR(5) PRIMARY KEY,
-	counter INTEGER UNSIGNED UNIQUE AUTO_INCREMENT,
 	quantifierString VARCHAR(1000) NOT NULL DEFAULT '',
 	title VARCHAR(75) NOT NULL UNIQUE,
 	FOREIGN KEY (quickCode) REFERENCES QuickCodes(id)

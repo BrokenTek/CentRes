@@ -157,17 +157,24 @@ END;
 CREATE TRIGGER beforeAddMenuCategory
 BEFORE INSERT ON MenuCategories FOR EACH ROW
 BEGIN
-	DECLARE cnt INTEGER UNSIGNED;
 	DECLARE isUnique BOOLEAN;
+	DECLARE recordedNextValue INTEGER UNSIGNED;
+	DECLARE calculatedNextValue INTEGER UNSIGNED;
 	SELECT menuObjectTitleUnique(NEW.title) INTO isUnique;
+	SELECT cCounter INTO recordedNextValue FROM Config;
+	SELECT IFNULL(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0) INTO calculatedNextValue FROM MenuCategories;
 	IF (NOT isUnique) THEN
 		SIGNAL SQLSTATE '45000'
     	SET MESSAGE_TEXT = 'Menu Object Titles must be unique.';
 	ELSE 
 		IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-			-- SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuCategories;
-			SELECT IFNULL(MAX(counter), 0) + 1 INTO cnt FROM MenuCategories;
-			SET NEW.quickCode = CONCAT('C', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
+			IF (calculatedNextValue > recordedNextValue) THEN
+				UPDATE Config SET cCounter = calculatedNextValue + 1;
+			ELSE
+				UPDATE Config SET cCounter = recordedNextValue + 1;
+			END IF;
+			SELECT cCounter INTO calculatedNextValue FROM Config;
+			SET NEW.quickCode = CONCAT('C', LPAD(CONVERT(calculatedNextValue, VARCHAR(4)),4,'0'));
 		END IF;
 		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 	END IF;
@@ -176,17 +183,24 @@ END;
 CREATE TRIGGER beforeAddMenuItem
 BEFORE INSERT ON MenuItems FOR EACH ROW
 BEGIN
-	DECLARE cnt INTEGER UNSIGNED;
 	DECLARE isUnique BOOLEAN;
+	DECLARE recordedNextValue INTEGER UNSIGNED;
+	DECLARE calculatedNextValue INTEGER UNSIGNED;
 	SELECT menuObjectTitleUnique(NEW.title) INTO isUnique;
+	SELECT iCounter INTO recordedNextValue FROM Config;
+	SELECT IFNULL(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0) INTO calculatedNextValue FROM MenuItems;
 	IF (NOT isUnique) THEN
 		SIGNAL SQLSTATE '45000'
     	SET MESSAGE_TEXT = 'Menu Object Titles must be unique.';
 	ELSE 
 		IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-			-- SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuItems;
-			SELECT IFNULL(MAX(counter), 0) + 1 INTO cnt FROM MenuItems;
-			SET NEW.quickCode = CONCAT('I', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
+			IF (calculatedNextValue > recordedNextValue) THEN
+				UPDATE Config SET iCounter = calculatedNextValue + 1;
+			ELSE
+				UPDATE Config SET iCounter = recordedNextValue + 1;
+			END IF;
+			SELECT iCounter INTO calculatedNextValue FROM Config;
+			SET NEW.quickCode = CONCAT('I', LPAD(CONVERT(calculatedNextValue, VARCHAR(4)),4,'0'));
 		END IF;
 		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 	END IF;
@@ -195,17 +209,24 @@ END;
 CREATE TRIGGER beforeAddMenuModificationCategory
 BEFORE INSERT ON MenuModificationCategories FOR EACH ROW
 BEGIN
-	DECLARE cnt INTEGER UNSIGNED;
 	DECLARE isUnique BOOLEAN;
+	DECLARE recordedNextValue INTEGER UNSIGNED;
+	DECLARE calculatedNextValue INTEGER UNSIGNED;
 	SELECT menuObjectTitleUnique(NEW.title) INTO isUnique;
+	SELECT mCounter INTO recordedNextValue FROM Config;
+	SELECT IFNULL(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0) INTO calculatedNextValue FROM MenuModificationCategories;
 	IF (NOT isUnique) THEN
 		SIGNAL SQLSTATE '45000'
     	SET MESSAGE_TEXT = 'Menu Object Titles must be unique.';
 	ELSE 
 		IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-			-- SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationCategories;
-			SELECT IFNULL(MAX(counter), 0) + 1 INTO cnt FROM MenuModificationCategories;
-			SET NEW.quickCode = CONCAT('M', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
+			IF (calculatedNextValue > recordedNextValue) THEN
+				UPDATE Config SET mCounter = calculatedNextValue + 1;
+			ELSE
+				UPDATE Config SET mCounter = recordedNextValue + 1;
+			END IF;
+			SELECT mCounter INTO calculatedNextValue FROM Config;
+			SET NEW.quickCode = CONCAT('M', LPAD(CONVERT(calculatedNextValue, VARCHAR(4)),4,'0'));
 		END IF;
 		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 	END IF;
@@ -214,17 +235,24 @@ END;
 CREATE TRIGGER beforeAddMenuModificationItem
 BEFORE INSERT ON MenuModificationItems FOR EACH ROW
 BEGIN
-	DECLARE cnt INTEGER UNSIGNED;
 	DECLARE isUnique BOOLEAN;
+	DECLARE recordedNextValue INTEGER UNSIGNED;
+	DECLARE calculatedNextValue INTEGER UNSIGNED;
 	SELECT menuObjectTitleUnique(NEW.title) INTO isUnique;
+	SELECT nCounter INTO recordedNextValue FROM Config;
+	SELECT IFNULL(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0) INTO calculatedNextValue FROM MenuModificationItems;
 	IF (NOT isUnique) THEN
 		SIGNAL SQLSTATE '45000'
     	SET MESSAGE_TEXT = 'Menu Object Titles must be unique.';
 	ELSE 
 		IF (NEW.quickCode IS NULL OR NEW.quickCode = '') THEN
-			-- SELECT GREATEST(COALESCE(MAX(CAST(SUBSTRING(quickCode,2) AS UNSIGNED)), 0), counter) + 1 INTO cnt FROM MenuModificationItems;
-			SELECT IFNULL(MAX(counter), 0) + 1 INTO cnt FROM MenuModificationItems;
-			SET NEW.quickCode = CONCAT('N', LPAD(CONVERT(cnt, VARCHAR(4)),4,'0'));
+			IF (calculatedNextValue > recordedNextValue) THEN
+				UPDATE Config SET nCounter = calculatedNextValue + 1;
+			ELSE
+				UPDATE Config SET nCounter = recordedNextValue + 1;
+			END IF;
+			SELECT nCounter INTO calculatedNextValue FROM Config;
+			SET NEW.quickCode = CONCAT('N', LPAD(CONVERT(calculatedNextValue, VARCHAR(4)),4,'0'));
 		END IF;
 		INSERT INTO QuickCodes (id) VALUES (NEW.quickCode);
 	END IF;
