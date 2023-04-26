@@ -231,7 +231,7 @@ if (isset($_POST['showDetachedMenuObjects'])) {
 		$sql = "SELECT childQuickCode, title, price
 		FROM MenuAssociations 
 		INNER JOIN MenuItems ON MenuItems.quickCode = MenuAssociations.childQuickCode 
-		WHERE MenuAssociations.parentQuickCode = '$qc';";
+		WHERE MenuAssociations.parentQuickCode = '$qc' ORDER BY title;";
 		$result = connection()->query($sql);
 
 		if ($result->num_rows > 0) {
