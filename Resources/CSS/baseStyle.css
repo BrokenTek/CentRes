@@ -91,12 +91,14 @@ body {
 
   button, .button, #submitBtn {
     background-color: #F6941D;
-    color: white !important;
+    color: black;
     font-weight: bold;
     margin: .25rem .25rem .25rem .25rem;
     min-width: 5rem;
     min-height: 2rem;
   }
+
+  
 
   #managementNavigationSelector {
     color: white !important;
@@ -115,6 +117,11 @@ body {
 
   button:hover, .button:hover {
     background-color: #bf1e2e;
+    color: white !important;
+  }
+
+  button:disabled, .button:disabled, #submitBtn:disabled {
+    color: white !important;
   }
 
   #sessionBody {
@@ -252,56 +259,56 @@ th {
     animation: fadeIn 2s 0s forwards;
   }
 
-    #modEditorContainer > form {
-    background-color: transparent;
-    }
+  #modEditorContainer > form {
+  background-color: transparent;
+  }
 
-    .toggled {
-      animation: toggleAnimate 1.5s 0s ease forwards;
-    }
+  .toggled {
+    animation: toggleAnimate 1.5s 0s ease forwards;
+  }
 
-    
+  
 
-    @keyframes fadeOut {
-    0% { opacity: 1; z-index: 2;}
-    100% { opacity: 0; z-index: -1;}
-    }
+  @keyframes fadeOut {
+  0% { opacity: 1; z-index: 2;}
+  100% { opacity: 0; z-index: -1;}
+  }
 
-    @keyframes fadeIn {
-    0% { opacity: 0;}
-    100% { opacity: 1;}
-    }
+  @keyframes fadeIn {
+  0% { opacity: 0;}
+  100% { opacity: 1;}
+  }
 
-    @keyframes highlightFlash {
-      0% { background-color: revert; transform: scale(1);}
-      50% { background-color: #bf1e2e; transform: scale(.9); }
-      100% { background-color: revert; transform: scale(1);}
-    }
+  @keyframes highlightFlash {
+    0% { background-color: revert; transform: scale(1);}
+    50% { background-color: #bf1e2e; transform: scale(.9); }
+    100% { background-color: revert; transform: scale(1);}
+  }
 
-      @keyframes toggleAnimate {
-        0% { background-color: #F6941D; transform: scale(1); border-radius: 0;}
-        50% { background-color: #42280e; transform: scale(.9); border-radius: 1rem; }
-        100% { background-color: #42280e; transform: scale(1); border-radius: 0;}
-        }
+    @keyframes toggleAnimate {
+      0% { background-color: #F6941D; transform: scale(1); border-radius: 0;}
+      50% { background-color: #42280e; transform: scale(.9); border-radius: 1rem; }
+      100% { background-color: #42280e; transform: scale(1); border-radius: 0;}
+      }
 
-    .message {
-      background-color: black;
-      color: white;
-      border: 3px solid white;
-      padding: .5rem .5rem .5rem .5rem;
-    }
+  .message {
+    background-color: black;
+    color: white;
+    border: 3px solid white;
+    padding: .5rem .5rem .5rem .5rem;
+  }
 
-    .ticketForm {
-      background-color: black;
-    }
+  .ticketForm {
+    background-color: black;
+  }
 
-    .ticketItem {
-      background-color: #FFE699;
-    }
+  .ticketItem {
+    background-color: #FFE699;
+  }
 
-    .highlighted {
-      animation: highlightFlash .5s ease-in-out 2 backwards;
-    }
+  .highlighted {
+    animation: highlightFlash .5s ease-in-out 2 backwards;
+  }
 
 
 

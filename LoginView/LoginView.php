@@ -42,7 +42,8 @@
             if (mysqli_num_rows($existingLocalSession) == 1) {
                 $username = $existingLocalSession->fetch_assoc()['userName'];
                 $sql = "CALL logout('$username');";
-                connection()->query($sql);
+                // Debug
+                // connection()->query($sql);
             }
 
             // generate session token

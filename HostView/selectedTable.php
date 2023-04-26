@@ -214,6 +214,7 @@
         #btnDisable:hover, 
         #btnBussingComplete:hover {
           background-color: #F6941D;
+          color: black !important;
         }
 
         .bannerLabel {

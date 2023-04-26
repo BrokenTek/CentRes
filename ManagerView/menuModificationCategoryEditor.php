@@ -498,7 +498,7 @@
                             <div id="menuItemList">
                                 <?php
                                     // populate the menu items list, and make items checked if menu item has this mod category
-                                    $sql = "SELECT title, quickCode FROM MenuItems ORDER BY title";
+                                    $sql = "SELECT title, quickCode FROM MenuItems ORDER BY REPLACE(CONCAT(' ', title),' .',' ');";
                                     $result = connection()->query($sql);
                                     while ($row = $result->fetch_assoc()) {
                                         if (strpos($associatedMenuItems,$row['quickCode']) > 0) {
@@ -516,7 +516,7 @@
                             <div id="modItemList">
                                 <?php
                                     // populate the menu items list, and make items checked if menu item has this mod category
-                                    $sql = "SELECT title, quickCode FROM MenuModificationItems ORDER BY title";
+                                    $sql = "SELECT title, quickCode FROM MenuModificationItems ORDER BY REPLACE(CONCAT(' ', title),' .',' ');";
                                     $result = connection()->query($sql);
                                     while ($row = $result->fetch_assoc()) {
                                         if (strpos($associatedModItems,$row['quickCode']) > 0) {
