@@ -445,7 +445,7 @@ BEGIN
 		UPDATE Tables SET status = 'bussing' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Remove' AND NEW.employeeId IS NOT NULL) THEN
 		DELETE FROM TableAssignments WHERE employeeId = NEW.employeeId and tableId = NEW.tableId;
-		IF (((SELECT COUNT(*) FROM TableAssignemnts WHERE tableId = NEW.TableId) = 0) AND 
+		IF (((SELECT COUNT(*) FROM TableAssignments WHERE tableId = NEW.TableId) = 0) AND 
 		((SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId and status = 'bussing')) = 0) THEN
 			UPDATE Tables SET status = 'unassigned' WHERE id = NEW.tableId;
 		END IF;
