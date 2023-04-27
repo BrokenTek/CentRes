@@ -76,7 +76,7 @@
 
                 document.querySelector("#btnHideMessage").addEventListener('click', hideAlertMsg);
                 
-                setTitle("CentRes POS: Server Window", "Server Window");
+                setTitle("CentRes RMS: Server Window", "Server Window");
 
             }
             addEventListener("load", loaded);

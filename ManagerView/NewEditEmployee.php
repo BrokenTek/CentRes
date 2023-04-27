@@ -76,10 +76,19 @@
             .hidden {
                 display: none;
             }
-            .highlighted, .message{
-                grid-area:messages;
-                margin-block: 1rem;
-                
+            .highlighted, .message {
+                grid-area: messages;
+                margin-top: 1rem;
+                margin-inline: auto;
+                border: .25rem solid white;
+                padding: .5rem;
+            }
+
+            .highlighted {
+                animation: highlightFlash .5s ease-in-out 2 backwards;
+            }
+            .disappear, .highlighted.disappear {
+                animation: fadeOut .33s ease-in-out 1 forwards;
             }
             fieldset{
                 grid-area:fields;
@@ -133,9 +142,20 @@
                     window.location.href="EmployeeRoster.php";
                 });
 
-                setTitle("CentRes POS: Management Tools - Employee Account Management", "Management Tools");
+                setTitle("CentRes RMS: Management Tools - Employee Account Management", "Management Tools");
 
                 document.getElementById("firstNameField").focus();
+
+                setTimeout(() => {
+                    var msg = document.getElementsByClassName("message");
+                    var err = document.getElementsByClassName("highlighted");
+                    if (msg.length > 0) {
+                        msg[0].classList.add("disappear");
+                    }
+                    if (err.length > 0) {
+                        err[0].classList.add("disappear");
+                    }
+                }, 3000);
             }
 
 
@@ -202,7 +222,6 @@
 
                 }
                 catch(mysqli_sql_exception $e){
-                    echo("<h1>".$e->getmessage()."</h1>");
                     if(str_contains($e->getmessage(), "null")){
                         $_POST['errorState'] = "Sorry, we can't add a user without a role.";
                     }
@@ -274,7 +293,7 @@
                     echo('<div class="highlighted">'.$_POST['errorState']."</div>");
                     unset($_POST['errorState']);
                 }
-                if(isset($successMessage)){
+                else if(isset($successMessage)){
                     echo('<div class="message">'.$successMessage."</div>");
                     unset($successMessage);
                 }

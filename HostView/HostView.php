@@ -65,7 +65,7 @@
 				if ((ROLE & 8) == 8) {
 					authorizationId = USER_ID;
             	}
-				setTitle("CentRes POS: Host Station", "Host Station");
+				setTitle("CentRes RMS: Host Station", "Host Station");
 				startEventLoopTimer();
 			}
 			

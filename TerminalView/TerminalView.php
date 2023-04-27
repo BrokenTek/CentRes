@@ -30,7 +30,7 @@
         <script>
             function allElementsLoaded() {
                 varCpy("route", null, "ifrTGC", true);
-                setTitle("CentRes POS: Terminal Window", "Terminal Window: Viewing Route " + varGet("route"));
+                setTitle("CentRes RMS: Terminal Window", "Terminal Window: Viewing Route " + varGet("route"));
             }
             
             var groupIdBuffer = [];

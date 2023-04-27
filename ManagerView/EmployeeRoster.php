@@ -274,7 +274,7 @@
                     }
                 }
 
-                setTitle("CentRes POS: Management Tools - Employee Account Management", "Management Tools");
+                setTitle("CentRes RMS: Management Tools - Employee Account Management", "Management Tools");
             }
 
             //Place your other JavaScript Code here

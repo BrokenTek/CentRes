@@ -429,10 +429,10 @@ BEGIN
 		UPDATE Tables SET status = 'seated' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Add' AND NEW.employeeId IS NOT NULL) THEN
 		INSERT INTO TableAssignments VALUES(NEW.employeeId, NEW.tableId);
-		IF ((SELECT COUNT(*) FROM Tickets WHERE tableId = NEW.TableId LIMIT 1) > 0) THEN
+		IF ((SELECT COUNT(*) FROM Tickets WHERE tableId = NEW.TableId ) > 0) THEN
 			UPDATE Tables SET status = 'seated' WHERE id = NEW.tableId;
 		ELSE
-			IF ((SELECT COUNT(status) FROM Tables WHERE id = NEW.TableId AND status = 'bussing' LIMIT 1) = 0) THEN
+			IF ((SELECT COUNT(status) FROM Tables WHERE id = NEW.TableId AND status = 'bussing') = 0) THEN
 				UPDATE Tables SET status = 'open' WHERE id = NEW.tableId;
 			END IF;
 		END IF;
@@ -445,12 +445,12 @@ BEGIN
 		UPDATE Tables SET status = 'bussing' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Remove' AND NEW.employeeId IS NOT NULL) THEN
 		DELETE FROM TableAssignments WHERE employeeId = NEW.employeeId and tableId = NEW.tableId;
-		IF (((SELECT COUNT(*) FROM Tickets WHERE tableId = NEW.TableId LIMIT 1) = 0) AND 
-		((SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId and status = 'bussing' LIMIT 1)) = 0) THEN
+		IF (((SELECT COUNT(*) FROM Tickets WHERE tableId = NEW.TableId) = 0) AND 
+		((SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId and status = 'bussing')) = 0) THEN
 			UPDATE Tables SET status = 'unassigned' WHERE id = NEW.tableId;
 		END IF;
 	ELSEIF (NEW.action = 'SetBused') THEN
-		IF ((SELECT COUNT(*) FROM TableAssignments WHERE tableId = NEW.TableId LIMIT 1) = 0) THEN
+		IF ((SELECT COUNT(*) FROM TableAssignments WHERE tableId = NEW.TableId) = 0) THEN
 			UPDATE Tables SET status = 'unassigned' WHERE id = NEW.tableId;
 		ELSE
 			UPDATE Tables SET status = 'open' WHERE id = NEW.tableId;
@@ -458,7 +458,7 @@ BEGIN
 	ELSEIF (NEW.action = 'Disable') THEN
 		UPDATE Tables SET status = 'disabled' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Enable') THEN
-		IF ((SELECT COUNT(*) FROM TableAssignments WHERE tableId = NEW.TableId LIMIT 1) = 0) THEN
+		IF ((SELECT COUNT(*) FROM TableAssignments WHERE tableId = NEW.TableId) = 0) THEN
 			UPDATE Tables SET status = 'unassigned' WHERE id = NEW.tableId;
 		ELSE
 			UPDATE Tables SET status = 'open' WHERE id = NEW.tableId;
@@ -750,7 +750,7 @@ BEGIN
 	IF (cnt = 0) THEN
 		UPDATE Config SET businessDay = NOW();
 	END IF;
-	IF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername) = 0) THEN
+	IF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername LIMIT 1) = 0) THEN
 		-- Invalid Employee Id
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Username not found!';

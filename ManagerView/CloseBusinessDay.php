@@ -23,7 +23,9 @@
         <script src="../Resources/JavaScript/display.js" type="text/javascript"></script> 
         
         <script>
-            function allElementsLoaded() { }
+            function allElementsLoaded() { 
+                setTitle("CentRes RMS: Management Tools - Close Business Day", "Management Tools - Close Business Day");
+            }
 
         </script>
         <style>
@@ -95,7 +97,7 @@
                             <legend>
                             Are you sure you want to close the business day for <?php echo($businessDay); ?>?
                             <br>
-                            This action can only be performed once per calendar date!
+                            This action can only be performed once for each calendar date!
                             </legend>
                             <input type="submit" class="button" name="confirmClose" value="Close Business Day">
                     <?php endif; ?>

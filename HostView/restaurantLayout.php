@@ -10,15 +10,16 @@
             animation: goDark .25s 0s ease forwards;
         }
 
+        .noselect {
+            animation: goLight .25s 0s ease forwards;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            background-color: #111;
+            background-color: #444;
         }
 
-        .tabletest {
-            opacity: 20%;
-        }
         html {
             overflow: hidden;
         }
@@ -27,6 +28,13 @@
         0% {background-color: initial;}
         100% { background-color: #333;}
     }
+
+    @keyframes goLight {
+        0% {background-color: #333;}
+        100% { background-color: initial; }
+    }
+
+
     </style>
     <script src="../Resources/JavaScript/display.js" type="text/javascript"></script>
     <script src="../Resources/JavaScript/svgManipulation.js"></script>
@@ -189,6 +197,7 @@
                     if (lookAt != null && lookAt.indexOf(",") == -1) {
                         multiselectEnabled = true;
                         document.getElementsByTagName("form")[0].classList.add("multiselect");
+                        document.getElementsByTagName("form")[0].classList.remove("noselect");
                         this.classList.toggle("selected");
                         updateSelectedTables();
                     }
@@ -204,6 +213,7 @@
             if (multiselectEnabled) {
                 multiselectEnabled = false;
                 document.getElementsByTagName("form")[0].classList.remove("multiselect");
+                document.getElementsByTagName("form")[0].classList.add("noselect");
             }
             else {
                 var oldSelectedItems = document.getElementsByClassName("table");
@@ -226,6 +236,7 @@
             pointerIsDown = false;
             multiselectEnabled = false;
             document.getElementsByTagName("form")[0].classList.remove("multiselect");
+            document.getElementsByTagName("form")[0].classList.add("noselect");
         }
 
         function updateSelectedTables() {

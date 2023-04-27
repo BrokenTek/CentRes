@@ -47,11 +47,33 @@
         #btnCreate {
             grid-column: 3;
         }
+        .message, .errorMessage {
+            margin-top: 1rem;
+            margin-inline: auto;
+            max-width: 20rem;
+            border: .25rem solid white;
+            padding: .5rem;
+        }
+        .disappear, .errorMessage.disappear {
+            animation: fadeOut .33s ease-in-out 1 forwards;
+        }
+
     </style>
     <script>
         var chkReservation;
         function declareReservationCheck() {
             chkReservation = document.getElementById("chkReservation");
+
+            setTimeout(() => {
+                    var msg = document.getElementsByClassName("message");
+                    var err = document.getElementsByClassName("highlighted");
+                    if (msg.length > 0) {
+                        msg[0].classList.add("disappear");
+                    }
+                    if (err.length > 0) {
+                        err[0].classList.add("disappear");
+                    }
+                }, 3000);
         }
 
         function setTimeRequestedToNow() {
@@ -115,9 +137,9 @@
             $row = $result->fetch_assoc();
             $newTicketNum = $row["newTicketNum"];
             $timeRequested = $row["timeRequested"];
-           $message = "<div>Ticket created for $nickname: $partySize</div>";
+            $message = "<div class='message'>Ticket created for $nickname: $partySize</div>";
         } catch (mysqli_sql_exception $e) {
-            $message =  "<div>An error has occured.\nTry changing the party name.</div>";
+            $message =  "<div class='errorMessage'>An error has occured.\nTry changing the party name.</div>";
         }
     }
 

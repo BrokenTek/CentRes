@@ -1,17 +1,13 @@
 .table {
-    opacity: .4;
-}
-
-.highlighted{
-    stroke:#bf1e2e;
-    animation: highlighted_animation 3s linear infinite;
-}
-.selected{
     opacity: 1;
-    stroke-width: 5px;
 }
 
 
+.selected{
+    animation: sel_animation 1s linear infinite;
+    stroke: black;
+    stroke-width: .25rem;
+}
 .multiSelect{
     stroke-width: 12px;
 }
@@ -36,15 +32,68 @@
     fill: gray;
     color: gray;
 }
+.highlighted{
+    stroke-width: .25rem;
+    animation: highlighted_animation 3s linear infinite;
+}
+
+.highlighted.selected {
+    stroke-width: .5rem;
+    animation: hybrid_animation 3s linear infinite;
+}
 
 
 
-@keyframes highlighted_animation {
+@keyframes sel_animation {
     0%, 100% {
-        stroke-width: 0px; 
+        filter: drop-shadow(0rem -.125rem .125rem white);
+    }
+    25% {
+        filter: drop-shadow(.125rem 0rem .125rem white);
+    }
+    50% {
+        filter: drop-shadow(0rem .125rem .125rem white);
+    }
+    75% {
+        filter: drop-shadow(-.125rem 0rem .125rem white);
     }
     
-    30%, 70% {
-        stroke-width: 5px;
-    }
 }
+@keyframes highlighted_animation {
+    0%, 100% {
+        stroke: #bf1e2e;
+        stroke-width: .125rem;
+    }
+    25% {
+        stroke: #bf1e2e;
+        stroke-width: .25rem;
+    }
+    50% {
+        stroke: #bf1e2e;
+        stroke-width: .5rem;
+    }
+    75% {
+        stroke: #bf1e2e;
+        stroke-width: .75rem;
+    }   
+}
+
+@keyframes hybrid_animation {
+    0%, 100% {
+        stroke: #000;
+        stroke-width: .125rem;
+    }
+    25% {
+        stroke: #bf1e2e;
+        stroke-width: .25rem;
+    }
+    50% {
+        stroke: #000;
+        stroke-width: .5rem;
+    }
+    75% {
+        stroke: #bf1e2e;
+        stroke-width: .75rem;
+    }   
+}
+

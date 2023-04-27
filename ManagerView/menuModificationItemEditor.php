@@ -157,14 +157,14 @@
                     if (msgs.length == 1) {
                         msgs[0].classList.add("disappear");
                     } 
-                }, 5000);
+                }, 3000);
 
                 setTimeout(function() { 
                     let errs = document.getElementsByClassName("errorMessage");
                     if (errs.length == 1) {
                         errs[0].classList.add("disappear");
                     } 
-                }, 5000);
+                }, 3000);
             }
 
             function btnResetPressed(event) {
