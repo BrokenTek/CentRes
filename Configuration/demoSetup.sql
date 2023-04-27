@@ -62,3 +62,6 @@ UPDATE Tickets SET timeReserved = DATE_ADD(now(),interval -10 minute), timeReque
 UPDATE Tickets SET timeReserved = DATE_ADD(now(),interval -9 minute), timeRequested = DATE_ADD(now(),interval -9 minute) WHERE partySize = 6;
 UPDATE Tickets SET timeReserved = DATE_ADD(now(),interval -12 minute), timeRequested = DATE_ADD(now(),interval -12 minute) WHERE partySize = 8;
 UPDATE Tickets SET timeReserved = DATE_ADD(now(),interval -17 minute), timeRequested = DATE_ADD(now(),interval -17 minute) WHERE partySize = 10;
+
+CALL createTicketItem(1, 1, 1, titleToQuickCode('Onion Ring Tower'));
+CALL createTicketItem(1, 1, 1, titleToQuickCode('Coca-Cola'));

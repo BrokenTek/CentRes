@@ -15,7 +15,7 @@
         if ($centStr != 0) {
             $centStr = substr($centStr, 1);
         }
-        $centStr = str_pad(substr(str_replace("0.",".", $centStr), 1),2,"0", STR_PAD_RIGHT);
+        $centStr = substr(str_pad(substr(str_replace("0.",".", $centStr), 1),2,"0", STR_PAD_RIGHT),0,2);
         
         $denominationStr = "";
         while ( $denominations > 0 ) {
