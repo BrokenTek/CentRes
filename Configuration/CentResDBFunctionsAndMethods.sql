@@ -110,13 +110,13 @@ END;
 
 CREATE FUNCTION menuObjectTitleUnique(objTitle VARCHAR(75)) RETURNS BOOLEAN
 BEGIN
-	IF ((SELECT COUNT(*) FROM MenuCategories WHERE title = objTitle LIMIT 1) = 1) THEN
+	IF ((SELECT COUNT(*) FROM MenuCategories WHERE title = objTitle) = 1) THEN
 		RETURN 0;
-	ELSEIF ((SELECT COUNT(*) FROM MenuItems WHERE title = objTitle LIMIT 1) = 1) THEN
+	ELSEIF ((SELECT COUNT(*) FROM MenuItems WHERE title = objTitle) = 1) THEN
 		RETURN 0;
-	ELSEIF ((SELECT COUNT(*) FROM MenuModificationCategories WHERE title = objTitle LIMIT 1) = 1) THEN
+	ELSEIF ((SELECT COUNT(*) FROM MenuModificationCategories WHERE title = objTitle) = 1) THEN
 		RETURN 0;
-	ELSEIF ((SELECT COUNT(*) FROM MenuModificationItems WHERE title = objTitle LIMIT 1) = 1) THEN
+	ELSEIF ((SELECT COUNT(*) FROM MenuModificationItems WHERE title = objTitle) = 1) THEN
 		RETURN 0;
 	END IF;
 	RETURN 1;
@@ -148,7 +148,7 @@ END;
 CREATE TRIGGER beforeDeleteEmployee
 BEFORE DELETE ON Employees FOR EACH ROW
 BEGIN
-  IF ((SELECT COUNT(*) FROM TableAssignments WHERE employeeId = OLD.id LIMIT 1) = 1) THEN
+  IF ((SELECT COUNT(*) FROM TableAssignments WHERE employeeId = OLD.id) = 1) THEN
     SIGNAL SQLSTATE '45000'
     SET MESSAGE_TEXT = 'Employees cannot be deleted if they are currently assigned to any tables.';
   END IF;
@@ -290,16 +290,16 @@ CREATE TRIGGER beforeUpdateMenuCategory
 BEFORE UPDATE ON MenuCategories FOR EACH ROW
 BEGIN
 	IF (OLD.quickCode <> NEW.quickCode OR OLD.title <> NEW.title) THEN
-		IF ((SELECT COUNT(*) FROM menuCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		IF ((SELECT COUNT(*) FROM menuCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
-		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
 		END IF; 
@@ -310,16 +310,16 @@ CREATE TRIGGER beforeUpdateMenuItem
 BEFORE UPDATE ON MenuItems FOR EACH ROW
 BEGIN
 	IF (OLD.quickCode <> NEW.quickCode OR OLD.title <> NEW.title) THEN
-		IF ((SELECT COUNT(*) FROM menuCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		IF ((SELECT COUNT(*) FROM menuCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
-		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
 		END IF;  
@@ -330,16 +330,16 @@ CREATE TRIGGER beforeUpdateMenuModificationCategory
 BEFORE UPDATE ON MenuModificationCategories FOR EACH ROW
 BEGIN
 	IF (OLD.quickCode <> NEW.quickCode OR OLD.title <> NEW.title) THEN
-		IF ((SELECT COUNT(*) FROM menuCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		IF ((SELECT COUNT(*) FROM menuCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
-		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
 		END IF; 
@@ -350,16 +350,16 @@ CREATE TRIGGER beforeUpdateMenuModificationItem
 BEFORE UPDATE ON MenuModificationItems FOR EACH ROW
 BEGIN
 	IF (OLD.quickCode <> NEW.quickCode OR OLD.title <> NEW.title) THEN
-		IF ((SELECT COUNT(*) FROM menuCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		IF ((SELECT COUNT(*) FROM menuCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
-		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		ELSEIF ((SELECT COUNT(*) FROM menuItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationCategories WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
-		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title) LIMIT 2) = 1 ) THEN
+		ELSEIF ((SELECT COUNT(*) FROM menuModificationItems WHERE (OLD.quickCode <> NEW.quickCode AND quickCode = NEW.quickCode) OR (OLD.title <> NEW.title AND title = NEW.title)) = 1 ) THEN
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'Duplicate entry';
 		END IF;   
@@ -370,23 +370,23 @@ CREATE TRIGGER beforeInsertTableLog
 BEFORE INSERT ON TableLog FOR EACH ROW
 BEGIN
 	DECLARE onlyEmp INT UNSIGNED;
-	IF ((NEW.tableId IS NOT NULL) AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId LIMIT 1) = 0) THEN
+	IF ((NEW.tableId IS NOT NULL) AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId) = 0) THEN
 		-- if table id is invalid
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Specified table does not exist!';
-	ELSEIF ((NEW.authorizationId IS NOT NULL) AND (SELECT COUNT(*) FROM Employees WHERE id = NEW.authorizationId LIMIT 1) = 0) THEN
+	ELSEIF ((NEW.authorizationId IS NOT NULL) AND (SELECT COUNT(*) FROM Employees WHERE id = NEW.authorizationId) = 0) THEN
 		-- if an authorization employee number is specified, but it's invalid
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Specifed authorization employee ID does not exist!';
-	ELSEIF ((NEW.employeeId IS NOT NULL) AND ((SELECT COUNT(*) FROM Employees WHERE id = NEW.employeeId LIMIT 1) = 0)) THEN
+	ELSEIF ((NEW.employeeId IS NOT NULL) AND ((SELECT COUNT(*) FROM Employees WHERE id = NEW.employeeId) = 0)) THEN
 		-- if an employee number is specified, but it's invalid
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Specifed employee ID does not exist!';
-	ELSEIF ((NEW.ticketId IS NOT NULL) AND (SELECT COUNT(*) FROM Tickets WHERE id = NEW.ticketId LIMIT 1) = 0) THEN
+	ELSEIF ((NEW.ticketId IS NOT NULL) AND (SELECT COUNT(*) FROM Tickets WHERE id = NEW.ticketId) = 0) THEN
 		-- if a ticket number is specified, but it's invalid
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Specifed ticket number does not exist!';
-	ELSEIF (NEW.action = 'Add' AND NEW.ticketId IS NOT NULL AND NEW.tableId IS NOT NULL AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status IN ('seated', 'disabled') LIMIT 2) = 1) THEN
+	ELSEIF (NEW.action = 'Add' AND NEW.ticketId IS NOT NULL AND NEW.tableId IS NOT NULL AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status IN ('seated', 'disabled')) = 1) THEN
 		-- if you're assigning a ticket to a table, but it's occupied or disabled	
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Cannot assign a Ticket to an Unassigned or Occupied Table!';
@@ -403,7 +403,7 @@ BEGIN
 		-- if you're trying to set the table as disabled but the table status <> unassigned
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Cannot Disable Table! Status Must Be Unassigned!';
-	ELSEIF (NEW.action = 'SetBused' AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status = 'bussing' LIMIT 1) = 0) THEN	
+	ELSEIF (NEW.action = 'SetBused' AND (SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId AND status = 'bussing') = 0) THEN	
 		-- if you're setting the bused flag but the table isn't flagged as bussing
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Specified Table is not marked for bussing. Cannot set status to bused.';
@@ -445,7 +445,7 @@ BEGIN
 		UPDATE Tables SET status = 'bussing' WHERE id = NEW.tableId;
 	ELSEIF (NEW.action = 'Remove' AND NEW.employeeId IS NOT NULL) THEN
 		DELETE FROM TableAssignments WHERE employeeId = NEW.employeeId and tableId = NEW.tableId;
-		IF (((SELECT COUNT(*) FROM Tickets WHERE tableId = NEW.TableId) = 0) AND 
+		IF (((SELECT COUNT(*) FROM TableAssignemnts WHERE tableId = NEW.TableId) = 0) AND 
 		((SELECT COUNT(*) FROM Tables WHERE id = NEW.tableId and status = 'bussing')) = 0) THEN
 			UPDATE Tables SET status = 'unassigned' WHERE id = NEW.tableId;
 		END IF;
@@ -470,7 +470,7 @@ CREATE FUNCTION userPasswordHash(uname VARCHAR(25)) RETURNS CHAR(60)
 BEGIN
 	DECLARE empId INT UNSIGNED;
 	DECLARE hashReturn CHAR(60);
-	IF ((SELECT COUNT(*) FROM Employees WHERE userName = uname LIMIT 1) = 0) THEN
+	IF ((SELECT COUNT(*) FROM Employees WHERE userName = uname) = 0) THEN
 		-- Invalid Employee Id
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Username not found!';
@@ -496,7 +496,7 @@ END;
 CREATE FUNCTION idFromUsername(uname VARCHAR(25)) RETURNS INT UNSIGNED
 BEGIN
 	DECLARE empId INT UNSIGNED;
-	IF ((SELECT COUNT(*) FROM Employees WHERE userName = uname LIMIT 1) = 0) THEN
+	IF ((SELECT COUNT(*) FROM Employees WHERE userName = uname) = 0) THEN
 		-- Invalid Username
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Username not found!';
@@ -750,7 +750,7 @@ BEGIN
 	IF (cnt = 0) THEN
 		UPDATE Config SET businessDay = NOW();
 	END IF;
-	IF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername LIMIT 1) = 0) THEN
+	IF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername) = 0) THEN
 		-- Invalid Employee Id
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Username not found!';
@@ -761,8 +761,8 @@ BEGIN
 			-- Invalid Requested Roles
 			SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'You do not have the authorization to login with the role you specified!';
-		ELSEIF ((SELECT COUNT(*) FROM Employees WHERE accessToken = newAccessToken AND userName <> requestedUsername LIMIT 2) = 1 ) THEN
-			IF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername AND accessToken IS NOT NULL AND accessTokenExpiration > now() LIMIT 2) = 1) THEN
+		ELSEIF ((SELECT COUNT(*) FROM Employees WHERE accessToken = newAccessToken AND userName <> requestedUsername) = 1 ) THEN
+			IF ((SELECT COUNT(*) FROM Employees WHERE userName = requestedUsername AND accessToken IS NOT NULL AND accessTokenExpiration > now()) = 1) THEN
 				CALL logout(requestedUsername);
 			END IF;
 			-- Another user is already logged in using your access key.
@@ -784,7 +784,7 @@ END;
 CREATE PROCEDURE logout(IN uname VARCHAR(25))
 BEGIN
 	DECLARE empId INT UNSIGNED;
-	IF ((SELECT COUNT(*) FROM Employees WHERE userName = uname LIMIT 1) = 0) THEN
+	IF ((SELECT COUNT(*) FROM Employees WHERE userName = uname) = 0) THEN
 		-- Invalid Employee Id
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Username not found!';
@@ -804,7 +804,7 @@ BEGIN
 	DECLARE del DATETIME;
 	DECLARE menItm VARCHAR(10);
 	DECLARE rte CHAR(1);
-	IF ((SELECT COUNT(*) FROM TicketItems WHERE id = ticketNum LIMIT 1) = 0) THEN
+	IF ((SELECT COUNT(*) FROM TicketItems WHERE id = ticketNum) = 0) THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Ticket Item Number Not Found!';
 	ELSE
@@ -867,7 +867,7 @@ BEGIN
 	SELECT businessDay FROM Config INTO bDay;
 	SET newItemIndex = 1;
 	SELECT tableId INTO tbl FROM Tickets WHERE id = ticketNumber;
-	IF ((SELECT COUNT(*) FROM Tickets WHERE id = ticketNumber LIMIT 1) = 0) THEN
+	IF ((SELECT COUNT(*) FROM Tickets WHERE id = ticketNumber) = 0) THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Ticket Item Number Doesn''t Exist!';
 	ELSEIF (split > 9) THEN
@@ -923,7 +923,7 @@ BEGIN
 	DECLARE splitFlg SMALLINT UNSIGNED;
 	DECLARE tickGrp DECIMAL(6, 2);
 	SELECT ticketId, splitFlag, groupId INTO tickNum, splitFlg, tickGrp FROM TicketItems WHERE id = ticketItemNumber;
-	IF ((SELECT COUNT(*) FROM TicketItems WHERE id = ticketItemNumber LIMIT 1) = 0) THEN
+	IF ((SELECT COUNT(*) FROM TicketItems WHERE id = ticketItemNumber) = 0) THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Ticket Item Number Doesn''t Exist!';
 	ELSE
@@ -952,7 +952,7 @@ BEGIN
 	DECLARE splitFlg SMALLINT UNSIGNED;
 	SELECT ticketItemStatus(ticketItemNumber) INTO stat;
 	SELECT ticketId, splitFlag INTO tickNum, splitFlg FROM TicketItems WHERE id = ticketItemNumber;
-	IF ((SELECT COUNT(*) FROM TicketItems WHERE id = ticketItemNumber LIMIT 1) = 0) THEN
+	IF ((SELECT COUNT(*) FROM TicketItems WHERE id = ticketItemNumber) = 0) THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Ticket Item Number Doesn''t Exist!';
 	ELSEIF (authorizationUsername IS NULL) THEN
@@ -1289,7 +1289,7 @@ BEGIN
 		
 		-- if no matches are found, delete tickGrp from ActiveTicketGroups table.
 		-- Occurs when ticket item is canceled after submission, or item marked as ready
-		IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) NOT IN ('Delivered', 'Canceled', 'Hidden' ) LIMIT 1) = 0) THEN
+		IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) NOT IN ('Delivered', 'Canceled', 'Hidden' )) = 0) THEN
 			DELETE FROM ActiveTicketGroups WHERE id = tickGrp;
 		END IF;
 	ELSEIF (flag = 1) THEN
@@ -1299,12 +1299,12 @@ BEGIN
 
 		-- occurs when a ticket items's ready state is rescinded or
 		-- ticket item is sent back to the kitchen to be reprepared.
-		IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) IN ('Preparing', 'Updated') LIMIT 1) > 0
-			AND (SELECT COUNT(*) FROM ActiveTicketGroups WHERE id = tickGrp LIMIT 1) = 0) THEN
+		IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) IN ('Preparing', 'Updated')) > 0
+			AND (SELECT COUNT(*) FROM ActiveTicketGroups WHERE id = tickGrp) = 0) THEN
 			
 			SELECT route into rte FROM TicketItems
 			INNER JOIN MenuItems ON menuItemQuickCode = quickCode
-			WHERE groupId = tickGrp LIMIT 1;
+			WHERE groupId = tickGrp;
 			INSERT INTO ActiveTicketGroups (id, route) VALUES (tickGrp, rte);
 		END IF;
 	END IF; 
@@ -1314,7 +1314,7 @@ END;
 
 CREATE PROCEDURE closeTicketGroup(tickGrp DECIMAL(6, 2))
 BEGIN
-	IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) IN ('Preparing', 'Updated') LIMIT 1) = 0) THEN
+	IF ((SELECT COUNT(*) FROM TicketItems WHERE groupId = tickGrp AND ticketItemStatus(id) IN ('Preparing', 'Updated')) = 0) THEN
 			DELETE FROM ActiveTicketGroups WHERE id = tickGrp;
 	END IF;
 END;
@@ -1327,7 +1327,7 @@ BEGIN
 	SELECT POWER(2, split) INTO sf;
 	UPDATE Tickets SET timeModified = NOW() WHERE id = ticketNumber;
 	
-	IF ((SELECT COUNT(*) FROM TicketItems WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf LIMIT 1) = 0) THEN
+	IF ((SELECT COUNT(*) FROM TicketItems WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf) = 0) THEN
 		DELETE FROM Splits WHERE ticketId = ticketNumber AND splitId = split;
 	ELSE
 		UPDATE Splits SET timeModified = NOW() WHERE ticketId = ticketNumber AND splitId = split;
@@ -1343,7 +1343,7 @@ BEGIN
 		SET sf = 1023;
 	END IF;
 
-	IF ((SELECT COUNT(*) FROM TicketItems WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf LIMIT 1) = 0) THEN
+	IF ((SELECT COUNT(*) FROM TicketItems WHERE ticketId = ticketNumber AND (splitFlag & sf) = sf) = 0) THEN
 		DELETE FROM Splits WHERE ticketId = ticketNumber AND (POWER(2, splitId) & sf) = sf;
 	ELSE
 		UPDATE Splits SET timeModified = NOW() WHERE ticketId = ticketNumber AND (POWER(2, splitId) & sf) = sf;
@@ -1375,7 +1375,7 @@ BEGIN
 	-- new split. Add Split record.
 	DECLARE bDay DATE;
 	SELECT businessDay FROM Config INTO bDay;
-	IF ((SELECT COUNT(*) FROM Splits WHERE ticketId = ticketNumber AND splitId = splitNumber LIMIT 1) = 0) THEN
+	IF ((SELECT COUNT(*) FROM Splits WHERE ticketId = ticketNumber AND splitId = splitNumber) = 0) THEN
 		INSERT INTO Splits (ticketId, splitId, businessDay) VALUES (ticketNumber, splitNumber, bDay);
 	END IF;
 END;
@@ -1383,7 +1383,7 @@ END;
 CREATE PROCEDURE removeSplit(IN ticketNumber INT UNSIGNED, IN splitNumber SMALLINT UNSIGNED)
 BEGIN
 	-- new split. Add Split record.
-	IF ((SELECT COUNT(*) FROM Splits WHERE ticketId = ticketNumber AND splitId = splitNumber LIMIT 1) = 0) THEN
+	IF ((SELECT COUNT(*) FROM Splits WHERE ticketId = ticketNumber AND splitId = splitNumber) = 0) THEN
 		DELETE FROM Splits WHERE ticketId = ticketNumber AND splitId = splitNumber;
 	END IF;
 END;
