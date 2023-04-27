@@ -365,9 +365,8 @@
 					
 			}
             catch (Exception $e) {
-            //    $errorMessage = $e->getMessage();
-                //$footer = $e->getMessage();
-                throw $e;
+                $errorMessage = $e->getMessage();
+                $footer = $e->getMessage();
             }
             			
 		}
