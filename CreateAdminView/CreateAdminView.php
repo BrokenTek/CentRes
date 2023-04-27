@@ -14,7 +14,7 @@
         <meta charset="UTF-8"><meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="../Resources/CSS/baseStyle.css">
-        
+        <title>CentRes RMS: Admin Setup</title>
         <script src="../Resources/JavaScript/display.js" type="text/javascript"></script> 
         <script>
             function allElementsLoaded() {
