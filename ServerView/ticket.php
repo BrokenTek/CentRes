@@ -304,6 +304,7 @@
 				}
                 elseif ($_POST['command'] == 'submitPending') {
 					$sql = "CALL submitPendingTicketItems(" .$_POST['ticket']. ", ". (isset($_POST['split']) ? $_POST['split'] : "10") . ");";
+                    echo("<h1>$sql</h1>");
                     connection()->query($sql);
 				}
                 elseif ($_POST['command'] == 'close'){
@@ -366,7 +367,8 @@
 			}
             catch (Exception $e) {
             //    $errorMessage = $e->getMessage();
-                $footer = $e->getMessage();
+                //$footer = $e->getMessage();
+                throw $e;
             }
             			
 		}
