@@ -56,11 +56,15 @@
                 // Populate Menu
                 $query = file_get_contents("CentResPopulateMenuWithAssociations.sql"); // Populate not Popuolate
                 $dbh->exec($query);
-                
                 print("<h1>☑ Loaded Menu as to Database</h1>");
 
+                // Populate Demo Script
+                $query = file_get_contents("demoSetup.sql"); // Populate not Popuolate
+                $dbh->exec($query);
+                print("<hr><h1>☑ Demo Script Loaded.... Tickets and Parties have been assigned.</h1>");
+
                 // Message to verify the success of all queries in the block
-                echo("<script>resetSuccessful = true;</script>");
+                //echo("<script>resetSuccessful = true;</script>");
 
                 //echo("<script>location.replace('../CreateAdminView/CreateAdminView.php');</script>");
 
